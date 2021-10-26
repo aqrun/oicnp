@@ -1,3 +1,4 @@
 [workspace]
-members = ["backend", "frontend-tera"]
-default-member = "backend"
+members = ["api", "frontend-tera"]
+exclude = ["backend", "frontend"]
+default-members = ["api"]

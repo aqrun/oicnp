@@ -4,7 +4,7 @@ pub mod queries;
 pub use queries::*;
 pub use mutations::*;
 
-use tide::{http::mime, Request, Response, StatusCode, Body};
+use poem::{http::mime, Request, Response, StatusCode, Body};
 use async_graphql::{
     Schema, EmptySubscription,
     http::{
