@@ -18,6 +18,7 @@ serde = {version = "1.0", features = ["derive"]}
 slab = "0.4.3"
 diesel = { version = "1.4.4", features = ["postgres", "chrono", "uuid", "r2d2"] }
 chrono = { version = "0.4.19", features = ["serde"] }
+tracing-subscriber = "0.2"
 
 [[bin]]
 name = "main"

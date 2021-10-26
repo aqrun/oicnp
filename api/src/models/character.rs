@@ -32,7 +32,7 @@ pub enum Character {
 }
 
 /// 角色
-#[derive(Queryabel)]
+#[derive(Queryable)]
 pub struct StarWarsChar {
     pub id: i32,
     // 姓名
@@ -52,7 +52,7 @@ pub struct StarWarsChar {
 }
 
 
-#[derive(Queryabel)]
+#[derive(Queryable)]
 #[table_name="users"]
 pub struct User {
     pub id: i32,

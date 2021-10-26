@@ -15,14 +15,16 @@ pub async fn run() -> Result<(), std::io::Error> {
     }
     tracing_subscriber::fmt::init();
 
-    let state = State { schema };
-    let schema = build_schema().await;
-    let app = Route::new()
-        .at(G.get(GRAPHQL_PATH), get(graphiql).post(graphql))
-        .data(state);
-
+    let path = G.get(GRAPHQL_PATH).unwrap();
     let address = G.get(ADDRESS).unwrap();
     let port = G.get(PORT).unwrap();
+
+    let schema = build_schema().await;
+    let state = State { schema };
+    let app = Route::new()
+        .at(path, get(graphiql).post(graphql))
+        .data(state);
+
     println!("Playground: https://{}:{}", address, port);
 
     let listener = TcpListener::bind(

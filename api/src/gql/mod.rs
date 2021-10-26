@@ -4,7 +4,8 @@ pub mod queries;
 pub use queries::*;
 pub use mutations::*;
 
-use poem::{http::mime, Request, Response, StatusCode, Body};
+use poem::{IntoResponse, web::{Html, Data}, Endpoint, EndpointExt, handler};
+use async_graphql_poem::GraphQL;
 use async_graphql::{
     Schema, EmptySubscription,
     http::{
@@ -29,28 +30,19 @@ pub async fn build_schema() -> Schema<QueryRoot, MutationRoot, EmptySubscription
         .finish()
 }
 
-pub async fn graphql(req: Request<State>) -> tide::Result {
-    let schema = req.state().schema.clone();
-    let gql_resp = schema.execute(
-        receive_json(req).await?
-    ).await;
-
-    let mut resp = Response::new(StatusCode::Ok);
-    resp.set_body(Body::from_json(&gql_resp)?);
-
-    Ok(resp.into())
+#[handler]
+pub async fn graphql(data: Data<State>) -> GraphQL<QueryRoot, MutationRoot, EmptySubscription> {
+    let schema = data.0.schema.clone();
+    GraphQL::new(schema)
 }
 
-pub async fn graphiql(_: Request<State>) -> tide::Result {
-    let mut resp = Response::new(StatusCode::Ok);
-    resp.set_body(playground_source(
+#[handler]
+pub async fn graphiql() -> impl IntoResponse {
+    Html(playground_source(
         GraphQLPlaygroundConfig::new(
-            G.get(GRAPHIQL_PATH).unwrap(),
+            G.get(GRAPHIQL_PATH).unwrap()
         )
-    ));
-    resp.set_content_type(mime::HTML);
-
-    Ok(resp.into())
+    ))
 }
 
 

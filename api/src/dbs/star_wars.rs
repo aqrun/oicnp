@@ -22,7 +22,7 @@ pub struct StarWars {
 impl StarWars {
     #[allow(clippy::new_without_default)]
     pub fn new() {
-        let mut chars = Slab::new();
+        let mut chars: Slab<StarWarsChar> = Slab::new();
 /*
         let luke = chars.insert(StarWarsChar {
             id: "1000",
