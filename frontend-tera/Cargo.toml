@@ -1,0 +1,5 @@
+[package]
+name = "frontend-tera"
+version = "0.1.0"
+authors = ["Aqrun <aqrun@sina.com>"]
+edition = "2018"
