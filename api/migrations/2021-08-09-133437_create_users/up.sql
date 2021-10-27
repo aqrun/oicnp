@@ -1,24 +1,48 @@
 
 
 create table users (
-    id SERIAL PRIMARY KEY,
+    uid SERIAL PRIMARY KEY,
     name VARCHAR(128) NOT NULL,
-    en_name VARCHAR(128) NOT NULL,
-    user_type VARCHAR(20) NOT NULL,
-    appears_in VARCHAR DEFAULT '',
-    home_planet VARCHAR,
-    primary_function VARCHAR,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-COMMENT ON COLUMN users.user_type is '用户类型 1：人类，2：机器人';
-COMMENT ON COLUMN users.appears_in is '用户出演的电影系统逗号隔开';
-
-CREATE TABLE user_friends (
-    id INTEGER NOT NULL,
-    friend_id INTEGER NOT NULL,
+    password VARCHAR(64) NOT NULL,
+    status SMALLINT NOT NULL DEFAULT 1,
+    email VARCHAR(128) NOT NULL,
+    admin BOOLEAN DEFAULT false,
+    intro VARCHAR DEFAULT '',
+    last_login_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    salt VARCHAR(64) DEFAULT '',
+    must_change_password boolean DEFAULT false,
+    password_changed_on TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id, friend_id)
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-COMMENT ON COLUMN user_friends.id is '关联 users.id';
-COMMENT ON COLUMN user_friends.friend_id is '关联 users.id';
+
+COMMENT ON COLUMN users.gender is '性别 1：男，2：女';
+COMMENT ON COLUMN users.admin is '是否管理员';
+
+CREATE TABLE posts (
+    pid SERIAL PRIMARY KEY,
+    vid VARCHAR NOT NULL
+    	CONSTRAINT posts_vid_unique_key UNIQUE,
+    uid INTEGER NOT NULL,
+    title VARCHAR NOT NULL,
+    summary TEXT,
+    body TEXT,
+    body_format VARCHAR(20),
+    deleted BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by INTEGER,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_by INTEGER
+);
+
+CREATE TABLE taxonomies (
+    tid SERIAL PRIMARY KEY,
+    vid VARCHAR NOT NULL
+    	CONSTRAINT taxonomies_vid_unique_key UNIQUE,
+    parent_tid INTEGER DEFAULT 0,
+    bundle VARCHAR(64) NOT NULL,
+    name VARCHAR(128) NOT NULL,
+    description VARCHAR NOT NULL
+);
+
+
