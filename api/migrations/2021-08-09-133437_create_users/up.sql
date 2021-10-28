@@ -14,7 +14,7 @@ CREATE TABLE file (
 COMMENT ON COLUMN file.storage is '资源存储位置类型如 local,qiniu(七牛),oos(阿里OOS)';
 CREATE INDEX file_uri__idx ON file (uri);
 
-CREATE TABLE user (
+CREATE TABLE users (
     uid SERIAL PRIMARY KEY,
     username VARCHAR(128) NOT NULL
         CONSTRAINT user_username_unique_key UNIQUE,
@@ -32,7 +32,7 @@ CREATE TABLE user (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-COMMENT ON COLUMN user.admin is '是否管理员';
+COMMENT ON COLUMN users.admin is '是否管理员';
 
 CREATE TABLE user_picture (
     bundle VARCHAR(20) NOT NULL,
