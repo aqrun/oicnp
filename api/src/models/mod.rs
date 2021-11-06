@@ -1,7 +1,3 @@
-pub mod droid;
-pub mod human;
-pub mod character;
+pub mod users;
 
-pub use droid::*;
-pub use human::*;
-pub use character::*;
+pub use users::*;

@@ -15,18 +15,16 @@ use async_graphql::{
 use crate::G;
 use crate::typings::{State};
 use crate::constants::{GRAPHIQL_PATH};
-use crate::dbs::StarWars;
 
 pub async fn build_schema() -> Schema<QueryRoot, MutationRoot, EmptySubscription> {
     // TODO: init by real database
-    let database = StarWars::new();
+    // let database = StarWars::new();
 
     Schema::build(
         QueryRoot,
         MutationRoot,
         EmptySubscription,
     )
-        .data(database)
         .finish()
 }
 

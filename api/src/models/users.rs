@@ -1,7 +1,9 @@
 use chrono::NaiveDateTime;
+use diesel::prelude::*;
+use crate::schema::users;
 
 #[derive(Queryable)]
-#[tablename = "users"]
+#[table_name = "users"]
 pub struct User {
     pub uid: i32,
     pub username: String,
@@ -20,7 +22,7 @@ pub struct User {
 }
 
 #[derive(Insertable)]
-#[tablename = "users"]
+#[table_name = "users"]
 pub struct NewUser {
     pub username: String,
     pub nickname: String,
