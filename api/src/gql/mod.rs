@@ -4,13 +4,15 @@ pub mod queries;
 pub use queries::*;
 pub use mutations::*;
 
-use poem::{IntoResponse, web::{Html, Data}, Endpoint, EndpointExt, handler};
-use async_graphql_poem::GraphQL;
+use poem::{
+    IntoResponse, web::{Html, Data, Json}, handler
+};
 use async_graphql::{
     Schema, EmptySubscription,
     http::{
-        GraphQLPlaygroundConfig, playground_source, receive_json,
+        GraphQLPlaygroundConfig, playground_source,
     },
+    Request, Response,
 };
 use crate::G;
 use crate::typings::{State};
@@ -29,13 +31,13 @@ pub async fn build_schema() -> Schema<QueryRoot, MutationRoot, EmptySubscription
 }
 
 #[handler]
-pub async fn graphql(data: Data<State>) -> GraphQL<QueryRoot, MutationRoot, EmptySubscription> {
+pub async fn graphql(data: Data<&State>, req: Json<Request>) -> Json<Response> {
     let schema = data.0.schema.clone();
-    GraphQL::new(schema)
+    Json(schema.execute(req.0).await)
 }
 
 #[handler]
-pub async fn graphiql() -> impl IntoResponse {
+pub fn graphiql() -> impl IntoResponse {
     Html(playground_source(
         GraphQLPlaygroundConfig::new(
             G.get(GRAPHIQL_PATH).unwrap()

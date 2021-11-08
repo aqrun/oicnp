@@ -1,7 +1,7 @@
-use async_graphql::{Object, Context, FieldResult};
+use async_graphql::{Object, Context};
 use crate::typings::{GqlResult};
-use async_graphql::connection::{Connection, EmptyFields};
-use crate::services;
+// use async_graphql::connection::{Connection, EmptyFields};
+// use crate::services;
 
 pub struct QueryRoot;
 
