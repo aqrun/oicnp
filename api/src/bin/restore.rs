@@ -1,9 +1,10 @@
 /// 历史数据恢复
 ///
-use std::env;
 use std::path::PathBuf;
 use std::fs;
 use std::io::Read;
+use api::utils::G;
+use api::constants::BLOG_BASE;
 
 #[derive(Debug)]
 struct Category<'a> {
@@ -45,9 +46,9 @@ impl<'a> Blog<'a> {
     }
 }
 
-const BLOG_BASE: &'static str = "/Users/aqrun/workspace/github.com/aqrun/aqrun.github.io";
-
 fn main () {
+    let blog_base = G.get(BLOG_BASE).unwrap();
+    println!("blogbase: {}", blog_base);
     let categories = [
         Category { name: "backend", dir: "blog/backend/_posts" },
         Category { name: "frontend", dir: "blog/frontend/_posts" },
@@ -56,7 +57,7 @@ fn main () {
         Category { name: "diary", dir: "blog/diary/_posts" },
     ];
     // let cwd = env::current_dir().unwrap();
-    let base = PathBuf::from(BLOG_BASE);
+    let base = PathBuf::from(blog_base);
     let mut allBlogs: Vec<Blog> = vec!();
     let mut index = 0;
 
@@ -64,7 +65,8 @@ fn main () {
         let mut dir = base.clone();
         dir.push(item.dir);
 
-        let entries = fs::read_dir(dir).expect("Read dir failed");
+	let str_dir = String::from(dir.to_str().unwrap());
+        let entries = fs::read_dir(dir).expect(&format!("Read dir failed: {}", &str_dir));
 
         for m in entries {
             let entry = m.unwrap();

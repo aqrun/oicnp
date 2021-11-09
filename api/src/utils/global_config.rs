@@ -5,7 +5,7 @@ use crate::constants::{
     ADDRESS, PORT, GRAPHQL_PATH, GRAPHIQL_PATH,
     DEFAULT_ADDRESS, DEFAULT_PORT,
     DEFAULT_GRAPHQL_PATH, DEFAULT_GRAPHIQL_PATH,
-    DATABASE_URL,
+    DATABASE_URL, BLOG_BASE,
 };
 
 lazy_static! {
@@ -23,6 +23,7 @@ lazy_static! {
         map.insert(PORT, var(PORT).unwrap_or(DEFAULT_PORT.into()));
         map.insert(GRAPHQL_PATH, var(GRAPHQL_PATH).unwrap_or(DEFAULT_GRAPHQL_PATH.into()));
         map.insert(GRAPHIQL_PATH, var(GRAPHIQL_PATH).unwrap_or(DEFAULT_GRAPHIQL_PATH.into()));
+	map.insert(BLOG_BASE, var(BLOG_BASE).expect("BLOG_BASE not setting"));
 
         map
     };

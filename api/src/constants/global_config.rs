@@ -11,6 +11,7 @@ pub const PORT: &'static str = "PORT";
 pub const GRAPHQL_PATH: &'static str = "GRAPHQL_PATH";
 /// graphiql
 pub const GRAPHIQL_PATH: &'static str = "GRAPHIQL_PATH";
+pub const BLOG_BASE: &'static str = "BLOG_BASE";
 
 /// 默认地址
 pub const DEFAULT_ADDRESS: &'static str = "0.0.0.0";
