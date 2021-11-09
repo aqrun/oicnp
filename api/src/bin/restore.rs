@@ -104,12 +104,12 @@ fn generate_blog<'a>(file_name: String, content: String, file_path: String) -> R
         dir: "blog"
     };
 
-    let (date, slug) = generate_slug(String::from(file_name));
+    let (date, slug) = generate_slug(&file_name);
 
     let blog = Blog {
         slug,
         date,
-        file: String::from(file_name),
+        file: String::from(&file_name),
         file_path,
         title: String::from(""),
         tags: vec!(),
@@ -121,7 +121,7 @@ fn generate_blog<'a>(file_name: String, content: String, file_path: String) -> R
 }
 
 
-fn generate_slug(file_name: String) -> (String, String) {
+fn generate_slug(file_name: &str) -> (String, String) {
     let mut file_arr: Vec<&str> = file_name.split(".").collect();
     file_arr.pop();
     let new_file_name = file_arr.join("-");
