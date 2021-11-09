@@ -2,19 +2,19 @@ table! {
     comment (cid) {
         cid -> Int4,
         uid -> Int8,
-        pid -> Nullable<Int8>,
-        status -> Nullable<Int2>,
+        pid -> Int8,
+        status -> Int2,
         bundle -> Varchar,
         target_id -> Int8,
         subject -> Varchar,
-        name -> Nullable<Varchar>,
-        email -> Nullable<Varchar>,
-        homepage -> Nullable<Varchar>,
-        hostname -> Nullable<Varchar>,
-        created_at -> Nullable<Timestamp>,
-        created_by -> Nullable<Int4>,
-        updated_at -> Nullable<Timestamp>,
-        updated_by -> Nullable<Int4>,
+        name -> Varchar,
+        email -> Varchar,
+        homepage -> Varchar,
+        hostname -> Varchar,
+        created_at -> Timestamp,
+        created_by -> Int4,
+        updated_at -> Timestamp,
+        updated_by -> Int4,
     }
 }
 
@@ -40,11 +40,11 @@ table! {
         filename -> Varchar,
         uri -> Varchar,
         storage -> Varchar,
-        mime -> Nullable<Varchar>,
-        sie -> Nullable<Int8>,
-        status -> Nullable<Int2>,
-        created_at -> Nullable<Timestamp>,
-        updated_at -> Nullable<Timestamp>,
+        mime -> Varchar,
+        sie -> Int8,
+        status -> Int2,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
     }
 }
 
@@ -55,11 +55,12 @@ table! {
         uid -> Int4,
         bundle -> Varchar,
         title -> Varchar,
-        deleted -> Nullable<Bool>,
-        created_at -> Nullable<Timestamp>,
-        created_by -> Nullable<Int4>,
-        updated_at -> Nullable<Timestamp>,
-        updated_by -> Nullable<Int4>,
+        deleted -> Bool,
+        published_at -> Int4,
+        created_at -> Timestamp,
+        created_by -> Int4,
+        updated_at -> Timestamp,
+        updated_by -> Int4,
     }
 }
 
@@ -68,7 +69,7 @@ table! {
         nid -> Int4,
         summary -> Nullable<Text>,
         body -> Nullable<Text>,
-        body_format -> Nullable<Varchar>,
+        body_format -> Varchar,
     }
 }
 
@@ -93,11 +94,11 @@ table! {
         bundle -> Varchar,
         nid -> Int4,
         fid -> Int4,
-        weight -> Nullable<Int4>,
-        alt -> Nullable<Varchar>,
-        title -> Nullable<Varchar>,
-        width -> Nullable<Int4>,
-        height -> Nullable<Int4>,
+        weight -> Int4,
+        alt -> Varchar,
+        title -> Varchar,
+        width -> Int4,
+        height -> Int4,
     }
 }
 
@@ -113,12 +114,12 @@ table! {
     taxonomy (tid) {
         tid -> Int4,
         vid -> Varchar,
-        pid -> Nullable<Int4>,
+        pid -> Int4,
         bundle -> Varchar,
         name -> Varchar,
         description -> Varchar,
-        description_format -> Nullable<Varchar>,
-        weight -> Nullable<Int4>,
+        description_format -> Varchar,
+        weight -> Int4,
     }
 }
 
@@ -127,11 +128,11 @@ table! {
         bundle -> Varchar,
         uid -> Int4,
         fid -> Int4,
-        weight -> Nullable<Int4>,
-        alt -> Nullable<Varchar>,
-        title -> Nullable<Varchar>,
-        width -> Nullable<Int8>,
-        height -> Nullable<Int8>,
+        weight -> Int4,
+        alt -> Varchar,
+        title -> Varchar,
+        width -> Int8,
+        height -> Int8,
     }
 }
 
@@ -139,18 +140,18 @@ table! {
     users (uid) {
         uid -> Int4,
         username -> Varchar,
-        nickname -> Nullable<Varchar>,
+        nickname -> Varchar,
         password -> Varchar,
         status -> Int2,
         email -> Varchar,
-        admin -> Nullable<Bool>,
-        intro -> Nullable<Varchar>,
-        last_login_on -> Nullable<Timestamp>,
-        salt -> Nullable<Varchar>,
-        must_change_password -> Nullable<Bool>,
-        password_changed_on -> Nullable<Timestamp>,
-        created_at -> Nullable<Timestamp>,
-        updated_at -> Nullable<Timestamp>,
+        admin -> Bool,
+        intro -> Varchar,
+        last_login_on -> Timestamp,
+        salt -> Varchar,
+        must_change_password -> Bool,
+        password_changed_on -> Int4,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
     }
 }
 

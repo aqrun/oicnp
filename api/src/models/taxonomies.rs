@@ -1,8 +1,10 @@
+use crate::schema::taxonomy;
 
-#[derive(Queryable)]
+#[derive(Queryable, Debug)]
 pub struct Taxonomy {
     pub tid: i32,
-    pub vid: i32,
+    pub vid: String,
+    pub pid: i32,
     pub bundle: String,
     pub name: String,
     pub description: String,
@@ -13,7 +15,8 @@ pub struct Taxonomy {
 #[derive(Insertable)]
 #[table_name = "taxonomy"]
 pub struct NewTaxonomy {
-    pub vid: i32,
+    pub vid: String,
+    pub pid: i32,
     pub bundle: String,
     pub name: String,
     pub description: String,

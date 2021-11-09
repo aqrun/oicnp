@@ -6,6 +6,16 @@ use std::io::Read;
 use api::utils::G;
 use api::constants::BLOG_BASE;
 use regex::Regex;
+use gray_matter::Matter;
+use gray_matter::engine::YAML;
+use api::dbs::establish_connection;
+use std::sync::Arc;
+use diesel::pg::PgConnection;
+use api::schema::taxonomy;
+use diesel::prelude::*;
+use api::models::{
+    Taxonomy,
+};
 
 #[derive(Debug)]
 struct Category<'a> {
@@ -49,6 +59,7 @@ impl<'a> Blog<'a> {
 
 fn main () {
     let blog_base = G.get(BLOG_BASE).unwrap();
+    let conn = establish_connection();
     println!("blogbase: {}", blog_base);
     let categories = [
         Category { name: "backend", dir: "blog/backend/_posts" },
@@ -80,7 +91,10 @@ fn main () {
                 content,
                 String::from(entry.path().to_str().expect("Invalid str"))
             ) {
-                allBlogs.push(blog);
+                // allBlogs.push(blog);
+                save_tags(&conn, &blog.tags);
+                save_category(&conn, &blog.category);
+                save_blog(&conn, &blog);
             }
 
             index += 1;
@@ -95,8 +109,26 @@ fn main () {
             break;
         }
     }
-    println!("{:?}", allBlogs);
 }
+
+fn save_tags(conn: &PgConnection, tags: &Vec<String>) {
+    use taxonomy::dsl;
+    for tag_name in tags {
+        let tag = dsl::taxonomy
+            .filter(dsl::name.eq(tag_name))
+            .filter(dsl::bundle.eq("tag"))
+            .first::<Taxonomy>(conn).expect("Tag query error");
+        println!("{:?}", tag);
+    }
+}
+
+fn save_category(conn: &PgConnection, category: &Category) {
+
+}
+
+fn save_blog(conn: &PgConnection, blog: &Blog) {
+}
+
 
 fn generate_blog<'a>(file_name: String, content: String, file_path: String) -> Result<Blog<'a>, String> {
     let category = Category {
@@ -106,16 +138,28 @@ fn generate_blog<'a>(file_name: String, content: String, file_path: String) -> R
 
     let (date, slug) = generate_slug(&file_name);
 
+    let matter = Matter::<YAML>::new();
+    let res = matter.parse(&content);
+    let data = res.data.as_ref().unwrap();
+    // let layout = &data["layout"].as_string().unwrap();
+    let title = &data["title"].as_string().unwrap();
+    let tags = &data["tags"].as_string().unwrap();
+    let tag_arr = tags.split(" ")
+        .map(|item| String::from(item))
+        .collect();
+    let excerpt = &data["excerpt"].as_string().unwrap();
+    let con = res.content;
+
     let blog = Blog {
         slug,
         date,
         file: String::from(&file_name),
         file_path,
-        title: String::from(""),
-        tags: vec!(),
-        excerpt: String::from(""),
+        title: String::from(title),
+        tags: tag_arr,
+        excerpt: String::from(excerpt),
         category,
-        content: Some(content.clone()),
+        content: Some(con),
     };
     Ok(blog)
 }
@@ -131,7 +175,7 @@ fn generate_slug(file_name: &str) -> (String, String) {
     let day = file_arr[2]; // .parse::<i32>().expect("Day error");
     let date = format!("{}-{}-{}", year, month, day);
 
-    let re = Regex::new(r"[\\.+\\s]+").unwrap();
+    let re = Regex::new(r"[\.+\s]+").unwrap();
     let source_title = file_arr[3..].join("-");
     let title = re.replace_all(&source_title, "-");
     let slug = format!("{}-{}", date, title);

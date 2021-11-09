@@ -14,7 +14,7 @@ pub struct User {
     pub last_login_on: NaiveDateTime,
     pub salt: String,
     pub must_change_password: bool,
-    pub password_changed_on: Option<NaiveDateTime>,
+    pub password_changed_on: i32,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
