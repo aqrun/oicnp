@@ -8,13 +8,13 @@ use api::constants::BLOG_BASE;
 use regex::Regex;
 use gray_matter::Matter;
 use gray_matter::engine::YAML;
-use api::dbs::establish_connection;
+use api::dbs::{get_connection_pool, ConnectionPool};
 use std::sync::Arc;
 use diesel::pg::PgConnection;
 use api::schema::taxonomy;
 use diesel::prelude::*;
 use api::models::{
-    Taxonomy,
+    Taxonomy, NewTaxonomy,
 };
 
 #[derive(Debug)]
@@ -59,8 +59,8 @@ impl<'a> Blog<'a> {
 
 fn main () {
     let blog_base = G.get(BLOG_BASE).unwrap();
-    let conn = establish_connection();
-    println!("blogbase: {}", blog_base);
+    let pool = get_connection_pool();
+
     let categories = [
         Category { name: "backend", dir: "blog/backend/_posts" },
         Category { name: "frontend", dir: "blog/frontend/_posts" },
@@ -92,9 +92,9 @@ fn main () {
                 String::from(entry.path().to_str().expect("Invalid str"))
             ) {
                 // allBlogs.push(blog);
-                save_tags(&conn, &blog.tags);
-                save_category(&conn, &blog.category);
-                save_blog(&conn, &blog);
+                save_tags(pool.clone(), &blog.tags);
+                // save_category(&conn, &blog.category); 
+                // save_blog(&conn, &blog);
             }
 
             index += 1;
@@ -111,15 +111,48 @@ fn main () {
     }
 }
 
-fn save_tags(conn: &PgConnection, tags: &Vec<String>) {
+fn fetch_tag(pool: ConnectionPool, tag_name: &str) -> Result<Taxonomy, String> {
     use taxonomy::dsl;
-    for tag_name in tags {
-        let tag = dsl::taxonomy
-            .filter(dsl::name.eq(tag_name))
-            .filter(dsl::bundle.eq("tag"))
-            .first::<Taxonomy>(conn).expect("Tag query error");
-        println!("{:?}", tag);
+    let conn = pool.get().unwrap();
+    
+    let tag_query = dsl::taxonomy
+	.filter(dsl::name.eq(tag_name))
+	.filter(dsl::bundle.eq("tag"))
+	.first::<Taxonomy>(&conn);
+}
+
+fn save_tag(pool: ConnectionPool, tag_name: &str) -> Result<Taxonomy, String> {
+    use taxonomy::dsl;
+    let conn = pool.get().unwrap();
+    let new_tag = Taxonomy {
+	vid: String::from(tag_name),
+	pid: 0,
+	bundle: String::from("tag"),
+	name: String::from(tag_name),
+	description: String::from(""),
+	description_format: String::from(""),
+	weight: 0,
+    };
+    let query = diesel::insert_into(taxonomy::table)
+	.values(&new_tag)
+	.get_result(&conn);
+    match query {
+	Ok(tag) => Ok(tag),
+	Err(_) => Err("Save tag data failed"),
     }
+}
+
+fn save_tags(pool: ConnectionPool, tags: &Vec<String>) -> Result<Vec<Taxonomy>, String> {
+    use taxonomy::dsl;
+    let conn = pool.get().unwrap();
+    let tags_list: Vec<Taxonomy> = vec!();
+    for tag_name in tags {
+	match fetch_tag(pool.clone(), &tag_name) {
+	    Ok(tag) => tags_list.push(tag),
+	    Err(_) => return save_tag(pool.clone(), &tag_name)
+	}
+    }
+    Ok(tags_list)
 }
 
 fn save_category(conn: &PgConnection, category: &Category) {
