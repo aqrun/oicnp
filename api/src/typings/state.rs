@@ -1,7 +1,7 @@
 use async_graphql::{Schema, EmptySubscription};
 use crate::gql::{QueryRoot, MutationRoot};
+use rbatis::rbatis::Rbatis;
 use std::sync::Arc;
-use crate::dbs::ConnectionPool;
 
 #[derive(Clone)]
 pub struct State {
@@ -10,5 +10,5 @@ pub struct State {
         MutationRoot,
         EmptySubscription,
     >,
-    pub connection_pool: Arc<ConnectionPool>,
+    pub rbatis: Arc<Rbatis>,
 }

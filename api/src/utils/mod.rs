@@ -1,3 +1,3 @@
-pub mod global_config;
+pub mod app_config;
 
-pub use global_config::*;
+pub use app_config::*;

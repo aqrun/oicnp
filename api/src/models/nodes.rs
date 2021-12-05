@@ -1,81 +1,63 @@
-use chrono::NaiveDateTime;
-use crate::schema::{
-    node, node_body, node_tags_map,
-    node_category_map, node_images_map,
-    node_comments_map,
-};
+// use chrono::NaiveDateTime;
 
-#[derive(Queryable)]
+#[crud_table]
+#[derive(Clone, Debug)]
 pub struct Node {
-    pub nid: i32,
-    pub vid: String,
-    pub uid: i32,
-    pub bundle: String,
-    pub title: String,
-    pub deleted: bool,
-    pub created_at: NaiveDateTime,
-    pub created_by: i32,
-    pub updated_at: NaiveDateTime,
-    pub updated_by: i32,
+    pub nid: Option<i32>,
+    pub vid: Option<String>,
+    pub uid: Option<i32>,
+    pub bundle: Option<String>,
+    pub title: Option<String>,
+    pub deleted: Option<bool>,
+    pub created_at: Option<rbatis::DateTimeNative>,
+    pub created_by: Option<i32>,
+    pub updated_at: Option<rbatis::DateTimeNative>,
+    pub updated_by: Option<i32>,
 }
 
-#[derive(Insertable)]
-#[table_name="node"]
-pub struct NewNode {
-    pub vid: String,
-    pub uid: i32,
-    pub bundle: String,
-    pub title: String,
-    pub deleted: bool,
-    pub created_at: NaiveDateTime,
-    pub created_by: i32,
-    pub updated_at: NaiveDateTime,
-    pub updated_by: i32,
-}
-
-#[derive(Queryable, Insertable)]
-#[table_name="node_body"]
+#[crud_table(table_name: node)]
+#[derive(Clone, Debug)]
 pub struct NodeBody {
-    pub nid: i32,
-    pub summary: String,
-    pub body: String,
-    pub body_format: String,
+    pub nid: Option<i32>,
+    pub summary: Option<String>,
+    pub body: Option<String>,
+    pub body_format: Option<String>,
 }
 
-#[derive(Queryable, Insertable)]
-#[table_name="node_category_map"]
+#[crud_table]
+#[derive(Clone, Debug)]
 pub struct NodeCategoryMap {
-    pub bundle: String,
-    pub nid: i32,
-    pub tid: i32,
+    pub bundle: Option<String>,
+    pub nid: Option<i32>,
+    pub tid: Option<i32>,
 }
 
-#[derive(Queryable, Insertable)]
-#[table_name="node_comments_map"]
+#[crud_table(table_name: node_comments_map)]
+#[derive(Clone, Debug)]
 pub struct NodeCommentsMap {
-    pub bundle: String,
-    pub nid: i32,
-    pub cid: i64,
+    pub bundle: Option<String>,
+    pub nid: Option<i32>,
+    pub cid: Option<i64>,
 }
 
-#[derive(Queryable, Insertable)]
-#[table_name="node_images_map"]
+#[crud_table(table_name: node_images_map)]
+#[derive(Clone, Debug)]
 pub struct NodeImagesMap {
-    pub bundle: String,
-    pub nid: i32,
-    pub fid: i32,
-    pub weight: i32,
-    pub alt: String,
-    pub title: String,
-    pub width: i32,
-    pub height: i32,
+    pub bundle: Option<String>,
+    pub nid: Option<i32>,
+    pub fid: Option<i32>,
+    pub weight: Option<i32>,
+    pub alt: Option<String>,
+    pub title: Option<String>,
+    pub width: Option<i32>,
+    pub height: Option<i32>,
 }
 
-#[derive(Queryable, Insertable)]
-#[table_name="node_tags_map"]
+#[crud_table(table_name: node_tags_map)]
+#[derive(Clone, Debug)]
 pub struct NodeTagsMap {
-    pub bundle: String,
-    pub nid: i32,
-    pub tid: i32,
+    pub bundle: Option<String>,
+    pub nid: Option<i32>,
+    pub tid: Option<i32>,
 }
 

@@ -1,26 +1,16 @@
-use chrono::NaiveDateTime;
+// use chrono::NaiveDateTime;
 
-#[derive(Queryable)]
+#[crud_table]
+#[derive(Clone, Debug)]
 pub struct File {
-    pub fid: i32,
-    pub uid: i32,
-    pub filename: String,
-    pub uri: String,
-    pub storage: String,
-    pub mime: String,
-    pub site: i32,
-    pub status: i32,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
-}
-
-#[derive(Insertable)]
-#[table_name = "file"]
-pub struct NewFile {
-    pub filename: String,
-    pub uri: String,
-    pub storage: String,
-    pub mime: String,
-    pub site: i32,
-    pub status: i32,
+    pub fid: Option<i32>,
+    pub uid: Option<i32>,
+    pub filename: Option<String>,
+    pub uri: Option<String>,
+    pub storage: Option<String>,
+    pub mime: Option<String>,
+    pub site: Option<i32>,
+    pub status: Option<i32>,
+    pub created_at: Option<rbatis::DateTimeNative>,
+    pub updated_at: Option<rbatis::DateTimeNative>,
 }

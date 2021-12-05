@@ -1,6 +1,6 @@
 use tokio::task;
 use async_graphql::{Result};
-use oicnp::backend::run;
+use api::run;
 
 #[tokio::main]
 async fn main() -> Result<()> {

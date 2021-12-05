@@ -3,19 +3,18 @@
 use std::path::PathBuf;
 use std::fs;
 use std::io::Read;
-use api::utils::G;
-use api::constants::BLOG_BASE;
+use api::services::G;
 use regex::Regex;
 use gray_matter::Matter;
 use gray_matter::engine::YAML;
-use api::dbs::{get_connection_pool, ConnectionPool};
+use api::dbs::{init_rbatis};
 use std::sync::Arc;
-use diesel::pg::PgConnection;
 use api::schema::taxonomy;
-use diesel::prelude::*;
 use api::models::{
-    Taxonomy, NewTaxonomy,
+    Taxonomy, Node,
 };
+use rbatis::rbatis::Rbatis;
+use rbatis::crud::CRUD;
 
 #[derive(Debug)]
 struct Category<'a> {
@@ -58,8 +57,9 @@ impl<'a> Blog<'a> {
 }
 
 fn main () {
-    let blog_base = G.get(BLOG_BASE).unwrap();
-    let pool = get_connection_pool();
+    let blog_base = &G.config.blog_base;
+    let rb = init_rbatis();
+    let rb: Arc<Rbatis> = Arc::new(rb);
 
     let categories = [
         Category { name: "backend", dir: "blog/backend/_posts" },
@@ -92,9 +92,10 @@ fn main () {
                 String::from(entry.path().to_str().expect("Invalid str"))
             ) {
                 // allBlogs.push(blog);
-                save_tags(pool.clone(), &blog.tags);
-                // save_category(&conn, &blog.category); 
-                // save_blog(&conn, &blog);
+
+                save_blog(rb.clone(), &blog);
+                // save_tags(rb.clone(), &blog.tags);
+                // save_category(rb.clone(), &blog.category);
             }
 
             index += 1;
@@ -111,7 +112,7 @@ fn main () {
     }
 }
 
-fn fetch_tag(pool: ConnectionPool, tag_name: &str) -> Result<Taxonomy, String> {
+fn fetch_tag(rb: Arc<Rbatis>, tag_name: &str) -> Result<Taxonomy, String> {
     use taxonomy::dsl;
     let conn = pool.get().unwrap();
     
@@ -121,45 +122,62 @@ fn fetch_tag(pool: ConnectionPool, tag_name: &str) -> Result<Taxonomy, String> {
 	.first::<Taxonomy>(&conn);
 }
 
-fn save_tag(pool: ConnectionPool, tag_name: &str) -> Result<Taxonomy, String> {
+fn save_tag(rb: Arc<Rbatis>, tag_name: &str) -> Result<Taxonomy, String> {
     use taxonomy::dsl;
     let conn = pool.get().unwrap();
     let new_tag = Taxonomy {
-	vid: String::from(tag_name),
-	pid: 0,
-	bundle: String::from("tag"),
-	name: String::from(tag_name),
-	description: String::from(""),
-	description_format: String::from(""),
-	weight: 0,
+        tid: None,
+        vid: Some(String::from(tag_name)),
+        pid: Some(0),
+        bundle: Some(String::from("tag")),
+        name: Some(String::from(tag_name)),
+        description: Some(String::from("")),
+        description_format: Some(String::from("")),
+        weight: Some(0),
     };
     let query = diesel::insert_into(taxonomy::table)
-	.values(&new_tag)
-	.get_result(&conn);
+        .values(&new_tag)
+        .get_result(&conn);
     match query {
-	Ok(tag) => Ok(tag),
-	Err(_) => Err("Save tag data failed"),
+        Ok(tag) => Ok(tag),
+        Err(_) => Err(String::from("Save tag data failed")),
     }
 }
 
-fn save_tags(pool: ConnectionPool, tags: &Vec<String>) -> Result<Vec<Taxonomy>, String> {
+fn save_tags(rb: Arc<Rbatis>, tags: &Vec<String>) -> Result<Vec<Taxonomy>, String> {
     use taxonomy::dsl;
-    let conn = pool.get().unwrap();
-    let tags_list: Vec<Taxonomy> = vec!();
+    let mut tags_list: Vec<Taxonomy> = vec!();
+
     for tag_name in tags {
-	match fetch_tag(pool.clone(), &tag_name) {
-	    Ok(tag) => tags_list.push(tag),
-	    Err(_) => return save_tag(pool.clone(), &tag_name)
-	}
+        match fetch_tag(rb.clone(), &tag_name) {
+            Ok(tag) => tags_list.push(tag),
+            Err(_) => {
+                let temp_tag = save_tag(rb.clone(), &tag_name)?;
+                tags_list.push(temp_tag);
+            }
+        }
     }
     Ok(tags_list)
 }
 
-fn save_category(conn: &PgConnection, category: &Category) {
+fn save_category(rb: Arc<Rbatis>, category: &Category) {
 
 }
 
-fn save_blog(conn: &PgConnection, blog: &Blog) {
+fn save_blog(rb: Arc<Rbatis>, blog: &Blog) {
+    let node = Node {
+        nid: None,
+        vid: Some(String::from(&blog.slug)),
+        uid: None,
+        bundle: Some(String::from("blog")),
+        title: Some(String::from(&blog.title)),
+        deleted: Some(false),
+        created_at: None,
+        created_by: None,
+        updated_at: None,
+        updated_by: None
+    };
+    rb.save(&node, &[]).await;
 }
 
 

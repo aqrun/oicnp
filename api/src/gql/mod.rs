@@ -14,9 +14,8 @@ use async_graphql::{
     },
     Request, Response,
 };
-use crate::G;
 use crate::typings::{State};
-use crate::constants::{GRAPHIQL_PATH};
+use crate::services::G;
 
 pub async fn build_schema() -> Schema<QueryRoot, MutationRoot, EmptySubscription> {
     // TODO: init by real database
@@ -40,7 +39,7 @@ pub async fn graphql(data: Data<&State>, req: Json<Request>) -> Json<Response> {
 pub fn graphiql() -> impl IntoResponse {
     Html(playground_source(
         GraphQLPlaygroundConfig::new(
-            G.get(GRAPHIQL_PATH).unwrap()
+            &G.config.graphql_url
         )
     ))
 }

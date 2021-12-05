@@ -2,13 +2,11 @@ use async_graphql::{Result};
 use poem::{get, Route, Server,
            listener::TcpListener, EndpointExt,
 };
-use crate::utils::G;
-use crate::constants::{
-    ADDRESS, PORT, GRAPHQL_PATH,
-};
+use crate::services::G;
 use crate::gql::{graphql, graphiql, build_schema};
 use crate::typings::State;
-use crate::dbs::get_connection_pool;
+use crate::dbs::init_rbatis;
+use rbatis::rbatis::Rbatis;
 use std::sync::Arc;
 
 pub async fn run() -> Result<(), std::io::Error> {
@@ -17,14 +15,14 @@ pub async fn run() -> Result<(), std::io::Error> {
     }
     tracing_subscriber::fmt::init();
 
-    let path = G.get(GRAPHQL_PATH).unwrap();
-    let address = G.get(ADDRESS).unwrap();
-    let port = G.get(PORT).unwrap();
+    let path = &G.config.graphql_url;
+    let address = &G.config.host;
+    let port = &G.config.port;
 
     let schema = build_schema().await;
-    let connection_pool = get_connection_pool();
-    let arc_connection_pool = Arc::new(connection_pool);
-    let state = State { schema, connection_pool: arc_connection_pool };
+    let rbatis: Rbatis = init_rbatis();
+    let rbatis: Arc<Rbatis> = Arc::new(rb);
+    let state = State { schema, rbatis, };
     let app = Route::new()
         .at(path, get(graphiql).post(graphql))
         .data(state);
