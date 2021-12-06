@@ -6,6 +6,8 @@
 extern crate rbatis;
 extern crate dotenv;
 extern crate chrono;
+#[macro_use]
+extern crate serde;
 extern crate serde_yaml;
 #[macro_use]
 extern crate lazy_static;

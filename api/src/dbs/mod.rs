@@ -18,19 +18,20 @@ pub async fn init_rbatis() -> Rbatis {
     rb.logic_plugin = Some(Box::new(
         RbatisLogicDeletePlugin::new_opt(
             &G.config.logic_column,
-            &G.config.logic_deleted as i32,
-            &G.config.logic_un_deleted as i32
+            *&G.config.logic_deleted as i32,
+            *&G.config.logic_un_deleted as i32
         )
     ));
 
-    if &G.config.debug.eq(&false) && &rb.is_debug_mode() {
+    if G.config.debug.eq(&false) && rb.is_debug_mode() {
         panic!(r#"已使用 release 模式，但 rbatis 仍使用 debug 模式！请删除
         Cargo.toml 中 rbatis 的配置 features = ["debug_mode"]"#);
     }
 
+    let database_type = &url[0..url.find(":").unwrap_or(0)];
     println!(
         "[oicnp] Rbatis link database({})...",
-        url[0..url.find(":").unwrap_or(0)]
+        database_type
     );
     rb
         .link(url)

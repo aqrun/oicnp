@@ -31,6 +31,7 @@ pub async fn run() -> Result<(), std::io::Error> {
 
     let listener = TcpListener::bind(
         format!("{}:{}", address, port));
-    let server = Server::new(listener).await?;
-    server.run(app).await
+    Server::new(listener)
+        .run(app)
+        .await
 }

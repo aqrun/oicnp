@@ -9,12 +9,13 @@ use gray_matter::Matter;
 use gray_matter::engine::YAML;
 use api::dbs::{init_rbatis};
 use std::sync::Arc;
-use api::schema::taxonomy;
 use api::models::{
-    Taxonomy, Node,
+    Taxonomy, Node, NewNode, NewTaxonomy
 };
 use rbatis::rbatis::Rbatis;
 use rbatis::crud::CRUD;
+use rbatis::Error;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
 struct Category<'a> {
@@ -56,103 +57,75 @@ impl<'a> Blog<'a> {
     }
 }
 
-fn main () {
-    let blog_base = &G.config.blog_base;
+#[tokio::main]
+async fn main () {
     let rb = init_rbatis().await;
     let rb: Arc<Rbatis> = Arc::new(rb);
 
-    let categories = [
+    let categories = vec![
         Category { name: "backend", dir: "blog/backend/_posts" },
         Category { name: "frontend", dir: "blog/frontend/_posts" },
         Category { name: "rust", dir: "blog/rust/_posts" },
         Category { name: "server", dir: "blog/server/_posts" },
         Category { name: "diary", dir: "blog/diary/_posts" },
     ];
-    // let cwd = env::current_dir().unwrap();
-    let base = PathBuf::from(blog_base);
-    let mut allBlogs: Vec<Blog> = vec!();
-    let mut index = 0;
 
-    for item in categories {
-        let mut dir = base.clone();
-        dir.push(item.dir);
+    let all_blogs = find_all_blogs(categories);
 
-	let str_dir = String::from(dir.to_str().unwrap());
-        let entries = fs::read_dir(dir).expect(&format!("Read dir failed: {}", &str_dir));
-
-        for m in entries {
-            let entry = m.unwrap();
-            let mut file = fs::File::open(entry.path()).expect("File read failed");
-            let mut content = String::new();
-            file.read_to_string(&mut content).expect("Read content failed");
-
-            if let Ok(blog) = generate_blog (
-                entry.file_name().into_string().expect("Invalid string"),
-                content,
-                String::from(entry.path().to_str().expect("Invalid str"))
-            ) {
-                // allBlogs.push(blog);
-
-                save_blog(rb.clone(), &blog);
-                // save_tags(rb.clone(), &blog.tags);
-                // save_category(rb.clone(), &blog.category);
-            }
-
-            index += 1;
-
-            if index > 1 {
-                break;
-            }
-            // println!("{}", content)
+    let mut _i = 0;
+    for blog in &all_blogs {
+        if _i < 1 {
+            save_blog(rb.clone(), blog).await;
+            // save_tags(rb.clone(), &blog.tags);
+            // save_category(rb.clone(), &blog.category);
         }
-
-        if index > 1 {
-            break;
-        }
+        _i += 1;
     }
 }
 
-fn fetch_tag(rb: Arc<Rbatis>, tag_name: &str) -> Result<Taxonomy, String> {
-    use taxonomy::dsl;
-    let conn = pool.get().unwrap();
+async fn fetch_tag(rb: Arc<Rbatis>, tag_name: &str) -> Result<Taxonomy, String> {
+    let wrapper = rb.new_wrapper()
+        .eq("name", tag_name)
+        .eq("bundle", "tag");
     
-    let tag_query = dsl::taxonomy
-	.filter(dsl::name.eq(tag_name))
-	.filter(dsl::bundle.eq("tag"))
-	.first::<Taxonomy>(&conn);
-}
+    let result: Result<Option<Taxonomy>, Error> = rb.fetch_by_wrapper(wrapper)
+        .await;
 
-fn save_tag(rb: Arc<Rbatis>, tag_name: &str) -> Result<Taxonomy, String> {
-    use taxonomy::dsl;
-    let conn = pool.get().unwrap();
-    let new_tag = Taxonomy {
-        tid: None,
-        vid: Some(String::from(tag_name)),
-        pid: Some(0),
-        bundle: Some(String::from("tag")),
-        name: Some(String::from(tag_name)),
-        description: Some(String::from("")),
-        description_format: Some(String::from("")),
-        weight: Some(0),
-    };
-    let query = diesel::insert_into(taxonomy::table)
-        .values(&new_tag)
-        .get_result(&conn);
-    match query {
-        Ok(tag) => Ok(tag),
-        Err(_) => Err(String::from("Save tag data failed")),
+    if let Ok(res) = result {
+        if let Some(tag) = res {
+            return Ok(tag);
+        }
     }
+    Err(format!("Tag not exist, {}", tag_name))
 }
 
-fn save_tags(rb: Arc<Rbatis>, tags: &Vec<String>) -> Result<Vec<Taxonomy>, String> {
-    use taxonomy::dsl;
+async fn save_tag(rb: Arc<Rbatis>, tag_name: &str) -> Result<Taxonomy, String> {
+    let new_tag = NewTaxonomy {
+        vid: String::from(tag_name),
+        pid: 0,
+        bundle: String::from("tag"),
+        name: String::from(tag_name),
+        description: String::from(""),
+        description_format: String::from(""),
+        weight: 0,
+    };
+    let res = rb.save(&new_tag, &[]).await;
+
+    if let Ok(_) = res {
+        return fetch_tag(rb.clone(), tag_name).await;
+    }
+    Err(format!("Save tag failed: {}", tag_name))
+}
+
+async fn save_tags(rb: Arc<Rbatis>, tags: &Vec<String>) -> Result<Vec<Taxonomy>, String> {
     let mut tags_list: Vec<Taxonomy> = vec!();
 
     for tag_name in tags {
-        match fetch_tag(rb.clone(), &tag_name) {
+        let res = fetch_tag(rb.clone(), &tag_name).await;
+        match res {
             Ok(tag) => tags_list.push(tag),
             Err(_) => {
-                let temp_tag = save_tag(rb.clone(), &tag_name)?;
+                let temp_tag = save_tag(rb.clone(), &tag_name).await?;
                 tags_list.push(temp_tag);
             }
         }
@@ -160,26 +133,29 @@ fn save_tags(rb: Arc<Rbatis>, tags: &Vec<String>) -> Result<Vec<Taxonomy>, Strin
     Ok(tags_list)
 }
 
-fn save_category(rb: Arc<Rbatis>, category: &Category) {
+// async fn save_category<'a>(rb: Arc<Rbatis>, category: &'a Category) {
+//
+// }
 
-}
-
-fn save_blog(rb: Arc<Rbatis>, blog: &Blog) {
-    let node = Node {
-        nid: None,
-        vid: Some(String::from(&blog.slug)),
-        uid: None,
-        bundle: Some(String::from("blog")),
-        title: Some(String::from(&blog.title)),
-        deleted: Some(false),
-        created_at: None,
-        created_by: None,
-        updated_at: None,
-        updated_by: None
+async fn save_blog<'a>(rb: Arc<Rbatis>, blog: &'a Blog<'a>) {
+    let node = NewNode {
+        vid: String::from(&blog.slug),
+        uid: 1,
+        bundle: String::from("blog"),
+        title: String::from(&blog.title),
+        deleted: false,
+        created_by: 1,
+        updated_by: 1
     };
     rb.save(&node, &[]).await;
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+struct BlogMatter {
+    title: Option<String>,
+    tags: Option<String>,
+    excerpt: Option<String>,
+}
 
 fn generate_blog<'a>(file_name: String, content: String, file_path: String) -> Result<Blog<'a>, String> {
     let category = Category {
@@ -188,27 +164,29 @@ fn generate_blog<'a>(file_name: String, content: String, file_path: String) -> R
     };
 
     let (date, slug) = generate_slug(&file_name);
-
+    println!("Matter parse: {}", &file_name);
     let matter = Matter::<YAML>::new();
-    let res = matter.parse(&content);
-    let data = res.data.as_ref().unwrap();
+    let res = matter.parse_with_struct::<BlogMatter>(&content)
+        .expect("BlogMatter parse failed");
+    let data = res.data;
+    let con = res.content;
+
     // let layout = &data["layout"].as_string().unwrap();
-    let title = &data["title"].as_string().unwrap();
-    let tags = &data["tags"].as_string().unwrap();
+    let title = data.title.unwrap_or(String::from(""));
+    let tags = data.tags.unwrap_or(String::from(""));
     let tag_arr = tags.split(" ")
         .map(|item| String::from(item))
         .collect();
-    let excerpt = &data["excerpt"].as_string().unwrap();
-    let con = res.content;
+    let excerpt = data.excerpt.unwrap_or(String::from(""));
 
     let blog = Blog {
         slug,
         date,
         file: String::from(&file_name),
         file_path,
-        title: String::from(title),
+        title,
         tags: tag_arr,
-        excerpt: String::from(excerpt),
+        excerpt,
         category,
         content: Some(con),
     };
@@ -233,4 +211,40 @@ fn generate_slug(file_name: &str) -> (String, String) {
 
     let res = (date, slug);
     return res;
+}
+
+/// 获取所有 blog 数据
+fn find_all_blogs<'a>(categories: Vec<Category>) -> Vec<Blog<'a>> {
+    let blog_base = &G.config.blog_base;
+    let base = PathBuf::from(blog_base);
+    let mut all_blogs: Vec<Blog> = vec!();
+    let mut index = 0;
+
+    for item in categories {
+        let mut dir = base.clone();
+        dir.push(item.dir);
+
+        let str_dir = String::from(dir.to_str().unwrap());
+        let entries = fs::read_dir(dir).expect(&format!("Read dir failed: {}", &str_dir));
+
+        for m in entries {
+            let entry = m.unwrap();
+            let mut file = fs::File::open(entry.path()).expect("File read failed");
+            let mut content = String::new();
+            file.read_to_string(&mut content).expect("Read content failed");
+
+            if let Ok(blog) = generate_blog (
+                entry.file_name().into_string().expect("Invalid string"),
+                content,
+                String::from(entry.path().to_str().expect("Invalid str"))
+            ) {
+                all_blogs.push(blog);
+            }
+
+            index += 1;
+            // println!("{}", content)
+        }
+    }
+
+    all_blogs
 }
