@@ -20,8 +20,8 @@ pub async fn run() -> Result<(), std::io::Error> {
     let port = &G.config.port;
 
     let schema = build_schema().await;
-    let rbatis: Rbatis = init_rbatis();
-    let rbatis: Arc<Rbatis> = Arc::new(rb);
+    let rbatis: Rbatis = init_rbatis().await;
+    let rbatis: Arc<Rbatis> = Arc::new(rbatis);
     let state = State { schema, rbatis, };
     let app = Route::new()
         .at(path, get(graphiql).post(graphql))

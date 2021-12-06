@@ -17,7 +17,7 @@ pub struct Node {
 
 #[crud_table(table_name: node)]
 #[derive(Clone, Debug)]
-pub struct Node {
+pub struct NewNode {
     pub vid: String,
     pub uid: i32,
     pub bundle: String,

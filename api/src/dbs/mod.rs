@@ -2,8 +2,6 @@ use crate::services::G;
 use rbatis::rbatis::Rbatis;
 use rbatis::plugin::logic_delete::RbatisLogicDeletePlugin;
 
-pub type ConnectionPool = Pool<ConnectionManager<PgConnection>>;
-
 pub async fn establish_connection() -> Rbatis {
     let url = &G.config.database_url;
     let rb = Rbatis::new();
