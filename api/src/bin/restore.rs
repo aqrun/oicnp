@@ -58,7 +58,7 @@ impl<'a> Blog<'a> {
 
 fn main () {
     let blog_base = &G.config.blog_base;
-    let rb = init_rbatis();
+    let rb = init_rbatis().await;
     let rb: Arc<Rbatis> = Arc::new(rb);
 
     let categories = [
