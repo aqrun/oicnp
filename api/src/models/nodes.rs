@@ -27,7 +27,7 @@ pub struct NewNode {
     pub updated_by: i32,
 }
 
-#[crud_table(table_name: node)]
+#[crud_table(table_name: node_body)]
 #[derive(Clone, Debug)]
 pub struct NodeBody {
     pub nid: i32,

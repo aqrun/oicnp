@@ -10,7 +10,8 @@ use gray_matter::engine::YAML;
 use api::dbs::{init_rbatis};
 use std::sync::Arc;
 use api::models::{
-    Taxonomy, Node, NewNode, NewTaxonomy
+    Taxonomy, Node, NewNode, NewTaxonomy,
+    NodeTagsMap, NodeCategoryMap, NodeBody,
 };
 use rbatis::rbatis::Rbatis;
 use rbatis::crud::CRUD;
@@ -24,7 +25,7 @@ struct Category<'a> {
 }
 
 #[derive(Debug)]
-struct Blog<'a> {
+struct Blog {
     slug: String,
     date: String,
     file: String,
@@ -32,17 +33,12 @@ struct Blog<'a> {
     title: String,
     tags: Vec<String>,
     excerpt: String,
-    category: Category<'a>,
+    category: String,
     content: Option<String>,
 }
 
-impl<'a> Blog<'a> {
+impl Blog {
     fn new() -> Self {
-        let category = Category {
-            name: "backend",
-            dir: "blog"
-        };
-
         Blog {
             slug: String::from(""),
             date: String::from(""),
@@ -51,7 +47,7 @@ impl<'a> Blog<'a> {
             title: String::from(""),
             tags: vec!(),
             excerpt: String::from(""),
-            category,
+            category: String::from(""),
             content: Some(String::from("")),
         }
     }
@@ -74,32 +70,66 @@ async fn main () {
 
     let mut _i = 0;
     for blog in &all_blogs {
-        if _i < 1 {
-            save_blog(rb.clone(), blog).await;
-            // save_tags(rb.clone(), &blog.tags);
-            // save_category(rb.clone(), &blog.category);
+        if let Ok(node) = save_blog(rb.clone(), blog).await {
+            let res = save_blog_content(rb.clone(), node.nid, blog).await;
+
+            // println!("node: {:?}", node);
+            let res = save_tags(rb.clone(), &blog.tags, node.nid).await;
+
+            if let Err(err) = res {
+                println!("Save tags failed: {}", err);
+            }
+
+            let res = save_category(rb.clone(), &blog.category, node.nid).await;
+
+            if let Err(err) = res {
+                println!("Save category failed: {}", err);
+            }
+            _i += 1;
         }
-        _i += 1;
+    }
+
+    println!("Restore completed with {} data", _i);
+}
+
+async fn save_blog_content(rb: Arc<Rbatis>, nid: i32, blog: &Blog) -> Result<String, String> {
+    rb.remove_by_column::<NodeBody, _>("nid", nid).await;
+    let content = blog.content.as_ref().unwrap();
+    let node_body = NodeBody {
+        nid,
+        summary: String::from(&blog.excerpt),
+        body: content.to_string(),
+        body_format: String::from("markdown"),
+    };
+    let res = rb.save(&node_body, &[]).await;
+    println!("{}", &blog.excerpt);
+    match res {
+        Ok(_) => Ok(format!("Body save success")),
+        Err(err) => Err(format!("Body save failed, {}", err.to_string())),
     }
 }
 
-async fn fetch_tag(rb: Arc<Rbatis>, tag_name: &str) -> Result<Taxonomy, String> {
+async fn find_taxonomy(rb: Arc<Rbatis>, name: &str, bundle: &str) -> Result<Taxonomy, String> {
     let wrapper = rb.new_wrapper()
-        .eq("name", tag_name)
-        .eq("bundle", "tag");
+        .eq("name", name)
+        .eq("bundle", bundle);
     
     let result: Result<Option<Taxonomy>, Error> = rb.fetch_by_wrapper(wrapper)
         .await;
 
     if let Ok(res) = result {
-        if let Some(tag) = res {
-            return Ok(tag);
+        if let Some(taxonomy) = res {
+            return Ok(taxonomy);
         }
     }
-    Err(format!("Tag not exist, {}", tag_name))
+    Err(format!("Taxonomy not exist, {}", name))
 }
 
 async fn save_tag(rb: Arc<Rbatis>, tag_name: &str) -> Result<Taxonomy, String> {
+    if let Ok(tag) = find_taxonomy(rb.clone(), &tag_name, "tag").await {
+        return Ok(tag);
+    }
+
     let new_tag = NewTaxonomy {
         vid: String::from(tag_name),
         pid: 0,
@@ -109,35 +139,157 @@ async fn save_tag(rb: Arc<Rbatis>, tag_name: &str) -> Result<Taxonomy, String> {
         description_format: String::from(""),
         weight: 0,
     };
-    let res = rb.save(&new_tag, &[]).await;
 
-    if let Ok(_) = res {
-        return fetch_tag(rb.clone(), tag_name).await;
+    if let Ok(_res) = rb.save(&new_tag, &[]).await {
+        if let Ok(tag) = find_taxonomy(rb.clone(), tag_name, "tag").await {
+            return Ok(tag);
+        }
     }
+
     Err(format!("Save tag failed: {}", tag_name))
 }
 
-async fn save_tags(rb: Arc<Rbatis>, tags: &Vec<String>) -> Result<Vec<Taxonomy>, String> {
+async fn find_tag_map(rb: Arc<Rbatis>, nid: i32, tid: i32) -> Result<NodeTagsMap, String> {
+    let w = rb.new_wrapper()
+        .eq("bundle", "blog")
+        .eq("nid", nid)
+        .eq("tid", tid);
+    let res: Result<Option<NodeTagsMap>, Error> = rb.fetch_by_wrapper(w.clone()).await;
+
+    if let Ok(res) = res {
+        if let Some(res) = res {
+            return Ok(res);
+        }
+    }
+    Err(format!("map not exist"))
+}
+
+async fn save_node_tag_map(rb: Arc<Rbatis>, nid: i32, tid: i32) -> Result<NodeTagsMap, String> {
+    if let Ok(map) = find_tag_map(rb.clone(), nid, tid).await {
+        return Ok(map);
+    }
+
+    let map = NodeTagsMap {
+        bundle: "blog".to_string(),
+        nid,
+        tid
+    };
+    if let Err(err) = rb.save(&map, &[]).await {
+        return Err(err.to_string());
+    }
+
+    if let Ok(map) = find_tag_map(rb.clone(), nid, tid).await {
+        return Ok(map);
+    }
+    Err(format!("Tag map save failed"))
+}
+
+async fn save_tags(rb: Arc<Rbatis>, tags: &Vec<String>, nid: i32) -> Result<Vec<Taxonomy>, String> {
     let mut tags_list: Vec<Taxonomy> = vec!();
 
     for tag_name in tags {
-        let res = fetch_tag(rb.clone(), &tag_name).await;
-        match res {
-            Ok(tag) => tags_list.push(tag),
-            Err(_) => {
-                let temp_tag = save_tag(rb.clone(), &tag_name).await?;
-                tags_list.push(temp_tag);
+        if let Ok(tag) = save_tag(rb.clone(), &tag_name).await {
+            let res = save_node_tag_map(rb.clone(), nid, tag.tid).await;
+
+            match res {
+                Ok(_map) => tags_list.push(tag),
+                Err(err) => return Err(err),
             }
+
         }
     }
     Ok(tags_list)
 }
 
-// async fn save_category<'a>(rb: Arc<Rbatis>, category: &'a Category) {
-//
-// }
+async fn save_category_data(rb: Arc<Rbatis>, category_name: &str) -> Result<Taxonomy, String> {
+    if let Ok(cat) = find_taxonomy(rb.clone(), &category_name, "category").await {
+        return Ok(cat);
+    }
 
-async fn save_blog<'a>(rb: Arc<Rbatis>, blog: &'a Blog<'a>) {
+    let new_cat = NewTaxonomy {
+        vid: String::from(category_name),
+        pid: 0,
+        bundle: String::from("category"),
+        name: String::from(category_name),
+        description: String::from(""),
+        description_format: String::from(""),
+        weight: 0,
+    };
+
+    if let Ok(_res) = rb.save(&new_cat, &[]).await {
+        if let Ok(cat) = find_taxonomy(rb.clone(), category_name, "category").await {
+            return Ok(cat);
+        }
+    }
+
+    Err(format!("Save Category failed: {}", category_name))
+}
+
+async fn find_node_category_map(rb: Arc<Rbatis>, nid: i32, tid: i32) -> Result<NodeCategoryMap, String> {
+    let w = rb.new_wrapper()
+        .eq("bundle", "blog")
+        .eq("nid", nid)
+        .eq("tid", tid);
+    let res: Result<Option<NodeCategoryMap>, Error> = rb.fetch_by_wrapper(w.clone()).await;
+
+    if let Ok(res) = res {
+        if let Some(res) = res {
+            return Ok(res);
+        }
+    }
+    Err(format!("map not exist"))
+}
+
+async fn save_node_category_map(rb: Arc<Rbatis>, nid: i32, tid: i32) -> Result<NodeCategoryMap, String> {
+    if let Ok(map) = find_node_category_map(rb.clone(), nid, tid).await {
+        return Ok(map);
+    }
+
+    let map = NodeCategoryMap {
+        bundle: "blog".to_string(),
+        nid,
+        tid
+    };
+    if let Err(err) = rb.save(&map, &[]).await {
+        return Err(err.to_string());
+    }
+
+    if let Ok(map) = find_node_category_map(rb.clone(), nid, tid).await {
+        return Ok(map);
+    }
+    Err(format!("Tag map save failed"))
+}
+
+async fn save_category(rb: Arc<Rbatis>, category_name: &str, nid: i32) -> Result<Taxonomy, String> {
+    if let Ok(cat) = save_category_data(rb.clone(), category_name).await {
+        let _res = save_node_category_map(rb.clone(), nid, cat.tid).await?;
+
+        return Ok(cat);
+    }
+
+    Err(format!("Save Category failed: {}", category_name))
+}
+
+async fn find_blog_by_vid(rb: Arc<Rbatis>, vid: &str) -> Result<Node, String> {
+    let w = rb.new_wrapper()
+        .eq("vid", vid)
+        .eq("bundle", "blog");
+    let node: Result<Option<Node>, Error> = rb.fetch_by_wrapper(w).await;
+
+    if let Ok(node) = node {
+        if let Some(node) = node {
+            return Ok(node);
+        }
+    }
+    Err(format!("Node not exist: {}", vid))
+}
+
+async fn save_blog(rb: Arc<Rbatis>, blog: &Blog) -> Result<Node, String> {
+    if let Ok(node) = find_blog_by_vid(rb.clone(), &blog.slug).await {
+        println!("Blog already exist: {}", &blog.slug);
+        return Ok(node);
+    }
+
     let node = NewNode {
         vid: String::from(&blog.slug),
         uid: 1,
@@ -147,7 +299,18 @@ async fn save_blog<'a>(rb: Arc<Rbatis>, blog: &'a Blog<'a>) {
         created_by: 1,
         updated_by: 1
     };
-    rb.save(&node, &[]).await;
+    let res = rb.save(&node, &[]).await;
+
+    if let Err(err) = res {
+        return Err(err.to_string());
+    }
+
+    if let Ok(node) = find_blog_by_vid(rb.clone(), &blog.slug).await {
+        println!("Saved blog: {}", &blog.slug);
+        return Ok(node);
+    }
+
+    Err(format!("Node save failed: {}", &blog.slug))
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -157,14 +320,19 @@ struct BlogMatter {
     excerpt: Option<String>,
 }
 
-fn generate_blog<'a>(file_name: String, content: String, file_path: String) -> Result<Blog<'a>, String> {
-    let category = Category {
-        name: "backend",
-        dir: "blog"
-    };
+fn generate_blog(
+    file_name: String,
+    content: String,
+    file_path: String,
+    category: String
+) -> Result<Blog, String> {
+    if !is_valid_matter_content(&content) {
+        println!("Not valid matter content: {}", &file_name);
+        return Err(format!("Not valid matter content: {}", &file_name));
+    }
 
     let (date, slug) = generate_slug(&file_name);
-    println!("Matter parse: {}", &file_name);
+    // println!("Matter parse: {}", &file_name);
     let matter = Matter::<YAML>::new();
     let res = matter.parse_with_struct::<BlogMatter>(&content)
         .expect("BlogMatter parse failed");
@@ -214,7 +382,7 @@ fn generate_slug(file_name: &str) -> (String, String) {
 }
 
 /// 获取所有 blog 数据
-fn find_all_blogs<'a>(categories: Vec<Category>) -> Vec<Blog<'a>> {
+fn find_all_blogs(categories: Vec<Category>) -> Vec<Blog> {
     let blog_base = &G.config.blog_base;
     let base = PathBuf::from(blog_base);
     let mut all_blogs: Vec<Blog> = vec!();
@@ -236,7 +404,8 @@ fn find_all_blogs<'a>(categories: Vec<Category>) -> Vec<Blog<'a>> {
             if let Ok(blog) = generate_blog (
                 entry.file_name().into_string().expect("Invalid string"),
                 content,
-                String::from(entry.path().to_str().expect("Invalid str"))
+                String::from(entry.path().to_str().expect("Invalid str")),
+                String::from(item.name)
             ) {
                 all_blogs.push(blog);
             }
@@ -247,4 +416,10 @@ fn find_all_blogs<'a>(categories: Vec<Category>) -> Vec<Blog<'a>> {
     }
 
     all_blogs
+}
+
+fn is_valid_matter_content(content: &str) -> bool {
+    let reg_matter = Regex::new(r#"---([\s\S]*)---"#)
+        .expect("Matter reg not valid");
+    reg_matter.is_match(content)
 }
