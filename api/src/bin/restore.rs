@@ -1,5 +1,7 @@
 /// 历史数据恢复
 ///
+extern crate fast_log;
+
 use std::path::PathBuf;
 use std::fs;
 use std::io::Read;
@@ -17,6 +19,7 @@ use rbatis::rbatis::Rbatis;
 use rbatis::crud::CRUD;
 use rbatis::Error;
 use serde::{Deserialize, Serialize};
+use log::{ warn };
 
 #[derive(Debug)]
 struct Category<'a> {
@@ -55,6 +58,11 @@ impl Blog {
 
 #[tokio::main]
 async fn main () {
+    fast_log::init_log("target/restore.log",
+                       1000,
+                       log::Level::Warn,
+                       None,
+                       true);
     let rb = init_rbatis().await;
     let rb: Arc<Rbatis> = Arc::new(rb);
 
@@ -102,7 +110,7 @@ async fn save_blog_content(rb: Arc<Rbatis>, nid: i32, blog: &Blog) -> Result<Str
         body_format: String::from("markdown"),
     };
     let res = rb.save(&node_body, &[]).await;
-    println!("{}", &blog.excerpt);
+
     match res {
         Ok(_) => Ok(format!("Body save success")),
         Err(err) => Err(format!("Body save failed, {}", err.to_string())),
@@ -286,7 +294,7 @@ async fn find_blog_by_vid(rb: Arc<Rbatis>, vid: &str) -> Result<Node, String> {
 
 async fn save_blog(rb: Arc<Rbatis>, blog: &Blog) -> Result<Node, String> {
     if let Ok(node) = find_blog_by_vid(rb.clone(), &blog.slug).await {
-        println!("Blog already exist: {}", &blog.slug);
+        // println!("Blog already exist: {}", &blog.slug);
         return Ok(node);
     }
 
@@ -327,7 +335,7 @@ fn generate_blog(
     category: String
 ) -> Result<Blog, String> {
     if !is_valid_matter_content(&content) {
-        println!("Not valid matter content: {}", &file_name);
+        warn!("[OICNP] Not valid matter content: {}", &file_name);
         return Err(format!("Not valid matter content: {}", &file_name));
     }
 

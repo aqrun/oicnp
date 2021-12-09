@@ -1,5 +1,5 @@
 use async_graphql::{Object};
-use crate::typings::GqlResult;
+use crate::gql::GqlResult;
 
 pub struct MutationRoot;
 

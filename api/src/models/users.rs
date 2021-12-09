@@ -1,3 +1,4 @@
+use async_graphql::{Object};
 
 #[crud_table]
 #[derive(Clone, Debug)]
@@ -16,6 +17,25 @@ pub struct User {
     pub password_changed_on: i32,
     pub created_at: rbatis::DateTimeNative,
     pub updated_at: rbatis::DateTimeNative,
+}
+
+#[Object]
+impl User {
+    async fn uid(&self) -> i32 {
+        self.uid
+    }
+
+    async fn username(&self) -> &str {
+        self.username.as_str()
+    }
+
+    async fn nickname(&self) -> &str {
+        self.nickname.as_str()
+    }
+
+    async fn email(&self) -> &str {
+        self.email.as_str()
+    }
 }
 
 #[crud_table(table_name: user)]

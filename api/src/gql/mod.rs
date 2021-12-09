@@ -1,8 +1,10 @@
 pub mod mutations;
 pub mod queries;
+pub mod user_query;
 
 pub use queries::*;
 pub use mutations::*;
+pub use user_query::*;
 
 use poem::{
     IntoResponse, web::{Html, Data, Json}, handler
@@ -17,12 +19,14 @@ use async_graphql::{
 use crate::typings::{State};
 use crate::services::G;
 
+pub type GqlResult<T> = std::result::Result<T, async_graphql::Error>;
+
 pub async fn build_schema() -> Schema<QueryRoot, MutationRoot, EmptySubscription> {
     // TODO: init by real database
     // let database = StarWars::new();
 
     Schema::build(
-        QueryRoot,
+        QueryRoot::default(),
         MutationRoot,
         EmptySubscription,
     )

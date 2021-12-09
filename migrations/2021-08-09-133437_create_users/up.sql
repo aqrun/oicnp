@@ -51,14 +51,15 @@ COMMENT ON COLUMN user_picture.bundle is '图片类型 avatar';
 
 CREATE TABLE taxonomy (
     tid SERIAL PRIMARY KEY,
-    vid VARCHAR NOT NULL
-      CONSTRAINT taxonomies_vid_unique_key UNIQUE,
+    vid VARCHAR NOT NULL,
     pid INTEGER NOT NULL DEFAULT 0,
     bundle VARCHAR(64) NOT NULL,
     name VARCHAR(128) NOT NULL,
     description VARCHAR NOT NULL,
     description_format VARCHAR(20) NOT NULL DEFAULT '',
-    weight INTEGER NOT NULL DEFAULT 0
+    weight INTEGER NOT NULL DEFAULT 0,
+    CONSTRAINT taxonomy_vid_bundle_unique
+        UNIQUE (vid, bundle)
 );
 
 COMMENT ON COLUMN taxonomy.bundle is '资源类型如 category, tag';

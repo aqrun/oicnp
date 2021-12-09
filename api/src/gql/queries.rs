@@ -1,16 +1,7 @@
-use async_graphql::{Object, Context};
-use crate::typings::{GqlResult};
-// use async_graphql::connection::{Connection, EmptyFields};
-// use crate::services;
+use async_graphql::{Object, Context, MergedObject};
+use crate::gql::{
+    UserQuery,
+};
 
-pub struct QueryRoot;
-
-#[Object]
-impl QueryRoot {
-    async fn hero(
-        &self,
-        ctx: &Context<'_>,
-    ) -> GqlResult<String> {
-       Ok("".to_string())
-    }
-}
+#[derive(MergedObject, Default)]
+pub struct QueryRoot(UserQuery);
