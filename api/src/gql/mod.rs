@@ -16,20 +16,27 @@ use async_graphql::{
     },
     Request, Response,
 };
-use crate::typings::{State};
+use crate::typings::{State, GqlState};
 use crate::services::G;
+use crate::dbs::init_rbatis;
+use rbatis::rbatis::Rbatis;
+use std::sync::Arc;
 
 pub type GqlResult<T> = std::result::Result<T, async_graphql::Error>;
 
 pub async fn build_schema() -> Schema<QueryRoot, MutationRoot, EmptySubscription> {
-    // TODO: init by real database
-    // let database = StarWars::new();
+    let rbatis: Rbatis = init_rbatis().await;
+    let rbatis: Arc<Rbatis> = Arc::new(rbatis);
+    let gql_state = GqlState{
+        rbatis,
+    };
 
     Schema::build(
         QueryRoot::default(),
         MutationRoot,
         EmptySubscription,
     )
+        .data(gql_state)
         .finish()
 }
 

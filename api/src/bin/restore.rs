@@ -59,7 +59,7 @@ impl Blog {
 #[tokio::main]
 async fn main () {
     fast_log::init_log("target/restore.log",
-                       1000,
+                       // 1000,
                        log::Level::Warn,
                        None,
                        true);

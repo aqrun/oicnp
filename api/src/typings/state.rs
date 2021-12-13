@@ -9,6 +9,9 @@ pub struct State {
         QueryRoot,
         MutationRoot,
         EmptySubscription,
-    >,
+    >
+}
+
+pub struct GqlState {
     pub rbatis: Arc<Rbatis>,
 }

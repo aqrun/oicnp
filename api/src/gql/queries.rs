@@ -1,4 +1,4 @@
-use async_graphql::{Object, Context, MergedObject};
+use async_graphql::{MergedObject};
 use crate::gql::{
     UserQuery,
 };

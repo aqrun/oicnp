@@ -5,9 +5,6 @@ use poem::{get, Route, Server,
 use crate::services::G;
 use crate::gql::{graphql, graphiql, build_schema};
 use crate::typings::State;
-use crate::dbs::init_rbatis;
-use rbatis::rbatis::Rbatis;
-use std::sync::Arc;
 
 pub async fn run() -> Result<(), std::io::Error> {
     if std::env::var_os("RUST_LOG").is_none() {
@@ -20,9 +17,7 @@ pub async fn run() -> Result<(), std::io::Error> {
     let port = &G.config.port;
 
     let schema = build_schema().await;
-    let rbatis: Rbatis = init_rbatis().await;
-    let rbatis: Arc<Rbatis> = Arc::new(rbatis);
-    let state = State { schema, rbatis, };
+    let state = State { schema };
     let app = Route::new()
         .at(path, get(graphiql).post(graphql))
         .data(state);

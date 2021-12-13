@@ -6,12 +6,14 @@
 extern crate rbatis;
 extern crate dotenv;
 extern crate chrono;
-#[macro_use]
+// #[macro_use]
 extern crate serde;
 extern crate serde_yaml;
 #[macro_use]
 extern crate lazy_static;
 extern crate tokio;
+extern crate fast_log;
+extern crate bson2;
 
 mod run;
 
