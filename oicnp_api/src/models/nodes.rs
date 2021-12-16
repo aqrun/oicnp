@@ -1,13 +1,14 @@
-// use chrono::NaiveDateTime;
+use async_graphql::{Object};
 
 #[crud_table]
 #[derive(Clone, Debug)]
-pub struct Node {
+pub struct Nodes {
     pub nid: i32,
     pub vid: String,
     pub uid: i32,
     pub bundle: String,
     pub title: String,
+    pub viewed: i32,
     pub deleted: bool,
     pub created_at: rbatis::DateTimeNative,
     pub created_by: i32,
@@ -15,7 +16,14 @@ pub struct Node {
     pub updated_by: i32,
 }
 
-#[crud_table(table_name: node)]
+#[Object]
+impl Nodes {
+    async fn nid(&self) -> i32 {
+        self.nid
+    }
+}
+
+#[crud_table(table_name: nodes)]
 #[derive(Clone, Debug)]
 pub struct NewNode {
     pub vid: String,
@@ -36,9 +44,9 @@ pub struct NodeBody {
     pub body_format: String,
 }
 
-#[crud_table]
+#[crud_table(table_name: node_taxonomies_map)]
 #[derive(Clone, Debug)]
-pub struct NodeCategoryMap {
+pub struct NodeTaxonomiesMap {
     pub bundle: String,
     pub nid: i32,
     pub tid: i32,
@@ -64,12 +72,3 @@ pub struct NodeImagesMap {
     pub width: i32,
     pub height: i32,
 }
-
-#[crud_table(table_name: node_tags_map)]
-#[derive(Clone, Debug)]
-pub struct NodeTagsMap {
-    pub bundle: String,
-    pub nid: i32,
-    pub tid: i32,
-}
-

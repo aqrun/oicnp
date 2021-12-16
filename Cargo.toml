@@ -1,4 +1,4 @@
 [workspace]
-members = ["api", "frontend-tera"]
-exclude = ["backend", "frontend"]
-default-members = ["api"]
+members = ["oicnp_api"]
+exclude = ["oicnp_backend", "oicnp_frontend"]
+default-members = ["oicnp_api"]

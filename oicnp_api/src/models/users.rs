@@ -2,11 +2,11 @@ use async_graphql::{Object, Context};
 use serde::{Serialize, Deserialize};
 use crate::typings::GqlState;
 use crate::services;
-use crate::models::{File};
+use crate::models::{Files};
 
 #[crud_table(table_name: users)]
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct User {
+pub struct Users {
     pub uid: i32,
     pub username: String,
     pub nickname: String,
@@ -24,7 +24,7 @@ pub struct User {
 }
 
 #[Object]
-impl User {
+impl Users {
     async fn uid(&self) -> i32 {
         self.uid
     }
@@ -77,7 +77,7 @@ impl User {
         self.last_login_on.format("%Y-%m-%d %H:%M:%S").to_string()
     }
 
-    async fn avatar(&self, ctx: &Context<'_>) -> File {
+    async fn avatar(&self, ctx: &Context<'_>) -> Files {
         let rb = ctx.data_unchecked::<GqlState>().rbatis.clone();
         let res = services::find_user_avatar(rb.clone(), &self.uid).await;
 
@@ -85,7 +85,7 @@ impl User {
             Ok(file) => file,
             Err(err) => {
                 println!("Fetch user avatar error: {}", err.to_string());
-                File::default()
+                Files::default()
             },
         };
 
@@ -109,9 +109,9 @@ pub struct NewUser {
     pub password_changed_on: i32,
 }
 
-#[crud_table]
+#[crud_table(table_name: user_pictures)]
 #[derive(Clone, Debug)]
-pub struct UserPicture {
+pub struct UserPictures {
     pub bundle: String,
     pub uid: i32,
     pub fid: i32,

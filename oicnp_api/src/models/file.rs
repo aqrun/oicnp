@@ -4,7 +4,7 @@ use rbatis::DateTimeNative;
 
 #[crud_table]
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct File {
+pub struct Files {
     pub fid: i32,
     pub uid: i32,
     pub filename: String,
@@ -17,7 +17,7 @@ pub struct File {
     pub updated_at: rbatis::DateTimeNative,
 }
 
-impl Default for File {
+impl Default for Files {
     fn default() -> Self {
         Self {
             fid: 0,
@@ -35,7 +35,7 @@ impl Default for File {
 }
 
 #[Object]
-impl File {
+impl Files {
     async fn fid(&self) -> i32 {
         self.fid
     }
@@ -47,7 +47,7 @@ impl File {
     }
 }
 
-#[crud_table(table_name: file)]
+#[crud_table(table_name: files)]
 #[derive(Clone, Debug)]
 pub struct NewFile {
     pub uid: i32,

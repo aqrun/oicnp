@@ -1,4 +1,4 @@
-CREATE TABLE file (
+CREATE TABLE files (
     fid SERIAL PRIMARY KEY,
     uid INTEGER NOT NULL,
     filename VARCHAR NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE file (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-COMMENT ON COLUMN file.storage is '资源存储位置类型如 local,qiniu(七牛),oos(阿里OOS)';
+COMMENT ON COLUMN files.storage is '资源存储位置类型如 local,qiniu(七牛),oos(阿里OOS)';
 CREATE INDEX file_uri__idx ON file (uri);
 
 CREATE TABLE users (
@@ -34,7 +34,7 @@ CREATE TABLE users (
 
 COMMENT ON COLUMN users.admin is '是否管理员';
 
-CREATE TABLE user_picture (
+CREATE TABLE user_pictures (
     bundle VARCHAR(20) NOT NULL,
     uid INTEGER NOT NULL,
     fid INTEGER NOT NULL,
@@ -47,9 +47,9 @@ CREATE TABLE user_picture (
         PRIMARY KEY (uid, fid)
 );
 
-COMMENT ON COLUMN user_picture.bundle is '图片类型 avatar';
+COMMENT ON COLUMN users_pictures.bundle is '图片类型 avatar';
 
-CREATE TABLE taxonomy (
+CREATE TABLE taxonomies (
     tid SERIAL PRIMARY KEY,
     vid VARCHAR NOT NULL,
     pid INTEGER NOT NULL DEFAULT 0,
@@ -58,17 +58,18 @@ CREATE TABLE taxonomy (
     description VARCHAR NOT NULL,
     description_format VARCHAR(20) NOT NULL DEFAULT '',
     weight INTEGER NOT NULL DEFAULT 0,
+    count INTEGER NOT NULL DEFAULT 0,
     CONSTRAINT taxonomy_vid_bundle_unique
         UNIQUE (vid, bundle)
 );
 
-COMMENT ON COLUMN taxonomy.bundle is '资源类型如 category, tag';
-COMMENT ON COLUMN taxonomy.description_format is '内容类型如 html, markdown, text';
+COMMENT ON COLUMN taxonomies.bundle is '资源类型如 category, tag';
+COMMENT ON COLUMN taxonomies.description_format is '内容类型如 html, markdown, text';
 
-CREATE INDEX taxonomy__vid_name__idx
-    ON taxonomy (vid, name);
+CREATE INDEX taxonomies__vid_name__idx
+    ON taxonomies (vid, name);
 
-CREATE TABLE comment (
+CREATE TABLE comments (
     cid SERIAL PRIMARY KEY,
     uid BIGINT NOT NULL,
     pid BIGINT NOT NULL DEFAULT 0,
@@ -86,8 +87,8 @@ CREATE TABLE comment (
     updated_by INTEGER NOT NULL DEFAULT 0
 );
 
-COMMENT ON COLUMN comment.bundle is '评论对象类型，如 node.article,node.page';
-CREATE INDEX comment_bundle_target_id___idx ON comment(bundle, target_id);
+COMMENT ON COLUMN comments.bundle is '评论对象类型，如 node.article,node.page';
+CREATE INDEX comment_bundle_target_id___idx ON comments(bundle, target_id);
 
 CREATE TABLE comment_body (
     cid BIGINT NOT NULL,
@@ -97,13 +98,14 @@ CREATE TABLE comment_body (
         PRIMARY KEY (cid)
 );
 
-CREATE TABLE node (
+CREATE TABLE nodes (
     nid SERIAL PRIMARY KEY,
     vid VARCHAR NOT NULL
     	CONSTRAINT posts_vid_unique_key UNIQUE,
     uid INTEGER NOT NULL,
     bundle VARCHAR(128) NOT NULL,
     title VARCHAR NOT NULL,
+    viewed INTEGER NOT NULL DEFAULT 0,
     deleted BOOLEAN NOT NULL DEFAULT false,
     published_at INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -112,7 +114,7 @@ CREATE TABLE node (
     updated_by INTEGER NOT NULL DEFAULT 0
 );
 
-COMMENT ON COLUMN node.bundle is '内容类型如 article, page';
+COMMENT ON COLUMN nodes.bundle is '内容类型如 article, page';
 
 CREATE TABLE node_body (
     nid INTEGER NOT NULL,
@@ -125,7 +127,7 @@ CREATE TABLE node_body (
 
 COMMENT ON COLUMN node_body.body_format is '内容类型如 html, markdown, text';
 
-CREATE TABLE node_category_map (
+CREATE TABLE node_taxonomies_map (
     bundle VARCHAR(20) NOT NULL,
     nid INTEGER NOT NULL,
     tid INTEGER NOT NULL,
@@ -133,19 +135,7 @@ CREATE TABLE node_category_map (
         PRIMARY KEY (nid, tid)
 );
 
-COMMENT ON COLUMN node_category_map.bundle IS '资源类型 如 article, page';
-
-CREATE TABLE node_tags_map (
-    bundle VARCHAR(20) NOT NULL,
-    nid INTEGER NOT NULL,
-    tid INTEGER NOT NULL,
-    CONSTRAINT node_tags_map___pkey
-        PRIMARY KEY (nid, tid)
-);
-
-COMMENT ON COLUMN node_tags_map.bundle IS '资源类型 如 article, page';
-
-CREATE TABLE node_images_map (
+CREATE TABLE node_files_map (
     bundle VARCHAR(20) NOT NULL,
     nid INTEGER NOT NULL,
     fid INTEGER NOT NULL,

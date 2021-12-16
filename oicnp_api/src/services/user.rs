@@ -1,5 +1,5 @@
 use crate::models::{
-    File, User,
+    Files, Users,
 };
 use std::sync::Arc;
 use rbatis::crud::CRUD;
@@ -15,10 +15,10 @@ use rbatis::py_sql;
 pub async fn find_user_avatar(
     rb: Arc<Rbatis>,
     uid: &i32,
-) -> Result<File, Error> {
+) -> Result<Files, Error> {
     todo!()
 }
 
-pub async fn find_user_by_id(rb: Arc<Rbatis>, uid: i32) -> Result<User, Error> {
+pub async fn find_user_by_id(rb: Arc<Rbatis>, uid: i32) -> Result<Users, Error> {
     return rb.fetch_by_column("uid", uid).await;
 }

@@ -1,10 +1,12 @@
 pub mod mutations;
 pub mod queries;
 pub mod user_query;
+pub mod node_query;
 
 pub use queries::*;
 pub use mutations::*;
 pub use user_query::*;
+pub use node_query::*;
 
 use poem::{
     IntoResponse, web::{Html, Data, Json}, handler
