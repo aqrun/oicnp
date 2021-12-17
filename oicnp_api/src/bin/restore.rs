@@ -6,20 +6,17 @@ use std::path::PathBuf;
 use std::fs;
 use std::io::Read;
 use oicnp_api::services::G;
-use regex::Regex;
 use gray_matter::Matter;
 use gray_matter::engine::YAML;
 use oicnp_api::dbs::{init_rbatis};
 use std::sync::Arc;
 use oicnp_api::models::{
-    Taxonomies, Nodes, NewNode, NewTaxonomy,
-    NodeTaxonomiesMap, NodeBody,
+    Nodes, NewNode,
 };
-use oicnp_api::typings::{TaxonomyBundle, NodeBundle, BodyFormat};
+use oicnp_api::typings::{NodeBundle, BodyFormat};
 use oicnp_api::services::{
     save_category,
     save_tags,
-    find_node_by_vid,
     save_node_content,
     save_node,
 };
@@ -28,8 +25,6 @@ use oicnp_api::utils::{
     is_valid_matter_content,
 };
 use rbatis::rbatis::Rbatis;
-use rbatis::crud::CRUD;
-use rbatis::Error;
 use serde::{Deserialize, Serialize};
 use log::{ warn };
 
@@ -90,50 +85,62 @@ async fn main () {
 
     let mut _i = 0;
     for blog in &all_blogs {
-        if let Ok(node) = save_blog(rb.clone(), blog).await {
-            let body = blog.content.as_ref().unwrap().as_str();
-            let res = save_node_content(
-                rb.clone(), node.nid,
-                body,
-                BodyFormat::Markdown,
-                blog.excerpt.as_str()
-            ).await;
+        let blog_res = save_blog(rb.clone(), blog).await;
 
-            // println!("node: {:?}", node);
-            let res = save_tags(rb.clone(), &blog.tags, node.nid).await;
+        match blog_res {
+            Ok(node) => {
+                let body = blog.content.as_ref().unwrap().as_str();
+                let res = save_node_content(
+                    rb.clone(), node.nid,
+                    body,
+                    BodyFormat::Markdown,
+                    blog.excerpt.as_str()
+                ).await;
 
-            if let Err(err) = res {
-                println!("Save tags failed: {}", err);
+                if let Err(err) = res {
+                    println!("Save node content failed: {}", err);
+                }
+
+                // println!("node: {:?}", node);
+                let res = save_tags(rb.clone(), &blog.tags, node.nid).await;
+
+                if let Err(err) = res {
+                    println!("Save tags failed: {}", err);
+                }
+
+                let res = save_category(rb.clone(), &blog.category, node.nid).await;
+
+                if let Err(err) = res {
+                    println!("Save category failed: {}", err);
+                }
+                _i += 1;
+            },
+            Err(err) => {
+                println!("Restore error: {}", err.to_string());
             }
-
-            let res = save_category(rb.clone(), &blog.category, node.nid).await;
-
-            if let Err(err) = res {
-                println!("Save category failed: {}", err);
-            }
-            _i += 1;
         }
     }
 
     println!("Restore completed with {} data", _i);
 }
 
-async fn save_blog(rb: Arc<Rbatis>, blog: &Blog) -> Result<Node, String> {
+async fn save_blog(rb: Arc<Rbatis>, blog: &Blog) -> Result<Nodes, String> {
+    let bundle = NodeBundle::Article;
     let node = NewNode {
         vid: String::from(&blog.slug),
         uid: 1,
-        bundle: String::from("blog"),
+        bundle: bundle.to_string(),
         title: String::from(&blog.title),
         deleted: false,
         created_by: 1,
         updated_by: 1
     };
-    let res = save_node(rb.clone(), &node).await;
+    let res = save_node(rb.clone(), &node, &bundle).await;
 
-    return match res {
+    match res {
         Ok(node) => Ok(node),
-        Err(err) => Err(format!("Node save failed: {}", &blog.slug));
-    };
+        Err(err) => Err(format!("Node save failed: {}", &blog.slug))
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]

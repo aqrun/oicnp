@@ -1,21 +1,18 @@
 use std::sync::Arc;
-use poem::Body;
 use rbatis::crud::CRUD;
 use rbatis::rbatis::Rbatis;
 use rbatis::Error;
-use rbatis::py_sql;
 use crate::models::{
     Nodes, NodeBody, NewNode,
 };
 use crate::typings::{
-    TaxonomyBundle, NodeBundle,
-    BodyFormat,
+    BodyFormat, NodeBundle,
 };
 
-pub async fn find_node_by_vid(rb: Arc<Rbatis>, vid: &str) -> Result<Nodes, String> {
+pub async fn find_node_by_vid(rb: Arc<Rbatis>, vid: &str, bundle: &NodeBundle) -> Result<Nodes, String> {
     let w = rb.new_wrapper()
         .eq("vid", vid)
-        .eq("bundle", "blog");
+        .eq("bundle", bundle.to_string());
     let node: Result<Option<Nodes>, Error> = rb.fetch_by_wrapper(w).await;
 
     if let Ok(node) = node {
@@ -33,7 +30,9 @@ pub async fn save_node_content(
     body_format: BodyFormat,
     summary: &str,
 ) -> Result<String, String> {
-    rb.remove_by_column::<NodeBody, _>("nid", nid).await;
+    if let Err(err) = rb.remove_by_column::<NodeBody, _>("nid", nid).await {
+        return Err(format!("Body save failed, {}", err.to_string()));
+    }
 
     let node_body = NodeBody {
         nid,
@@ -49,8 +48,8 @@ pub async fn save_node_content(
     }
 }
 
-pub async fn save_node(rb: Arc<Rbatis>, new_node: &NewNode) -> Result<Nodes, String> {
-    if let Ok(node) = find_node_by_vid(rb.clone(), &new_node.vid).await {
+pub async fn save_node(rb: Arc<Rbatis>, new_node: &NewNode, bundle: &NodeBundle) -> Result<Nodes, String> {
+    if let Ok(node) = find_node_by_vid(rb.clone(), &new_node.vid, bundle).await {
         return Ok(node);
     }
 
@@ -60,9 +59,9 @@ pub async fn save_node(rb: Arc<Rbatis>, new_node: &NewNode) -> Result<Nodes, Str
         return Err(err.to_string());
     }
 
-    if let Ok(node) = find_node_by_vid(rb.clone(), &new_node.vid).await {
+    if let Ok(node) = find_node_by_vid(rb.clone(), &new_node.vid, bundle).await {
         return Ok(node);
     }
 
-    Err(format!("Node save failed: {}", &blog.slug))
+    Err(format!("Node save failed: {}", &new_node.vid))
 }

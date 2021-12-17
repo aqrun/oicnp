@@ -10,7 +10,7 @@ use crate::typings::{
     TaxonomyBundle, NodeBundle,
 };
 
-#[py_sql("UPDATE taxonomies SET count = count + 1 WHERE tid = #{}")]
+#[py_sql("UPDATE taxonomies SET count = count + 1 WHERE tid = #{tid}")]
 pub async fn taxonomy_increase_count(
     rb: Arc<Rbatis>,
     tid: &i32,
@@ -23,7 +23,7 @@ pub async fn find_taxonomy(rb: Arc<Rbatis>, name: &str, bundle: &TaxonomyBundle)
         .eq("name", name)
         .eq("bundle", bundle.to_string());
 
-    let result: Result<Option<Taxonomy>, Error> = rb.fetch_by_wrapper(wrapper)
+    let result: Result<Option<Taxonomies>, Error> = rb.fetch_by_wrapper(wrapper)
         .await;
 
     if let Ok(res) = result {
@@ -59,7 +59,7 @@ pub async fn save_taxonomy(rb: Arc<Rbatis>, name: &str, bundle: &TaxonomyBundle)
         }
     }
 
-    Err(format!("Save tag failed: {}", tag_name))
+    Err(format!("Save tag failed: {}", name))
 }
 
 pub async fn find_node_taxonomy_map(rb: Arc<Rbatis>, nid: i32, tid: i32) -> Result<NodeTaxonomiesMap, String> {
@@ -95,9 +95,9 @@ pub async fn save_node_taxonomy_map(
         return Err(err.to_string());
     }
 
-    if bundle == TaxonomyBundle::Tag {
-        if let Error(err) = taxonomy_increase_count(rb.clone(), &tid) {
-            return Err(format!("Tag increase count error"));
+    if let TaxonomyBundle::Tag = bundle {
+        if let Err(err) = taxonomy_increase_count(rb.clone(), &tid).await {
+            return Err(format!("Tag increase count error, {}", err.to_string()));
         }
     }
 
@@ -108,7 +108,7 @@ pub async fn save_node_taxonomy_map(
 }
 
 pub async fn save_tags(rb: Arc<Rbatis>, tags: &Vec<String>, nid: i32) -> Result<Vec<Taxonomies>, String> {
-    let mut tags_list: Vec<Taxonomy> = vec!();
+    let mut tags_list: Vec<Taxonomies> = vec!();
 
     for tag_name in tags {
         if let Ok(tag) = save_taxonomy(rb.clone(), &tag_name, &TaxonomyBundle::Tag).await {

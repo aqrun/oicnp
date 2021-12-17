@@ -12,7 +12,7 @@ CREATE TABLE files (
 );
 
 COMMENT ON COLUMN files.storage is '资源存储位置类型如 local,qiniu(七牛),oos(阿里OOS)';
-CREATE INDEX file_uri__idx ON file (uri);
+CREATE INDEX file_uri__idx ON files (uri);
 
 CREATE TABLE users (
     uid SERIAL PRIMARY KEY,
@@ -47,7 +47,7 @@ CREATE TABLE user_pictures (
         PRIMARY KEY (uid, fid)
 );
 
-COMMENT ON COLUMN users_pictures.bundle is '图片类型 avatar';
+COMMENT ON COLUMN user_pictures.bundle is '图片类型 avatar';
 
 CREATE TABLE taxonomies (
     tid SERIAL PRIMARY KEY,
