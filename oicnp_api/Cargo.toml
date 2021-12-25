@@ -21,10 +21,10 @@ serde_yaml = "0.8"
 bson2 = "2"
 rbson = "2.0"
 log = "0.4"
-fast_log = "1"
-rbatis = { version = "3" }
+fast_log = { version = "1", features = ["lz4", "zip", "gzip"]}
+rbatis = { version = "3", features = ["debug_mode"] }
 chrono = { version = "0.4.19", features = ["serde"] }
-tracing-subscriber = "0.2"
+tracing-subscriber = "0.3"
 regex = "1"
 gray_matter = "0.2"
 strum = "0.23"

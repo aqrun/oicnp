@@ -1,7 +1,7 @@
 use async_graphql::{MergedObject};
 use crate::gql::{
-    UserQuery,
+    UserQuery, NodeQuery,
 };
 
 #[derive(MergedObject, Default)]
-pub struct QueryRoot(UserQuery);
+pub struct QueryRoot(UserQuery, NodeQuery);

@@ -19,6 +19,13 @@ pub async fn find_user_avatar(
     todo!()
 }
 
-pub async fn find_user_by_id(rb: Arc<Rbatis>, uid: i32) -> Result<Users, Error> {
-    return rb.fetch_by_column("uid", uid).await;
+pub async fn find_user_by_id(rb: Arc<Rbatis>, uid: i32) -> Result<Users, String> {
+    let res: Result<Option<Users>, Error> = rb.fetch_by_column("uid", uid).await;
+
+    if let Ok(user) = res {
+        if let Some(user) = user {
+            return Ok(user);
+        }
+    }
+    Err(format!("User not exist: {}", uid))
 }

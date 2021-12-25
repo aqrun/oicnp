@@ -5,12 +5,14 @@ use poem::{get, Route, Server,
 use crate::services::G;
 use crate::gql::{graphql, graphiql, build_schema};
 use crate::typings::State;
+use crate::utils::log;
 
 pub async fn run() -> Result<(), std::io::Error> {
+    log::init_log();
     if std::env::var_os("RUST_LOG").is_none() {
         std::env::set_var("RUST_LOG", "poem=debug");
     }
-    tracing_subscriber::fmt::init();
+    // tracing_subscriber::fmt::init();
 
     let path = &G.config.graphql_url;
     let address = &G.config.host;

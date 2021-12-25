@@ -29,7 +29,7 @@ impl UserQuery {
         &self,
         ctx: &Context<'_>,
         uid: i32,
-    ) -> Result<Users, Error> {
+    ) -> Result<Users, String> {
         let rb = ctx.data_unchecked::<GqlState>().rbatis.clone();
         let res = services::find_user_by_id(rb.clone(), uid).await;
         res

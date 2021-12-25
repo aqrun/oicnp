@@ -1,4 +1,12 @@
-use async_graphql::{Object};
+use async_graphql::{Object, Context};
+use crate::models::{
+    Users,
+};
+use crate::services::{
+    find_user_by_id,
+    find_node_body,
+};
+use crate::typings::{GqlState, DateFormat};
 
 #[crud_table]
 #[derive(Clone, Debug)]
@@ -21,6 +29,58 @@ impl Nodes {
     async fn nid(&self) -> i32 {
         self.nid
     }
+    async fn vid(&self) -> &str {
+        self.vid.as_str()
+    }
+    async fn user(
+        &self,
+        ctx: &Context<'_>
+    ) -> Option<Users> {
+        let rb = ctx.data_unchecked::<GqlState>().rbatis.clone();
+        if let Ok(user) = find_user_by_id(rb, self.uid).await {
+            return Some(user);
+        }
+        None
+    }
+    async fn bundle(&self) -> &str {
+        self.bundle.as_str()
+    }
+    async fn title(&self) -> &str {
+        self.title.as_str()
+    }
+    async fn viewed(&self) -> i32 {
+        self.viewed
+    }
+    async fn deleted(&self) -> bool {
+        self.deleted
+    }
+    async fn created_by(
+        &self,
+        ctx: &Context<'_>
+    ) -> Option<Users> {
+        let rb = ctx.data_unchecked::<GqlState>().rbatis.clone();
+        if let Ok(user) = find_user_by_id(rb, self.created_by).await {
+            return Some(user);
+        }
+        None
+    }
+    async fn updated_by(
+        &self,
+        ctx: &Context<'_>
+    ) -> Option<Users> {
+        let rb = ctx.data_unchecked::<GqlState>().rbatis.clone();
+        if let Ok(user) = find_user_by_id(rb, self.updated_by).await {
+            return Some(user);
+        }
+        None
+    }
+
+    async fn created_at(&self) -> String {
+        self.created_at.format(&DateFormat::Normal.to_string()).to_string()
+    }
+    async fn updated_at(&self) -> String {
+        self.updated_at.format(&DateFormat::Normal.to_string()).to_string()
+    }
 }
 
 #[crud_table(table_name: nodes)]
@@ -42,6 +102,22 @@ pub struct NodeBody {
     pub summary: String,
     pub body: String,
     pub body_format: String,
+}
+
+#[Object]
+impl NodeBody {
+    async fn nid(&self) -> i32 {
+        self.nid
+    }
+    async fn summary(&self) -> &str {
+        self.summary.as_str()
+    }
+    async fn body(&self) -> &str {
+        self.body.as_str()
+    }
+    async fn body_format(&self) -> &str {
+        self.body_format.as_str()
+    }
 }
 
 #[crud_table(table_name: node_taxonomies_map)]

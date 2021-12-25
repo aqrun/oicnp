@@ -1,6 +1,6 @@
 use async_graphql::{Object, Context};
 use serde::{Serialize, Deserialize};
-use crate::typings::GqlState;
+use crate::typings::{GqlState, DateFormat};
 use crate::services;
 use crate::models::{Files};
 
@@ -54,7 +54,7 @@ impl Users {
     }
 
     async fn last_login_on(&self) -> String {
-        self.last_login_on.format("%Y-%m-%d %H:%M:%S").to_string()
+        self.last_login_on.format(&DateFormat::Normal.to_string()).to_string()
     }
 
     async fn salt(&self) -> &str {
@@ -70,22 +70,22 @@ impl Users {
     }
 
     async fn created_at(&self) -> String {
-        self.last_login_on.format("%Y-%m-%d %H:%M:%S").to_string()
+        self.last_login_on.format(&DateFormat::Normal.to_string()).to_string()
     }
 
     async fn updated_at(&self) -> String {
-        self.last_login_on.format("%Y-%m-%d %H:%M:%S").to_string()
+        self.last_login_on.format(&DateFormat::Normal.to_string()).to_string()
     }
 
-    async fn avatar(&self, ctx: &Context<'_>) -> Files {
+    async fn avatar(&self, ctx: &Context<'_>) -> Option<Files> {
         let rb = ctx.data_unchecked::<GqlState>().rbatis.clone();
         let res = services::find_user_avatar(rb.clone(), &self.uid).await;
 
         let file = match res {
-            Ok(file) => file,
+            Ok(file) => Some(file),
             Err(err) => {
                 println!("Fetch user avatar error: {}", err.to_string());
-                Files::default()
+                None
             },
         };
 

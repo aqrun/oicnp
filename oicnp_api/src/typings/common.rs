@@ -1,4 +1,5 @@
 use strum_macros::Display;
+use serde::{Deserialize, Serialize};
 
 #[derive(Display, Debug)]
 pub enum TaxonomyBundle {
@@ -12,6 +13,15 @@ pub enum TaxonomyBundle {
 pub enum NodeBundle {
     #[strum(serialize = "article")]
     Article,
+}
+
+impl From<&str> for NodeBundle {
+    fn from(bundle: &str) -> Self {
+        match bundle {
+            "article" => Self::Article,
+            _ => Self::Article,
+        }
+    }
 }
 
 #[derive(Display, Debug)]
@@ -30,4 +40,9 @@ pub enum UserPicturesBundle {
     Avatar,
     #[strum(serialize = "image")]
     Image,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct Count {
+    pub count: i32,
 }
