@@ -67,18 +67,19 @@ impl NodeQuery {
             total_count
         };
 
-        query(None, None, None, None,
-              |_after, _before, _first, _last| async move {
-                    let mut connection = Connection::with_additional_fields(
-                        false, false, page_info
-                    );
-                    connection.append(
-                        data
-                            .iter()
-                            .map(|item| Edge::new(item.nid, item.clone()))
-                    );
-                    Ok(connection)
-              }
+        query(
+            None, None, None, None,
+            |_after, _before, _first, _last| async move {
+                let mut connection = Connection::with_additional_fields(
+                    false, false, page_info
+                );
+                connection.append(
+                    data
+                        .iter()
+                        .map(|item| Edge::new(item.nid, item.clone()))
+                );
+                Ok(connection)
+            }
         ).await
     }
 

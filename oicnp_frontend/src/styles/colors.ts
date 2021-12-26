@@ -1,0 +1,1 @@
+export const BLUE_PRIMARY = '#224ce7';

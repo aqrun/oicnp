@@ -1,0 +1,65 @@
+/** @type {import('next').NextConfig} */
+/* eslint-disable */
+const withLess = require('@zeit/next-less')
+const lessToJS = require('less-vars-to-js')
+const fs = require('fs')
+const path = require('path')
+const _ = require('lodash');
+
+// Where your antd-custom.less file lives
+// const themeVariables = lessToJS(
+//   fs.readFileSync(path.resolve(__dirname, './assets/antd-custom.less'), 'utf8')
+// )
+/*
+module.exports = withLess({
+  lessLoaderOptions: {
+    javascriptEnabled: true,
+    // modifyVars: themeVariables, // make your antd custom effective
+  },
+  webpack: (config, { isServer }) => {
+    console.log('---------------config', config);
+
+    if (isServer) {
+      const antStyles = /antd\/.*?\/style.*?/
+      const origExternals = [...config.externals]
+      config.externals = [
+        (context, request, callback) => {
+          if (request.match(antStyles)) return callback()
+          if (typeof origExternals[0] === 'function') {
+            origExternals[0](context, request, callback)
+          } else {
+            callback()
+          }
+        },
+        ...(typeof origExternals[0] === 'function' ? [] : origExternals),
+      ]
+
+      config.module.rules.unshift({
+        test: antStyles,
+        use: 'null-loader',
+      })
+    }
+
+    return config
+  },
+})
+*/
+
+module.exports = (phase, { defaultConfig }) => {
+  const alias = _.get(defaultConfig, 'resolve.alias', {});
+  const resolve = Object.assign({}, defaultConfig.resolve || {}, {
+    alias: Object.assign({}, alias, {
+      '~': path.resolve(__dirname, 'src'),
+    })
+  });
+
+  const config = {
+    resolve,
+    experimental: {
+      // Enables the styled-components SWC transform
+      styledComponents: true,
+    },
+  }
+
+  return config;
+};
