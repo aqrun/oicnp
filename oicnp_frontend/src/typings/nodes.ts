@@ -8,6 +8,8 @@ export interface Node {
   vid: string;
   bundle: string;
   title: string;
+  subTitle?: string;
+  cover?: string;
   viewed: number;
   deleted: boolean;
   author: User;
@@ -31,6 +33,9 @@ export interface QueryNodesRequestParams {
   category?: string;
   page?: number;
   pageSize?: number;
+  targetNid?: number;
+  orderName?: string;
+  orderDir?: string;
 }
 
 export interface QueryNodesResponseData {
@@ -38,4 +43,14 @@ export interface QueryNodesResponseData {
   page: number;
   pageSize: number;
   totalCount: number;
+}
+
+export interface QueryNodeRequestParams {
+  bundle: string;
+  nid: number;
+  vid: string;
+}
+
+export interface QueryNodeResponseData {
+  node: Node;
 }

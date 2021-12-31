@@ -18,6 +18,7 @@ export const HtmlHead = () => {
       <meta property="og:description" content={SITE.description} />
       <meta property="og:site_name" content={SITE.title} />
 
+      <link href="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.3.1/styles/base16/solarized-dark.min.css" rel="stylesheet" />
       <link rel="stylesheet" href="//cdn.staticfile.org/normalize/6.0.0/normalize.min.css" />
       <link rel="stylesheet" href="//at.alicdn.com/t/font_3063613_38mhesfhyb5.css"/>
       <link rel="stylesheet" href="/assets/css/github-markdown.css" />

@@ -1,17 +1,25 @@
+import React from 'react';
 import Head from 'next/head';
-import { mainMenu } from '../../constants';
+import { SITE, mainMenu } from '../../constants';
+import { QueryNodesResponseData } from '../../typings';
+import { queryNodes } from '../../services';
+import { Category } from '../../containers/Category';
 
-const Blogs = () => {
+export interface BlogsProps {
+  nodesRes: QueryNodesResponseData;
+  category: string;
+}
+
+const Blogs: React.FC<BlogsProps> = ({
+  nodesRes,
+  category,
+}) => {
 
   return (
-    <>
-      <Head>
-        <title>About 23</title>
-      </Head>
-      <div>
-        about page
-      </div>
-    </>
+    <Category
+      nodesRes={nodesRes}
+      category={category}
+    />
   );
 };
 
@@ -25,11 +33,19 @@ export const getStaticPaths = async () => {
   return { paths, fallback: false }
 };
 
-export const getStaticProps = async ({ params }) => {
-  console.log('----', params);
+export const getStaticProps = async ({ params }: any) => {
+  const category = params?.category;
+  const { pageSize } = SITE;
+  const nodesRes = await queryNodes({
+    category,
+    page: 1,
+    pageSize,
+  });
+
   return {
     props: {
-
+      nodesRes,
+      category,
     },
   };
 };

@@ -29,6 +29,7 @@ regex = "1"
 gray_matter = "0.2"
 strum = "0.23"
 strum_macros = "0.23"
+rand = "0.8"
 
 [[bin]]
 name = "main"

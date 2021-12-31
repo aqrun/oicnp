@@ -25,23 +25,65 @@ SELECT n.*, nb.body, nb.body_format, nb.summary,
   LEFT JOIN users uu on n.updated_by=uu.uid
   LEFT JOIN users a ON n.uid=a.uid
   WHERE n.deleted = false
-  AND n.bundle = #{bundle}
+  AND n.bundle = '${bundle}'
   AND t.bundle = 'category'
 
-  if category != '':
-    AND t.name = #{category}
+  for index,item in filters:
+    AND ${item}
 
-  ORDER BY n.created_at
-  OFFSET #{offset}
-  LIMIT #{limit}
+  if category != '':
+    AND t.name = '${category}'
+
+  ORDER BY n.${order_name} ${order_dir}
+  OFFSET ${offset}
+  LIMIT ${limit}
+")]
+pub async fn find_detail_nodes(
+    rb: Arc<Rbatis>,
+    bundle: &str,
+    category: &str,
+    filters: &Vec<String>,
+    order_name: &str, // created_at
+    order_dir: &str, // DESC
+    offset: &i32,
+    limit: &i32,
+) -> Result<Vec<DetailNode>, Error> {
+    todo!()
+}
+
+#[py_sql("
+SELECT n.*
+  FROM nodes n
+  LEFT JOIN node_body nb ON n.nid=nb.nid
+  LEFT JOIN node_taxonomies_map ntm ON ntm.nid=n.nid
+  LEFT JOIN taxonomies t ON t.tid=ntm.tid
+  LEFT JOIN users cu ON n.created_by=cu.uid
+  LEFT JOIN users uu on n.updated_by=uu.uid
+  LEFT JOIN users a ON n.uid=a.uid
+  WHERE n.deleted = false
+  AND n.bundle = '${bundle}'
+  AND t.bundle = 'category'
+
+  for index,item in filters:
+    AND ${item}
+
+  if category != '':
+    AND t.name = '${category}'
+
+  ORDER BY n.${order_name} ${order_dir}
+  OFFSET ${offset}
+  LIMIT ${limit}
 ")]
 pub async fn find_nodes(
     rb: Arc<Rbatis>,
     bundle: &str,
     category: &str,
+    filters: &Vec<String>,
+    order_name: &str, // created_at
+    order_dir: &str, // DESC
     offset: &i32,
     limit: &i32,
-) -> Result<Vec<DetailNode>, Error> {
+) -> Result<Vec<Nodes>, Error> {
     todo!()
 }
 
@@ -164,4 +206,87 @@ pub async fn find_node_taxonomies(
     nid: &i32,
 ) -> Result<Vec<Taxonomies>, Error> {
  todo!()
+}
+
+///
+/// 获取指定 target_id 对应的 相关数据列表
+///
+pub async fn find_nodes_width_target_id(
+    rb: Arc<Rbatis>,
+    bundle: &str,
+    category: &str,
+    filters: &Vec<String>,
+    order_name: &str, // created_at
+    order_dir: &str, // DESC
+    limit: &i32,
+    target_nid: &i32
+) -> Result<Vec<DetailNode>, Error> {
+    let mut data: Vec<DetailNode> = vec!();
+    let mut target_arr: Vec<DetailNode> = vec![];
+    let mut temp_filters = filters.clone();
+
+    let mut prev_filters = vec![
+        format!("n.nid = {}", target_nid)
+    ];
+    prev_filters.append(&mut temp_filters);
+
+    if let Ok(res) = find_detail_nodes(
+        rb.clone(),
+        &bundle,
+        &category,
+        &prev_filters,
+        &order_name,
+        &order_dir,
+        &0,
+        &1
+    ).await {
+        target_arr = res;
+    }
+
+    if limit <= &1 {
+        return Ok(target_arr);
+    }
+
+    let limit = (*limit as f32 / 2.0).ceil() as i32;
+    let mut next_filters = vec![
+        format!("n.nid < {}", target_nid)
+    ];
+    next_filters.append(&mut temp_filters);
+
+    if let Ok(res) = find_detail_nodes(
+        rb.clone(),
+        &bundle,
+        &category,
+        &next_filters,
+        &order_name,
+        &order_dir,
+        &0,
+        &limit
+    ).await {
+        let mut temp = res;
+        temp.reverse();
+        data.append(&mut temp);
+    }
+
+    data.extend(target_arr);
+
+    let filters = vec![
+        format!("n.nid > {}", target_nid)
+    ];
+    let order_dir = String::from("ASC");
+    if let Ok(res) = find_detail_nodes(
+        rb.clone(),
+        &bundle,
+        &category,
+        &filters,
+        &order_name,
+        &order_dir,
+        &0,
+        &limit
+    ).await {
+        let mut temp = res;
+        data.append(&mut temp);
+    }
+
+    Ok(data)
 }

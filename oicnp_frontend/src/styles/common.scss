@@ -151,16 +151,22 @@
         margin-top: 8px;
     }
     &.index-page{
-        background-image:  url('img/index-banner.jpg');
+      background-image:  url('img/index-banner.jpg');
+    }
+    &.backend {
+      background-image:  url('img/banner1.jpg');
     }
     &.frontend{
-        background-image:  url('img/banner2.jpg');
+      background-image:  url('img/banner2.jpg');
     }
     &.server{
-        background-image:  url('img/banner3.jpg');
+      background-image:  url('img/banner3.jpg');
     }
     &.diary{
-        background-image:  url('img/banner4.jpg');
+      background-image:  url('img/banner4.jpg');
+    }
+    &.rust {
+      background-image:  url('img/banner3.jpg');
     }
 }
 
@@ -648,7 +654,7 @@
         z-index: 3;
     }
     section {
-        display: none;
+        // display: none;
         position: relative;
         width: 80%;
         margin-left: 10%;

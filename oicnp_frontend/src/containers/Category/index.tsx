@@ -1,3 +1,4 @@
+import React from 'react';
 import { SITE } from '../../constants';
 import {
   QueryNodesResponseData,
@@ -10,24 +11,25 @@ import {
   SideBar,
   Header,
 } from '../../components';
-import {
-  Global,
-} from './index.styled';
 
-export interface HomeProps {
+export interface CategoryProps {
   nodesRes: QueryNodesResponseData;
+  category: string;
 }
 
-export const Home: React.FC<HomeProps> = ({
+export const Category: React.FC<CategoryProps> = ({
   nodesRes,
+  category,
 }) => {
   return (
     <>
-      <Global />
       <HtmlHead />
-      <Header menuId={MenuId.index} />
+      <Header
+        menuId={MenuId.index}
+        activeVid={category}
+      />
       <div
-        className={`g-banner home-banner index-page banner-theme-${SITE.themeColor}`}
+        className={`g-banner home-banner ${category} banner-theme-${SITE.themeColor}`}
         data-theme={SITE.themeColor}
       >
         <h2>满江红·怒发冲冠</h2>

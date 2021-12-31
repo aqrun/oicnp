@@ -16,7 +16,7 @@ export const ArticleList: React.FC<ArticleList> = ({
   page = 1,
   pageSize = 10,
   totalCount = 0,
-}) => {console.log(allBlogs)
+}) => {
   const pageCount = useMemo(() => {
     return Math.ceil(totalCount / pageSize);
   }, [totalCount, pageSize]);
@@ -31,7 +31,6 @@ export const ArticleList: React.FC<ArticleList> = ({
 
   const pagerClickHandle = useMemoizedFn((e) => {
     const current_page = e?.nextSelectedPage ?? 0;
-    console.log(current_page)
     location.href = current_page
       ? `/page/${current_page + 1}`
       : '/';
@@ -45,7 +44,7 @@ export const ArticleList: React.FC<ArticleList> = ({
           <ArticleListItem
             key={item.nid}
             title={item.title}
-            url={`/blog/${item.vid}`}
+            url={`/blog/${item.nid}/${item.vid}`}
             excerpt={item?.nodeBody?.summary}
             tags={tags}
             date={item.createdAt}

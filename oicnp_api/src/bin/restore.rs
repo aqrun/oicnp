@@ -27,6 +27,7 @@ use oicnp_api::utils::{
 use rbatis::rbatis::Rbatis;
 use serde::{Deserialize, Serialize};
 use log::{ warn };
+use rand::{Rng, thread_rng};
 
 #[derive(Debug)]
 struct Category<'a> {
@@ -126,6 +127,12 @@ async fn main () {
 
 async fn save_blog(rb: Arc<Rbatis>, blog: &Blog) -> Result<Nodes, String> {
     let bundle = NodeBundle::Article;
+    let mut rng = thread_rng();
+    let hour = format!("{:02}", rng.gen_range(0..23));
+    let minute = format!("{:02}", rng.gen_range(0..59));
+    let second = format!("{:02}", rng.gen_range(0..59));
+    let data_str = format!("{}T{}:{}:{}", &blog.date, hour, minute, second);
+    let date = rbatis::DateTimeNative::from_str(&data_str).unwrap();
     let node = NewNode {
         vid: String::from(&blog.slug),
         uid: 1,
@@ -133,7 +140,9 @@ async fn save_blog(rb: Arc<Rbatis>, blog: &Blog) -> Result<Nodes, String> {
         title: String::from(&blog.title),
         deleted: false,
         created_by: 1,
-        updated_by: 1
+        updated_by: 1,
+        created_at: date,
+        updated_at: date,
     };
     let res = save_node(rb.clone(), &node, &bundle).await;
 

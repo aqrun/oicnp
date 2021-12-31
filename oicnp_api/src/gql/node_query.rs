@@ -12,10 +12,11 @@ use crate::typings::{
     DetailNode, PageInfo,
 };
 use crate::services::{
-    find_nodes,
+    find_detail_nodes,
     find_nodes_count,
     find_node_by_nid,
     find_node_by_vid,
+    find_nodes_width_target_id,
 };
 
 #[derive(Default)]
@@ -27,8 +28,12 @@ impl NodeQuery {
         &self,
         ctx: &Context<'_>,
         category: Option<String>,
+        order_name: Option<String>,
+        order_dir: Option<String>,
         page: Option<i32>,
         page_size: Option<i32>,
+        #[graphql(desc = "返回指定ID相关的列表")]
+        target_nid: Option<i32>,
     ) -> FieldResult<Connection<i32, DetailNode, PageInfo, EmptyFields>> {
         let rb = ctx.data_unchecked::<GqlState>().rbatis.clone();
         let bundle = NodeBundle::Article.to_string();
@@ -37,18 +42,38 @@ impl NodeQuery {
         let category = category.unwrap_or(String::from(""));
         let limit = page_size;
         let offset = (page - 1 ) * limit;
+        let order_name = order_name.unwrap_or(String::from("created_at"));
+        let order_dir = order_dir.unwrap_or(String::from("DESC"));
+        let filters: Vec<String> = vec!();
 
         let mut total_count = 0;
-        let mut data: Vec<DetailNode> = vec!();
+        let mut data: Vec<DetailNode> = vec![];
+
+        let res = match target_nid {
+            Some(target_nid) => find_nodes_width_target_id(
+                rb.clone(),
+                &bundle,
+                &category,
+                &filters,
+                &order_name,
+                &order_dir,
+                &limit,
+                &target_nid
+            ).await,
+            _ => find_detail_nodes(
+                rb.clone(),
+                &bundle,
+                &category,
+                &filters,
+                &order_name,
+                &order_dir,
+                &offset,
+                &limit
+            ).await,
+        };
 
         // 查询数据列表
-        if let Ok(res) = find_nodes(
-            rb.clone(),
-            &bundle,
-            &category,
-            &offset,
-            &limit
-        ).await {
+        if let Ok(res) = res {
             data = res;
         }
 

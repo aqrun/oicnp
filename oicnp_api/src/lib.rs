@@ -15,6 +15,7 @@ extern crate tokio;
 extern crate fast_log;
 extern crate bson2;
 extern crate strum;
+extern crate rand;
 
 mod run;
 
