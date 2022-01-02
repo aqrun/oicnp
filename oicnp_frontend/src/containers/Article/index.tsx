@@ -15,6 +15,7 @@ import {
 import { ArticleBody } from './ArticleBody';
 import { Container } from './index.styled';
 import { ContentBottom } from './ContentBottom';
+import { SocialShare } from './SocialShare';
 
 export interface ArticleProps {
   node: Node;
@@ -37,7 +38,12 @@ export const Article: React.FC<ArticleProps> = ({
 
   return (
     <Container>
-      <HtmlHead />
+      <HtmlHead
+        title={`${node?.title} - ${SITE.title}`}
+        description={node?.nodeBody?.summary}
+        author={node?.author?.nickname}
+        url={`/blog/${node?.nid}/${node?.vid}`}
+      />
       <Header
         menuId={MenuId.index}
       />
@@ -110,11 +116,7 @@ export const Article: React.FC<ArticleProps> = ({
           />
         </article>
 
-        {SITE?.socialShare && (
-          <div className="social-share-wrapper">
-            <div className="social-share"></div>
-          </div>
-        )}
+        <SocialShare />
       </div>
 
       <ContentBottom

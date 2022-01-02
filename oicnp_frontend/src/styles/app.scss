@@ -1,7 +1,11 @@
-/**
- * Jekyll Theme Style
- * - author: liaokeyu (liaokeyu.com)
- */
+// icon-font
+@import '//at.alicdn.com/t/font_3063613_mdvukt1nt8.css';
+
+@import 'https://cdn.bootcdn.net/ajax/libs/highlight.js/11.3.1/styles/base16/solarized-dark.min.css';
+@import '//cdn.staticfile.org/normalize/6.0.0/normalize.min.css';
+@import './share.min.css';
+@import 'https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css';
+    
 @import 'helper';
 @import 'base';
 @import 'common';

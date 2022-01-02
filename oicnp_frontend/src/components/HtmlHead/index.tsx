@@ -1,30 +1,43 @@
+import React, { useMemo } from 'react';
 import Head from 'next/head';
 import { SITE } from '../../constants';
 
-export const HtmlHead = () => {
+export interface HtmlHeadProps {
+  url?: string;
+  title?: string;
+  description?: string;
+  keywords?: string;
+  author?: string;
+}
+
+export const HtmlHead: React.FC<HtmlHeadProps> = ({
+  url,
+  title,
+  description,
+  keywords,
+  author,
+}) => {
+  const newTitle = title || SITE.title;
+  const newUrl = url || SITE.url;
+  const newDesc = description || SITE.description;
+  const newKeywords = keywords || SITE.keyword;
+  const newAuthor = author || SITE.author;
 
   return (
     <Head>
       <meta charSet="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>{SITE.title}</title>
-      <meta name="author"  content="子十" />
-      <meta name="description" content={SITE.description} />
-      <meta name="keywords"  content={SITE.keyword} />
+      <title>{newTitle}</title>
+      <meta name="title" content={newTitle} />
+      <meta name="author"  content={newAuthor} />
+      <meta name="description" content={newDesc} />
+      <meta name="keywords"  content={newKeywords} />
 
-      <meta property="og:title" content={SITE.title} />
+      <meta property="og:title" content={newTitle} />
       <meta property="og:type" content="website" />
-      <meta property="og:url" content="http://www.aqrun.com" />
-      <meta property="og:description" content={SITE.description} />
+      <meta property="og:url" content={newUrl} />
+      <meta property="og:description" content={newDesc} />
       <meta property="og:site_name" content={SITE.title} />
-
-      <link href="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.3.1/styles/base16/solarized-dark.min.css" rel="stylesheet" />
-      <link rel="stylesheet" href="//cdn.staticfile.org/normalize/6.0.0/normalize.min.css" />
-      <link rel="stylesheet" href="//at.alicdn.com/t/font_3063613_38mhesfhyb5.css"/>
-      <link rel="stylesheet" href="/assets/css/github-markdown.css" />
-      <link rel="stylesheet" href="/assets/prism/prism.css?v=0.1" />
-      <link rel="stylesheet" href="/assets/css/share.min.css" />
-      <link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" />
     </Head>
   );
 };

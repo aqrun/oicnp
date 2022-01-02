@@ -7,3 +7,4 @@ export * from './ArticleListItem';
 export * from './HtmlHead';
 export * from './SideBar';
 export * from './Header';
+export * from './FixedButtons';

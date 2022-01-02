@@ -35,7 +35,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   });
   let node = res?.node;
   const relatedRes = await await queryNodes({
-    category: node?.category?.name ?? '',
+    category: '', // node?.category?.name ?? '',
     page: 1,
     pageSize: 10,
     targetNid: node?.nid,

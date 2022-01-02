@@ -36,7 +36,7 @@ export const SITE = {
   sns: [
     { name: 'weibo', url: '//weibo.com/aqrun' },
     { name: 'jianshu', url: '//www.jianshu.com/u/0b2ee2adc013' },
-    { name: 'gitee2', url: '//gitee.com/aqrun' },
+    { name: 'gitee', url: '//gitee.com/aqrun' },
     { name: 'github', url: '//github.com/aqrun' },
   ],
 
