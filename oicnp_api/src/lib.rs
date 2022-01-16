@@ -16,6 +16,7 @@ extern crate fast_log;
 extern crate bson2;
 extern crate strum;
 extern crate rand;
+extern crate snowflake;
 
 mod run;
 

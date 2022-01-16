@@ -29,3 +29,23 @@ pub async fn find_user_by_id(rb: Arc<Rbatis>, uid: i32) -> Result<Users, String>
     }
     Err(format!("User not exist: {}", uid))
 }
+
+pub async fn find_user_by_username(rb: Arc<Rbatis>, username: &str) -> Result<Users, String> {
+    let res: Result<Option<Users>, Error> = rb.fetch_by_column("username", username).await;
+    if let Ok(user) = res {
+        if let Some(user) = user {
+            return Ok(user);
+        }
+    }
+    Err(format!("User not exist: {}", username))
+}
+
+pub async fn find_user_by_email(rb: Arc<Rbatis>, email: &str) -> Result<Users, String> {
+    let res: Result<Option<Users>, Error> = rb.fetch_by_column("email", email).await;
+    if let Ok(user) = res {
+        if let Some(user) = user {
+            return Ok(user);
+        }
+    }
+    Err(format!("User not exist: {}", email))
+}
