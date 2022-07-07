@@ -34,7 +34,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     vid: slug,
   });
   let node = res?.node;
-  const relatedRes = await await queryNodes({
+  const relatedRes = await queryNodes({
     category: '', // node?.category?.name ?? '',
     page: 1,
     pageSize: 10,
