@@ -1,0 +1,25 @@
+.breadcrumb-li {
+    &:before {
+        color: #b5b5b5;
+        content: "\0002f";
+    }
+    &:first-child {
+        &:before {
+            content: none;
+        }
+
+        a {
+            padding-left: 0;
+        }
+    }
+    &:last-child {
+        a {
+            @apply cursor-default text-gray-600;
+
+            &:hover {
+                @apply text-gray-600;
+            }
+        }
+    }
+}
+

@@ -7,9 +7,7 @@ use crate::routes::{switch, AppRoute};
 pub fn app() -> Html {
     html! {
         <BrowserRouter>
-            <main class="h-full">
-                <Switch<AppRoute> render={Switch::render(switch)} />
-            </main>
+            <Switch<AppRoute> render={Switch::render(switch)} />
         </BrowserRouter>
     }
 }

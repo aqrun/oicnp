@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+html, body {
+  font-size: 12px;
+  @apply min-h-screen overflow-hidden;
+}
+
+.main-height {
+  height: calc(100vh - 4rem);
+}
+
+.dropdown:hover .dropdown-content {
+  @apply block;
+}
+
+span {
+  cursor: default;
+}
