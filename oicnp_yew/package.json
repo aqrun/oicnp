@@ -1,0 +1,24 @@
+{
+  "name": "mybulma",
+  "version": "1.0.0",
+  "main": "sass/mystyles.scss",
+  "license": "MIT",
+  "scripts": {
+    "start": "concurrently 'npm:start-sass' 'npm:start-tailwind' 'npm:start-trunk'",
+    "start-sass": "sass ./src/styles/style.scss:./src/styles/builds/tailwind.css -w --no-source-map",
+    "start-tailwind": "yarn tailwindcss -i ./src/styles/builds/tailwind.css -o ./src/styles/builds/style.css --watch",
+    "start-trunk": "trunk serve --port=9527",
+    "build": "NODE_ENV=production yarn tailwindcss -i ./src/styles/tailwind.css -o style.min.css --minify"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.2",
+    "autoprefixer": "^10.4.7",
+    "concurrently": "^7.3.0",
+    "postcss": "^8.4.14",
+    "tailwindcss": "^3.1.6"
+  },
+  "dependencies": {
+    "tw-elements": "^1.0.0-alpha12"
+  }
+}
+
