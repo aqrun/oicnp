@@ -1,6 +1,8 @@
 use sea_orm_migration::prelude::*;
 use super::types::*;
 
+const INDEX_PARENT_ID: &'static str = "idx-departments-parentId";
+
 pub struct Migration;
 
 impl MigrationName for Migration {
@@ -53,7 +55,7 @@ impl MigrationTrait for Migration {
 
         let idx_parent_id = Index::create()
             .if_not_exists()
-            .name("idx-departments-parentId")
+            .name(INDEX_PARENT_ID)
             .table(SysDepartments::Table)
             .col(SysDepartments::ParentId)
             .to_owned();
@@ -65,7 +67,7 @@ impl MigrationTrait for Migration {
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager.drop_index(
             Index::drop()
-                .name("idx-departments-parentId")
+                .name(INDEX_PARENT_ID)
                 .table(SysDepartments::Table)
                 .to_owned(),
         ).await?;
