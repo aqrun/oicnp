@@ -1,6 +1,5 @@
 use yew::prelude::*;
 use web_sys::{HtmlInputElement};
-use crate::utils::log;
 
 #[function_component(InputTest)]
 pub fn input_test() -> Html {
@@ -13,7 +12,7 @@ pub fn input_test() -> Html {
             // array.push(&format!("name: {}", val).into());
             // array.push(&"2342".into());
             // console::log(&array);
-            log(&vec![&val, "43"]);
+            // log(&vec![&val, "43"]);
         })
     };
 

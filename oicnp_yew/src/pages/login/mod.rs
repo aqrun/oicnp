@@ -1,7 +1,6 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
 use web_sys::{HtmlInputElement};
-use crate::components::layouts::{Footer};
 use crate::routes::AppRoute;
 
 #[function_component(Login)]
@@ -82,7 +81,6 @@ pub fn login() -> Html {
                     </form>
                 </div>
             </div>
-            <Footer />
         </div>
     }
 }

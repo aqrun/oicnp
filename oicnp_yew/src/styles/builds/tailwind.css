@@ -14,6 +14,19 @@ html, body {
   @apply block;
 }
 
-span {
-  cursor: default;
+.breadcrumb-li:before {
+  color: #b5b5b5;
+  content: "/";
+}
+.breadcrumb-li:first-child:before {
+  content: none;
+}
+.breadcrumb-li:first-child a {
+  padding-left: 0;
+}
+.breadcrumb-li:last-child a {
+  @apply cursor-default text-gray-600;
+}
+.breadcrumb-li:last-child a:hover {
+  @apply text-gray-600;
 }
