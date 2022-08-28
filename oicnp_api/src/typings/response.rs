@@ -5,14 +5,14 @@ use crate::typings::{
 };
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct PageInfo {
+pub struct PagerInfo {
     pub page: i32,
     pub page_size: i32,
     pub total_count: i32,
 }
 
 #[Object]
-impl PageInfo {
+impl PagerInfo {
     async fn page(&self) -> i32 {
         self.page
     }

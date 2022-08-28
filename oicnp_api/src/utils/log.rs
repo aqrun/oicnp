@@ -1,23 +1,26 @@
+use std::ops::Deref;
 use crate::services::G;
 use fast_log::consts::LogSize;
 use fast_log::plugin::file_split::{Packer, RollingType};
 use fast_log::plugin::packer::{LZ4Packer, ZipPacker, LogPacker, GZipPacker};
+use fast_log::Config;
 use std::time::Duration;
 
 pub fn init_log() {
     //create log dir
     std::fs::create_dir_all(&G.config.log_dir);
+
+    // let packer = choose_packer(&G.config.log_pack_compress);
     //init fast log
-    let res = fast_log::init_split_log(
-        &G.config.log_dir,
-       // G.config.log_cup as usize,
-        str_to_temp_size(&G.config.log_temp_size),
-        str_to_rolling(&G.config.log_rolling_type),
-        str_to_log_level(&G.config.log_level),
-        None,
-        choose_packer(&G.config.log_pack_compress),
-        G.config.debug,
-    );
+    let fast_log_config = Config::new()
+        .console()
+        .file_split(
+            &G.config.log_dir,
+            str_to_temp_size(&G.config.log_temp_size),
+            str_to_rolling(&G.config.log_rolling_type),
+            LogPacker {},
+        );
+    let res = fast_log::init(fast_log_config);
 
     if let Err(err) = res {
         println!("Logger init error: {:?}", err);

@@ -1,66 +1,108 @@
 use sea_orm_migration::prelude::*;
+use oicnp_derives::{Column as OicColumn};
 
-#[derive(Iden)]
+#[derive(Iden, OicColumn)]
 pub enum SysApiDb {
     Table,
+    #[oic()]
     ApiId,
     Db,
 }
 
 // sys_dept
-#[derive(Iden)]
+#[derive(Iden, OicColumn)]
+#[oic(comment = "部门表")]
 pub enum SysDepartments {
     Table,
+    #[oic(type = "string", len = 32, comment = "部门ID")]
     Id,
+    #[oic(type = "string", len = 32, default = "" comment = "父部门id")]
     ParentId,
+    #[oic(type = "string", len = 32, default = "" comment = "部门名称")]
     Name,
+    #[oic(type = "int", len = 4, default = 0 comment = "权重")]
     Weight,
+    #[oic(type = "string", len = 20, default = "" comment = "负责人")]
     Leader,
+    #[oic(type = "string", len = 11, default = "" comment = "联系电话")]
     Phone,
+    #[oic(type = "string", len = 50, default = "" comment = "邮箱")]
     Email,
+    #[oic(type = "char", len = 1, default = "0" comment = "部门状态（0正常 1停用）")]
     Status,
+    #[oic(type = "string", len = 32, default = "" comment = "创建者")]
     CreatedBy,
+    #[oic(type = "datetime", comment = "创建时间")]
     CreatedAt,
+    #[oic(type = "string", len = 32, default = "" comment = "更新者")]
     UpdatedBy,
+    #[oic(type = "datetime", default = "null" comment = "更新时间")]
     UpdatedAt,
+    #[oic(type = "datetime", default = "null" comment = "删除时间")]
     DeletedAt,
 }
 
 // sys_dict_type
-#[derive(Iden)]
+#[derive(Iden, OicColumn)]
+#[oic(comment = "字典类型表")]
 pub enum SysAttributes {
     Table,
+    #[oic(type = "string", len = 32, default = "" comment = "字典主键")]
     Id,
     // 原 type
+    #[oic(type = "string", len = 100, unique = true, default = "" comment = "字典类型")]
     Vid,
+    #[oic(type = "string", len = 100, default = "" comment = "字典名称")]
     Name,
+    #[oic(type = "char", len = 1, default = "0" comment = "状态（0正常 1停用）")]
     Status,
+    #[oic(type = "string", len = 500, default = "" comment = "备注")]
     Remark,
+    #[oic(type = "string", len = 32, default = "" comment = "创建者")]
     CreatedBy,
+    #[oic(type = "datetime", comment = "创建时间")]
     CreatedAt,
+    #[oic(type = "string", len = 32, default = "" comment = "更新者")]
     UpdatedBy,
+    #[oic(type = "datetime", default = "null" comment = "更新时间")]
     UpdatedAt,
+    #[oic(type = "datetime", default = "null" comment = "删除时间")]
     DeletedAt,
 }
 
 // sys_dict_data
-#[derive(Iden)]
+#[derive(Iden, OicColumn)]
+#[oic(comment = "字典数据表")]
 pub enum SysAttributeValues {
     Table,
+    #[oic(type = "string", len = 32, default = "" comment = "字典主键")]
     Id,
+    #[oic(type = "string", len = 32, default = "" comment = "字典主键")]
     AttributeVid,
+    #[oic(type = "string", len = 32, default = "" comment = "字典主键")]
     Label,
+    #[oic(type = "string", len = 32, default = "" comment = "字典主键")]
     Value,
+    #[oic(type = "int", len = 4, default = 0 comment = "权重")]
     Weight,
+    #[oic(type = "string", len = 32, default = "" comment = "字典主键")]
     CssClass,
+    #[oic(type = "string", len = 32, default = "" comment = "字典主键")]
     ListClass,
+    #[oic(type = "string", len = 32, default = "" comment = "字典主键")]
     IsDefault,
     Status,
+    #[oic(type = "string", len = 500, default = "" comment = "备注")]
     Remark,
+    #[oic(type = "string", len = 32, default = "" comment = "创建者")]
     CreatedBy,
+    #[oic(type = "datetime", comment = "创建时间")]
     CreatedAt,
+    #[oic(type = "string", len = 32, default = "" comment = "更新者")]
     UpdatedBy,
+    #[oic(type = "datetime", default = "null" comment = "更新时间")]
     UpdatedAt,
+    #[oic(type = "datetime", default = "null" comment = "删除时间")]
     DeletedAt,
 }
 

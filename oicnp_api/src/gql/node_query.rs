@@ -9,7 +9,7 @@ use crate::gql::GqlResult;
 use crate::models::Nodes;
 use crate::typings::{
     GqlState, NodeBundle,
-    DetailNode, PageInfo,
+    DetailNode, PagerInfo,
 };
 use crate::services::{
     find_detail_nodes,
@@ -34,7 +34,7 @@ impl NodeQuery {
         page_size: Option<i32>,
         #[graphql(desc = "返回指定ID相关的列表")]
         target_nid: Option<i32>,
-    ) -> FieldResult<Connection<i32, DetailNode, PageInfo, EmptyFields>> {
+    ) -> FieldResult<Connection<i32, DetailNode, PagerInfo, EmptyFields>> {
         let rb = ctx.data_unchecked::<GqlState>().rbatis.clone();
         let bundle = NodeBundle::Article.to_string();
         let page = page.unwrap_or(1);
@@ -86,7 +86,7 @@ impl NodeQuery {
             total_count = res.count;
         }
 
-        let page_info = PageInfo {
+        let page_info = PagerInfo {
             page,
             page_size,
             total_count
@@ -98,12 +98,12 @@ impl NodeQuery {
                 let mut connection = Connection::with_additional_fields(
                     false, false, page_info
                 );
-                connection.append(
+                connection.edges.extend(
                     data
                         .iter()
                         .map(|item| Edge::new(item.nid, item.clone()))
                 );
-                Ok(connection)
+                Ok::<_, async_graphql::Error>(connection)
             }
         ).await
     }

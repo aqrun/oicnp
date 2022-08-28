@@ -12,8 +12,8 @@ tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 poem = "1.0"
 dotenv = "0.15.0"
 lazy_static = "1.4"
-async-graphql-poem = "2.10"
-async-graphql = {version = "2.10", features = ["bson", "chrono"]}
+async-graphql-poem = "^4"
+async-graphql = {version = "^4", features = ["bson", "chrono"]}
 slab = "0.4.3"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

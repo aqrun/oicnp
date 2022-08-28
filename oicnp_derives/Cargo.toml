@@ -1,0 +1,15 @@
+[package]
+name = "oicnp_derives"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "oicnp_derives"
+path = "src/lib.rs"
+proc-macro = true
+
+[dependencies]
+syn = { version = "^1", features = [ "full" ] }
+quote = "^1"
+proc-macro2 = "^1"
+bae = "^0"
