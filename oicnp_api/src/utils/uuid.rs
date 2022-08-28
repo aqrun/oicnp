@@ -1,4 +1,7 @@
 use snowflake::SnowflakeIdBucket;
+use snowflake::SnowflakeIdGenerator;
+use std::thread::sleep;
+use std::time::Duration;
 
 const ALL_CHARS: &'static str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_";
 
@@ -9,14 +12,14 @@ const ALL_CHARS: &'static str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJK
 /// let raw_id = 6888076346770202619;
 /// assert_eq!(base_10_to_n(raw_id, 36), "1gbyra5idyk8r");
 /// ```
-pub fn base_10_to_n(num: u64, radix: u32) -> String {
+pub fn base_10_to_n(num: u128, radix: u32) -> String {
     if num == 0 {
         return String::from("0");
     }
 
-    let base = base_10_to_n(num / (radix as u64), radix);
+    let base = base_10_to_n(num / (radix as u128), radix);
     let start = base.strip_prefix("0").unwrap_or(base.as_str());
-    let end = match ALL_CHARS.chars().nth((num % (radix as u64)) as usize) {
+    let end = match ALL_CHARS.chars().nth((num % (radix as u128)) as usize) {
         Some(data) => String::from(data),
         _ => String::from(""),
     };
@@ -44,9 +47,19 @@ pub fn base_n_to_10(num_str: &str, radix: u32) -> u128 {
 /// 生成雪花算法ID 结果转为36进制
 ///
 /// let (id, raw_id) = generate_snow_id(36);
-pub fn generate_snow_id(radix: u32) -> (String, u64) {
+pub fn generate_snow_id(radix: u32) -> (String, u128) {
+    // 暂停1毫秒
+    sleep(Duration::from_nanos(1));
     let mut b = SnowflakeIdBucket::new(1, 1);
-    let raw_id = b.get_id() as u64;
+    let raw_id = b.get_id() as u128;
+    (base_10_to_n(raw_id, radix), raw_id)
+}
+
+pub fn unique_id(radix: u32) -> (String, u128) {
+    // 暂停1毫秒
+    sleep(Duration::from_nanos(1));
+    let mut id_generator = SnowflakeIdGenerator::new(2, 3);
+    let raw_id = id_generator.real_time_generate() as u128;
     (base_10_to_n(raw_id, radix), raw_id)
 }
 
