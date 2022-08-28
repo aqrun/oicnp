@@ -77,20 +77,21 @@ pub enum SysAttributeValues {
     Table,
     #[oic(type = "string", len = 32, default = "" comment = "字典主键")]
     Id,
-    #[oic(type = "string", len = 32, default = "" comment = "字典主键")]
+    #[oic(type = "string", len = 100, default = "" comment = "字典类型")]
     AttributeVid,
-    #[oic(type = "string", len = 32, default = "" comment = "字典主键")]
+    #[oic(type = "string", len = 100, default = "" comment = "字典标签")]
     Label,
-    #[oic(type = "string", len = 32, default = "" comment = "字典主键")]
+    #[oic(type = "string", len = 100, default = "" comment = "字典键值")]
     Value,
     #[oic(type = "int", len = 4, default = 0 comment = "权重")]
     Weight,
-    #[oic(type = "string", len = 32, default = "" comment = "字典主键")]
+    #[oic(type = "string", len = 100, default = "" comment = "样式属性（其他样式扩展）")]
     CssClass,
-    #[oic(type = "string", len = 32, default = "" comment = "字典主键")]
+    #[oic(type = "string", len = 100, default = "" comment = "表格回显样式")]
     ListClass,
-    #[oic(type = "string", len = 32, default = "" comment = "字典主键")]
+    #[oic(type = "char", len = 1, default = "N" comment = "是否默认（Y是 N否）")]
     IsDefault,
+    #[oic(type = "char", len = 1, default = "0" comment = "状态（0正常 1停用）")]
     Status,
     #[oic(type = "string", len = 500, default = "" comment = "备注")]
     Remark,
