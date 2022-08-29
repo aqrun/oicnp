@@ -108,100 +108,170 @@ pub enum SysAttributeValues {
 }
 
 // sys_job
-#[derive(Iden)]
+#[derive(Iden, OicColumn)]
+#[oic(comment = "定时任务调度表")]
 pub enum SysCrons {
     Table,
+    #[oic(type = "string", len = 32, comment = "任务ID")]
     Id,
+    #[oic(type = "string", len = 100, default = "", comment = "vid")]
     Vid,
+    #[oic(type = "int", default = 0, comment = "")]
     Count,
+    #[oic(type = "int", default = 0)]
     RunCount,
+    #[oic(type = "string", len = 64, default = "", comment = "任务名称")]
     Name,
+    #[oic(type = "string", len = 200, default = "", comment = "任务参数")]
     Params,
+    #[oic(type = "string", len = 64, default = "DEFAULT", comment = "任务组名")]
     Group,
+    #[oic(type = "string", len = 500, default = "", comment = "调用目标字符串")]
     InvokeTarget,
+    #[oic(type = "string", len = 255, default = "", comment = "cron执行表达式")]
     Expression,
+    #[oic(type = "string", len = 20, default = "3", comment = "计划执行错误策略（1立即执行 2执行一次 3放弃执行）")]
     MisfirePolicy,
+    #[oic(type = "char", len = 1, default = "1", comment = "是否并发执行（0允许 1禁止）")]
     Concurrent,
+    #[oic(type = "char", len = 1, default = "1", comment = "状态（1正常 0暂停）")]
     Status,
+    #[oic(type = "string", len = 500, default = "", comment = "备注信息")]
     Remark,
+    #[oic(type = "datetime", default = "null", comment = "上次执行时间")]
     LastTime,
+    #[oic(type = "datetime", default = "null", comment = "下次执行时间")]
     NextTime,
+    #[oic(type = "datetime", default = "null", comment = "结束时间")]
     EndTime,
+    #[oic(type = "string", len = 32, default = "", comment = "创建者")]
     CreatedBy,
+    #[oic(type = "datetime", comment = "创建时间")]
     CreatedAt,
+    #[oic(type = "string", len = 32, default = "", comment = "更新者")]
     UpdatedBy,
+    #[oic(type = "datetime", default = "null", comment = "更新时间")]
     UpdatedAt,
+    #[oic(type = "datetime", default = "null", comment = "删除时间")]
     DeletedAt,
 }
 
 // sys_job_log
-#[derive(Iden)]
+#[derive(Iden, OicColumn)]
 pub enum SysCronLogs {
     Table,
+    #[oic(type = "string", len = 32, comment = "任务日志ID")]
     Id,
+    #[oic(type = "string", len = 32, comment = "cron id")]
     CronId,
+    #[oic(type = "string", len = 32, default = "", comment = "")]
     LotId,
+    #[oic(type = "int", len = 4, default = 0, comment = "权重")]
     Weight,
+    #[oic(type = "string", len = 64, default = "", comment = "任务名称")]
     Name,
+    #[oic(type = "string", len = 64, default = "", comment = "任务组名")]
     Group,
+    #[oic(type = "string", len = 500, default = "", comment = "调用目标字符串")]
     InvokeTarget,
+    #[oic(type = "string", len = 500, default = "", comment = "参数")]
     Params,
+    #[oic(type = "string", len = 500, default = "", comment = "日志信息")]
     Message,
+    #[oic(type = "char", len = 1, default = "1", comment = "状态（1正常 0暂停）")]
     Status,
+    #[oic(type = "string", len = 2000, default = "", comment = "异常信息")]
     ExceptionInfo,
+    #[oic(type = "char", default = "null", comment = "")]
     IsOnce,
+    #[oic(type = "datetime", comment = "创建时间")]
     CreatedAt,
+    #[oic(type = "datetime", comment = "")]
     ElapsedTime,
 }
 
 // sys_login_log
-#[derive(Iden)]
+#[derive(Iden, OicColumn)]
 pub enum SysLoginLogs {
     Table,
+    #[oic(type = "string", len = 32, comment = "id")]
     Id,
+    #[oic(type = "string", len = 50, default = "", comment = "")]
     LoginName,
+    #[oic(type = "string", len = 10, default = "", comment = "")]
     Net,
+    #[oic(type = "string", len = 50, default = "", comment = "IP")]
     Ip,
+    #[oic(type = "string", len = 255, default = "", comment = "地址")]
     Location,
+    #[oic(type = "string", len = 50, default = "", comment = "浏览器")]
     Browser,
+    #[oic(type = "string", len = 50, default = "", comment = "系统")]
     Os,
+    #[oic(type = "string", len = 50, default = "", comment = "")]
     Device,
+    #[oic(type = "char", len = 1, default = "0", comment = "")]
     Status,
+    #[oic(type = "string", len = 255, default = "", comment = "")]
     Message,
+    #[oic(type = "datetime", comment = "")]
     LoginAt,
+    #[oic(type = "string", len = 30, default = "", comment = "")]
     Module,
 }
 
 // sys_menus
-#[derive(Iden)]
+#[derive(Iden, OicColumn)]
 pub enum SysMenus {
     Table,
+    #[oic(type = "string", len = 32, comment = "id")]
     Id,
+    #[oic(type = "string", len = 32, default = "", comment = "")]
     Pid,
+    #[oic(type = "string", len = 255, default = "", comment = "")]
     Path,
+    #[oic(type = "string", len = 100, default = "", comment = "")]
     Name,
+    #[oic(type = "string", len = 50, default = "", comment = "")]
     Icon,
+    #[oic(type = "char", len = 1, default = "", comment = "")]
     Type,
+    #[oic(type = "string", len = 255, default = "", comment = "")]
     Query,
+    #[oic(type = "int", default = 0, comment = "")]
     Weight,
+    #[oic(type = "string", len = 255, default = "", comment = "")]
     Api,
+    #[oic(type = "char", len = 1, default = "1", comment = "")]
     Status,
+    #[oic(type = "string", len = 10, default = "", comment = "")]
     Method,
+    #[oic(type = "string", len = 100, default = "", comment = "")]
     Component,
+    #[oic(type = "char", len = 1, default = "1", comment = "")]
     Visible,
+    #[oic(type = "char", len = 1, default = "1", comment = "")]
     IsCache,
+    #[oic(type = "char", len = 1, default = "0", comment = "")]
     LogMethod,
+    #[oic(type = "char", len = 1, default = "0", comment = "")]
     DataCacheMethod,
+    #[oic(type = "char", len = 1, default = "0", comment = "")]
     IsFrame,
+    #[oic(type = "char", len = 1, default = "0", comment = "")]
     DataScope,
+    #[oic(type = "string", len = 255, default = "", comment = "")]
     Remark,
+    #[oic(type = "datetime", default = "", comment = "创建时间")]
     CreatedAt,
+    #[oic(type = "datetime", default = "null", comment = "更新时间")]
     UpdatedAt,
+    #[oic(type = "datetime", default = "null", comment = "删除时间")]
     DeletedAt,
 }
 
 // sys_oper_log
-#[derive(Iden)]
+#[derive(Iden, OicColumn)]
 pub enum SysOperationLogs {
     Table,
     Id,
@@ -226,7 +296,7 @@ pub enum SysOperationLogs {
 }
 
 // sys_post
-#[derive(Iden)]
+#[derive(Iden, OicColumn)]
 pub enum SysPositions {
     Table,
     Id,
@@ -243,7 +313,7 @@ pub enum SysPositions {
 }
 
 // sys_role
-#[derive(Iden)]
+#[derive(Iden, OicColumn)]
 pub enum SysRoles {
     Table,
     Id,
@@ -258,7 +328,7 @@ pub enum SysRoles {
 }
 
 // sys_role_api
-#[derive(Iden)]
+#[derive(Iden, OicColumn)]
 pub enum SysRoleApiMap {
     Table,
     Id,
@@ -270,7 +340,7 @@ pub enum SysRoleApiMap {
 }
 
 // sys_role_dept
-#[derive(Iden)]
+#[derive(Iden, OicColumn)]
 pub enum SysRoleDepartmentMap {
     Table,
     RoleId,
@@ -279,7 +349,7 @@ pub enum SysRoleDepartmentMap {
 }
 
 // sys_update_log
-#[derive(Iden)]
+#[derive(Iden, OicColumn)]
 pub enum SysUpdateLogs {
     Table,
     Id,
@@ -295,7 +365,7 @@ pub enum SysUpdateLogs {
 }
 
 // sys_user
-#[derive(Iden)]
+#[derive(Iden, OicColumn)]
 pub enum SysUsers {
     Table,
     Id,
@@ -320,7 +390,7 @@ pub enum SysUsers {
 }
 
 // sys_user_dept
-#[derive(Iden)]
+#[derive(Iden, OicColumn)]
 pub enum SysUserDepartmentMap {
     Table,
     UserId,
@@ -330,7 +400,7 @@ pub enum SysUserDepartmentMap {
 }
 
 // sys_user_post
-#[derive(Iden)]
+#[derive(Iden, OicColumn)]
 pub enum SysUserPositionMap {
     Table,
     UserId,
@@ -339,7 +409,7 @@ pub enum SysUserPositionMap {
 }
 
 // sys_user_role
-#[derive(Iden)]
+#[derive(Iden, OicColumn)]
 pub enum SysUserRoleMap {
     Table,
     UserId,
@@ -349,7 +419,7 @@ pub enum SysUserRoleMap {
 }
 
 // sys_user_online
-#[derive(Iden)]
+#[derive(Iden, OicColumn)]
 pub enum SysUserOnline {
     Table,
     UserId,
