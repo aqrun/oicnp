@@ -34,7 +34,7 @@ impl MigrationTrait for Migration {
             .col(ColumnDef::new(SysCrons::Expression).string_len(255).default(""))
             .col(ColumnDef::new(SysCrons::MisfirePolicy).string_len(20).default(""))
             .col(ColumnDef::new(SysCrons::Concurrent).char_len(1).default("1"))
-            .col(ColumnDef::new(SysCrons::Status).char_len(1).default(1))
+            .col(ColumnDef::new(SysCrons::Status).char_len(1).default("1"))
             .col(ColumnDef::new(SysCrons::Remark).string_len(500).default(""))
             .col(
                 ColumnDef::new(SysCrons::LastTime)
