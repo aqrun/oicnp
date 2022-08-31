@@ -270,28 +270,48 @@ pub enum SysMenus {
     DeletedAt,
 }
 
+
 // sys_oper_log
 #[derive(Iden, OicColumn)]
 pub enum SysOperationLogs {
     Table,
+    #[oic(type = "string", len = 32, comment = "ID")]
     Id,
+    #[oic(type = "bigint", default = 0, comment = "")]
     TimeId,
+    #[oic(type = "string", len = 50, default = "", comment = "")]
     Title,
+    #[oic(type = "char", len = 100, default = "", comment = "")]
     BusinessType,
+    #[oic(type = "string", len = 100, default = "", comment = "")]
     Method,
+    #[oic(type = "string", len = 10, default = "", comment = "")]
     RequestMethod,
+    #[oic(type = "char", len = 100, default = "1", comment = "")]
     OperatorType,
+    #[oic(type = "string", len = 50, default = "", comment = "")]
     Name,
+    #[oic(type = "string", len = 50, default = "", comment = "")]
     DepartmentName,
+    #[oic(type = "string", len = 5000, default = "", comment = "")]
     Url,
+    #[oic(type = "string", len = 50, default = "", comment = "")]
     Ip,
+    #[oic(type = "string", len = 255, default = "", comment = "")]
     Location,
+    #[oic(type = "text", default = "", comment = "")]
     Param,
+    #[oic(type = "text", default = "", comment = "")]
     PathParam,
+    #[oic(type = "text", default = "", comment = "")]
     JsonResult,
+    #[oic(type = "char", len = 100, default = "1", comment = "")]
     Status,
+    #[oic(type = "string", len = 2000, default = "", comment = "")]
     ErrorMessage,
+    #[oic(type = "bigint", default = 0, comment = "")]
     Duration,
+    #[oic(type = "datetime", comment = "")]
     CreatedAt,
 }
 
@@ -299,16 +319,27 @@ pub enum SysOperationLogs {
 #[derive(Iden, OicColumn)]
 pub enum SysPositions {
     Table,
+    #[oic(type = "string", len = 32, comment = "")]
     Id,
+    #[oic(type = "string", len = 64, default = "", comment = "")]
     Vid,
+    #[oic(type = "string", len = 50, default = "", comment = "")]
     Name,
+    #[oic(type = "int", default = 0, comment = "权重")]
     Weight,
+    #[oic(type = "char", len = 1, default = "1", comment = "")]
     Status,
+    #[oic(type = "string", len = 500, default = "", comment = "")]
     Remark,
+    #[oic(type = "string", len = 32, default = "" comment = "创建者")]
     CreatedBy,
+    #[oic(type = "datetime", comment = "创建时间")]
     CreatedAt,
-    UpdatedAt,
+    #[oic(type = "string", len = 32, default = "" comment = "更新者")]
     UpdatedBy,
+    #[oic(type = "datetime", default = "null" comment = "更新时间")]
+    UpdatedAt,
+    #[oic(type = "datetime", default = "null" comment = "删除时间")]
     DeletedAt,
 }
 
@@ -316,14 +347,23 @@ pub enum SysPositions {
 #[derive(Iden, OicColumn)]
 pub enum SysRoles {
     Table,
+    #[oic(type = "string", len = 32, comment = "")]
     Id,
+    #[oic(type = "string", len = 64, default = "", comment = "")]
     Vid,
+    #[oic(type = "string", len = 64, default = "", comment = "")]
     Name,
+    #[oic(type = "int", default = 0, comment = "")]
     Weight,
+    #[oic(type = "char", len = 1, default = "0", comment = "")]
     Scope,
+    #[oic(type = "char", len = 1, default = "1", comment = "")]
     Status,
+    #[oic(type = "string", len = 255, default = "", comment = "")]
     Remark,
+    #[oic(type = "datetime", comment = "")]
     CreatedAt,
+    #[oic(type = "datetime", comment = "")]
     UpdatedAt,
 }
 
@@ -331,36 +371,57 @@ pub enum SysRoles {
 #[derive(Iden, OicColumn)]
 pub enum SysRoleApiMap {
     Table,
+    #[oic(type = "string", len = 32, comment = "")]
     Id,
+    #[oic(type = "string", len = 32, comment = "")]
     RoleId,
+    #[oic(type = "string", len = 255, comment = "")]
     Api,
+    #[oic(type = "char", len = 10, default = "", comment = "")]
     Method,
+    #[oic(type = "datetime", comment = "")]
     CreatedBy,
+    #[oic(type = "datetime", comment = "")]
     CreatedAt,
 }
 
 // sys_role_dept
 #[derive(Iden, OicColumn)]
+#[oic_index(columns = ["role_id", "department_id"])]
 pub enum SysRoleDepartmentMap {
     Table,
+    #[oic(type = "string", len = 32, comment = "")]
     RoleId,
+    #[oic(type = "string", len = 32, comment = "")]
     DepartmentId,
+    #[oic(type = "datetime", comment = "")]
     CreatedAt,
 }
+    
 
 // sys_update_log
 #[derive(Iden, OicColumn)]
 pub enum SysUpdateLogs {
     Table,
+    #[oic(type = "string", len = 32, comment = "")]
     Id,
+    #[oic(type = "char", len = 10, comment = "")]
     AppVersion,
+    #[oic(type = "char", len = 10, default(""), comment = "")]
     BackendVersion,
+    #[oic(type = "string", len = 100, default(""), comment = "")]
     Title,
+    #[oic(type = "text", default(""), comment = "")]
     Content,
-    CreatedAt,
+    #[oic(type = "string", len = 32, default = "" comment = "创建者")]
     CreatedBy,
-    UpdateAt,
-    UpdateBy,
+    #[oic(type = "datetime", comment = "创建时间")]
+    CreatedAt,
+    #[oic(type = "string", len = 32, default = "" comment = "更新者")]
+    UpdatedBy,
+    #[oic(type = "datetime", default = "null" comment = "更新时间")]
+    UpdatedAt,
+    #[oic(type = "datetime", default = "null" comment = "删除时间")]
     DeletedAt,
 }
 
@@ -368,24 +429,43 @@ pub enum SysUpdateLogs {
 #[derive(Iden, OicColumn)]
 pub enum SysUsers {
     Table,
+    #[oic(type = "string", len = 32, comment = "")]
     Id,
+    #[oic(type = "string", len = 60, default(""), comment = "")]
     Username,
+    #[oic(type = "string", len = 60, default(""), comment = "")]
     Nickname,
+    #[oic(type = "string", len = 32, default(""), comment = "")]
     Password,
+    #[oic(type = "string", len = 32, default(""), comment = "")]
     Salt,
+    #[oic(type = "char", len = 1, default(""), comment = "")]
     Status,
+    #[oic(type = "string", len = 100, default("1"), comment = "")]
     Email,
+    #[oic(type = "char", len = 1, default("0"), comment = "")]
     Gender,
+    #[oic(type = "string", len = 255, default(""), comment = "")]
     Avatar,
+    #[oic(type = "string", len = 32, default(""), comment = "")]
     RoleId,
+    #[oic(type = "string", len = 32, default(""), comment = "")]
     DepartmentId,
+    #[oic(type = "string", len = 255, default(""), comment = "")]
     Remark,
+    #[oic(type = "char", len = 1, default("0"), comment = "")]
     IsAdmin,
+    #[oic(type = "string", len = 20, default(""), comment = "")]
     Phone,
+    #[oic(type = "string", len = 20, default(""), comment = "")]
     LastLoginIp,
+    #[oic(type = "datetime", default("null"), comment = "")]
     LastLoginAt,
+    #[oic(type = "datetime", comment = "创建时间")]
     CreatedAt,
+    #[oic(type = "datetime", default = "null" comment = "更新时间")]
     UpdatedAt,
+    #[oic(type = "datetime", default = "null" comment = "删除时间")]
     DeletedAt,
 }
 
@@ -393,9 +473,13 @@ pub enum SysUsers {
 #[derive(Iden, OicColumn)]
 pub enum SysUserDepartmentMap {
     Table,
+    #[oic(type = "string", len = 32, comment = "")]
     UserId,
+    #[oic(type = "string", len = 32, comment = "")]
     DepartmentId,
+    #[oic(type = "string", len = 32)]
     CreatedBy,
+    #[oic(type = "datetime", comment = "创建时间")]
     CreatedAt,
 }
 
@@ -403,8 +487,11 @@ pub enum SysUserDepartmentMap {
 #[derive(Iden, OicColumn)]
 pub enum SysUserPositionMap {
     Table,
+    #[oic(type = "string", len = 32, comment = "")]
     UserId,
+    #[oic(type = "string", len = 32, comment = "")]
     PositionId,
+    #[oic(type = "datetime", comment = "创建时间")]
     CreatedAt,
 }
 
@@ -412,9 +499,13 @@ pub enum SysUserPositionMap {
 #[derive(Iden, OicColumn)]
 pub enum SysUserRoleMap {
     Table,
+    #[oic(type = "string", len = 32, comment = "")]
     UserId,
+    #[oic(type = "string", len = 32, comment = "")]
     RoleId,
+    #[oic(type = "string", len = 32)]
     CreatedBy,
+    #[oic(type = "datetime", comment = "创建时间")]
     CreatedAt,
 }
 
@@ -422,16 +513,29 @@ pub enum SysUserRoleMap {
 #[derive(Iden, OicColumn)]
 pub enum SysUserOnline {
     Table,
+    #[oic(type = "string", len = 32, comment = "")]
     UserId,
+    #[oic(type = "string", len = 32, comment = "")]
     TokenId,
+    #[oic(type = "biginteger", comment = "")]
     TokenExpire,
+    #[oic(type = "datetime", comment = "登录时间")]
     LoginAt,
+    #[oic(type = "string", len = 60, comment = "")]
     Username,
+    #[oic(type = "string", len = 100, comment = "")]
     DepartmentName,
+    #[oic(type = "string", len = 10, comment = "")]
     Net,
+    #[oic(type = "string", len = 100, comment = "")]
     Ip,
+    #[oic(type = "string", len = 255, comment = "")]
     Location,
+    #[oic(type = "string", len = 50, comment = "")]
     Device,
+    #[oic(type = "string", len = 30, comment = "")]
     Browser,
+    #[oic(type = "string", len = 30, comment = "")]
     Os,
 }
+
