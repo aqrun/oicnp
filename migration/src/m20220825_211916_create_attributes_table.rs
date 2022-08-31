@@ -26,8 +26,8 @@ impl MigrationTrait for Migration {
             )
             .col(ColumnDef::new(SysAttributes::Vid).string_len(100).not_null())
             .col(ColumnDef::new(SysAttributes::Name).string_len(100).not_null())
-            .col(ColumnDef::new(SysAttributes::Status).char().not_null())
-            .col(ColumnDef::new(SysAttributes::Remark).string_len(500).not_null())
+            .col(ColumnDef::new(SysAttributes::Status).char_len(1).default("1"))
+            .col(ColumnDef::new(SysAttributes::Remark).string_len(500).default(""))
             .col(ColumnDef::new(SysAttributes::CreatedBy).string_len(32).not_null())
             .col(ColumnDef::new(SysAttributes::UpdatedBy).string_len(32).default(""))
             .col(
