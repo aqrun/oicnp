@@ -79,7 +79,7 @@ impl MigrationTrait for Migration {
             .to_owned();
 
         manager.create_table(table).await?;
-        manager.create_index(idx_parent_id).await
+        manager.create_index(idx_vid).await
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
