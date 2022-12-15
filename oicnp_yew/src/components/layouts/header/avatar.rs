@@ -1,7 +1,7 @@
 use yew::prelude::*;
 
-#[function_component(Avatar)]
-pub fn avatar() -> Html {
+#[function_component]
+pub fn Avatar() -> Html {
     html! {
         <div class="dropdown is-active relative mx-8">
             <button class="h-16 flex items-center text-xl">

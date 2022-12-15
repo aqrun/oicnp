@@ -6,8 +6,8 @@ pub struct PageTitleProps {
     pub title: String,
 }
 
-#[function_component(PageTitle)]
-pub fn page_title(props: &PageTitleProps) -> Html {
+#[function_component]
+pub fn PageTitle(props: &PageTitleProps) -> Html {
     html! {
         <section
             class="page-title-container mt-2.5"

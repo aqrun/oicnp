@@ -4,8 +4,8 @@ use crate::components::{
     BreadItem, PageContent,
 };
 
-#[function_component(Dashboard)]
-pub fn dashboard() -> Html {
+#[function_component]
+pub fn Dashboard() -> Html {
     let bread_data: Vec<BreadItem> = vec![
         BreadItem { label: String::from("Home") },
         BreadItem { label: String::from("Dashboard") },

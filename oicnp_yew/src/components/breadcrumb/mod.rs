@@ -15,8 +15,8 @@ pub struct BreadcrumbProps {
     pub items: Vec<BreadItem>,
 }
 
-#[function_component(Breadcrumb)]
-pub fn breadcrumb(props: &BreadcrumbProps) -> Html {
+#[function_component]
+pub fn Breadcrumb(props: &BreadcrumbProps) -> Html {
 
     if props.items.len() == 0 {
         return html!{};

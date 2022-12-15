@@ -6,8 +6,8 @@ pub struct PageContentProps {
     pub children: Children,
 }
 
-#[function_component(PageContent)]
-pub fn page_content(props: &PageContentProps) -> Html {
+#[function_component]
+pub fn PageContent(props: &PageContentProps) -> Html {
     html! {
         <section class="page-content bg-white m-8">
             { props.children.clone() }

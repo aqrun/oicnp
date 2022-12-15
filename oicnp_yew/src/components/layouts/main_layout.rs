@@ -9,8 +9,8 @@ pub struct MainLayoutProps {
     pub classes: Option<Classes>,
 }
 
-#[function_component(MainLayout)]
-pub fn main_layout(props: &MainLayoutProps) -> Html {
+#[function_component]
+pub fn MainLayout(props: &MainLayoutProps) -> Html {
     html! {
         <div class={classes!(
             "main-layout-container",

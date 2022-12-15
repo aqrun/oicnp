@@ -1,8 +1,8 @@
 use yew::prelude::*;
 use web_sys::{HtmlInputElement};
 
-#[function_component(InputTest)]
-pub fn input_test() -> Html {
+#[function_component]
+pub fn InputTest() -> Html {
 
     let name_change_handle = {
         Callback::from(move |e: Event| {

@@ -5,8 +5,8 @@ use yew::prelude::*;
 use self::avatar::Avatar;
 use self::nav_item::NavItem;
 
-#[function_component(Header)]
-pub fn header() -> Html {
+#[function_component]
+pub fn Header() -> Html {
     html! {
         <div
             class="layout-header-w flex place-content-between items-center

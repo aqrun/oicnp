@@ -3,9 +3,9 @@ use yew_router::prelude::*;
 use web_sys::{HtmlInputElement};
 use crate::routes::AppRoute;
 
-#[function_component(Login)]
-pub fn login() -> Html {
-    let history = use_history().unwrap();
+#[function_component]
+pub fn Login() -> Html {
+    let history = use_navigator().unwrap();
     let login_handle = {
         Callback::from(move |e: MouseEvent| {
             // let win = web_sys::window().unwrap();
@@ -13,13 +13,16 @@ pub fn login() -> Html {
             // let target = e.target_unchecked_into::<HtmlInputElement>();
             // target.preventDefault();
             // println!("{:?}", target);
-            history.push(AppRoute::Home);
+            history.push(&AppRoute::Home);
         })
     };
 
     html! {
-        <div class="page-login-w container mx-auto bg-cover h-screen
-            flex flex-1 justify-center items-center flex-col">
+        <div
+				 class={"page-login-w container mx-auto bg-cover h-screen
+								flex flex-1 justify-center items-center flex-col"
+				 }
+				>
             <div class="main w-full max-w-lg">
                 <div class="leading-loose">
                     <form

@@ -14,8 +14,8 @@ pub struct PageHeaderProps {
     pub bread_items: Vec<BreadItem>,
 }
 
-#[function_component(PageHeader)]
-pub fn page_header(props: &PageHeaderProps) -> Html {
+#[function_component]
+pub fn PageHeader(props: &PageHeaderProps) -> Html {
     html! {
         <section
             class="page-header-container p-8 bg-white"
