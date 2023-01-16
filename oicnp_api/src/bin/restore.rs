@@ -28,6 +28,13 @@ use rbatis::rbatis::Rbatis;
 use serde::{Deserialize, Serialize};
 use log::{ warn };
 use rand::{Rng, thread_rng};
+use fast_log::{
+    plugin::{
+        file_split::RollingType,
+        packer::LogPacker,
+    },
+    consts::LogSize,
+};
 
 #[derive(Debug)]
 struct Category<'a> {
@@ -66,11 +73,20 @@ impl Blog {
 
 #[tokio::main]
 async fn main () {
-    fast_log::init_log("target/restore.log",
-                       // 1000,
-                       log::Level::Warn,
-                       None,
-                       true);
+    fast_log::init(fast_log::Config::new()
+        .console()
+        .chan_len(Some(100000))
+        .file_split(
+            "target/logs/",
+            LogSize::MB(1),
+            RollingType::All,
+            LogPacker{}
+        )).unwrap();
+    // fast_log::init("target/restore.log",
+    //                    // 1000,
+    //                    log::Level::Warn,
+    //                    None,
+    //                    true);
     let rb = init_rbatis().await;
     let rb: Arc<Rbatis> = Arc::new(rb);
 

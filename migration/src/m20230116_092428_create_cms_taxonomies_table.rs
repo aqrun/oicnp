@@ -14,7 +14,7 @@ impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let table = Table::create()
             .table(CmsTaxonomies::Table)
-            .if_not_exits()
+            .if_not_exists()
             .col(
                 ColumnDef::new(CmsTaxonomies::Tid)
                     .string_len(32)

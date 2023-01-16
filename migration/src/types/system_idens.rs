@@ -387,7 +387,7 @@ pub enum SysRoleApiMap {
 
 // sys_role_dept
 #[derive(Iden, OicColumn)]
-#[oic_index(columns = ["role_id", "department_id"])]
+// #[oic_index(columns = ["role_id", "department_id"])]
 pub enum SysRoleDepartmentMap {
     Table,
     #[oic(type = "string", len = 32, comment = "")]

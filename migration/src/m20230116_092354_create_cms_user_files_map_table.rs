@@ -24,6 +24,8 @@ impl MigrationTrait for Migration {
             .col(ColumnDef::new(CmsUserFilesMap::Width).big_integer().default(0))
             .col(ColumnDef::new(CmsUserFilesMap::Height).big_integer().default(0))
             .to_owned();
+        
+        manager.create_table(table).await
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {

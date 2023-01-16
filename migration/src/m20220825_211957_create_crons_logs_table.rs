@@ -24,7 +24,7 @@ impl MigrationTrait for Migration {
             )
             .col(ColumnDef::new(SysCronLogs::CronId).string_len(32).not_null())
             .col(ColumnDef::new(SysCronLogs::LotId).string_len(32).default(""))
-            .col(ColumnDef::new(SysCronLogs::Weight).integer_len(4).default(0))
+            .col(ColumnDef::new(SysCronLogs::Weight).small_integer().default(0))
             .col(ColumnDef::new(SysCronLogs::Name).string_len(64).not_null())
             .col(ColumnDef::new(SysCronLogs::Group).string_len(64).default(""))
             .col(ColumnDef::new(SysCronLogs::InvokeTarget).string_len(500).default(""))

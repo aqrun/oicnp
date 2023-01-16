@@ -86,6 +86,6 @@ mod test {
         let radix = 36;
         let (id, raw_id) = generate_snow_id(radix);
         let decode_id = base_n_to_10(&id, radix);
-        assert_eq!(raw_id, decode_id as u64);
+        assert_eq!(raw_id, decode_id as u128);
     }
 }

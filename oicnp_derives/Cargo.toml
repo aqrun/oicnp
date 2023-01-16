@@ -13,3 +13,6 @@ syn = { version = "^1", features = [ "full" ] }
 quote = "^1"
 proc-macro2 = "^1"
 bae = "^0"
+darling = "^0"
+proc-macro-crate = "^1"
+thiserror = "^1"

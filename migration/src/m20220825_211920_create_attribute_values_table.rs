@@ -27,7 +27,7 @@ impl MigrationTrait for Migration {
             .col(ColumnDef::new(SysAttributeValues::AttributeVid).string_len(100).not_null())
             .col(ColumnDef::new(SysAttributeValues::Label).string_len(100).not_null())
             .col(ColumnDef::new(SysAttributeValues::Value).string_len(100).not_null())
-            .col(ColumnDef::new(SysAttributeValues::Weight).integer_len(4).default(0))
+            .col(ColumnDef::new(SysAttributeValues::Weight).small_integer().default(0))
             .col(ColumnDef::new(SysAttributeValues::CssClass).string_len(100).default(""))
             .col(ColumnDef::new(SysAttributeValues::ListClass).string_len(100).default(""))
             .col(ColumnDef::new(SysAttributeValues::IsDefault).char_len(1).default(""))
@@ -61,7 +61,7 @@ impl MigrationTrait for Migration {
             .to_owned();
 
         manager.create_table(table).await?;
-        manager.create_index(idx_parent_id).await
+        manager.create_index(idx_vid).await
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {

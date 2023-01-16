@@ -28,21 +28,21 @@ impl MigrationTrait for Migration {
             .col(ColumnDef::new(CmsFiles::Storage).string_len(64).default(""))
             .col(ColumnDef::new(CmsFiles::Mime).string_len(64).default(""))
             .col(ColumnDef::new(CmsFiles::Status).char_len(1).default("0"))
-            .col(ColumnDef::new(SysUsers::CreatedBy).string_len(32).not_null())
-            .col(ColumnDef::new(SysUsers::UpdatedBy).string_len(32).default(""))
+            .col(ColumnDef::new(CmsFiles::CreatedBy).string_len(32).not_null())
+            .col(ColumnDef::new(CmsFiles::UpdatedBy).string_len(32).default(""))
             .col(
-                ColumnDef::new(SysUsers::CreatedAt)
+                ColumnDef::new(CmsFiles::CreatedAt)
                     .date_time()
                     .not_null()
                     .extra("DEFAULT CURRENT_TIMESTAMP".to_string()),
             )
             .col(
-                ColumnDef::new(SysUsers::UpdatedAt)
+                ColumnDef::new(CmsFiles::UpdatedAt)
                     .date_time()
                     .default(Value::Int(None)),
             )
             .col(
-                ColumnDef::new(SysUsers::DeletedAt)
+                ColumnDef::new(CmsFiles::DeletedAt)
                     .date_time()
                     .default(Value::Int(None)),
             )
@@ -53,7 +53,7 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager.drop_table(
-            Table::drop_table(CmsFiles::Table).to_owned()
+            Table::drop().table(CmsFiles::Table).to_owned()
         ).await
     }
 }

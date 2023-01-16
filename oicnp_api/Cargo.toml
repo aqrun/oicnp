@@ -8,6 +8,7 @@ default-run = "main"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+oicnp_derives = { path = "../oicnp_derives" }
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 poem = "1.0"
 dotenv = "0.15.0"
@@ -21,7 +22,7 @@ serde_yaml = "0.8"
 bson2 = "2"
 rbson = "2.0"
 log = "0.4"
-fast_log = { version = "1", features = ["lz4", "zip", "gzip"]}
+fast_log = { version = "^1", features = ["lz4", "zip", "gzip"]}
 rbatis = { version = "3", features = ["debug_mode"] }
 chrono = { version = "0.4.19", features = ["serde"] }
 tracing-subscriber = "0.3"

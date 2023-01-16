@@ -44,7 +44,7 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager.drop_table(
-            Table::drop_table(SysUserDepartmentMap::Table).to_owned()
+            Table::drop().table(SysUserDepartmentMap::Table).to_owned()
         ).await
     }
 }

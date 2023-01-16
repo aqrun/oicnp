@@ -22,9 +22,9 @@ impl MigrationTrait for Migration {
                     .primary_key()
                     .unique_key(),
             )
-            .col(ColumnDef::new(SysOperationLogs::TimeId).biginteger().not_null().default(0))
+            .col(ColumnDef::new(SysOperationLogs::TimeId).big_integer().not_null().default(0))
             .col(ColumnDef::new(SysOperationLogs::Title).string_len(50).default(""))
-            .col(ColumnDef::new(SysOperationLogs::BussinessType).string_len(100).default(""))
+            .col(ColumnDef::new(SysOperationLogs::BusinessType).string_len(100).default(""))
             .col(ColumnDef::new(SysOperationLogs::Method).string_len(100).default(""))
             .col(ColumnDef::new(SysOperationLogs::RequestMethod).string_len(100).default(""))
             .col(ColumnDef::new(SysOperationLogs::OperatorType).string_len(100).default(""))
@@ -37,8 +37,8 @@ impl MigrationTrait for Migration {
             .col(ColumnDef::new(SysOperationLogs::PathParam).text().default(""))
             .col(ColumnDef::new(SysOperationLogs::JsonResult).text().default(""))
             .col(ColumnDef::new(SysOperationLogs::Status).char_len(1).default("1"))
-            .col(ColumnDef::new(SysOperationLogs::ErrorMessage).text("").default(""))
-            .col(ColumnDef::new(SysOperationLogs::Duration).biginteger().default(1))
+            .col(ColumnDef::new(SysOperationLogs::ErrorMessage).text().default(""))
+            .col(ColumnDef::new(SysOperationLogs::Duration).big_integer().default(1))
             .col(
                 ColumnDef::new(SysOperationLogs::CreatedAt)
                     .date_time()
@@ -52,7 +52,7 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager.drop_table(
-            Table::drop_table(SysOperationLogs::Table).to_owned()
+            Table::drop().table(SysOperationLogs::Table).to_owned()
         ).await
     }
 }

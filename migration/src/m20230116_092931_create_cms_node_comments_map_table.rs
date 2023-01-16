@@ -17,7 +17,7 @@ impl MigrationTrait for Migration {
             .if_not_exists()
             .col(ColumnDef::new(CmsNodeCommentsMap::Bundle).string_len(20).default(""))
             .col(ColumnDef::new(CmsNodeCommentsMap::Nid).string_len(32).default(""))
-            .col(ColumnDef::new(CmsNodeCommentsMap::CommentId).string_l(32).default(""))
+            .col(ColumnDef::new(CmsNodeCommentsMap::CommentId).string_len(32).default(""))
             .primary_key(
                 Index::create()
                     .col(CmsNodeCommentsMap::Nid)

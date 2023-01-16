@@ -60,7 +60,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20220825_212300_create_user_position_map_table::Migration),
             Box::new(m20220825_212309_create_user_role_map_table::Migration),
             Box::new(m20220825_212320_create_user_online_table::Migration),
-            Box::new(m20230116_090508_create_cms_tables::Migration),
+            Box::new(m20230116_090508_create_cms_files_table::Migration),
             Box::new(m20230116_092354_create_cms_user_files_map_table::Migration),
             Box::new(m20230116_092428_create_cms_taxonomies_table::Migration),
             Box::new(m20230116_092604_create_cms_tags_table::Migration),

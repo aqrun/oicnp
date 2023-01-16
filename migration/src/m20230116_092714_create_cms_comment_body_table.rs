@@ -14,7 +14,7 @@ impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let table = Table::create()
             .table(CmsCommentBody::Table)
-            .if_not_exist()
+            .if_not_exists()
             .col(
                 ColumnDef::new(CmsCommentBody::CommentId)
                     .string_len(32)

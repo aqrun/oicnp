@@ -16,7 +16,7 @@ impl MigrationTrait for Migration {
             .table(SysRoleApiMap::Table)
             .if_not_exists()
             .col(
-                ColumnDef::new(SysRoles::Id)
+                ColumnDef::new(SysRoleApiMap::Id)
                     .string_len(32)
                     .not_null()
                     .primary_key()
@@ -39,7 +39,7 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager.drop_table(
-            Table::drop_table(SysRoleApiMap::Table).to_owned()
+            Table::drop().table(SysRoleApiMap::Table).to_owned()
         ).await
     }
 }

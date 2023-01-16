@@ -25,8 +25,8 @@ impl MigrationTrait for Migration {
                     .unique_key(),
             )
             .col(ColumnDef::new(SysDepartments::ParentId).string_len(32).not_null())
-            .col(ColumnDef::new(SysDepartments::Name).string_len(32).not_null())
-            .col(ColumnDef::new(SysDepartments::Weight).small_integer_len(4).not_null())
+            .col(ColumnDef::new(SysDepartments::Name).string_len(32).default(""))
+            .col(ColumnDef::new(SysDepartments::Weight).small_integer().default(0))
             .col(ColumnDef::new(SysDepartments::Leader).string_len(20).default(""))
             .col(ColumnDef::new(SysDepartments::Phone).string_len(11).default(""))
             .col(ColumnDef::new(SysDepartments::Email).string_len(50).default(""))
@@ -51,7 +51,7 @@ impl MigrationTrait for Migration {
             )
             .to_owned();
 
-        println!("---{:?}", table.to_string(PostgresQueryBuilder));
+        // println!("---{:?}", table.to_string(PostgresQueryBuilder));
 
         let idx_parent_id = Index::create()
             .if_not_exists()

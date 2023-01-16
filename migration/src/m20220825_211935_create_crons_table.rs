@@ -26,7 +26,7 @@ impl MigrationTrait for Migration {
             )
             .col(ColumnDef::new(SysCrons::Vid).string_len(100).not_null())
             .col(ColumnDef::new(SysCrons::Count).integer().default(0))
-            .col(ColumnDef::new(SysCrons::RunCount).interger().default(0))
+            .col(ColumnDef::new(SysCrons::RunCount).integer().default(0))
             .col(ColumnDef::new(SysCrons::Name).string_len(64).not_null())
             .col(ColumnDef::new(SysCrons::Params).string_len(200).default(""))
             .col(ColumnDef::new(SysCrons::Group).string_len(64).default("DEFAULT"))
@@ -75,7 +75,7 @@ impl MigrationTrait for Migration {
             .if_not_exists()
             .name(INDEX_VID)
             .table(SysCrons::Table)
-            .col(SysCrons::AttributeVid)
+            .col(SysCrons::Vid)
             .to_owned();
 
         manager.create_table(table).await?;

@@ -1,8 +1,10 @@
-pub mod attributes;
-pub mod column;
+pub(crate) mod attributes;
+pub(crate) mod column;
+pub(crate) mod utils;
+pub(crate) mod error;
 
 use proc_macro::TokenStream;
-use syn::{parse_macro_input, AttributeArgs, DeriveInput, ItemImpl};
+use syn::{parse_macro_input, DeriveInput};
 
 #[proc_macro_derive(Column, attributes(oic))]
 pub fn derive_enum(input: TokenStream) -> TokenStream {

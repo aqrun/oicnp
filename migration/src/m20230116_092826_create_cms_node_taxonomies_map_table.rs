@@ -17,7 +17,7 @@ impl MigrationTrait for Migration {
             .if_not_exists()
             .col(ColumnDef::new(CmsNodeTaxonomiesMap::Bundle).string_len(20).default(""))
             .col(ColumnDef::new(CmsNodeTaxonomiesMap::Nid).string_len(32).default(""))
-            .col(ColumnDef::New(CmsNodeTaxonomiesMap::Tid).string_len(32).default(""))
+            .col(ColumnDef::new(CmsNodeTaxonomiesMap::Tid).string_len(32).default(""))
             .primary_key(
                 Index::create()
                     .col(CmsNodeTaxonomiesMap::Nid)

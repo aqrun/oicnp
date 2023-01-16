@@ -1,19 +1,13 @@
-use darling::{
-    ast::{Data, Fields},
-    util::Ignored,
-    FromDeriveInput, FromVariant,
-};
-use proc_macro2::{Ident, TokenStream, Literal};
+use proc_macro2::{TokenStream, Literal};
 use quote::quote;
-use syn::{ext::IdentExt, DeriveInput, Error, Lit};
+use syn::{DeriveInput, Lit};
 
 use crate::{
-    common_args::{RenameRule, RenameRuleExt, RenameTarget},
     error::GeneratorResult,
-    utils::get_crate_name,
 };
+use crate::attributes::OicColumn;
 
-pub(crate) fn generate(args: DeriveInput) -> GeneratorResult<TokenStream> {
+pub(crate) fn generate(input: DeriveInput) -> GeneratorResult<TokenStream> {
     // ident 当前枚举名称
     let DeriveInput { ident, .. } = input;
 

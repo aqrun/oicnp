@@ -21,11 +21,11 @@ impl MigrationTrait for Migration {
             .primary_key(
                 Index::create()
                     .col(CmsNodeTagsMap::Nid)
-                    .col(CmsNodeTagsMap.TagId),
+                    .col(CmsNodeTagsMap::TagId),
             )
             .to_owned();
 
-        manager.create_table().await
+        manager.create_table(table).await
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
