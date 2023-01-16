@@ -12,12 +12,38 @@ impl MigrationName for Migration {
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        // Replace the sample below with your own migration scripts
-        todo!()
+        let table = Table::create()
+            .table(SysRoleDepartmentMap::Table)
+            .if_not_exists()
+            .col(
+                ColumnDef::new(SysRoleDepartmentMap::RoleId)
+                    .string_len(32)
+                    .not_null(),
+            )
+            .col(
+                ColumnDef::new(SysRoleDepartmentMap::DepartmentId)
+                    .string_len(32)
+                    .not_null(),
+            )
+            .col(
+                ColumnDef::new(SysRoleDepartmentMap::CreatedAt)
+                    .date_time()
+                    .not_null()
+                    .extra("DEFAULT CURRENT_TIMESTAMP".to_string()),
+            )
+            .primary_key(
+                Index::create()
+                    .col(SysRoleDepartmentMap::RoleId)
+                    .col(SysRoleDepartmentMap::DepartmentId)
+            )
+            .to_owned();
+
+        manager.create_table(table).await
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        // Replace the sample below with your own migration scripts
-        todo!()
+        manager.drop_table(
+            Table::drop_table(SysRoleDepartmentMap::Table).to_owned()
+        ).await
     }
 }

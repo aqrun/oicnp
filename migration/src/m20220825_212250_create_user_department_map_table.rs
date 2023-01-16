@@ -12,12 +12,39 @@ impl MigrationName for Migration {
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        // Replace the sample below with your own migration scripts
-        todo!()
+        let table = Table::create()
+            .table(SysUserDepartmentMap::Table)
+            .if_not_exists()
+            .col(
+                ColumnDef::new(SysUserDepartmentMap::UserId)
+                    .string_len(32)
+                    .not_null(),
+            )
+            .col(
+                ColumnDef::new(SysUserDepartmentMap::DepartmentId)
+                    .string_len(32)
+                    .not_null(),
+            )
+            .col(ColumnDef::new(SysUserDepartmentMap::CreatedBy).string_len(32).default(""))
+            .col(
+                ColumnDef::new(SysUserDepartmentMap::CreatedAt)
+                    .date_time()
+                    .not_null()
+                    .extra("DEFAULT CURRENT_TIMESTAMP".to_string()),
+            )
+            .primary_key(
+                Index::create()
+                    .col(SysUserDepartmentMap::UserId)
+                    .col(SysUserDepartmentMap::DepartmentId),
+            )
+            .to_owned();
+
+        manager.create_table(table).await
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        // Replace the sample below with your own migration scripts
-        todo!()
+        manager.drop_table(
+            Table::drop_table(SysUserDepartmentMap::Table).to_owned()
+        ).await
     }
 }

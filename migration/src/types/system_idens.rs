@@ -397,7 +397,6 @@ pub enum SysRoleDepartmentMap {
     #[oic(type = "datetime", comment = "")]
     CreatedAt,
 }
-    
 
 // sys_update_log
 #[derive(Iden, OicColumn)]
@@ -425,7 +424,7 @@ pub enum SysUpdateLogs {
     DeletedAt,
 }
 
-// sys_user
+// sys_users
 #[derive(Iden, OicColumn)]
 pub enum SysUsers {
     Table,
@@ -461,6 +460,10 @@ pub enum SysUsers {
     LastLoginIp,
     #[oic(type = "datetime", default("null"), comment = "")]
     LastLoginAt,
+    #[oic(type = "string", len = 32, default(""), comment = "")]
+    CreatedBy,
+    #[oic(type = "string", len = 32, default(""), comment = "")]
+    UpdatedBy,
     #[oic(type = "datetime", comment = "创建时间")]
     CreatedAt,
     #[oic(type = "datetime", default = "null" comment = "更新时间")]
