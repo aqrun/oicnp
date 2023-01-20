@@ -16,7 +16,7 @@ impl MigrationTrait for Migration {
             .table(SysUserPositionMap::Table)
             .if_not_exists()
             .col(
-                ColumnDef::new(SysUserPositionMap::UserId)
+                ColumnDef::new(SysUserPositionMap::Uid)
                     .string_len(32)
                     .not_null(),
             )
@@ -33,7 +33,7 @@ impl MigrationTrait for Migration {
             )
             .primary_key(
                 Index::create()
-                    .col(SysUserPositionMap::UserId)
+                    .col(SysUserPositionMap::Uid)
                     .col(SysUserPositionMap::PositionId)
             )
             .to_owned();

@@ -16,7 +16,7 @@ impl MigrationTrait for Migration {
             .table(SysUsers::Table)
             .if_not_exists()
             .col(
-                ColumnDef::new(SysUsers::Id)
+                ColumnDef::new(SysUsers::Uid)
                     .string_len(32)
                     .not_null()
                     .primary_key()

@@ -429,7 +429,7 @@ pub enum SysUpdateLogs {
 pub enum SysUsers {
     Table,
     #[oic(type = "string", len = 32, comment = "")]
-    Id,
+    Uid,
     #[oic(type = "string", len = 60, default(""), comment = "")]
     Username,
     #[oic(type = "string", len = 60, default(""), comment = "")]
@@ -477,7 +477,7 @@ pub enum SysUsers {
 pub enum SysUserDepartmentMap {
     Table,
     #[oic(type = "string", len = 32, comment = "")]
-    UserId,
+    Uid,
     #[oic(type = "string", len = 32, comment = "")]
     DepartmentId,
     #[oic(type = "string", len = 32)]
@@ -491,7 +491,7 @@ pub enum SysUserDepartmentMap {
 pub enum SysUserPositionMap {
     Table,
     #[oic(type = "string", len = 32, comment = "")]
-    UserId,
+    Uid,
     #[oic(type = "string", len = 32, comment = "")]
     PositionId,
     #[oic(type = "datetime", comment = "创建时间")]
@@ -503,7 +503,7 @@ pub enum SysUserPositionMap {
 pub enum SysUserRoleMap {
     Table,
     #[oic(type = "string", len = 32, comment = "")]
-    UserId,
+    Uid,
     #[oic(type = "string", len = 32, comment = "")]
     RoleId,
     #[oic(type = "string", len = 32)]
@@ -517,7 +517,7 @@ pub enum SysUserRoleMap {
 pub enum SysUserOnline {
     Table,
     #[oic(type = "string", len = 32, comment = "")]
-    UserId,
+    Uid,
     #[oic(type = "string", len = 32, comment = "")]
     TokenId,
     #[oic(type = "biginteger", comment = "")]

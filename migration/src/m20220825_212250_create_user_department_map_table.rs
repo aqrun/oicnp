@@ -16,7 +16,7 @@ impl MigrationTrait for Migration {
             .table(SysUserDepartmentMap::Table)
             .if_not_exists()
             .col(
-                ColumnDef::new(SysUserDepartmentMap::UserId)
+                ColumnDef::new(SysUserDepartmentMap::Uid)
                     .string_len(32)
                     .not_null(),
             )
@@ -34,7 +34,7 @@ impl MigrationTrait for Migration {
             )
             .primary_key(
                 Index::create()
-                    .col(SysUserDepartmentMap::UserId)
+                    .col(SysUserDepartmentMap::Uid)
                     .col(SysUserDepartmentMap::DepartmentId),
             )
             .to_owned();

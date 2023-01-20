@@ -16,7 +16,7 @@ impl MigrationTrait for Migration {
             .table(SysUserRoleMap::Table)
             .if_not_exists()
             .col(
-                ColumnDef::new(SysUserRoleMap::UserId)
+                ColumnDef::new(SysUserRoleMap::Uid)
                     .string_len(32)
                     .not_null(),
             )
@@ -34,7 +34,7 @@ impl MigrationTrait for Migration {
             )
             .primary_key(
                 Index::create()
-                    .col(SysUserRoleMap::UserId)
+                    .col(SysUserRoleMap::Uid)
                     .col(SysUserRoleMap::RoleId)
             )
             .to_owned();

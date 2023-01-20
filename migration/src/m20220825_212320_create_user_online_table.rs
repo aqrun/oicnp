@@ -16,9 +16,11 @@ impl MigrationTrait for Migration {
             .table(SysUserOnline::Table)
             .if_not_exists()
             .col(
-                ColumnDef::new(SysUserOnline::UserId)
+                ColumnDef::new(SysUserOnline::Uid)
                     .string_len(32)
-                    .not_null(),
+                    .not_null()
+                    .primary_key()
+                    .unique_key(),
             )
             .col(ColumnDef::new(SysUserOnline::TokenId).string_len(32).default(""))
             .col(ColumnDef::new(SysUserOnline::TokenExpire).big_integer().default("0"))

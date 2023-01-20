@@ -1,5 +1,11 @@
 # Running Migrator CLI
 
+```shell
+sea-orm-cli migrate up
+
+sea-orm-cli generate entity -o common/src/entities
+```
+
 - Generate a new migration file
     ```sh
     cargo run -- migrate generate MIGRATION_NAME
