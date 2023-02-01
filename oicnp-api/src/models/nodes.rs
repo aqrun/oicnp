@@ -7,6 +7,7 @@ use crate::services::{
 };
 use crate::typings::{DateFormat, NodeBundle, TaxonomyBundle};
 use oicnp_core::{DateTime, DatabaseConnection};
+use anyhow::{anyhow, Result};
 
 #[derive(Clone, Debug)]
 pub struct Nodes {
@@ -86,7 +87,7 @@ impl Nodes {
     async fn category(
         &self,
         ctx: &Context<'_>
-    ) -> Result<Taxonomies, String> {
+    ) -> Result<Taxonomies> {
         let db = ctx.data_unchecked::<DatabaseConnection>();
         // if let Ok(res) = find_node_taxonomies(
         //     rb,
@@ -97,22 +98,22 @@ impl Nodes {
         //         return Ok(res.clone());
         //     }
         // }
-        Err(format!("Category not exist"))
+        Err(anyhow!("Category not exist"))
     }
     async fn node_body(
         &self,
         ctx: &Context<'_>
-    ) -> Result<NodeBody, String> {
+    ) -> Result<NodeBody> {
         let db = ctx.data_unchecked::<DatabaseConnection>();
         // if let Ok(res) = find_node_body(rb.clone(), self.nid).await {
         //     return Ok(res);
         // }
-        Err(format!("Node body not exist"))
+        Err(anyhow!("Node body not exist"))
     }
     async fn tags(
         &self,
         ctx: &Context<'_>,
-    ) -> Result<Vec<Taxonomies>, String> {
+    ) -> Result<Vec<Taxonomies>> {
         let db = ctx.data_unchecked::<DatabaseConnection>();
         // if let Ok(res) = find_node_taxonomies(
         //     rb,
@@ -121,7 +122,7 @@ impl Nodes {
         // ).await {
         //     return Ok(res);
         // }
-        Err(format!("Tags not exist"))
+        Err(anyhow!("Tags not exist"))
     }
 }
 

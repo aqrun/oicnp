@@ -5,6 +5,9 @@ pub mod entities;
 pub mod utils;
 mod config;
 mod db;
+pub mod services;
+pub mod models;
+pub mod typings;
 
 pub use config::*;
 pub use db::*;

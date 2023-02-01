@@ -4,6 +4,7 @@ use crate::models::Users;
 use crate::services;
 use crate::utils;
 use oicnp_core::{DatabaseConnection};
+use anyhow::{anyhow, Result};
 
 #[derive(Default)]
 pub struct UserQuery;
@@ -41,7 +42,7 @@ impl UserQuery {
         username: Option<String>,
         email: Option<String>,
         password: String,
-    ) -> Result<Users, String> {
+    ) -> Result<Users> {
         let db = ctx.data_unchecked::<DatabaseConnection>();
         let mut user: Option<Users> = None;
 
@@ -62,6 +63,6 @@ impl UserQuery {
         //     }
         // }
 
-        Err(String::from("Data not valid try again"))
+        Err(anyhow!("Data not valid try again"))
     }
 }

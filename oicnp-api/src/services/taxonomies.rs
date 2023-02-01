@@ -32,7 +32,7 @@ pub async fn find_taxonomy(
     //         return Ok(taxonomy);
     //     }
     // }
-    Err(anyhow!(format!("Taxonomy not exist, {}", name)))
+    Err(anyhow!("Taxonomy not exist, {}", name))
 }
 
 pub async fn save_taxonomy(
@@ -64,7 +64,7 @@ pub async fn save_taxonomy(
     //     }
     // }
 
-    Err(anyhow!(format!("Save tag failed: {}", name)))
+    Err(anyhow!("Save tag failed: {}", name))
 }
 
 pub async fn find_node_taxonomy_map(
@@ -82,7 +82,7 @@ pub async fn find_node_taxonomy_map(
     //         return Ok(res);
     //     }
     // }
-    Err(anyhow!(format!("map not exist")))
+    Err(anyhow!("map not exist"))
 }
 
 pub async fn save_node_taxonomy_map(
@@ -113,7 +113,7 @@ pub async fn save_node_taxonomy_map(
     // if let Ok(map) = find_node_taxonomy_map(rb.clone(), nid, tid).await {
     //     return Ok(map);
     // }
-    Err(anyhow!(format!("Node Taxonomy map save failed")))
+    Err(anyhow!("Node Taxonomy map save failed"))
 }
 
 pub async fn save_tags(
@@ -154,5 +154,5 @@ pub async fn save_category(
     //     return Ok(cat);
     // }
 
-    Err(anyhow!(format!("Save Category failed: {}", category_name)))
+    Err(anyhow!("Save Category failed: {}", category_name))
 }

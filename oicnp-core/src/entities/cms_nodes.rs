@@ -21,7 +21,8 @@ pub struct Model {
 }
 
 #[derive(Copy, Clone, Debug, EnumIter)]
-pub enum Relation {}
+pub enum Relation {
+}
 
 impl RelationTrait for Relation {
     fn def(&self) -> RelationDef {

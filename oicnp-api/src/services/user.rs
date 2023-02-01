@@ -24,7 +24,7 @@ pub async fn find_user_by_id(db: &DatabaseConnection, uid: i32) -> Result<Users>
     //         return Ok(user);
     //     }
     // }
-    Err(anyhow!(format!("User not exist: {}", uid)))
+    Err(anyhow!("User not exist: {}", uid))
 }
 
 pub async fn find_user_by_username(
@@ -37,7 +37,7 @@ pub async fn find_user_by_username(
     //         return Ok(user);
     //     }
     // }
-    Err(anyhow!(format!("User not exist: {}", username)))
+    Err(anyhow!("User not exist: {}", username))
 }
 
 pub async fn find_user_by_email(
@@ -50,5 +50,5 @@ pub async fn find_user_by_email(
     //         return Ok(user);
     //     }
     // }
-    Err(anyhow!(format!("User not exist: {}", email)))
+    Err(anyhow!("User not exist: {}", email))
 }

@@ -1,42 +1,19 @@
-use std::sync::Arc;
-use crate::models::{Nodes, NodeBody, NewNode, Taxonomies};
-use crate::typings::{
-    BodyFormat, NodeBundle, DetailNode, Count,
-};
-use oicnp_core::{DatabaseConnection};
 use anyhow::{anyhow, Result};
+use crate::models::{Nodes, NodeBody, NewNode, Taxonomies, DetailNode};
+use crate::typings::{
+    BodyFormat, NodeBundle, Count,
+};
+use crate::{DatabaseConnection};
+use crate::entities::{
+    cms_nodes, cms_node_body, cms_node_taxonomies_map, cms_taxonomies,
+    prelude::{
+        CmsNodes, CmsNodeBody, CmsNodeTaxonomiesMap, CmsTaxonomies,
+    },
+};
+use sea_orm::*;
+use sea_query::{Alias, Expr};
+use log::{info};
 
-/*#[py_sql("
-SELECT n.*, nb.body, nb.body_format, nb.summary,
-  t.name AS category_name, t.vid as category_vid,
-  t.bundle as category_bundle, t.tid,
-  a.uid as author_uid, a.username as author_username,
-  a.nickname as author_nickname,
-  cu.username as created_by_username,
-  cu.nickname as created_by_nickname,
-  uu.username as updated_by_username,
-  uu.nickname as updated_by_nickname
-  FROM nodes n
-  LEFT JOIN node_body nb ON n.nid=nb.nid
-  LEFT JOIN node_taxonomies_map ntm ON ntm.nid=n.nid
-  LEFT JOIN taxonomies t ON t.tid=ntm.tid
-  LEFT JOIN users cu ON n.created_by=cu.uid
-  LEFT JOIN users uu on n.updated_by=uu.uid
-  LEFT JOIN users a ON n.uid=a.uid
-  WHERE n.deleted = false
-  AND n.bundle = '${bundle}'
-  AND t.bundle = 'category'
-
-  for index,item in filters:
-    AND ${item}
-
-  if category != '':
-    AND t.name = '${category}'
-
-  ORDER BY n.${order_name} ${order_dir}
-  OFFSET ${offset}
-  LIMIT ${limit}
-")]*/
 pub async fn find_detail_nodes(
     db: &DatabaseConnection,
     bundle: &str,
@@ -50,8 +27,8 @@ pub async fn find_detail_nodes(
     todo!()
 }
 
-/*#[py_sql("
-SELECT n.*
+/**
+ * SELECT n.*
   FROM nodes n
   LEFT JOIN node_body nb ON n.nid=nb.nid
   LEFT JOIN node_taxonomies_map ntm ON ntm.nid=n.nid
@@ -72,7 +49,7 @@ SELECT n.*
   ORDER BY n.${order_name} ${order_dir}
   OFFSET ${offset}
   LIMIT ${limit}
-")]*/
+ */
 pub async fn find_nodes(
     db: &DatabaseConnection,
     bundle: &str,
@@ -80,28 +57,41 @@ pub async fn find_nodes(
     filters: &Vec<String>,
     order_name: &str, // created_at
     order_dir: &str, // DESC
-    offset: &i32,
-    limit: &i32,
+    offset: i32,
+    limit: i32,
 ) -> Result<Vec<Nodes>> {
-    todo!()
+    let a = CmsNodes::find()
+        .select_only()
+        .column(cms_nodes::Column::Nid)
+        .column(cms_nodes::Column::Vid)
+        .column(cms_nodes::Column::Bundle)
+        .column(cms_nodes::Column::Title)
+        .column_as(
+            Expr::tbl(Alias::new("nb"), cms_node_body::Column::Body).into_simple_expr(),
+            "body"
+        )
+        .join_as(
+            JoinType::LeftJoin,
+            CmsNodes::belongs_to(CmsNodeBody)
+                .from(cms_nodes::Column::Nid)
+                .to(cms_node_body::Column::Nid)
+                .into(),
+            Alias::new("nb")
+        ).filter(
+            Condition::all()
+                .add(cms_nodes::Column::Deleted.eq("0"))
+                .add(cms_nodes::Column::Bundle.eq(bundle))
+        )
+        // .build(DbBackend::Postgres)
+        // .to_string()
+        .all(db)
+        .await
+    ;
+    println!("----1111111111--------{:?}", a);
+    info!("{:?}", a);
+    Err(anyhow!(""))
 }
 
-/*#[py_sql("
-SELECT count(n.nid) AS count
-  FROM nodes n
-  LEFT JOIN node_body nb ON n.nid=nb.nid
-  LEFT JOIN node_taxonomies_map ntm ON ntm.nid=n.nid
-  LEFT JOIN taxonomies t ON t.tid=ntm.tid
-  LEFT JOIN users cu ON n.created_by=cu.uid
-  LEFT JOIN users uu on n.updated_by=uu.uid
-  LEFT JOIN users a ON n.uid=a.uid
-  WHERE n.deleted = false
-  AND n.bundle = #{bundle}
-  AND t.bundle = 'category'
-
-  if category != '':
-    AND t.name = #{category}
-")]*/
 pub async fn find_nodes_count(
     db: &DatabaseConnection,
     bundle: &str,
@@ -197,13 +187,6 @@ pub async fn save_node(
     Err(anyhow!("Node save failed: {}", 1))
 }
 
-/*#[py_sql("
-SELECT t.* FROM taxonomies t
-  LEFT JOIN node_taxonomies_map ntm ON t.tid = ntm.tid
-  WHERE ntm.nid=#{nid}
-  AND t.bundle=#{bundle}
-  ORDER BY count desc, weight
-")]*/
 pub async fn find_node_taxonomies(
     db: &DatabaseConnection,
     bundle: &str,
@@ -291,7 +274,7 @@ pub async fn find_nodes_width_target_id(
     //     let mut temp = res;
     //     data.append(&mut temp);
     // }
-    let data = Vec::new();
+    let data: Vec<DetailNode> = Vec::new();
 
     Ok(data)
 }
