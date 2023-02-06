@@ -1,5 +1,5 @@
 use anyhow::{anyhow, Result};
-use crate::models::{Nodes, NodeBody, NewNode, Taxonomies, DetailNode};
+use crate::models::{Node, NodeBody, NewNode, Taxonomies, DetailNode};
 use crate::typings::{
     BodyFormat, NodeBundle, Count,
 };
@@ -59,7 +59,7 @@ pub async fn find_nodes(
     order_dir: &str, // DESC
     offset: i32,
     limit: i32,
-) -> Result<Vec<Nodes>> {
+) -> Result<Vec<Node>> {
     let a = CmsNodes::find()
         .select_only()
         .column(cms_nodes::Column::Nid)
@@ -82,6 +82,8 @@ pub async fn find_nodes(
                 .add(cms_nodes::Column::Deleted.eq("0"))
                 .add(cms_nodes::Column::Bundle.eq(bundle))
         )
+        .order_by_desc(cms_nodes::Column::CreatedAt)
+        .into_model::<Node>()
         // .build(DbBackend::Postgres)
         // .to_string()
         .all(db)
@@ -101,7 +103,7 @@ pub async fn find_nodes_count(
 }
 
 
-pub async fn find_node_by_vid(db: &DatabaseConnection, vid: &str, bundle: &NodeBundle) -> Result<Nodes> {
+pub async fn find_node_by_vid(db: &DatabaseConnection, vid: &str, bundle: &NodeBundle) -> Result<Node> {
     // let w = rb.new_wrapper()
     //     .eq("vid", vid)
     //     .eq("bundle", bundle.to_string());
@@ -115,7 +117,7 @@ pub async fn find_node_by_vid(db: &DatabaseConnection, vid: &str, bundle: &NodeB
     Err(anyhow!("Node not exist: {}", ""))
 }
 
-pub async fn find_node_by_nid(db: &DatabaseConnection, nid: i32, bundle: &NodeBundle) -> Result<Nodes> {
+pub async fn find_node_by_nid(db: &DatabaseConnection, nid: i32, bundle: &NodeBundle) -> Result<Node> {
     // let w = rb.new_wrapper()
     //     .eq("nid", nid)
     //     .eq("bundle", bundle.to_string());
@@ -169,7 +171,7 @@ pub async fn save_node(
     db: &DatabaseConnection,
     new_node: &NewNode,
     bundle: &NodeBundle,
-) -> Result<Nodes> {
+) -> Result<Node> {
     // if let Ok(node) = find_node_by_vid(rb.clone(), &new_node.vid, bundle).await {
     //     return Ok(node);
     // }

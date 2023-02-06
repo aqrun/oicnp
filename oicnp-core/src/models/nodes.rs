@@ -1,8 +1,9 @@
 use crate::{DateTime};
 use serde::{Deserialize, Serialize};
+use sea_orm::FromQueryResult;
 
-#[derive(Clone, Debug)]
-pub struct Nodes {
+#[derive(Clone, Debug, Serialize, Deserialize, FromQueryResult)]
+pub struct Node {
     pub nid: i32,
     pub vid: String,
     pub uid: i32,
