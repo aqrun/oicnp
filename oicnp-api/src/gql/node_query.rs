@@ -17,7 +17,10 @@ use crate::services::{
     find_node_by_vid,
     find_nodes_width_target_id,
 };
-use oicnp_core::{DatabaseConnection};
+use oicnp_core::{
+    DatabaseConnection,
+    services::find_nodes,
+};
 
 #[derive(Default)]
 pub struct NodeQuery;
@@ -48,6 +51,20 @@ impl NodeQuery {
 
         let mut total_count = 0;
         let mut data: Vec<DetailNode> = vec![];
+
+        println!("-----res2 start---");
+        let res2 = find_nodes(
+            db,
+            &bundle,
+            &category,
+            &filters,
+            &order_name,
+            &order_dir,
+            offset,
+            limit
+        ).await;
+
+        println!("{:?}------res2", res2);
 
         let res = match target_nid {
             Some(target_nid) => find_nodes_width_target_id(

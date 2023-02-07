@@ -31,7 +31,7 @@ pub async fn build_schema() -> Schema<QueryRoot, MutationRoot, EmptySubscription
         MutationRoot,
         EmptySubscription,
     )
-        .data(db)
+        .data(db.clone())
         .finish()
 }
 

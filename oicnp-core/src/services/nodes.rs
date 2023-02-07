@@ -60,7 +60,7 @@ pub async fn find_nodes(
     offset: i32,
     limit: i32,
 ) -> Result<Vec<Node>> {
-    let a = CmsNodes::find()
+    let mut query = CmsNodes::find()
         .select_only()
         .column(cms_nodes::Column::Nid)
         .column(cms_nodes::Column::Vid)
@@ -81,16 +81,25 @@ pub async fn find_nodes(
             Condition::all()
                 .add(cms_nodes::Column::Deleted.eq("0"))
                 .add(cms_nodes::Column::Bundle.eq(bundle))
-        )
-        .order_by_desc(cms_nodes::Column::CreatedAt)
-        .into_model::<Node>()
-        // .build(DbBackend::Postgres)
-        // .to_string()
-        .all(db)
-        .await
-    ;
-    println!("----1111111111--------{:?}", a);
-    info!("{:?}", a);
+        );
+
+    query = query.order_by_desc(cms_nodes::Column::CreatedAt);
+
+    // let data = query.into_model::<Node>()
+    //     // .build(DbBackend::Postgres)
+    //     // .to_string()
+    //     .all(db)
+    //     .await
+    //     ;
+
+    // 获取全部数据条数据
+    let total = query.clone().count(db).await?;
+    let pager = query.paginate(db, limit as usize);
+    let total_pages = pager.num_pages().await?;
+    let list = pager.fetch_page(offset as usize).await?;
+
+    println!("----1111111111--------{:?} total:{:?}  taotal_page: {:?}", list, total, total_pages);
+    info!("{:?}", list);
     Err(anyhow!(""))
 }
 

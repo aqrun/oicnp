@@ -47,7 +47,7 @@ pub async fn find_detail_nodes(
     offset: &i32,
     limit: &i32,
 ) -> Result<Vec<DetailNode>> {
-    todo!()
+    Err(anyhow!("map not exist"))
 }
 
 /*#[py_sql("
@@ -83,7 +83,7 @@ pub async fn find_nodes(
     offset: &i32,
     limit: &i32,
 ) -> Result<Vec<Nodes>> {
-    todo!()
+    Err(anyhow!("map not exist"))
 }
 
 /*#[py_sql("
@@ -107,7 +107,7 @@ pub async fn find_nodes_count(
     bundle: &str,
     category: &str,
 ) -> Result<Count> {
-    todo!()
+    Err(anyhow!("map not exist"))
 }
 
 
@@ -209,7 +209,7 @@ pub async fn find_node_taxonomies(
     bundle: &str,
     nid: &i32,
 ) -> Result<Vec<Taxonomies>> {
- todo!()
+    Err(anyhow!("map not exist"))
 }
 
 ///
