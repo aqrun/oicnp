@@ -17,6 +17,7 @@ anyhow = "^1"
 strum = "^0"
 strum_macros = "^0"
 log = "^0"
+rs-snowflake = "^0"
 
 [dependencies.sea-orm]
 version = "^0"

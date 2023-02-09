@@ -13,6 +13,7 @@ use crate::entities::{
 use sea_orm::*;
 use sea_query::{Alias, Expr};
 use log::{info};
+use crate::utils::uuid;
 
 pub async fn find_detail_nodes(
     db: &DatabaseConnection,
@@ -181,20 +182,23 @@ pub async fn save_node(
     new_node: &NewNode,
     bundle: &NodeBundle,
 ) -> Result<Node> {
-    // if let Ok(node) = find_node_by_vid(rb.clone(), &new_node.vid, bundle).await {
-    //     return Ok(node);
-    // }
+    if let Ok(node) = find_node_by_vid(db, &new_node.vid, bundle).await {
+        return Ok(node);
+    }
 
-    // let res = rb.save(&new_node, &[]).await;
+    let node = cms_nodes::ActiveModel {
+        nid: Set(uuid()),
+        vid: Set(Some(String::from(&new_node.vid))),
+        bundle: Set(Some(String::from(&new_node.bundle))),
+        title: Set(Some(String::from(&new_node.title))),
+        viewed: Set(Some(0)),
+        deleted: Set(Some("0".to_owned())),
+        ..Default::default()
+    };
 
-    // if let Err(err) = res {
-    //     return Err(err.to_string());
-    // }
+    let node: cms_nodes::Model = node.insert(db).await?;
 
-    // if let Ok(node) = find_node_by_vid(rb.clone(), &new_node.vid, bundle).await {
-    //     return Ok(node);
-    // }
-
+    // Ok(node)
     Err(anyhow!("Node save failed: {}", 1))
 }
 

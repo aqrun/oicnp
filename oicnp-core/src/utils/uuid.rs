@@ -4,6 +4,8 @@ use std::thread::sleep;
 use std::time::Duration;
 
 const ALL_CHARS: &'static str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_";
+const RANDOM_CHARS: &'static str = "nXjU7PK3LbqszfmDvpScrHwAhiOk8IeWgVGBoRdZY4JT9MxNuQt05Ea12F6lyC-_";
+const RANDOM_36: &'static str = "ms9gwn2xvbr4ioqhy1680j3uzc5eadpkt7fl";
 
 /// 10 进制转 11 - 64 进制
 ///
@@ -25,6 +27,36 @@ pub fn base_10_to_n(num: u128, radix: u32) -> String {
     };
     format!("{}{}", start, end)
 }
+
+pub fn random_36(num: u128, radix: u32) -> String {
+    if num == 0 {
+        return String::from("0");
+    }
+
+    let base = base_10_to_n(num / (radix as u128), radix);
+    let start = base.strip_prefix("0").unwrap_or(base.as_str());
+    let end = match RANDOM_36.chars().nth((num % (radix as u128)) as usize) {
+        Some(data) => String::from(data),
+        _ => String::from(""),
+    };
+    format!("{}{}", start, end)
+}
+
+pub fn random_base_10_to_n(num: u128, radix: u32) -> String {
+    if num == 0 {
+        return String::from("0");
+    }
+
+    let base = base_10_to_n(num / (radix as u128), radix);
+    let start = base.strip_prefix("0").unwrap_or(base.as_str());
+    let end = match RANDOM_CHARS.chars().nth((num % (radix as u128)) as usize) {
+        Some(data) => String::from(data),
+        _ => String::from(""),
+    };
+    format!("{}{}", start, end)
+}
+
+
 
 /// 11 - 64 进制解析为 10 进制
 ///
@@ -61,6 +93,16 @@ pub fn unique_id(radix: u32) -> (String, u128) {
     let mut id_generator = SnowflakeIdGenerator::new(2, 3);
     let raw_id = id_generator.real_time_generate() as u128;
     (base_10_to_n(raw_id, radix), raw_id)
+}
+
+pub fn uuid() -> String {
+    let radix = 36;
+    // 暂停1毫秒
+    sleep(Duration::from_nanos(1));
+    let mut id_generator = SnowflakeIdGenerator::new(2, 3);
+    let raw_id = id_generator.real_time_generate() as u128;
+    
+    random_36(raw_id, radix)
 }
 
 #[cfg(test)]
