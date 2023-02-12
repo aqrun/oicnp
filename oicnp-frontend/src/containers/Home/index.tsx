@@ -43,9 +43,9 @@ export const Home: React.FC<HomeProps> = ({
               <div className="oic-header-text-w grid gap-6 justify-items-start w-1/2 text-black">
                 <div className="grid gap-2 max-w-4xl">
                   <h1 className="text-4xl font-bold text-black-500">
-                    <b className="text-purple">OICNP</b>
+                    <b className="text-purple">了息</b>
                     <br/>
-                    Oh I See No Problem!
+                    寥寥无几，生生不息
                   </h1>
                 </div>
                 <div className="max-w-2xl whitespace-pre-wrap leading-normal text-xl">
@@ -56,7 +56,7 @@ export const Home: React.FC<HomeProps> = ({
                 </div>
                 <div className="flex flex-row justify-center">
                   <a className="oic-btn-default min-w-[15rem]" >
-                    一穷二白
+                    前路漫漫
                   </a>
                   <a className="oic-btn-simple ml-5 min-w-[15rem] hover:underline hover:underline-offset-4" >
                     充满希望

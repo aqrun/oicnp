@@ -2,10 +2,10 @@ export const SITE = {
   name: 'AQRUN',
 
   // Site settings 配置站点
-  title: '子十的独立博客',
+  title: '了息时代',
   description: '热爱技术。很高兴能在这里与你分享我对技术和生活的思考。',
-  keyword: 'AQRUN,子十,AQRUN的独立博客,子十的博客,前端,javascript,vuejs,nodejs,RUST,PHP,java,react,骑行,跑步,爬山',
-  url: 'http://aqrun.com', // your host
+  keyword: '前端,javascript,vuejs,nodejs,RUST,PHP,java,react,骑行,跑步,爬山',
+  url: 'http://lxage.com', // your host
 
   footer: {
     since: 2014,

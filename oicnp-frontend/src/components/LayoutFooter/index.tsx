@@ -16,8 +16,9 @@ export const LayoutFooter: React.FC<LayoutFooterProps> = () => {
         { SITE.title } © 2014 - {(new Date).getFullYear()}
       </section>
       <section>
-        Powered by <a href="//jekyllrb.com">Next.js</a> 
-        | <a href="https://github.com/kaeyleo/jekyll-theme-H2O">Theme H2O</a>
+        Powered by <a href="https://nextjs.org/" target="_blank" rel="noreferrer">Next.js</a> 
+        &nbsp;|&nbsp;
+        <a href="https://www.rust-lang.org/" target="_blank" rel="noreferrer">Rust</a>
       </section>
     </footer>
   );
