@@ -31,7 +31,7 @@ export const FixedButtons: React.FC = () => {
 
   return (
     <Container className={`oic-fixed-btns ${show ? 'show' : ''}`}>
-      <div className="oic-btn oic-back-top" onClick={backTopHandle}>
+      <div className="oic-btn oic-back-top bg-slate-100" onClick={backTopHandle}>
         <i className="icon iconfont icon-back_to_top" />
       </div>
     </Container>

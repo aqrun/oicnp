@@ -55,10 +55,9 @@ module.exports = (phase, { defaultConfig }) => {
 
   const config = {
     resolve,
-    experimental: {
-      // Enables the styled-components SWC transform
+    compiler: {
       styledComponents: true,
-    },
+    }
   }
 
   return config;
