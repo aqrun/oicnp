@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Layout, Menu, Breadcrumb } from 'antd';
+import { Layout, Menu, Breadcrumb as BaseBreadCrumb } from 'antd';
 import {
   Container,
   BreadWrapper,
@@ -8,7 +8,13 @@ import {
 
 const { Content, Sider } = Layout;
 
-export const LayoutMain: React.FC = ({
+const Breadcrumb = BaseBreadCrumb as any;
+
+export interface LayoutMainProps {
+  children?: React.ReactNode;
+}
+
+export const LayoutMain: React.FC<LayoutMainProps> = ({
   children
 }) => {
 
