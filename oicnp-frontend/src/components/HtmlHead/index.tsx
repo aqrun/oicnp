@@ -26,7 +26,7 @@ export const HtmlHead: React.FC<HtmlHeadProps> = ({
   return (
     <Head>
       <meta charSet="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta name="viewport" content="width=device-width" />
       <title>{newTitle}</title>
       <meta name="title" content={newTitle} />
       <meta name="author"  content={newAuthor} />

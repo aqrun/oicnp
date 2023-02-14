@@ -37,6 +37,9 @@
       .g-logo {
         background-size: 100% 100% !important;
       }
+      .g-icon-menu {
+        color:#007aff;
+      }
       .g-nav {
         a {
           color: #666 !important;
@@ -463,9 +466,6 @@
         color: #A6ABB2;
         a {
             color: #A6ABB2;
-            &:hover {
-                color: #83888F;
-            }
 
         }
     }

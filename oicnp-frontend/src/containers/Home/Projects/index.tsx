@@ -52,7 +52,7 @@ export const Projects: React.FC<ProjectsProps> = () => {
           在线文档
         </h3>
         <div className="w-full overflow-hidden pb-4">
-          <ul className="grid grid-cols-2 gap-4">
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 mx-6 md:mx-0">
             {projectList?.map((item) => {
               return (
                 <li
