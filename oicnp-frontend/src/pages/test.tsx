@@ -5,7 +5,7 @@ import { queryNodes } from '../services';
 import { GetServerSideProps } from 'next';
 import { checkIsMobile } from '~/utils';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectCount, increment } from '~/redux/reducers/counterSlice';
+import { selectCount, increment, incrementAsync } from '~/redux/counter';
 
 
 export interface TestPageProps {
@@ -36,9 +36,7 @@ const TestPage: React.FC<TestPageProps> = (props) => {
       <div
         className=" cursor-pointer rounded-md bg-blue-600 text-white px-6 py-2 inline-block shadow-sm"
         onClick={() => {
-          dispatch({
-            type: 'incrementSync',
-          });
+          dispatch(incrementAsync({ num: 3 }));
         }}
       >
         Increment Sync

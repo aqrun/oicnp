@@ -1,4 +1,4 @@
-import { counterSlice } from './counterSlice';
+import { counterSlice } from './counter';
 
 export const getReducers = () => {
   return {

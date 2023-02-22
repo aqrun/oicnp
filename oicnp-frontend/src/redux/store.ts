@@ -17,10 +17,11 @@ export const createStore = () => {
 
   // run saga
   sagaMiddleware.run(sagas);
-
+  type a = ReturnType<typeof store.getState>;
   return store;
 };
 
-export type RootState = ReturnType<typeof createStore>;
+type RootStore = ReturnType<typeof createStore>;
+export type RootState = ReturnType<RootStore['getState']>;
 
 export const wrapper = createWrapper(createStore);
