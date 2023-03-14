@@ -6,10 +6,10 @@ export interface ItemFooterProps {
 export const ItemFooter: React.FC<ItemFooterProps> = () => {
 
   return (
-    <div className="oic-article-footer hidden
+    <div className="oic-article-footer hidden flex-wrap
       md:flex flex-col md:flex-row justify-between md:items-center text-sm
     ">
-      <div className="oic-col-left flex flex-col md:flex-row md:items-center">
+      <div className="oic-col-left flex flex-col md:flex-row md:items-center flex-wrap">
         <div className="flex flex-row items-center">
           <div className="oic-author-info flex items-center">
             <a className="block w-8 h-8 bg-slate-100 rounded-[50%] relative overflow-hidden">

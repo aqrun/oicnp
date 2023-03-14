@@ -9,7 +9,7 @@ export const ItemFooterMobile: React.FC<ItemFooterMobileProps> = () => {
     <div className="oic-article-footer
       flex flex-col md:flex-row justify-between md:items-center text-sm
     ">
-      <div className="flex flex-row items-center justify-between">
+      <div className="flex flex-row items-center justify-between flex-1">
         <div className="oic-author-info flex items-center">
           <a className="block text-slate-400">
             Alex

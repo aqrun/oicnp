@@ -94,7 +94,7 @@ export const Home: React.FC<HomeProps> = ({
                 
                 {[1,2,3,4,5,6,7].map((item) => {
                   return (
-                    <ArticleItem key={item} isMobile={isMobile} />
+                    <ArticleItem key={item} />
                   );
                 })}
   

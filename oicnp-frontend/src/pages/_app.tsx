@@ -5,25 +5,36 @@ import { useEffect } from 'react';
 import { nightMode } from '../utils';
 import { FixedButtons } from '../components';
 import { Provider } from 'react-redux';
-import withRedux from 'next-redux-wrapper';
-import withReduxSaga from 'next-redux-saga';
 import { wrapper } from '../redux/store';
+import { RecoilRoot } from 'recoil';
+import {
+ useCheckIsMobile,
+} from '~/hooks';
 
-function MyApp({ Component, ...restProps }: AppProps) {
-  const { store, props } = wrapper.useWrappedStore(restProps);
-  const { pageProps } = props;
+const AppWidget = ({ Component, ...restProps }: AppProps) => {
+  useCheckIsMobile();
 
   useEffect(() => {
     nightMode();
   }, []);
 
   return (
-    <Provider store={store} >
-      <div className="oic-app">
-        <Component {...pageProps} />
-        <FixedButtons />
-      </div>
-    </Provider>
+    <div className="oic-app">
+      <Component {...restProps.pageProps} />
+      <FixedButtons />
+    </div>
+  );
+};
+
+function MyApp(appProps: AppProps) {
+  const { store, props } = wrapper.useWrappedStore(appProps);
+
+  return (
+    <RecoilRoot>
+      <Provider store={store} >
+        <AppWidget {...appProps} />
+      </Provider>
+    </RecoilRoot>
   );
 }
 

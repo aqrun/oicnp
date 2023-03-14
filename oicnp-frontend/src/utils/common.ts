@@ -8,4 +8,3 @@ export const nightMode = () => {
     document.body.classList.add(className);
   }
 }
-
