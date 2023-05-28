@@ -43,5 +43,4 @@ white_list_api:
   - "/"
   - "/admin/sys_login"
   - "/admin/captcha"
-# 旧 blog 目录地址
-blog_base: "~/workspace/github.com/aqrun/aqrun.github.io"
+  

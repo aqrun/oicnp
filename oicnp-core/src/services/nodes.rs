@@ -108,46 +108,81 @@ pub async fn find_nodes_count(
     db: &DatabaseConnection,
     bundle: &str,
     category: &str,
-) -> Result<Count> {
-    todo!()
+) -> Result<i32> {
+    let mut q: Select<CmsNodes> = CmsNodes::find()
+        .select_only()
+        .join_as(
+            JoinType::LeftJoin,
+            CmsNodes::belongs_to(CmsNodeTaxonomiesMap)
+                .from(cms_nodes::Column::Nid)
+                .to(cms_node_taxonomies_map::Column::Nid)
+                .into(),
+            Alias::new("ntm")
+        ).join_as(
+            JoinType::LeftJoin,
+            CmsNodeTaxonomiesMap::belongs_to(CmsTaxonomies)
+                .from(cms_node_taxonomies_map::Column::Tid)
+                .to(cms_taxonomies::Column::Tid)
+                .into(),
+            Alias::new("t")
+        ).filter(
+            Condition::all()
+                .add(cms_nodes::Column::Deleted.eq("0"))
+                .add(cms_nodes::Column::Bundle.eq(bundle))
+                .add(cms_taxonomies::Column::Name.eq(category))
+        );
+
+    // let data = // q.into_model::<Node>()
+    //     q.build(DbBackend::Postgres)
+    //     .to_string()
+    //     // .all(db)
+    //     // .await
+    //     ;
+    // println!("data: {:?}", data);
+    let total = q.count(db).await?;
+    Ok(total as i32)
 }
 
 
 pub async fn find_node_by_vid(db: &DatabaseConnection, vid: &str, bundle: &NodeBundle) -> Result<Node> {
-    // let w = rb.new_wrapper()
-    //     .eq("vid", vid)
-    //     .eq("bundle", bundle.to_string());
-    // let node: Result<Option<Nodes>, Error> = rb.fetch_by_wrapper(w).await;
+    let mut q = CmsNodes::find();
+    q = q.filter(cms_nodes::Column::Vid.eq(vid));
+    q = q.filter(cms_nodes::Column::Bundle.eq(bundle.to_string()));
+    q = q.filter(cms_nodes::Column::Deleted.eq("0"));
 
-    // if let Ok(node) = node {
-    //     if let Some(node) = node {
-    //         return Ok(node);
-    //     }
-    // }
-    Err(anyhow!("Node not exist: {}", ""))
+    let res = q.into_model::<Node>().one(db).await?;
+
+    if let Some(node) = res {
+        return Ok(node);
+    }
+
+    Err(anyhow!("Node not exist: {}", vid))
 }
 
 pub async fn find_node_by_nid(db: &DatabaseConnection, nid: i32, bundle: &NodeBundle) -> Result<Node> {
-    // let w = rb.new_wrapper()
-    //     .eq("nid", nid)
-    //     .eq("bundle", bundle.to_string());
-    // let node: Result<Option<Nodes>, Error> = rb.fetch_by_wrapper(w).await;
+    let mut q = CmsNodes::find();
+    q = q.filter(cms_nodes::Column::Nid.eq(nid));
+    q = q.filter(cms_nodes::Column::Bundle.eq(bundle.to_string()));
+    q = q.filter(cms_nodes::Column::Deleted.eq("0"));
 
-    // if let Ok(node) = node {
-    //     if let Some(node) = node {
-    //         return Ok(node);
-    //     }
-    // }
+    let res = q.into_model::<Node>().one(db).await?;
+
+    if let Some(node) = res {
+        return Ok(node);
+    }
     Err(anyhow!("Node not exist: {}", 1))
 }
 
 pub async fn find_node_body(db: &DatabaseConnection, nid: i32) -> Result<NodeBody> {
-    // let node_body: Result<Option<NodeBody>, Error> = rb.fetch_by_column("nid", nid).await;
-    // if let Ok(node_body) = node_body {
-    //     if let Some(node_body) = node_body {
-    //         return Ok(node_body);
-    //     }
-    // }
+    let mut q = CmsNodeBody::find();
+    q = q.filter(cms_node_body::Column::Nid.eq(nid));
+    
+    let res = q.into_model::<NodeBody>().one(db).await?;
+
+    if let Some(node_body) = res {
+        return Ok(node_body);
+    }
+
     Err(anyhow!("NodeBody not exist: {}", 1))
 }
 
@@ -198,8 +233,22 @@ pub async fn save_node(
 
     let node: cms_nodes::Model = node.insert(db).await?;
 
-    // Ok(node)
-    Err(anyhow!("Node save failed: {}", 1))
+    let created_by = node.created_by.unwrap_or(String::from("0")).parse().unwrap();
+
+    let data = Node {
+        nid: node.nid.parse().unwrap_or(0),
+        vid: node.vid.unwrap(),
+        uid: created_by,
+        bundle: node.bundle.unwrap_or("".to_string()),
+        title: node.title.unwrap(),
+        viewed: node.viewed.unwrap(),
+        deleted: node.deleted.unwrap().eq("1"),
+        created_at: node.created_at,
+        created_by,
+        updated_at: node.updated_at.unwrap(),
+        updated_by: node.updated_by.unwrap().parse().unwrap(),
+    };
+    Ok(data)
 }
 
 pub async fn find_node_taxonomies(

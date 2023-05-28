@@ -4,8 +4,6 @@ import type { AppProps } from 'next/app';
 import { useEffect } from 'react';
 import { nightMode } from '../utils';
 import { FixedButtons } from '../components';
-import { Provider } from 'react-redux';
-import { wrapper } from '../redux/store';
 import { RecoilRoot } from 'recoil';
 import {
  useCheckIsMobile,
@@ -27,13 +25,9 @@ const AppWidget = ({ Component, ...restProps }: AppProps) => {
 };
 
 function MyApp(appProps: AppProps) {
-  const { store, props } = wrapper.useWrappedStore(appProps);
-
   return (
     <RecoilRoot>
-      <Provider store={store} >
-        <AppWidget {...appProps} />
-      </Provider>
+      <AppWidget {...appProps} />
     </RecoilRoot>
   );
 }

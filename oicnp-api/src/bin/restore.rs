@@ -214,8 +214,7 @@ fn generate_blog(
 
 /// 获取所有 blog 数据
 fn find_all_blogs(categories: Vec<Category>) -> Vec<Blog> {
-    let blog_base = &G.blog_base;
-    let base = PathBuf::from(blog_base);
+    let base = PathBuf::from("");
     let mut all_blogs: Vec<Blog> = vec!();
     let mut index = 0;
 

@@ -62,7 +62,7 @@ pub struct NewNode {
     pub updated_by: i32,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize, FromQueryResult)]
 pub struct NodeBody {
     pub nid: i32,
     pub summary: String,

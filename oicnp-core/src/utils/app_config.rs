@@ -42,6 +42,4 @@ pub struct AppConfig {
     pub login_fail_retry: u64,
     /// 重试等待时间
     pub login_fail_retry_wait_sec: u64,
-    /// 旧blog绝对路径
-    pub blog_base: String,
 }

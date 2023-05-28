@@ -70,9 +70,8 @@ export const Home: React.FC<HomeProps> = ({
                   <Image
                     src="/assets/img/home-banner.avif"
                     alt="banner"
-                    layout="responsive"
-                    width="800px"
-                    height="456px"
+                    width={800}
+                    height={456}
                     className="max-w-800px w-auto h-auto"
                   />
                 </div>

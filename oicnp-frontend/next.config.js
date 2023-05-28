@@ -46,15 +46,8 @@ module.exports = withLess({
 */
 
 module.exports = (phase, { defaultConfig }) => {
-  const alias = _.get(defaultConfig, 'resolve.alias', {});
-  const resolve = Object.assign({}, defaultConfig.resolve || {}, {
-    alias: Object.assign({}, alias, {
-      '~': path.resolve(__dirname, 'src'),
-    })
-  });
-
   const config = {
-    resolve,
+    trailingSlash: false,
     compiler: {
       styledComponents: true,
     }

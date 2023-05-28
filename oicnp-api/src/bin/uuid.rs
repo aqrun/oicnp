@@ -1,5 +1,5 @@
 use scru128;
-use oicnp_api::utils::base_10_to_n;
+use oicnp_core::utils::base_10_to_n;
 
 /**
 037YGCNZNYIN6ZGZQBIKT7B0B => 2QOiNhAkWh7AQFraiSI5B

@@ -5,6 +5,11 @@ use crate::typings::{
 };
 use oicnp_core::{DatabaseConnection};
 use anyhow::{anyhow, Result};
+use oicnp_core::{
+    entities::{
+        cms_nodes,
+    },
+};
 
 /*#[py_sql("
 SELECT n.*, nb.body, nb.body_format, nb.summary,
