@@ -1,5 +1,7 @@
 use anyhow::{anyhow, Result};
-use crate::models::{Node, NodeBody, NewNode, Taxonomies, DetailNode};
+use crate::models::{Node, NodeBody, NewNode, Taxonomies, DetailNode, NodeCount,
+    NodeTaxonomiesMap,
+};
 use crate::typings::{
     BodyFormat, NodeBundle, Count,
 };
@@ -14,6 +16,7 @@ use sea_orm::*;
 use sea_query::{Alias, Expr};
 use log::{info};
 use crate::utils::uuid;
+use chrono::prelude::*;
 
 pub async fn find_detail_nodes(
     db: &DatabaseConnection,
@@ -111,20 +114,18 @@ pub async fn find_nodes_count(
 ) -> Result<i32> {
     let mut q: Select<CmsNodes> = CmsNodes::find()
         .select_only()
-        .join_as(
+        .join(
             JoinType::LeftJoin,
             CmsNodes::belongs_to(CmsNodeTaxonomiesMap)
                 .from(cms_nodes::Column::Nid)
                 .to(cms_node_taxonomies_map::Column::Nid)
-                .into(),
-            Alias::new("ntm")
-        ).join_as(
+                .into()
+        ).join(
             JoinType::LeftJoin,
             CmsNodeTaxonomiesMap::belongs_to(CmsTaxonomies)
                 .from(cms_node_taxonomies_map::Column::Tid)
                 .to(cms_taxonomies::Column::Tid)
-                .into(),
-            Alias::new("t")
+                .into()
         ).filter(
             Condition::all()
                 .add(cms_nodes::Column::Deleted.eq("0"))
@@ -132,15 +133,22 @@ pub async fn find_nodes_count(
                 .add(cms_taxonomies::Column::Name.eq(category))
         );
 
-    // let data = // q.into_model::<Node>()
-    //     q.build(DbBackend::Postgres)
-    //     .to_string()
-    //     // .all(db)
-    //     // .await
-    //     ;
-    // println!("data: {:?}", data);
-    let total = q.count(db).await?;
-    Ok(total as i32)
+    let data = // q.into_model::<Node>()
+        q.build(DbBackend::Postgres)
+        .to_string()
+        // .all(db)
+        // .await
+        ;
+    println!("data: {:?}", data);
+    let total = match q.into_model::<NodeCount>().all(db).await {
+        Ok(count) => count,
+        Err(err) => {
+            println!("dbErr: {:?}", err);
+            vec![]
+        }
+    };
+    println!("total: {:?}", total);
+    Ok(1 as i32)
 }
 
 
@@ -188,28 +196,28 @@ pub async fn find_node_body(db: &DatabaseConnection, nid: i32) -> Result<NodeBod
 
 pub async fn save_node_content(
     db: &DatabaseConnection,
-    nid: i32,
+    nid: &str,
     body: &str,
     body_format: BodyFormat,
     summary: &str,
 ) -> Result<String> {
-    // if let Err(err) = rb.remove_by_column::<NodeBody, _>("nid", nid).await {
-    //     return Err(format!("Body save failed, {}", err.to_string()));
-    // }
+    let node_body = cms_node_body::ActiveModel {
+        nid: Set(format!("{}", nid)),
+        summary: Set(Some(String::from(summary))),
+        summary_format: Set(Some(body_format.to_string())),
+        body: Set(Some(String::from(body))),
+        body_format: Set(Some(body_format.to_string())),
+        ..Default::default()
+    };
 
-    // let node_body = NodeBody {
-    //     nid,
-    //     summary: String::from(summary),
-    //     body: String::from(body),
-    //     body_format: body_format.to_string(),
-    // };
-    // let res = rb.save(&node_body, &[]).await;
-
-    // match res {
-    //     Ok(_) => Ok(format!("Body save success")),
-    //     Err(err) => Err(format!("Body save failed, {}", err.to_string())),
-    // }
-    Ok(format!(""))
+    let res: cms_node_body::Model = match node_body.insert(db).await {
+        Ok(data) => data,
+        Err(err) => {
+            return Err(anyhow!("Node Body save failed {}", err.to_string()));
+        }
+    };
+    
+    Ok(res.nid)
 }
 
 pub async fn save_node(
@@ -233,21 +241,37 @@ pub async fn save_node(
 
     let node: cms_nodes::Model = node.insert(db).await?;
 
-    let created_by = node.created_by.unwrap_or(String::from("0")).parse().unwrap();
+    let created_by = node.created_by.unwrap_or("".to_string());
 
     let data = Node {
-        nid: node.nid.parse().unwrap_or(0),
+        nid: node.nid,
         vid: node.vid.unwrap(),
-        uid: created_by,
+        uid: created_by.to_string(),
         bundle: node.bundle.unwrap_or("".to_string()),
         title: node.title.unwrap(),
         viewed: node.viewed.unwrap(),
         deleted: node.deleted.unwrap().eq("1"),
         created_at: node.created_at,
-        created_by,
-        updated_at: node.updated_at.unwrap(),
+        created_by: created_by.to_string(),
+        updated_at: node.updated_at.unwrap_or(Local::now().naive_local()),
         updated_by: node.updated_by.unwrap().parse().unwrap(),
     };
+    Ok(data)
+}
+
+pub async fn save_node_taxonomies_map(
+    db: &DatabaseConnection,
+    bundle: &str,
+    nid: &str,
+    tid: &str
+) -> Result<NodeTaxonomiesMap> {
+    let n = cms_node_taxonomies_map::ActiveModel {
+        bundle: Set(Some(String::from(bundle))),
+        nid: Set(String::from(nid)),
+        tid: Set(String::from(tid)),
+    };
+    let res = n.insert(db).await?;
+    let data = NodeTaxonomiesMap::from_model(&res);
     Ok(data)
 }
 
