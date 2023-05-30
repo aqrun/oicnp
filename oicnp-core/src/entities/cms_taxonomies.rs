@@ -24,4 +24,14 @@ impl RelationTrait for Relation {
     }
 }
 
+impl Related<super::cms_nodes::Entity> for Entity {
+    fn to() -> RelationDef {
+        super::cms_node_taxonomies_map::Relation::Node.def()
+    }
+
+    fn via() -> Option<RelationDef> {
+        Some(super::cms_node_taxonomies_map::Relation::Taxonomy.def().rev())
+    }
+}
+
 impl ActiveModelBehavior for ActiveModel {}

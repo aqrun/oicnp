@@ -20,13 +20,25 @@ pub struct Model {
     pub deleted_at: Option<DateTime>,
 }
 
-#[derive(Copy, Clone, Debug, EnumIter)]
+#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
+    #[sea_orm(has_one = "super::cms_node_body::Entity")]
+    NodeBody,
 }
 
-impl RelationTrait for Relation {
-    fn def(&self) -> RelationDef {
-        panic!("No RelationDef")
+impl Related<super::cms_node_body::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::NodeBody.def()
+    }
+}
+
+impl Related<super::cms_taxonomies::Entity> for Entity {
+    fn to() -> RelationDef {
+        super::cms_node_taxonomies_map::Relation::Taxonomy.def()
+    }
+
+    fn via() -> Option<RelationDef> {
+        Some(super::cms_node_taxonomies_map::Relation::Node.def().rev())
     }
 }
 

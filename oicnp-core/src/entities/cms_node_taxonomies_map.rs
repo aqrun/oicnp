@@ -12,13 +12,24 @@ pub struct Model {
     pub tid: String,
 }
 
-#[derive(Copy, Clone, Debug, EnumIter)]
-pub enum Relation {}
-
-impl RelationTrait for Relation {
-    fn def(&self) -> RelationDef {
-        panic!("No RelationDef")
-    }
+#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
+pub enum Relation {
+    #[sea_orm(
+        belongs_to = "super::cms_nodes::Entity",
+        from = "Column::Nid",
+        to = "super::cms_nodes::Column::Nid",
+        on_update = "Cascade",
+        on_delete = "Cascade"
+    )]
+    Node,
+    #[sea_orm(
+        belongs_to = "super::cms_taxonomies::Entity",
+        from = "Column::Tid",
+        to = "super::cms_taxonomies::Column::Tid",
+        on_update = "Cascade",
+        on_delete = "Cascade"
+    )]
+    Taxonomy,
 }
 
 impl ActiveModelBehavior for ActiveModel {}

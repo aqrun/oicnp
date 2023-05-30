@@ -16,11 +16,24 @@ pub struct Model {
 }
 
 #[derive(Copy, Clone, Debug, EnumIter)]
-pub enum Relation {}
+pub enum Relation {
+    Node,
+}
 
 impl RelationTrait for Relation {
     fn def(&self) -> RelationDef {
-        panic!("No RelationDef")
+        match self {
+            Self::Node => Entity::belongs_to(super::cms_nodes::Entity)
+                .from(Column::Nid)
+                .to(super::cms_nodes::Column::Nid)
+                .into(),
+        }
+    }
+}
+
+impl Related<super::cms_nodes::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Node.def()
     }
 }
 

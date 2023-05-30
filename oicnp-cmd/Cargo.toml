@@ -31,3 +31,8 @@ rs-snowflake = "^0"
 scru128 = "^2"
 anyhow = "^1"
 clap = { version = "^4", features = ["derive"] }
+
+[dependencies.sea-orm]
+version = "^0"
+default-features = false
+features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "with-chrono"]

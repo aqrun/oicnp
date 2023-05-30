@@ -143,7 +143,7 @@ pub async fn find_nodes_count(
         ;
     println!("data: {:?}", data);
     */
-    let total = q.count(db).await        
+    let total = q.count(db).await?;    
     
     Ok(total as i32)
 }
