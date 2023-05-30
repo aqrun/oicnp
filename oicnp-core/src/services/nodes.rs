@@ -114,6 +114,7 @@ pub async fn find_nodes_count(
 ) -> Result<i32> {
     let mut q: Select<CmsNodes> = CmsNodes::find()
         .select_only()
+        .column(cms_nodes::Column::Nid)
         .join(
             JoinType::LeftJoin,
             CmsNodes::belongs_to(CmsNodeTaxonomiesMap)
@@ -133,6 +134,7 @@ pub async fn find_nodes_count(
                 .add(cms_taxonomies::Column::Name.eq(category))
         );
 
+    /*
     let data = // q.into_model::<Node>()
         q.build(DbBackend::Postgres)
         .to_string()
@@ -140,15 +142,10 @@ pub async fn find_nodes_count(
         // .await
         ;
     println!("data: {:?}", data);
-    let total = match q.into_model::<NodeCount>().all(db).await {
-        Ok(count) => count,
-        Err(err) => {
-            println!("dbErr: {:?}", err);
-            vec![]
-        }
-    };
-    println!("total: {:?}", total);
-    Ok(1 as i32)
+    */
+    let total = q.count(db).await        
+    
+    Ok(total as i32)
 }
 
 
