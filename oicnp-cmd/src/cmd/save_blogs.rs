@@ -1,8 +1,12 @@
 use crate::{Cli, models::{Blog, Category}};
 use std::fs::File;
 use std::io::prelude::*;
-use chrono::{NaiveDateTime};
 use oicnp_core::{DatabaseConnection, DB, establish_connection,
+    prelude::{
+        anyhow::{Result, anyhow},
+        chrono::{NaiveDateTime},
+        serde_json,
+    },
     typings::{
         BodyFormat, NodeBundle,
     },
@@ -14,23 +18,33 @@ use oicnp_core::{DatabaseConnection, DB, establish_connection,
     },
 };
 use rand::{Rng, thread_rng};
-use anyhow::{Result, anyhow};
+use crate::constants::get_categories;
+use sea_orm_migration::prelude::*;
+use migration::types as tables;
+use crate::cmd::truncate_all_tables;
 
 pub async fn save_blogs(cli: &Cli) {
     let all_blogs = get_all_blogs(&cli.dist_file);
     let db = DB.get_or_init(establish_connection).await;
+    let categories = get_categories();
 
-    let categories = vec![
-        Category { name: "backend", dir: "blog/backend/_posts" },
-        Category { name: "frontend", dir: "blog/frontend/_posts" },
-        Category { name: "rust", dir: "blog/rust/_posts" },
-        Category { name: "server", dir: "blog/server/_posts" },
-        Category { name: "diary", dir: "blog/diary/_posts" },
-    ];
+    truncate_all_tables(db).await;
 
+    let mut date = "";
+    if let Some(blog) = all_blogs.get(0) {
+        date = blog.date.as_str();
+    }
+
+    let mut date_index = 0;
     let mut _i = 0;
     for blog in &all_blogs {
-        let blog_res = save_blog(db, blog, _i).await;
+        if !date.eq(blog.date.as_str()) {
+            date_index = 0;
+            date = blog.date.as_str();
+        }
+
+        date_index += 1;
+        let blog_res = save_blog(db, blog, date_index).await;
 
         match blog_res {
             Ok(node) => {
@@ -47,6 +61,9 @@ pub async fn save_blogs(cli: &Cli) {
                     println!("Save node content failed: {}", err);
                 }
 
+                let cat_data = categories.iter().find(|item| {
+                    item.name.eq(blog.category.as_str())
+                }).unwrap();
                 let cat = blog.category.as_str();
                 let new_taxonomy = NewTaxonomy {
                     vid: String::from(cat),
@@ -54,7 +71,7 @@ pub async fn save_blogs(cli: &Cli) {
                     name: String::from(cat),
                     description: "".to_string(),
                     description_format: "".to_string(),
-                    weight: 0,
+                    weight: cat_data.weight,
                 };
                 let res = save_taxonomy(db, &new_taxonomy)
                     .await;
@@ -91,7 +108,7 @@ pub async fn save_blogs(cli: &Cli) {
 async fn save_blog(db: &DatabaseConnection, blog: &Blog, index: i32) -> Result<Node, String> {
     let bundle = NodeBundle::Article;
     let mut rng = thread_rng();
-    let hour = format!("{:02}", index + 1);
+    let hour = format!("{:02}", index);
     let minute = format!("{:02}", rng.gen_range(0..59));
     let second = format!("{:02}", rng.gen_range(0..59));
     let data_str = format!("{} {}:{}:{}", &blog.date, hour, minute, second);
@@ -100,7 +117,6 @@ async fn save_blog(db: &DatabaseConnection, blog: &Blog, index: i32) -> Result<N
     ).unwrap();
     let node = NewNode {
         vid: String::from(&blog.slug),
-        uid: "1".to_string(),
         bundle: bundle.to_string(),
         title: String::from(&blog.title),
         deleted: false,
@@ -108,6 +124,7 @@ async fn save_blog(db: &DatabaseConnection, blog: &Blog, index: i32) -> Result<N
         updated_by: "1".to_string(),
         created_at: date,
         updated_at: date,
+        published_at: Some(date),
     };
     let res = save_node(db, &node, &bundle).await;
 

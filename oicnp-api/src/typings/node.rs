@@ -1,5 +1,4 @@
 use async_graphql::{Object, Context};
-use serde::{Deserialize, Serialize};
 use crate::typings::{DateFormat, TaxonomyBundle};
 use crate::services::{
     find_user_by_id,
@@ -11,8 +10,13 @@ use crate::models::{
     Users,
     Taxonomies,
 };
-use chrono::prelude::*;
-use oicnp_core::{DatabaseConnection};
+use oicnp_core::{
+    DatabaseConnection,
+    prelude::{
+        chrono::prelude::*,
+    },
+};
+use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct DetailNode {

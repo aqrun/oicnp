@@ -1,14 +1,17 @@
-extern crate fast_log;
-
 use oicnp_api::typings::TaxonomyBundle;
-use fast_log::{
-    plugin::{
-        file_split::RollingType,
-        packer::LogPacker,
+use oicnp_core::prelude::{
+    log::{info},
+    serde::{Deserialize, Serialize},
+    fast_log::{
+        self,
+        plugin::{
+            file_split::RollingType,
+            packer::LogPacker,
+        },
+        consts::LogSize,
     },
-    consts::LogSize,
+    chrono::prelude::*,
 };
-use log::{info};
 
 #[tokio::main]
 async fn main() {

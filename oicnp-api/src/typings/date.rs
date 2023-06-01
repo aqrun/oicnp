@@ -1,4 +1,9 @@
-use strum_macros::Display;
+use oicnp_core::{
+    prelude::{
+        strum,
+        strum_macros::Display,
+    }
+};
 
 #[derive(Display, Debug)]
 pub enum DateFormat {

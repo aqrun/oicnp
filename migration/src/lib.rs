@@ -1,4 +1,4 @@
-mod types;
+pub mod types;
 
 mod m20220825_211845_create_departments_table;
 mod m20220825_211904_create_api_db_table;

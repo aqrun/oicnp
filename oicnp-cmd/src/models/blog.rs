@@ -1,9 +1,10 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
 pub struct Category<'a> {
     pub name: &'a str,
     pub dir: &'a str,
+    pub weight: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

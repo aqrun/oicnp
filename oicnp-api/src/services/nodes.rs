@@ -3,12 +3,14 @@ use crate::models::{Nodes, NodeBody, NewNode, Taxonomies};
 use crate::typings::{
     BodyFormat, NodeBundle, DetailNode, Count,
 };
-use oicnp_core::{DatabaseConnection};
-use anyhow::{anyhow, Result};
 use oicnp_core::{
+    DatabaseConnection,
     entities::{
         cms_nodes,
     },
+    prelude::{
+        anyhow::{anyhow, Result}
+    }
 };
 
 /*#[py_sql("

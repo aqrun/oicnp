@@ -6,8 +6,17 @@ use crate::services::{
     find_node_taxonomies,
 };
 use crate::typings::{DateFormat, NodeBundle, TaxonomyBundle};
-use oicnp_core::{DateTime, DatabaseConnection};
-use anyhow::{anyhow, Result};
+use oicnp_core::{
+    DateTime, DatabaseConnection,
+    entities::{
+        cms_nodes,
+    },
+    prelude::{
+        chrono::prelude::*,
+        anyhow::{anyhow, Result}
+    }
+};
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug)]
 pub struct Nodes {

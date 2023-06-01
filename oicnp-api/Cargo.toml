@@ -10,30 +10,14 @@ default-run = "main"
 [dependencies]
 oicnp_core = { path = "../oicnp-core" }
 oicnp_derives = { path = "../oicnp-derives" }
-tokio = { version = "^1", features = ["macros", "rt-multi-thread"] }
 poem = "^1"
-dotenv = "^0"
-lazy_static = "^1"
 async-graphql-poem = "^4"
 async-graphql = {version = "^4", features = ["bson", "chrono"]}
-slab = "^0"
-serde = { version = "^1", features = ["derive"] }
-serde_json = "^1"
-serde_yaml = "^0"
-bson2 = "^2"
-rbson = "^2"
-log = "^0"
-fast_log = { version = "^1", features = ["lz4", "zip", "gzip"]}
-chrono = { version = "^0", features = ["serde"] }
-tracing-subscriber = "^0"
 regex = "^1"
 gray_matter = "^0"
-strum = "^0"
-strum_macros = "^0"
 rand = "^0"
-rs-snowflake = "^0"
 scru128 = "^2"
-anyhow = "^1"
+serde = { version = "1.0", features = ["derive"] }
 
 [[bin]]
 name = "main"

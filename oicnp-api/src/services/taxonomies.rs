@@ -4,8 +4,15 @@ use crate::models::{
 use crate::typings::{
     TaxonomyBundle, NodeBundle,
 };
-use oicnp_core::{DatabaseConnection};
-use anyhow::{anyhow, Result};
+use oicnp_core::{
+    DatabaseConnection,
+    entities::{
+        cms_nodes,
+    },
+    prelude::{
+        anyhow::{anyhow, Result}
+    }
+};
 
 // #[py_sql("UPDATE taxonomies SET count = count + 1 WHERE tid = #{tid}")]
 pub async fn taxonomy_increase_count(

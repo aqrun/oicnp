@@ -24,4 +24,5 @@ pub enum Command {
     },
     SaveBlogs,
     TestRun,
+    TruncateTables,
 }

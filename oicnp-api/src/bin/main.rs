@@ -1,4 +1,6 @@
-extern crate fast_log;
+use oicnp_core::prelude::{
+    fast_log,
+};
 // use tokio::task;
 use oicnp_api::run;
 

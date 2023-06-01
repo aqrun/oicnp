@@ -1,8 +1,8 @@
 use async_graphql::{Object, MergedObject};
-use serde::{Deserialize, Serialize};
 use crate::typings::{
     DetailNode,
 };
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct PagerInfo {

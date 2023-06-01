@@ -1,9 +1,15 @@
 use std::ops::Deref;
-use oicnp_core::G;
-use fast_log::consts::LogSize;
-use fast_log::plugin::file_split::{Packer, RollingType};
-use fast_log::plugin::packer::{LZ4Packer, ZipPacker, LogPacker, GZipPacker};
-use fast_log::Config;
+use oicnp_core::{
+    G,
+    prelude::{
+        log,
+        fast_log::{self, Config,
+            consts::LogSize,
+            plugin::file_split::{Packer, RollingType},
+            plugin::packer::{LZ4Packer, ZipPacker, LogPacker, GZipPacker},
+        }
+    }
+};
 use std::time::Duration;
 
 pub fn init_log() {

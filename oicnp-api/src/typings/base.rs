@@ -1,5 +1,10 @@
-use strum_macros::Display;
-use serde::{Deserialize, Serialize};
+use oicnp_core::{
+    prelude::{
+        strum,
+        strum_macros::Display,
+    },
+};
+use serde::{Serialize, Deserialize};
 
 #[derive(Display, Debug)]
 pub enum TaxonomyBundle {

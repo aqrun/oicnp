@@ -8,9 +8,9 @@ mod db;
 pub mod services;
 pub mod models;
 pub mod typings;
+pub mod prelude;
 
 pub use config::*;
 pub use db::*;
 
 pub use sea_orm::prelude::DateTime;
-pub use sea_orm;

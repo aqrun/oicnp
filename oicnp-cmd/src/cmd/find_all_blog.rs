@@ -1,9 +1,20 @@
-extern crate fast_log;
-
 use std::path::PathBuf;
 use std::fs;
 use std::io::Read;
-use oicnp_core::{G, establish_connection, DB, DatabaseConnection};
+use oicnp_core::{
+    G, establish_connection, DB, DatabaseConnection,
+    prelude::{
+        anyhow::{anyhow, Result},
+        fast_log::{
+            self,
+            consts::LogSize,
+            plugin::{file_split::RollingType, packer::LogPacker},
+        },
+        log::{warn, error, info},
+        serde_json,
+        chrono::prelude::*,
+    }
+};
 use gray_matter::Matter;
 use gray_matter::engine::YAML;
 use oicnp_api::models::{
@@ -14,19 +25,10 @@ use oicnp_api::utils::{
     generate_slug,
     is_valid_matter_content,
 };
-use serde::{Deserialize, Serialize};
-use log::{ warn, error, info };
 use rand::{Rng, thread_rng};
-use fast_log::{
-    plugin::{
-        file_split::RollingType,
-        packer::LogPacker,
-    },
-    consts::LogSize,
-};
-use chrono::prelude::*;
 use crate::models::{Blog, Category, BlogMatter};
-use anyhow::{anyhow, Result};
+use crate::constants::{get_categories};
+use serde::{Serialize, Deserialize};
 
 pub async fn run(format: &str, blog_base: &str, dist_file: &str) {
     fast_log::init(fast_log::Config::new()
@@ -42,14 +44,7 @@ pub async fn run(format: &str, blog_base: &str, dist_file: &str) {
     info!("\n\n\n[OICP] Blog handle start at {}", Local::now().format("%Y-%m-%d %H:%M:%S"));
 
     // let db = DB.get_or_init(establish_connection).await;
-
-    let categories = vec![
-        Category { name: "backend", dir: "blog/backend/_posts" },
-        Category { name: "frontend", dir: "blog/frontend/_posts" },
-        Category { name: "rust", dir: "blog/rust/_posts" },
-        Category { name: "server", dir: "blog/server/_posts" },
-        Category { name: "diary", dir: "blog/diary/_posts" },
-    ];
+    let categories = get_categories();
 
     let all_blogs = find_all_blogs(categories, blog_base);
     // println!("all_blogs {}", serde_json::to_string(&all_blogs[0..2]).unwrap());

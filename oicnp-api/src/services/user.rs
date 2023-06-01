@@ -1,8 +1,15 @@
 use crate::models::{
     Files, Users,
 };
-use oicnp_core::{DatabaseConnection};
-use anyhow::{anyhow, Result};
+use oicnp_core::{
+    DatabaseConnection,
+    entities::{
+        cms_nodes,
+    },
+    prelude::{
+        anyhow::{anyhow, Result}
+    }
+};
 
 // #[py_sql("SELECT f.* FROM file f
 //  LEFT JOIN user_picture u
