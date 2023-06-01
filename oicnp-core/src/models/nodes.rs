@@ -10,15 +10,16 @@ use sea_orm::FromQueryResult;
 pub struct Node {
     pub nid: String,
     pub vid: String,
-    pub uid: String,
     pub bundle: String,
     pub title: String,
     pub viewed: i32,
     pub deleted: bool,
+    pub published_at: Option<DateTime>,
     pub created_at: DateTime,
     pub created_by: String,
     pub updated_at: DateTime,
     pub updated_by: String,
+    pub deleted_at: Option<DateTime>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -56,10 +57,10 @@ pub struct DetailNode {
 #[derive(Clone, Debug)]
 pub struct NewNode {
     pub vid: String,
-    pub uid: String,
     pub bundle: String,
     pub title: String,
     pub deleted: bool,
+    pub published_at: Option<DateTime>,
     pub created_at: DateTime,
     pub updated_at: DateTime,
     pub created_by: String,

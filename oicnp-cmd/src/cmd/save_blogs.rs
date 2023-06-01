@@ -30,7 +30,7 @@ pub async fn save_blogs(cli: &Cli) {
 
     let mut _i = 0;
     for blog in &all_blogs {
-        let blog_res = save_blog(db, blog).await;
+        let blog_res = save_blog(db, blog, _i).await;
 
         match blog_res {
             Ok(node) => {
@@ -88,10 +88,10 @@ pub async fn save_blogs(cli: &Cli) {
     println!("Restore completed with {} data", _i);
 }
 
-async fn save_blog(db: &DatabaseConnection, blog: &Blog) -> Result<Node, String> {
+async fn save_blog(db: &DatabaseConnection, blog: &Blog, index: i32) -> Result<Node, String> {
     let bundle = NodeBundle::Article;
     let mut rng = thread_rng();
-    let hour = format!("{:02}", rng.gen_range(0..23));
+    let hour = format!("{:02}", index + 1);
     let minute = format!("{:02}", rng.gen_range(0..59));
     let second = format!("{:02}", rng.gen_range(0..59));
     let data_str = format!("{} {}:{}:{}", &blog.date, hour, minute, second);

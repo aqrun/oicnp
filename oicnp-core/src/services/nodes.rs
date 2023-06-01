@@ -233,6 +233,12 @@ pub async fn save_node(
         title: Set(Some(String::from(&new_node.title))),
         viewed: Set(Some(0)),
         deleted: Set(Some("0".to_owned())),
+        published_at: Set(new_node.published_at),
+        created_by: Set(Some(String::from(&new_node.created_by))),
+        updated_by: Set(Some(String::from(&new_node.updated_by))),
+        created_at: Set(new_node.created_at),
+        updated_at: Set(Some(new_node.updated_at)),
+        deleted_at: Set(None),
         ..Default::default()
     };
 
@@ -243,15 +249,16 @@ pub async fn save_node(
     let data = Node {
         nid: node.nid,
         vid: node.vid.unwrap(),
-        uid: created_by.to_string(),
         bundle: node.bundle.unwrap_or("".to_string()),
         title: node.title.unwrap(),
         viewed: node.viewed.unwrap(),
         deleted: node.deleted.unwrap().eq("1"),
+        published_at: node.published_at,
         created_at: node.created_at,
         created_by: created_by.to_string(),
         updated_at: node.updated_at.unwrap_or(Local::now().naive_local()),
         updated_by: node.updated_by.unwrap().parse().unwrap(),
+        deleted_at: node.deleted_at,
     };
     Ok(data)
 }
