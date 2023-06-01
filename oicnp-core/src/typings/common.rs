@@ -1,6 +1,12 @@
 use strum_macros::Display;
 use serde::{Deserialize, Serialize};
 
+#[cfg(target_os = "windows")]
+pub type oic_usize = usize;
+
+#[cfg(not(target_os = "windows"))]
+pub type oic_usize = u64;
+
 #[derive(Display, Debug)]
 pub enum TaxonomyBundle {
     #[strum(serialize = "category")]

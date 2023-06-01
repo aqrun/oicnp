@@ -1,4 +1,5 @@
 use oicnp_core::{
+    sea_orm::*,
     DB, establish_connection, DatabaseConnection,
     services::{
         find_nodes_count, find_taxonomy_by_vid,
@@ -14,7 +15,6 @@ use oicnp_core::{
         Node, NodeBody,
     }
 };
-use sea_orm::*;
 use serde::{Serialize, Deserialize};
 
 pub async fn run() {

@@ -4,7 +4,7 @@ use std::io::Read;
 use crate::utils::AppConfig;
 
 // 配置文件路径
-const APP_CONFIG_FILE: &'static str = "./api/app.yml";
+const APP_CONFIG_FILE: &'static str = "./configs/app.yml";
 
 lazy_static! {
     pub static ref G: AppConfig = generate_app_config(APP_CONFIG_FILE);

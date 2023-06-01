@@ -13,3 +13,4 @@ pub use config::*;
 pub use db::*;
 
 pub use sea_orm::prelude::DateTime;
+pub use sea_orm;

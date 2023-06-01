@@ -3,7 +3,7 @@ use crate::models::{Node, NodeBody, NewNode, Taxonomies, DetailNode, NodeCount,
     NodeTaxonomiesMap,
 };
 use crate::typings::{
-    BodyFormat, NodeBundle, Count,
+    BodyFormat, NodeBundle, Count, oic_usize,
 };
 use crate::{DatabaseConnection};
 use crate::entities::{
@@ -98,9 +98,9 @@ pub async fn find_nodes(
 
     // 获取全部数据条数据
     let total = query.clone().count(db).await?;
-    let pager = query.paginate(db, limit as usize);
+    let pager = query.paginate(db, limit as oic_usize);
     let total_pages = pager.num_pages().await?;
-    let list = pager.fetch_page(offset as usize).await?;
+    let list = pager.fetch_page(offset as oic_usize).await?;
 
     println!("----1111111111--------{:?} total:{:?}  taotal_page: {:?}", list, total, total_pages);
     info!("{:?}", list);

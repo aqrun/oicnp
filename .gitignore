@@ -1,4 +1,5 @@
 /target
+/configs/app.yml
 /backend/target
 .idea
 Cargo.lock
