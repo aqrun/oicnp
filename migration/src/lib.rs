@@ -33,7 +33,7 @@ mod m20230116_092919_create_cms_node_files_map_table;
 mod m20230116_092931_create_cms_node_comments_map_table;
 mod m20230116_092944_create_cms_configs_table;
 
-pub use sea_orm_migration::prelude::*;
+use oicnp_core::prelude::sea_orm_migration::prelude::*;
 
 pub struct Migrator;
 

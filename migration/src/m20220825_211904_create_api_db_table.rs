@@ -1,4 +1,4 @@
-use sea_orm_migration::prelude::*;
+use oicnp_core::prelude::sea_orm_migration::prelude::*;
 use super::types::*;
 
 const INDEX_DB: &'static str = "idx-apiDb-db";

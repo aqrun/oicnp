@@ -1,4 +1,4 @@
-use sea_orm_migration::prelude::*;
+use oicnp_core::prelude::sea_orm_migration::prelude::*;
 use oicnp_derives::{Column as OicColumn};
 
 // cms_files
