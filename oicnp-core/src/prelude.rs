@@ -1,5 +1,6 @@
 
 pub use sea_orm;
+pub use sea_orm_migration;
 pub use anyhow;
 pub use chrono;
 pub use serde;

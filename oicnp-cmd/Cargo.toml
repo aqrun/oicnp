@@ -20,9 +20,3 @@ clap = { version = "^4", features = ["derive"] }
 async-std = { version = "^1", features = ["attributes", "tokio1"] }
 lazy_static = "^1"
 
-[dependencies.sea-orm-migration]
-version = "^0"
-features = [
-    "runtime-tokio-rustls",  # `ASYNC_RUNTIME` feature
-    "sqlx-postgres",         # `DATABASE_DRIVER` feature
-]

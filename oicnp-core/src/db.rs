@@ -5,6 +5,7 @@ use sea_orm::{ConnectOptions, Database};
 use tokio::sync::OnceCell;
 
 pub use sea_orm::entity::prelude::DatabaseConnection;
+pub use sea_orm::DbConn;
 
 //  异步初始化数据库
 pub static DB: OnceCell<DatabaseConnection> = OnceCell::const_new();
