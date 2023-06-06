@@ -2,7 +2,7 @@ use strum_macros::Display;
 use serde::{Deserialize, Serialize};
 
 #[cfg(target_os = "windows")]
-pub type oic_usize = usize;
+pub type oic_usize = u64;
 
 #[cfg(not(target_os = "windows"))]
 pub type oic_usize = u64;
