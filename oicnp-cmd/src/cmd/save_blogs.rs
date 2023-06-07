@@ -1,34 +1,42 @@
 use crate::{Cli, models::{Blog, Category}};
 use std::fs::File;
 use std::io::prelude::*;
-use oicnp_core::{DatabaseConnection, DB, establish_connection,
+use std::ops::Deref;
+use oicnp_core::{DatabaseConnection, DbConn, DB, establish_connection,
     prelude::{
         anyhow::{Result, anyhow},
         chrono::{NaiveDateTime},
         serde_json,
+        sea_orm_migration::prelude::*,
     },
     typings::{
         BodyFormat, NodeBundle,
     },
     services::{
-        save_node_content, save_node, save_taxonomy, save_node_taxonomies_map,
+        save_node_content, save_node, save_taxonomies, save_node_taxonomies_map,
+        find_taxonomy_by_vid,
     },
     models::{
         NewNode, Node, NewTaxonomy, NodeTaxonomiesMap,
     },
 };
 use rand::{Rng, thread_rng};
-use crate::constants::get_categories;
-use sea_orm_migration::prelude::*;
+use crate::constants::{init_categories, CATEGORIES};
 use migration::types as tables;
 use crate::cmd::truncate_all_tables;
+use std::collections::HashMap;
+use oicnp_core::models::Taxonomies;
+use oicnp_core::prelude::sea_orm::ColIdx;
 
 pub async fn save_blogs(cli: &Cli) {
     let all_blogs = get_all_blogs(&cli.dist_file);
     let db = DB.get_or_init(establish_connection).await;
-    let categories = get_categories();
 
     truncate_all_tables(db).await;
+
+    if let Err(err) = save_taxonomies_data(db).await {
+        println!("Taxonomies data save failed {}", err);
+    }
 
     let mut date = "";
     if let Some(blog) = all_blogs.get(0) {
@@ -61,39 +69,17 @@ pub async fn save_blogs(cli: &Cli) {
                     println!("Save node content failed: {}", err);
                 }
 
-                let cat_data = categories.iter().find(|item| {
-                    item.name.eq(blog.category.as_str())
-                }).unwrap();
-                let cat = blog.category.as_str();
-                let new_taxonomy = NewTaxonomy {
-                    vid: String::from(cat),
-                    pid: "".to_string(),
-                    name: String::from(cat),
-                    description: "".to_string(),
-                    description_format: "".to_string(),
-                    weight: cat_data.weight,
-                };
-                let res = save_taxonomy(db, &new_taxonomy)
-                    .await;
-
-                match res {
-                    Ok(taxonomies) => {
-                        let res = save_node_taxonomies_map(
-                            db, 
-                            node.bundle.as_str(),
-                            node.nid.as_str(), 
-                            taxonomies.tid.as_str()
-                        ).await;
-
-                        if let Err(err) = res {
-                            println!("Save Node_taxonomies_map failed: {}", err);
-                        }
-                    },
-                    Err(err) => {
-                        println!("Save taxonomies failed: {}", err);
+                if let Ok(cat_data) = find_taxonomy_by_vid(db, blog.category.as_str())
+                    .await {
+                    if let Err(res) = save_node_taxonomies_map(
+                        db,
+                        node.bundle.as_str(),
+                        node.nid.as_str(),
+                        cat_data.tid.as_str()
+                    ).await {
+                        println!("Save Node_taxonomies_map failed: {}", res);
                     }
-                };
-
+                }
 
                 _i += 1;
             },
@@ -147,4 +133,75 @@ fn get_all_blogs(dist_file: &str) -> Vec<Blog> {
         _ => vec![],
     };
     blogs
+}
+
+async fn save_taxonomies_data(db: &DbConn) -> Result<String> {
+    let categories = CATEGORIES.get_or_init(init_categories);
+    let mut err = String::from("");
+    // 要存储的父级数据
+    let mut parent_taxonomies: Vec<NewTaxonomy> = Vec::new();
+
+    // 先把第一父级保存
+    for item in categories.iter() {
+        if (item.parent.eq("")) {
+            parent_taxonomies.push(NewTaxonomy {
+                vid: item.name.to_string(),
+                pid: item.parent.to_string(),
+                name: item.name.to_string(),
+                description: "".to_string(),
+                description_format: "".to_string(),
+                weight: item.weight,
+            });
+        }
+    }
+
+    match save_taxonomies(db, &parent_taxonomies).await {
+        Ok(_data) => {},
+        Err(err) => {
+            println!("Save parent taxonmies failed {:?}", err);
+        }
+    };
+
+    let mut new_taxonomies: Vec<NewTaxonomy> = Vec::new();
+    // 缓存父级 tid Map{vid: tid}
+    let mut parent_taxonomies: HashMap<String, String> = HashMap::new();
+
+    for item in categories.iter() {
+        // 跳过已保存的父级
+        if item.parent.eq("") {
+            continue;
+        }
+        let mut pid = "".to_string();
+
+        // 先获取缓存数据
+        if let Some(data) = parent_taxonomies.get(item.parent) {
+            pid = data.to_string();
+        }
+
+        // 缓存数据不存在 且 parent不为空
+        if pid.eq("") && !item.parent.eq("") {
+            if let Ok(res) = find_taxonomy_by_vid(db, item.parent).await {
+                pid = String::from(&res.tid);
+                parent_taxonomies.insert(item.parent.to_string(), String::from(&res.tid));
+            }
+        }
+
+        new_taxonomies.push(NewTaxonomy {
+            vid: item.name.to_string(),
+            pid,
+            name: item.name.to_string(),
+            description: "".to_string(),
+            description_format: "".to_string(),
+            weight: item.weight,
+        });
+    }
+
+    match save_taxonomies(db, &new_taxonomies).await {
+        Err(err) => {
+            Err(anyhow!(err))
+        },
+        _ => {
+            Ok("success".to_string())
+        },
+    }
 }

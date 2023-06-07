@@ -13,6 +13,7 @@ pub use super::cms_nodes::Entity as CmsNodes;
 pub use super::cms_tags::Entity as CmsTags;
 pub use super::cms_taxonomies::Entity as CmsTaxonomies;
 pub use super::cms_user_files_map::Entity as CmsUserFilesMap;
+pub use super::cms_short_links::Entity as CmsShortLinks;
 pub use super::sys_api_db::Entity as SysApiDb;
 pub use super::sys_attribute_values::Entity as SysAttributeValues;
 pub use super::sys_attributes::Entity as SysAttributes;

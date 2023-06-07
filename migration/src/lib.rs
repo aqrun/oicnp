@@ -32,6 +32,7 @@ mod m20230116_092906_create_cms_node_tags_map_table;
 mod m20230116_092919_create_cms_node_files_map_table;
 mod m20230116_092931_create_cms_node_comments_map_table;
 mod m20230116_092944_create_cms_configs_table;
+mod m20230607_204902_create_short_links_table;
 
 use oicnp_core::prelude::sea_orm_migration::prelude::*;
 
@@ -73,6 +74,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20230116_092919_create_cms_node_files_map_table::Migration),
             Box::new(m20230116_092931_create_cms_node_comments_map_table::Migration),
             Box::new(m20230116_092944_create_cms_configs_table::Migration),
+            Box::new(m20230607_204902_create_short_links_table::Migration),
         ]
     }
 }

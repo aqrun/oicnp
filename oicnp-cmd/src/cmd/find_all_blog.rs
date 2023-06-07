@@ -27,7 +27,7 @@ use oicnp_api::utils::{
 };
 use rand::{Rng, thread_rng};
 use crate::models::{Blog, Category, BlogMatter};
-use crate::constants::{get_categories};
+use crate::constants::{init_categories, CATEGORIES};
 use serde::{Serialize, Deserialize};
 
 pub async fn run(format: &str, blog_base: &str, dist_file: &str) {
@@ -44,7 +44,7 @@ pub async fn run(format: &str, blog_base: &str, dist_file: &str) {
     info!("\n\n\n[OICP] Blog handle start at {}", Local::now().format("%Y-%m-%d %H:%M:%S"));
 
     // let db = DB.get_or_init(establish_connection).await;
-    let categories = get_categories();
+    let categories = CATEGORIES.get_or_init(init_categories);
 
     let all_blogs = find_all_blogs(categories, blog_base);
     // println!("all_blogs {}", serde_json::to_string(&all_blogs[0..2]).unwrap());
@@ -114,12 +114,15 @@ fn generate_blog(
 }
 
 /// 获取所有 blog 数据
-fn find_all_blogs(categories: Vec<Category>, blog_base: &str) -> Vec<Blog> {
+fn find_all_blogs(categories: &Vec<Category>, blog_base: &str) -> Vec<Blog> {
     let base = PathBuf::from(blog_base);
     let mut all_blogs: Vec<Blog> = vec!();
     let mut index = 0;
 
-    for item in categories {
+    for item in categories.iter() {
+        if (item.dir.eq((""))) {
+            continue;
+        }
         let mut dir = base.clone();
         dir.push(item.dir);
 
@@ -128,20 +131,22 @@ fn find_all_blogs(categories: Vec<Category>, blog_base: &str) -> Vec<Blog> {
 
         for m in entries {
             let entry = m.unwrap();
-            let mut file = fs::File::open(entry.path()).expect("File read failed");
-            let mut content = String::new();
-            file.read_to_string(&mut content).expect("Read content failed");
 
-            if let Ok(blog) = generate_blog (
-                entry.file_name().into_string().expect("Invalid string"),
-                content,
-                String::from(entry.path().to_str().expect("Invalid str")),
-                String::from(item.name)
-            ) {
-                all_blogs.push(blog);
+            if let Ok(mut file) = fs::File::open(entry.path()) {
+                let mut content = String::new();
+                file.read_to_string(&mut content).expect("Read content failed");
+
+                if let Ok(blog) = generate_blog (
+                    entry.file_name().into_string().expect("Invalid string"),
+                    content,
+                    String::from(entry.path().to_str().expect("Invalid str")),
+                    String::from(item.name)
+                ) {
+                    all_blogs.push(blog);
+                }
+
+                index += 1;
             }
-
-            index += 1;
             // println!("{}", content)
         }
     }

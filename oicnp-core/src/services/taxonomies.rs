@@ -42,6 +42,7 @@ pub async fn find_taxonomy_by_vid(
     Err(anyhow!("Taxonomies not exist: {}", vid))
 }
 
+/// 保存一条数据
 pub async fn save_taxonomy(
     db: &DatabaseConnection,
     new_taxonomy: &NewTaxonomy
@@ -64,4 +65,43 @@ pub async fn save_taxonomy(
     let res: cms_taxonomies::Model = t.insert(db).await?;
     let taxonomy = Taxonomies::from_model(&res);
     Ok(taxonomy)
+}
+
+/// 保存多条数据
+pub async fn save_taxonomies(
+    db: &DatabaseConnection,
+    new_taxonomies: &Vec<NewTaxonomy>
+) -> Result<String> {
+    let mut filtered_taxonomies: Vec<&NewTaxonomy> = Vec::new();
+
+    for item in new_taxonomies.iter() {
+        if let Err(_err) = find_taxonomy_by_vid(db, item.vid.as_str()).await {
+            filtered_taxonomies.push(item);
+        }
+    }
+
+    let taxonomy_models = filtered_taxonomies
+        .into_iter()
+        .map(|item| {
+            cms_taxonomies::ActiveModel {
+                tid: Set(uuid()),
+                vid: Set(Some(String::from(&item.vid))),
+                pid: Set(Some(String::from(&item.pid))),
+                name: Set(Some(String::from(&item.name))),
+                description: Set(Some(String::from(&item.description))),
+                description_format: Set(Some(String::from(&item.description_format))),
+                weight: Set(Some(item.weight)),
+                ..Default::default()
+            }
+        })
+        .collect::<Vec<cms_taxonomies::ActiveModel>>();
+
+    match CmsTaxonomies::insert_many(taxonomy_models).exec(db).await {
+        Ok(_data) => {
+            Ok("".to_string())
+        },
+        Err(err) => {
+            Err(anyhow!("Save Taxonomies failed {:?}", err))
+        }
+    }
 }

@@ -252,7 +252,7 @@ pub async fn save_node(
         bundle: node.bundle.unwrap_or("".to_string()),
         title: node.title.unwrap(),
         viewed: node.viewed.unwrap(),
-        deleted: node.deleted.unwrap().eq("1"),
+        deleted: node.deleted.unwrap(),
         published_at: node.published_at,
         created_at: node.created_at,
         created_by: created_by.to_string(),

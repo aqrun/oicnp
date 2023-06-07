@@ -5,9 +5,39 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>OICNP Short links</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/bulma/0.9.4/css/bulma.min.css" rel="stylesheet">
+    <style>
+        html,body {background: #eff2f5;}
+    </style>
 </head>
 <body>
-    target is {{ target }}
+<div class="container" style="max-width: 640px;margin-top: 100px;">
+    <div class="is-size-1">
+        OICNP
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <div class="card-header-title">
+                即将访问新页面
+            </div>
+        </div>
+        <div class="card-content">
+            <p>
+                您即将跳转未知页面，请注意您的帐号和财产安全。
+            </p>
+            <div style="margin-top: 16px;">
+                {{ target }}
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="card-footer-item" style="justify-content: flex-end">
+                <a href="{{ target }}" target="_self" class="button is-link">
+                    继续访问
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

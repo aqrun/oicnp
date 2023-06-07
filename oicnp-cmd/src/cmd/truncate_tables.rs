@@ -2,9 +2,9 @@ use oicnp_core::{
     DB,DatabaseConnection, establish_connection,
     prelude::{
         anyhow::{Result},
+        sea_orm_migration::prelude::*,
     }
 };
-use sea_orm_migration::prelude::*;
 use migration::types as tables;
 
 pub async fn truncate_tables() {

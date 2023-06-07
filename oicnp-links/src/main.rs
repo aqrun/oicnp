@@ -4,6 +4,10 @@ use oicnp_core::prelude::{
     tracing_subscriber, tokio,
 };
 use askama::Template;
+use oicnp_core::{
+    establish_connection, DB,
+    services::find_short_link_by_id,
+};
 
 #[derive(Template)]
 #[template(path = "warning-page.html")]
@@ -17,8 +21,15 @@ struct WarningPageUrlParams {
 }
 
 #[handler]
-fn short_link(Path(link_name): Path<String>) -> Redirect {
-    let url = format!("/a?target={}", link_name);
+async fn short_link(Path(short_link_id): Path<String>) -> Redirect {
+    let db = DB.get_or_init(establish_connection).await;
+    let mut target = String::new();
+
+    if let Ok(res) = find_short_link_by_id(db, &short_link_id).await {
+        target = String::from(&res.link);
+    }
+
+    let url = format!("/a?target={}", target);
     Redirect::moved_permanent(url)
 }
 
@@ -30,7 +41,7 @@ fn warning_page(
     let tpl = WarningPageTemplate {
         target: target.as_str(),
     };
-    let dom tpl.render().unwrap_or("".to_string());
+    let dom = tpl.render().unwrap_or("".to_string());
     Html(dom).into_response()
 }
 
@@ -42,7 +53,7 @@ async fn main() -> Result<(), std::io::Error> {
     tracing_subscriber::fmt::init();
 
     let app = Route::new()
-        .at("/a/:link_name", get(short_link))
+        .at("/a/:short_link_id", get(short_link))
         .at("/a", get(warning_page))
         ;
     let listener = TcpListener::bind("127.0.0.1:8199");

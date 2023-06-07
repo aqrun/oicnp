@@ -15,6 +15,7 @@ pub mod cms_nodes;
 pub mod cms_tags;
 pub mod cms_taxonomies;
 pub mod cms_user_files_map;
+pub mod cms_short_links;
 pub mod sys_api_db;
 pub mod sys_attribute_values;
 pub mod sys_attributes;

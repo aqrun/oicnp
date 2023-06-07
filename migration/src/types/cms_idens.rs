@@ -270,3 +270,25 @@ pub enum CmsConfigs {
     #[oic(type = "string", len = 32, default = "", comment = "数据类型 json, string, number")]
     DataType,
 }
+
+#[derive(Iden, OicColumn)]
+#[oic(comment = "短链接表")]
+pub enum CmsShortLinks {
+    Table,
+    #[oic(type = "string", len = 32, default = "", comment = "key")]
+    Id,
+    #[oic(type = "string", len = 512, default = "", comment = "名称")]
+    Link,
+    #[oic(type = "string", len = 255, default = "", comment = "名称")]
+    Name,
+    #[oic(type = "string", len = 512, default = "", comment = "简介")]
+    Description,
+    #[oic(type = "integer", default = 0, comment = "内容已读计数")]
+    Viewed,
+    #[oic(type = "char", len = 1, default = "0", comment = "是否删除")]
+    Deleted,
+    #[oic(type = "datetime", comment = "创建时间")]
+    CreatedAt,
+    #[oic(type = "string", len = 32, comment = "创建者")]
+    CreatedBy,
+}

@@ -5,6 +5,7 @@ pub struct Category<'a> {
     pub name: &'a str,
     pub dir: &'a str,
     pub weight: i32,
+    pub parent: &'a str,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
