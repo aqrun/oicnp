@@ -3,13 +3,13 @@ use serde::Deserialize;
 use oicnp_core::prelude::{
     tracing_subscriber, tokio,
 };
-// use askama::Template;
+use askama::Template;
 
-// #[derive(Template)] // this will generate the code...
-// #[template(source = "warning-page.html", ext = "html")] // using the template in this path, relative
-// struct WarningPageTemplate<'a> {
-//     target: &'a str,
-// }
+#[derive(Template)]
+#[template(path = "warning-page.html")]
+struct WarningPageTemplate<'a> {
+    target: &'a str,
+}
 
 #[derive(Debug, Deserialize)]
 struct WarningPageUrlParams {
@@ -27,11 +27,11 @@ fn warning_page(
     Query(WarningPageUrlParams { target }): Query<WarningPageUrlParams>
 ) -> Response {
     let target = target.unwrap_or("".to_string());
-    // let tpl = WarningPageTemplate {
-    //     target: target.as_str(),
-    // };
-    // tpl.render().unwrap_or("".to_string()).into_response()
-    "abc".into_response()
+    let tpl = WarningPageTemplate {
+        target: target.as_str(),
+    };
+    let dom tpl.render().unwrap_or("".to_string());
+    Html(dom).into_response()
 }
 
 #[tokio::main]
@@ -45,7 +45,7 @@ async fn main() -> Result<(), std::io::Error> {
         .at("/a/:link_name", get(short_link))
         .at("/a", get(warning_page))
         ;
-    let listener = TcpListener::bind("127.0.0.1:3000");
+    let listener = TcpListener::bind("127.0.0.1:8199");
     let server = Server::new(listener);
     server.run(app).await
 }
