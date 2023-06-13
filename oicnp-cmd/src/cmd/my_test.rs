@@ -14,6 +14,7 @@ use oicnp_core::{
         },
         cms_nodes, cms_node_body, cms_taxonomies,
     },
+    utils::get_config_file_path,
     models::{
         Node, NodeBody,
     }
@@ -29,7 +30,13 @@ pub async fn run() {
     // let res = find_taxonomy_by_vid(db, category).await;
     // println!("res------ {:?}", res);
     // find_node_with_body(db).await;
-    find_nodes_by_taxonomy(db).await;
+    // find_nodes_by_taxonomy(db).await;
+    get_config_path();
+}
+
+pub fn get_config_path() {
+    let p = get_config_file_path();
+    println!("file path is: {}", p);
 }
 
 // one to one 查找node 和 node_body

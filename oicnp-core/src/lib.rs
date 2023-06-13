@@ -9,6 +9,7 @@ pub mod services;
 pub mod models;
 pub mod typings;
 pub mod prelude;
+pub mod constants;
 
 pub use config::*;
 pub use db::*;

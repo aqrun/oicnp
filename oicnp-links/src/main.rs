@@ -1,7 +1,7 @@
 use poem::{handler, listener::TcpListener, get, web::{Path, Query, Redirect, Html}, Route, Server, Response, IntoResponse};
 use serde::Deserialize;
 use oicnp_core::prelude::{
-    tracing_subscriber, tokio,
+    tracing_subscriber, tokio, dotenv,
 };
 use askama::Template;
 use oicnp_core::{
@@ -30,7 +30,7 @@ async fn short_link(Path(short_link_id): Path<String>) -> Redirect {
     }
 
     let url = format!("/a?target={}", target);
-    Redirect::moved_permanent(url)
+    Redirect::temporary(url)
 }
 
 #[handler]
@@ -47,6 +47,8 @@ fn warning_page(
 
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {
+    dotenv::dotenv().ok();
+
     if std::env::var_os("RUST_LOG").is_none() {
         std::env::set_var("RUST_LOG", "poem=debug");
     }
@@ -56,7 +58,7 @@ async fn main() -> Result<(), std::io::Error> {
         .at("/a/:short_link_id", get(short_link))
         .at("/a", get(warning_page))
         ;
-    let listener = TcpListener::bind("127.0.0.1:8199");
+    let listener = TcpListener::bind("0.0.0.0:8199");
     let server = Server::new(listener);
     server.run(app).await
 }

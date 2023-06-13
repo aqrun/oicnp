@@ -8,6 +8,7 @@ use cmd::{
     my_test::run as my_test_run,
     truncate_tables,
 };
+use oicnp_core::prelude::dotenv;
 
 
 mod cli;
@@ -17,6 +18,7 @@ mod constants;
 
 #[tokio::main]
 async fn main() {
+    dotenv::dotenv().ok();
     let cli = Cli::parse();
 
     match cli.command {
