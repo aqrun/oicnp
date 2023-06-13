@@ -48,3 +48,15 @@ pub async fn find_short_link_by_id(db: &DbConn, id: &str) -> Result<ShortLink> {
 
     Err(anyhow!("Short link not exist: {}", id))
 }
+
+pub async fn update_short_link_viewed(db: &DbConn, id: &str) -> Result<i32> {
+    if let Ok(res) = find_short_link_by_id(db, id).await {
+        CmsShortLinks::update_many()
+            .col_expr(cms_short_links::Column::Viewed, Expr::value(res.viewed + 1))
+            .filter(cms_short_links::Column::Id.eq(id))
+            .exec(db)
+            .await?;
+        return Ok(res.viewed + 1);
+    }
+    Ok(0)
+}

@@ -6,7 +6,7 @@ use oicnp_core::prelude::{
 use askama::Template;
 use oicnp_core::{
     establish_connection, DB,
-    services::find_short_link_by_id,
+    services::{find_short_link_by_id, update_short_link_viewed},
 };
 
 #[derive(Template)]
@@ -18,6 +18,7 @@ struct WarningPageTemplate<'a> {
 #[derive(Debug, Deserialize)]
 struct WarningPageUrlParams {
     pub target: Option<String>,
+    pub key: Option<String>,
 }
 
 #[handler]
@@ -29,14 +30,19 @@ async fn short_link(Path(short_link_id): Path<String>) -> Redirect {
         target = String::from(&res.link);
     }
 
-    let url = format!("/a?target={}", target);
+    let url = format!("/a?key={}&target={}", short_link_id, target);
     Redirect::temporary(url)
 }
 
 #[handler]
-fn warning_page(
-    Query(WarningPageUrlParams { target }): Query<WarningPageUrlParams>
+async fn warning_page(
+    Query(WarningPageUrlParams { target, key }): Query<WarningPageUrlParams>
 ) -> Response {
+    if let Some(key) = key {
+        let db = DB.get_or_init(establish_connection).await;
+        update_short_link_viewed(db, &key).await.unwrap();
+    }
+
     let target = target.unwrap_or("".to_string());
     let tpl = WarningPageTemplate {
         target: target.as_str(),
