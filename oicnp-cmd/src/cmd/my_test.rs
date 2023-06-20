@@ -16,6 +16,7 @@ use oicnp_core::{
     },
     utils::{get_config_file_path,
             slugify_paths_without_date, capture_file_name,
+            youdao_translate,
     },
     models::{
         Node, NodeBody,
@@ -34,7 +35,8 @@ pub async fn run() {
     // find_node_with_body(db).await;
     // find_nodes_by_taxonomy(db).await;
     // get_config_path();
-    get_slug_url();
+    // get_slug_url();
+    let a = youdao_translate("中国人").await;
 }
 
 /// slug 函数测试
