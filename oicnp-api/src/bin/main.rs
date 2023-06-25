@@ -3,9 +3,11 @@ use oicnp_core::prelude::{
 };
 // use tokio::task;
 use oicnp_api::run;
+use oicnp_core::prelude::dotenv;
 
 #[tokio::main]
 async fn main() {
+    dotenv::dotenv().ok();
     // fast_log::init_log("target/api.log",
     //                    log::Level::Warn,
     //                    None,
