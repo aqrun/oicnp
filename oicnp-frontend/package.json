@@ -10,7 +10,6 @@
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
     "@apollo/client": "^3.5.6",
-    "@reduxjs/toolkit": "^1.9.2",
     "@types/lodash": "^4.14.178",
     "@types/styled-components": "^5.1.19",
     "@zeit/next-less": "^1.0.1",
