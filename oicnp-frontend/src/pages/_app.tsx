@@ -8,7 +8,6 @@ import { RecoilRoot } from 'recoil';
 import {
  useCheckIsMobile,
 } from '~/hooks';
-import NotFound from './not-found';
 
 const AppWidget = ({ Component, ...restProps }: AppProps) => {
   useCheckIsMobile();
@@ -26,9 +25,6 @@ const AppWidget = ({ Component, ...restProps }: AppProps) => {
 };
 
 function MyApp(appProps: AppProps) {
-  if (appProps?.router?.route !== '/tools/fares') {
-    return <NotFound />
-  }
   
   return (
     <RecoilRoot>
