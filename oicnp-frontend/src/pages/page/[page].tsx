@@ -14,7 +14,7 @@ export const IndexPage: React.FC<IndexPageProps> = (props) => {
   return (<HomeBase {...props} />)
 };
 
-export const getStaticPaths = async () => {
+export const getStaticPaths1 = async () => {
   const { pageSize } = SITE;
   const nodesRes = await queryNodes({
     pageSize,
@@ -30,7 +30,7 @@ export const getStaticPaths = async () => {
   return { paths, fallback: false }
 };
 
-export const getStaticProps = async ({ params }: any) => {
+export const getStaticProps1 = async ({ params }: any) => {
   const page = Number(params.page || 1);
   const { pageSize } = SITE;
   const nodesRes = await queryNodes({

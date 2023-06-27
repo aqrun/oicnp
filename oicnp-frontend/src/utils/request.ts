@@ -3,6 +3,7 @@ import {
   ApolloClient,
   InMemoryCache,
 } from "@apollo/client";
+import { API_URL } from '~/constants';
 
 export interface BaseResponse {
   [key: string]: any;
@@ -27,6 +28,6 @@ export const generateListResponseData = <T extends BaseResponse>(
 }
 
 export const client = new ApolloClient({
-  uri: 'http://localhost:8000',
+  uri: API_URL,
   cache: new InMemoryCache()
 });

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { NodeDetailPage } from '../../containers';
 import { useParams } from 'next/navigation';
 
-export default async function NodeDetail () {
+export default function NodeDetail () {
   const params = useParams();
 
   useEffect(() => {
