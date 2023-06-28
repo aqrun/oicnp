@@ -26,7 +26,7 @@ use oicnp_api::utils::{
     is_valid_matter_content,
 };
 use rand::{Rng, thread_rng};
-use crate::models::{Blog, Category, BlogMatter};
+use crate::models::{Blog, Category, BlogMatter, MatterTaxonomy};
 use crate::constants::{init_categories, CATEGORIES};
 use serde::{Serialize, Deserialize};
 
@@ -87,17 +87,19 @@ fn generate_blog(
                 return Err(anyhow!("[OICNP]Matter parse failed: {}{}", &file_path, &file_name));
             }
     };
-
+    // println!("{:?}", res.data);
     let data = res.data;
     let con = res.content;
 
     // let layout = &data["layout"].as_string().unwrap();
     let title = data.title.unwrap_or(String::from(""));
-    let tags = data.tags.unwrap_or(String::from(""));
-    let tag_arr = tags.split(" ")
-        .map(|item| String::from(item))
-        .collect();
-    let excerpt = data.excerpt.unwrap_or(String::from(""));
+    let default_meta_taxonomy = MatterTaxonomy {
+        categories: vec![],
+        tags: vec![],
+    };
+    let meta_taxonomies = data.taxonomies.unwrap_or(default_meta_taxonomy);
+    let tags = meta_taxonomies.tags;
+    let excerpt = data.description.unwrap_or(String::from(""));
 
     let blog = Blog {
         slug,
@@ -105,7 +107,7 @@ fn generate_blog(
         file: String::from(&file_name),
         file_path,
         title,
-        tags: tag_arr,
+        tags,
         excerpt,
         category,
         content: Some(con),
@@ -132,7 +134,15 @@ fn find_all_blogs(categories: &Vec<Category>, blog_base: &str) -> Vec<Blog> {
         for m in entries {
             let entry = m.unwrap();
 
+            // println!("entyr--- {:?}, {:?}", &entry.path(), &entry.path().ends_with("_index.md"));
+            // _index.md 文件不需要处理
+            let is_index_file = (&entry).path().ends_with("_index.md");
+            if is_index_file {
+                continue;
+            }
+
             if let Ok(mut file) = fs::File::open(entry.path()) {
+
                 let mut content = String::new();
                 file.read_to_string(&mut content).expect("Read content failed");
 

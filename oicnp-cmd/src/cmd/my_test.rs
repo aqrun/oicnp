@@ -42,15 +42,15 @@ pub async fn run() {
 /// slug 函数测试
 fn get_slug_url() {
     let s = "2014-02-24-php代码展示";
-    let slug = slugify_paths_without_date(s);
+    let (_, slug) = slugify_paths_without_date(s);
 
     let s1 = "2014-02-24-php代码展示.md";
-    let res1 = slugify_paths_without_date(s1);
+    let (_, res1) = slugify_paths_without_date(s1);
 
     let s2 = "content\\diary\\2017-10-07-程序员提高方式.md";
-    let res2 = slugify_paths_without_date(s2);
+    let (_, res2) = slugify_paths_without_date(s2);
     let s3 = "content/diary/2017-10-07-程序员提高方式.md";
-    let res3 = slugify_paths_without_date(s3);
+    let (_, res3) = slugify_paths_without_date(s3);
 
     println!("{}: {}", s, slug);
     println!("{}: {}", s1, res1);

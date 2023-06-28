@@ -104,20 +104,28 @@ pub fn capture_file_name(s: &str) -> CapturedFile {
 }
 
 /// 去除文件名的日期
-pub fn slugify_paths_without_date(s: &str) -> String {
+pub fn slugify_paths_without_date(s: &str) -> (String, String) {
+    let mut date_time = String::new();
     let mut captured_file = capture_file_name(s);
     let mut file_path = String::from(captured_file.file_stem.as_str());
 
     // 正则匹配包含日期的文件名 无日期则不会匹配
     if let Some(caps) = RFC3339_DATE.captures(file_path.as_str()) {
+        if let Some(s) = caps.name("datetime") {
+            date_time = s.as_str().to_string();
+        }
         if let Some(s) = caps.name("slug") {
             file_path = s.as_str().to_string();
         }
     }
     // 将unicode转为ascii
-    let res_slug = slug::slugify( file_path.as_str());
+    let mut res_slug = slug::slugify( file_path.as_str());
+    res_slug = strip_invalid_paths_chars(res_slug.as_str());
+    res_slug = res_slug.replace(".", "-");
     captured_file.file_stem = res_slug;
-    captured_file.stringify()
+    let slug = captured_file.stringify();
+
+    (date_time, slug)
 }
 
 pub fn slugify_anchors(s: &str, strategy: SlugifyStrategy) -> String {

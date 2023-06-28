@@ -38,8 +38,14 @@ impl Blog {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct MatterTaxonomy {
+    pub categories: Vec<String>,
+    pub tags: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct BlogMatter {
     pub title: Option<String>,
-    pub tags: Option<String>,
-    pub excerpt: Option<String>,
+    pub description: Option<String>,
+    pub taxonomies: Option<MatterTaxonomy>,
 }

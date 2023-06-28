@@ -1,22 +1,11 @@
 use regex::Regex;
+use oicnp_core::utils::{RFC3339_DATE, slugify_paths_without_date};
 
 pub fn generate_slug(file_name: &str) -> (String, String) {
-    let mut file_arr: Vec<&str> = file_name.split(".").collect();
-    file_arr.pop();
-    let new_file_name = file_arr.join("-");
-    file_arr = new_file_name.split("-").collect();
-    let year = file_arr[0];
-    let month = file_arr[1];
-    let day = file_arr[2]; // .parse::<i32>().expect("Day error");
-    let date = format!("{}-{}-{}", year, month, day);
-
-    let re = Regex::new(r"[\.+\s]+").unwrap();
-    let source_title = file_arr[3..].join("-");
-    let title = re.replace_all(&source_title, "-");
-    let slug = format!("{}-{}", date, title);
-
-    let res = (date, slug);
-    return res;
+    let article_title = file_name.strip_suffix(".md").unwrap_or(file_name);
+    let (date_time, slug) = slugify_paths_without_date(&article_title);
+    println!("slug---- {}", &slug);
+    return (date_time, slug);
 }
 
 pub fn is_valid_matter_content(content: &str) -> bool {
