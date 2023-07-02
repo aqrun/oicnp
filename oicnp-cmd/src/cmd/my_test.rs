@@ -6,6 +6,7 @@ use oicnp_core::{
     DB, establish_connection, DatabaseConnection,
     services::{
         find_nodes_count, find_taxonomy_by_vid,
+        find_node_taxonomies,
     },
     typings::{NodeBundle},
     entities::{
@@ -36,7 +37,13 @@ pub async fn run() {
     // find_nodes_by_taxonomy(db).await;
     // get_config_path();
     // get_slug_url();
-    let a = youdao_translate("中国人").await;
+    // let a = youdao_translate("中国人").await;
+    get_node_taxonomies(db).await;
+}
+
+async fn get_node_taxonomies(db: &DbConn) {
+    let a = find_node_taxonomies(db, "article", "1hss6so1js8ac")
+        .await;
 }
 
 /// slug 函数测试

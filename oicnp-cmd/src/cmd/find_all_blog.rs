@@ -13,14 +13,15 @@ use oicnp_core::{
         log::{warn, error, info},
         serde_json,
         chrono::prelude::*,
-    }
+    },
+    typings::NodeBundle,
 };
 use gray_matter::Matter;
 use gray_matter::engine::YAML;
 use oicnp_api::models::{
     Nodes, NewNode,
 };
-use oicnp_api::typings::{NodeBundle, BodyFormat};
+use oicnp_api::typings::{BodyFormat};
 use oicnp_api::utils::{
     generate_slug,
     is_valid_matter_content,
@@ -122,7 +123,7 @@ fn find_all_blogs(categories: &Vec<Category>, blog_base: &str) -> Vec<Blog> {
     let mut index = 0;
 
     for item in categories.iter() {
-        if (item.dir.eq((""))) {
+        if item.dir.eq("") {
             continue;
         }
         let mut dir = base.clone();

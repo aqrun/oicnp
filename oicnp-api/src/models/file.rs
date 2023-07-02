@@ -13,8 +13,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Files {
-    pub fid: i32,
-    pub uid: i32,
+    pub fid: String,
+    pub uid: String,
     pub filename: String,
     pub uri: String,
     pub storage: String,
@@ -30,8 +30,8 @@ impl Default for Files {
         let now = Local::now().naive_local();
 
         Self {
-            fid: 0,
-            uid: 0,
+            fid: "".to_string(),
+            uid: "".to_string(),
             filename: "".to_string(),
             uri: "".to_string(),
             storage: "".to_string(),
@@ -46,8 +46,8 @@ impl Default for Files {
 
 #[Object]
 impl Files {
-    async fn fid(&self) -> i32 {
-        self.fid
+    async fn fid(&self) -> &str {
+        self.fid.as_str()
     }
     async fn filename(&self) -> &str {
         self.filename.as_str()
@@ -59,7 +59,7 @@ impl Files {
 
 #[derive(Clone, Debug)]
 pub struct NewFile {
-    pub uid: i32,
+    pub uid: String,
     pub filename: String,
     pub uri: String,
     pub storage: String,

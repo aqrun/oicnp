@@ -119,13 +119,8 @@ pub fn slugify_paths_without_date(s: &str) -> (String, String) {
         }
     }
     // 将unicode转为ascii
-    let mut res_slug = slug::slugify( file_path.as_str());
-    res_slug = strip_invalid_paths_chars(res_slug.as_str());
-    res_slug = res_slug.replace(".", "-");
-    captured_file.file_stem = res_slug;
-    let slug = captured_file.stringify();
-
-    (date_time, slug)
+    let res_slug = slug::slugify( file_path.as_str());
+    (date_time, res_slug)
 }
 
 pub fn slugify_anchors(s: &str, strategy: SlugifyStrategy) -> String {

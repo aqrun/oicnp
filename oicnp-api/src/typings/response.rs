@@ -1,8 +1,9 @@
-use async_graphql::{Object, MergedObject};
+use async_graphql::{Object, MergedObject, OutputType};
 use crate::typings::{
     DetailNode,
 };
 use serde::{Deserialize, Serialize};
+use std::marker::{Send, Sync};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct PagerInfo {
@@ -13,6 +14,32 @@ pub struct PagerInfo {
 
 #[Object]
 impl PagerInfo {
+    async fn page(&self) -> i32 {
+        self.page
+    }
+    async fn page_size(&self) -> i32 {
+        self.page_size
+    }
+    async fn total_count(&self) -> i32 {
+        self.total_count
+    }
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct ResListData<T> {
+    pub data: Vec<T>,
+    pub page: i32,
+    pub page_size: i32,
+    pub total_count: i32,
+}
+
+#[Object]
+impl<T> ResListData<T>
+    where T: Send + Sync + OutputType
+{
+    async fn data(&self) -> &Vec<T> {
+        &self.data
+    }
     async fn page(&self) -> i32 {
         self.page
     }

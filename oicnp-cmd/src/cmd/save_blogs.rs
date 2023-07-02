@@ -143,7 +143,7 @@ async fn save_taxonomies_data(db: &DbConn) -> Result<String> {
 
     // 先把第一父级保存
     for item in categories.iter() {
-        if (item.parent.eq("")) {
+        if item.parent.eq("") {
             parent_taxonomies.push(NewTaxonomy {
                 vid: item.name.to_string(),
                 pid: item.parent.to_string(),

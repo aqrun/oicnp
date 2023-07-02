@@ -9,6 +9,7 @@ use cmd::{
     truncate_tables,
 };
 use oicnp_core::prelude::dotenv;
+use oicnp_core::utils::get_env_config;
 
 
 mod cli;
@@ -22,13 +23,14 @@ async fn main() {
     let cli = Cli::parse();
 
     match cli.command {
-        Command::FindAllBlogs { format, blog_base } => {
-            blog_run(&format, &blog_base, &cli.dist_file).await;
+        Command::FindAllBlogs { format } => {
+            let blog_base = get_env_config("BLOG_BASE");
+            blog_run(&format, blog_base.as_str(), &cli.dist_file).await;
         },
         Command::SaveBlogs => {
             save_blogs(&cli).await;
         },
-        Command::TestRun => {
+        Command::MyTest => {
             my_test_run().await;
         },
         Command::TruncateTables => {

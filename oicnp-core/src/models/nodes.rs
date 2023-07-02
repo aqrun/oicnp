@@ -71,6 +71,7 @@ pub struct NewNode {
 pub struct NodeBody {
     pub nid: String,
     pub summary: String,
+    pub summary_format: String,
     pub body: String,
     pub body_format: String,
 }

@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use crate::models::{Nodes, NodeBody, NewNode, Taxonomies};
 use crate::typings::{
-    BodyFormat, NodeBundle, DetailNode, Count,
+    BodyFormat, DetailNode, Count,
 };
 use oicnp_core::{
     DatabaseConnection,
@@ -10,8 +10,11 @@ use oicnp_core::{
     },
     prelude::{
         anyhow::{anyhow, Result}
-    }
+    },
+    typings::{NodeBundle},
+    services as core_services,
 };
+use oicnp_core::entities::cms_node_body::Relation::Node;
 
 /*#[py_sql("
 SELECT n.*, nb.body, nb.body_format, nb.summary,
@@ -46,7 +49,6 @@ SELECT n.*, nb.body, nb.body_format, nb.summary,
 ")]*/
 pub async fn find_detail_nodes(
     db: &DatabaseConnection,
-    bundle: &str,
     category: &str,
     filters: &Vec<String>,
     order_name: &str, // created_at
@@ -119,41 +121,29 @@ pub async fn find_nodes_count(
 
 
 pub async fn find_node_by_vid(db: &DatabaseConnection, vid: &str, bundle: &NodeBundle) -> Result<Nodes> {
-    // let w = rb.new_wrapper()
-    //     .eq("vid", vid)
-    //     .eq("bundle", bundle.to_string());
-    // let node: Result<Option<Nodes>, Error> = rb.fetch_by_wrapper(w).await;
+    let res = core_services::find_node_by_vid(db, vid, bundle).await;
 
-    // if let Ok(node) = node {
-    //     if let Some(node) = node {
-    //         return Ok(node);
-    //     }
-    // }
+    if let Ok(node) = res {
+        let node_obj = Nodes::from(&node);
+        return Ok(node_obj);
+    }
     Err(anyhow!("Node not exist: {}", ""))
 }
 
-pub async fn find_node_by_nid(db: &DatabaseConnection, nid: i32, bundle: &NodeBundle) -> Result<Nodes> {
-    // let w = rb.new_wrapper()
-    //     .eq("nid", nid)
-    //     .eq("bundle", bundle.to_string());
-    // let node: Result<Option<Nodes>, Error> = rb.fetch_by_wrapper(w).await;
+pub async fn find_node_by_nid(db: &DatabaseConnection, nid: &str, bundle: &NodeBundle) -> Result<Nodes> {
+    let res = core_services::find_node_by_nid(db, nid, bundle).await;
 
-    // if let Ok(node) = node {
-    //     if let Some(node) = node {
-    //         return Ok(node);
-    //     }
-    // }
+    if let Ok(node) = res {
+        let node_obj = Nodes::from(&node);
+        return Ok(node_obj);
+    }
     Err(anyhow!("Node not exist: {}", 1))
 }
 
-pub async fn find_node_body(db: &DatabaseConnection, nid: i32) -> Result<NodeBody> {
-    // let node_body: Result<Option<NodeBody>, Error> = rb.fetch_by_column("nid", nid).await;
-    // if let Ok(node_body) = node_body {
-    //     if let Some(node_body) = node_body {
-    //         return Ok(node_body);
-    //     }
-    // }
-    Err(anyhow!("NodeBody not exist: {}", 1))
+pub async fn find_node_body(db: &DatabaseConnection, nid: &str) -> Result<NodeBody> {
+    let res = core_services::find_node_body(db, nid).await?;
+    let res = NodeBody::from(&res);
+    Ok(res)
 }
 
 pub async fn save_node_content(
@@ -204,27 +194,25 @@ pub async fn save_node(
     Err(anyhow!("Node save failed: {}", 1))
 }
 
-/*#[py_sql("
-SELECT t.* FROM taxonomies t
-  LEFT JOIN node_taxonomies_map ntm ON t.tid = ntm.tid
-  WHERE ntm.nid=#{nid}
-  AND t.bundle=#{bundle}
-  ORDER BY count desc, weight
-")]*/
 pub async fn find_node_taxonomies(
     db: &DatabaseConnection,
-    bundle: &str,
-    nid: &i32,
+    nid: &str,
 ) -> Result<Vec<Taxonomies>> {
-    Err(anyhow!("map not exist"))
+    let res = core_services::find_node_taxonomies(db, nid).await?;
+    let data = res
+        .iter()
+        .map(|item| {
+            Taxonomies::from(item)
+        })
+        .collect::<Vec<Taxonomies>>();
+    Ok(data)
 }
 
 ///
 /// 获取指定 target_id 对应的 相关数据列表
 ///
-pub async fn find_nodes_width_target_id(
+pub async fn find_nodes_with_target_id(
     db: &DatabaseConnection,
-    bundle: &str,
     category: &str,
     filters: &Vec<String>,
     order_name: &str, // created_at

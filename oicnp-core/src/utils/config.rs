@@ -9,3 +9,9 @@ pub fn get_config_file_path() -> String {
         .unwrap_or(OsString::from(""));
     env_file_path.into_string().unwrap_or(String::from(""))
 }
+
+pub fn get_env_config(cfg_name: &str) -> String {
+    let cfg = std::env::var_os(cfg_name)
+        .unwrap_or(OsString::from(""));
+    cfg.into_string().unwrap_or(String::from(""))
+}

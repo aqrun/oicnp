@@ -16,7 +16,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Users {
-    pub uid: i32,
+    pub uid: String,
     pub username: String,
     pub nickname: String,
     pub password: String,
@@ -34,8 +34,8 @@ pub struct Users {
 
 #[Object]
 impl Users {
-    async fn uid(&self) -> i32 {
-        self.uid
+    async fn uid(&self) -> &str {
+        self.uid.as_str()
     }
 
     async fn username(&self) -> &str {
@@ -121,8 +121,8 @@ pub struct NewUser {
 #[derive(Clone, Debug)]
 pub struct UserPictures {
     pub bundle: String,
-    pub uid: i32,
-    pub fid: i32,
+    pub uid: String,
+    pub fid: String,
     pub weight: i32,
     pub alt: String,
     pub title: String,

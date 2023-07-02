@@ -20,40 +20,40 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct DetailNode {
-    pub nid: i32,
+    pub nid: String,
     pub vid: String,
-    pub uid: i32,
     pub bundle: String,
     pub title: String,
     pub viewed: i32,
     pub deleted: bool,
     pub created_at: NaiveDateTime,
-    pub created_by: i32,
+    pub created_by: String,
     pub updated_at: NaiveDateTime,
-    pub updated_by: i32,
+    pub updated_by: String,
     pub created_by_username: String,
     pub created_by_nickname: String,
     pub updated_by_username: String,
     pub updated_by_nickname: String,
 
-    pub tid: i32,
+    pub tid: String,
     pub category_bundle: String,
     pub category_name: String,
     pub category_vid: String,
 
-    pub author_uid: i32,
+    pub author_uid: String,
     pub author_username: String,
     pub author_nickname: String,
 
     pub summary: String,
+    pub summary_format: String,
     pub body: String,
     pub body_format: String,
 }
 
 #[Object]
 impl DetailNode {
-    async fn nid(&self) -> i32 {
-        self.nid
+    async fn nid(&self) -> &str {
+        self.nid.as_str()
     }
     async fn vid(&self) -> &str {
         self.vid.as_str()
@@ -76,7 +76,7 @@ impl DetailNode {
         let a = self.clone();
         let now = Local::now().naive_local();
         Users {
-            uid: a.created_by,
+            uid: String::from(&a.created_by),
             username: a.created_by_username,
             nickname: a.created_by_nickname,
             password: "".to_string(),
@@ -125,7 +125,7 @@ impl DetailNode {
         let n = self.clone();
         let now = Local::now().naive_local();
         Users {
-            uid: n.uid,
+            uid: n.created_by,
             username: n.author_username,
             nickname: n.author_nickname,
             password: "".to_string(),
@@ -147,13 +147,11 @@ impl DetailNode {
         Taxonomies {
             tid: n.tid,
             vid: n.category_vid,
-            pid: 0,
-            bundle: n.category_bundle,
+            pid: "".to_string(),
             name: n.category_name,
             description: "".to_string(),
             description_format: "".to_string(),
             weight: 0,
-            count: 0
         }
     }
 
@@ -162,6 +160,7 @@ impl DetailNode {
         NodeBody {
             nid: n.nid,
             summary: n.summary,
+            summary_format: n.summary_format,
             body: n.body,
             body_format: n.body_format
         }
@@ -172,8 +171,7 @@ impl DetailNode {
         ctx: &Context<'_>
     ) -> Result<Vec<Taxonomies>, String> {
         let db = ctx.data_unchecked::<DatabaseConnection>();
-        let bundle = TaxonomyBundle::Tag.to_string();
-        let res = find_node_taxonomies(db, &bundle, &self.nid)
+        let res = find_node_taxonomies(db, &self.nid)
             .await;
 
         match res {

@@ -16,13 +16,10 @@ pub struct Cli {
 #[derive(Subcommand)]
 pub enum Command {
     FindAllBlogs {
-        #[clap(default_value = "/home/aqrun/work/github.com/aqrun/aqrun.github.io")]
-        blog_base: String,
-
         #[clap(default_value = "json")]
         format: String,
     },
     SaveBlogs,
-    TestRun,
+    MyTest,
     TruncateTables,
 }

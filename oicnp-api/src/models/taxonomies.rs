@@ -1,31 +1,31 @@
 use async_graphql::{Object, Context};
+use oicnp_core::{
+    models::{
+        Taxonomies as CoreTaxonomies,
+    },
+};
 
 #[derive(Clone, Debug)]
 pub struct Taxonomies {
-    pub tid: i32,
+    pub tid: String,
     pub vid: String,
-    pub pid: i32,
-    pub bundle: String,
+    pub pid: String,
     pub name: String,
     pub description: String,
     pub description_format: String,
     pub weight: i32,
-    pub count: i32,
 }
 
 #[Object]
 impl Taxonomies {
-    async fn tid(&self) -> i32 {
-        self.tid
+    async fn tid(&self) -> &str {
+        self.tid.as_str()
     }
     async fn vid(&self) -> &str {
         self.vid.as_str()
     }
-    async fn pid(&self) -> i32 {
-        self.pid
-    }
-    async fn bundle(&self) -> &str {
-        self.bundle.as_str()
+    async fn pid(&self) -> &str {
+        self.pid.as_str()
     }
     async fn name(&self) -> &str {
         self.name.as_str()
@@ -39,8 +39,19 @@ impl Taxonomies {
     async fn weight(&self) -> i32 {
         self.weight
     }
-    async fn count(&self) -> i32 {
-        self.count
+}
+
+impl From<&CoreTaxonomies> for Taxonomies {
+    fn from(t: &CoreTaxonomies) -> Self {
+        Self {
+            tid: String::from(&t.tid),
+            vid: String::from(&t.vid),
+            pid: String::from(&t.pid),
+            name: String::from(&t.name),
+            description: String::from(&t.description),
+            description_format: String::from(&t.description_format),
+            weight: t.weight,
+        }
     }
 }
 
@@ -48,7 +59,6 @@ impl Taxonomies {
 pub struct NewTaxonomy {
     pub vid: String,
     pub pid: i32,
-    pub bundle: String,
     pub name: String,
     pub description: String,
     pub description_format: String,

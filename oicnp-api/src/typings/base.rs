@@ -15,21 +15,6 @@ pub enum TaxonomyBundle {
 }
 
 #[derive(Display, Debug)]
-pub enum NodeBundle {
-    #[strum(serialize = "article")]
-    Article,
-}
-
-impl From<&str> for NodeBundle {
-    fn from(bundle: &str) -> Self {
-        match bundle {
-            "article" => Self::Article,
-            _ => Self::Article,
-        }
-    }
-}
-
-#[derive(Display, Debug)]
 pub enum BodyFormat {
     #[strum(serialize = "markdown")]
     Markdown,

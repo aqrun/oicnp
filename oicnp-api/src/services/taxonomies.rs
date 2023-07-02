@@ -2,13 +2,14 @@ use crate::models::{
     Taxonomies, NewTaxonomy, NodeTaxonomiesMap,
 };
 use crate::typings::{
-    TaxonomyBundle, NodeBundle,
+    TaxonomyBundle,
 };
 use oicnp_core::{
     DatabaseConnection,
     entities::{
         cms_nodes,
     },
+    typings::NodeBundle,
     prelude::{
         anyhow::{anyhow, Result}
     }

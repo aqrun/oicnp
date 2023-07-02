@@ -7,19 +7,22 @@ use async_graphql::{
 };
 use crate::models::Nodes;
 use crate::typings::{
-    NodeBundle,
-    DetailNode, PagerInfo,
+    DetailNode, PagerInfo, ResListData,
 };
 use crate::services::{
     find_detail_nodes,
     find_nodes_count,
     find_node_by_nid,
     find_node_by_vid,
-    find_nodes_width_target_id,
+    find_nodes_with_target_id,
 };
 use oicnp_core::{
     DatabaseConnection,
     services::find_nodes,
+    typings::NodeBundle,
+    prelude::{
+        anyhow::{anyhow, Result},
+    },
 };
 
 #[derive(Default)]
@@ -37,9 +40,8 @@ impl NodeQuery {
         page_size: Option<i32>,
         #[graphql(desc = "返回指定ID相关的列表")]
         target_nid: Option<i32>,
-    ) -> FieldResult<Connection<i32, DetailNode, PagerInfo, EmptyFields>> {
+    ) -> Result<ResListData<DetailNode>> /* Result<Connection<i32, DetailNode, PagerInfo, EmptyFields>> */ {
         let db = ctx.data_unchecked::<DatabaseConnection>();
-        let bundle = NodeBundle::Article.to_string();
         let page = page.unwrap_or(1);
         let page_size = page_size.unwrap_or(10);
         let category = category.unwrap_or(String::from(""));
@@ -55,7 +57,6 @@ impl NodeQuery {
         println!("-----res2 start---");
         let res2 = find_nodes(
             db,
-            &bundle,
             &category,
             &filters,
             &order_name,
@@ -67,9 +68,8 @@ impl NodeQuery {
         println!("{:?}------res2", res2);
 
         let res = match target_nid {
-            Some(target_nid) => find_nodes_width_target_id(
+            Some(target_nid) => find_nodes_with_target_id(
                 db,
-                &bundle,
                 &category,
                 &filters,
                 &order_name,
@@ -79,7 +79,6 @@ impl NodeQuery {
             ).await,
             _ => find_detail_nodes(
                 db,
-                &bundle,
                 &category,
                 &filters,
                 &order_name,
@@ -103,39 +102,26 @@ impl NodeQuery {
             total_count = res.count;
         }
 
-        let page_info = PagerInfo {
+        let res_data = ResListData {
+            data,
             page,
             page_size,
-            total_count
+            total_count,
         };
-
-        query(
-            None, None, None, None,
-            |_after, _before, _first, _last| async move {
-                let mut connection = Connection::with_additional_fields(
-                    false, false, page_info
-                );
-                connection.edges.extend(
-                    data
-                        .iter()
-                        .map(|item| Edge::new(item.nid, item.clone()))
-                );
-                Ok::<_, async_graphql::Error>(connection)
-            }
-        ).await
+        Ok(res_data)
     }
 
     async fn node(
         &self,
         ctx: &Context<'_>,
         bundle: String,
-        nid: Option<i32>,
+        nid: Option<String>,
         vid: Option<String>
     ) -> Result<Nodes, String> {
         let db = ctx.data_unchecked::<DatabaseConnection>();
         let bundle_data = NodeBundle::from(bundle.as_str());
         let mut real_vid = String::from("");
-        let mut real_nid = 0;
+        let mut real_nid = String::from("");
 
         if let Some(vid) = &vid {
             real_vid = String::from(vid);
@@ -153,7 +139,7 @@ impl NodeQuery {
             real_nid = nid;
 
             let res = find_node_by_nid(
-                db, nid, &bundle_data
+                db, real_nid.as_str(), &bundle_data
             ).await;
 
             if let Ok(res) = res {

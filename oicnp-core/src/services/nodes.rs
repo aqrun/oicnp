@@ -56,7 +56,6 @@ pub async fn find_detail_nodes(
  */
 pub async fn find_nodes(
     db: &DatabaseConnection,
-    bundle: &str,
     category: &str,
     filters: &Vec<String>,
     order_name: &str, // created_at
@@ -164,7 +163,7 @@ pub async fn find_node_by_vid(db: &DatabaseConnection, vid: &str, bundle: &NodeB
     Err(anyhow!("Node not exist: {}", vid))
 }
 
-pub async fn find_node_by_nid(db: &DatabaseConnection, nid: i32, bundle: &NodeBundle) -> Result<Node> {
+pub async fn find_node_by_nid(db: &DatabaseConnection, nid: &str, bundle: &NodeBundle) -> Result<Node> {
     let mut q = CmsNodes::find();
     q = q.filter(cms_nodes::Column::Nid.eq(nid));
     q = q.filter(cms_nodes::Column::Bundle.eq(bundle.to_string()));
@@ -178,7 +177,7 @@ pub async fn find_node_by_nid(db: &DatabaseConnection, nid: i32, bundle: &NodeBu
     Err(anyhow!("Node not exist: {}", 1))
 }
 
-pub async fn find_node_body(db: &DatabaseConnection, nid: i32) -> Result<NodeBody> {
+pub async fn find_node_body(db: &DatabaseConnection, nid: &str) -> Result<NodeBody> {
     let mut q = CmsNodeBody::find();
     q = q.filter(cms_node_body::Column::Nid.eq(nid));
     
@@ -281,10 +280,28 @@ pub async fn save_node_taxonomies_map(
 
 pub async fn find_node_taxonomies(
     db: &DatabaseConnection,
-    bundle: &str,
-    nid: &i32,
+    nid: &str,
 ) -> Result<Vec<Taxonomies>> {
- todo!()
+    let q = CmsTaxonomies::find()
+        .join(
+            JoinType::LeftJoin,
+            CmsTaxonomies::belongs_to(CmsNodeTaxonomiesMap)
+                .from(cms_taxonomies::Column::Tid)
+                .to(cms_node_taxonomies_map::Column::Tid)
+                .into()
+        )
+        .filter(
+            Condition::all()
+                .add(cms_node_taxonomies_map::Column::Nid.eq(nid))
+                // .add(cms_node_taxonomies_map::Column::Bundle.eq(bundle))
+        );
+
+    // let data = // q.into_model::<Node>()
+    //     a.build(DbBackend::Postgres)
+    //         .to_string();
+    let res = q.into_model::<Taxonomies>().all(db).await?;
+    return Ok(res);
+    // println!("----{:?}", res);
 }
 
 ///
