@@ -3,13 +3,13 @@ use crate::models::{Node, NodeBody, NewNode, Taxonomies, DetailNode, NodeCount,
     NodeTaxonomiesMap,
 };
 use crate::typings::{
-    BodyFormat, NodeBundle, Count, oic_usize,
+    BodyFormat, NodeBundle, Count, ListData,
 };
 use crate::{DatabaseConnection};
 use crate::entities::{
-    cms_nodes, cms_node_body, cms_node_taxonomies_map, cms_taxonomies,
+    cms_nodes, cms_node_body, cms_node_taxonomies_map, cms_taxonomies, sys_users,
     prelude::{
-        CmsNodes, CmsNodeBody, CmsNodeTaxonomiesMap, CmsTaxonomies,
+        CmsNodes, CmsNodeBody, CmsNodeTaxonomiesMap, CmsTaxonomies, SysUsers,
     },
 };
 use sea_orm::*;
@@ -56,54 +56,133 @@ pub async fn find_detail_nodes(
  */
 pub async fn find_nodes(
     db: &DatabaseConnection,
+    bundle: &str,
     category: &str,
     filters: &Vec<String>,
     order_name: &str, // created_at
     order_dir: &str, // DESC
-    offset: i32,
-    limit: i32,
-) -> Result<Vec<Node>> {
+    page: u64,
+    page_size: u64,
+) -> Result<ListData<DetailNode>> {
     let mut query = CmsNodes::find()
         .select_only()
-        .column(cms_nodes::Column::Nid)
-        .column(cms_nodes::Column::Vid)
-        .column(cms_nodes::Column::Bundle)
-        .column(cms_nodes::Column::Title)
+        .columns([
+            cms_nodes::Column::Nid,
+            cms_nodes::Column::Vid,
+            cms_nodes::Column::Bundle,
+            cms_nodes::Column::Title,
+            cms_nodes::Column::Viewed,
+            cms_nodes::Column::Deleted,
+            cms_nodes::Column::Deleted,
+            cms_nodes::Column::PublishedAt,
+            cms_nodes::Column::CreatedBy,
+            cms_nodes::Column::UpdatedBy,
+            cms_nodes::Column::CreatedAt,
+            cms_nodes::Column::UpdatedAt,
+            cms_nodes::Column::DeletedAt,
+        ])
+        .column_as(cms_node_body::Column::Summary, "summary")
+        .column_as(cms_node_body::Column::Body, "body")
+        .column_as(cms_node_body::Column::BodyFormat, "body_format")
+        .column_as(cms_taxonomies::Column::Tid, "tid")
+        .column_as(cms_taxonomies::Column::Vid, "category_vid")
+        .column_as(cms_taxonomies::Column::Name, "category_name")
         .column_as(
-            Expr::tbl(Alias::new("nb"), cms_node_body::Column::Body).into_simple_expr(),
-            "body"
+            Expr::col((Alias::new("cu"), sys_users::Column::Uid)),
+            "author_uid"
         )
-        .join_as(
+        .column_as(
+            Expr::col((Alias::new("cu"), sys_users::Column::Username)),
+            "author_username"
+        )
+        .column_as(
+            Expr::col((Alias::new("cu"), sys_users::Column::Nickname)),
+            "author_nickname"
+        )
+        .column_as(
+            Expr::col((Alias::new("uu"), sys_users::Column::Username)),
+            "updated_by_username"
+        )
+        .column_as(
+            Expr::col((Alias::new("uu"), sys_users::Column::Nickname)),
+            "updated_by_nickname"
+        )
+        .join(
             JoinType::LeftJoin,
             CmsNodes::belongs_to(CmsNodeBody)
                 .from(cms_nodes::Column::Nid)
                 .to(cms_node_body::Column::Nid)
+                .into()
+        )
+        .join(
+            JoinType::LeftJoin,
+            CmsNodes::belongs_to(CmsNodeTaxonomiesMap)
+                .from(cms_nodes::Column::Nid)
+                .to(cms_node_taxonomies_map::Column::Nid)
+                .into()
+        )
+        .join(
+            JoinType::LeftJoin,
+            CmsNodeTaxonomiesMap::belongs_to(CmsTaxonomies)
+                .from(cms_node_taxonomies_map::Column::Tid)
+                .to(cms_taxonomies::Column::Tid)
                 .into(),
-            Alias::new("nb")
-        ).filter(
-            Condition::all()
-                .add(cms_nodes::Column::Deleted.eq("0"))
-                .add(cms_nodes::Column::Bundle.eq(bundle))
-        );
+        )
+        .join_as(
+            JoinType::LeftJoin,
+            CmsNodes::belongs_to(SysUsers)
+                .from(cms_nodes::Column::CreatedBy)
+                .to(sys_users::Column::Uid)
+                .into(),
+            Alias::new("cu"),
+        )
+        .join_as(
+            JoinType::LeftJoin,
+            CmsNodes::belongs_to(SysUsers)
+                .from(cms_nodes::Column::UpdatedBy)
+                .to(sys_users::Column::Uid)
+                .into(),
+            Alias::new("uu"),
+        )
+        .filter(cms_nodes::Column::Deleted.eq("0"));
+
+    if !bundle.is_empty() {
+        query = query.filter(cms_nodes::Column::Bundle.eq(bundle));
+    }
+
+    if !category.eq("") {
+        query = query.filter(cms_taxonomies::Column::Vid.eq(category));
+    }
 
     query = query.order_by_desc(cms_nodes::Column::CreatedAt);
 
-    // let data = query.into_model::<Node>()
-    //     // .build(DbBackend::Postgres)
-    //     // .to_string()
-    //     .all(db)
-    //     .await
-    //     ;
+    /*
+    let data = query.clone()
+        // .into_model::<Node>()
+        .build(DbBackend::Postgres)
+        .to_string()
+        // .all(db)
+        // .await
+        ;
+     */
 
     // 获取全部数据条数据
     let total = query.clone().count(db).await?;
-    let pager = query.paginate(db, limit as oic_usize);
+    let pager = query
+        .into_model::<DetailNode>()
+        .paginate(db, page_size);
     let total_pages = pager.num_pages().await?;
-    let list = pager.fetch_page(offset as oic_usize).await?;
+    let list = pager.fetch_page(page).await?;
 
-    println!("----1111111111--------{:?} total:{:?}  taotal_page: {:?}", list, total, total_pages);
-    info!("{:?}", list);
-    Err(anyhow!(""))
+    let list_data = ListData {
+        data: list,
+        page,
+        page_size,
+        total_pages,
+        total_count: total,
+    };
+
+    Ok(list_data)
 }
 
 pub async fn find_nodes_count(

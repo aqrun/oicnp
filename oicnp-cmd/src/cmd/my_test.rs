@@ -6,7 +6,7 @@ use oicnp_core::{
     DB, establish_connection, DatabaseConnection,
     services::{
         find_nodes_count, find_taxonomy_by_vid,
-        find_node_taxonomies,
+        find_node_taxonomies, find_nodes,
     },
     typings::{NodeBundle},
     entities::{
@@ -33,16 +33,16 @@ pub async fn run() {
     // let count = find_nodes_count(db, &bundle, category).await;
     // let res = find_taxonomy_by_vid(db, category).await;
     // println!("res------ {:?}", res);
-    // find_node_with_body(db).await;
+    find_node_with_body(db).await;
     // find_nodes_by_taxonomy(db).await;
     // get_config_path();
     // get_slug_url();
     // let a = youdao_translate("中国人").await;
-    get_node_taxonomies(db).await;
+    // get_node_taxonomies(db).await;
 }
 
 async fn get_node_taxonomies(db: &DbConn) {
-    let a = find_node_taxonomies(db, "article", "1hss6so1js8ac")
+    let a = find_node_taxonomies(db, "1hss6so1js8ac")
         .await;
 }
 
@@ -72,6 +72,7 @@ pub fn get_config_path() {
 
 // one to one 查找node 和 node_body
 pub async fn find_node_with_body(db: &DatabaseConnection) {
+    /*
     let a = CmsNodes::find()
         .find_also_related(CmsNodeBody)
         // .select_only()
@@ -91,6 +92,18 @@ pub async fn find_node_with_body(db: &DatabaseConnection) {
 
     println!("sql-----{:?}", sql);
     println!("data-----{:?}", data);
+     */
+    let category = "backend";
+    let filters = Vec::new();
+    let order_name = "";
+    let order_dir = "desc";
+    let offset = 0;
+    let limit = 2;
+
+    match find_nodes(db, category, &filters, order_name, order_dir, offset, limit).await {
+        Ok(a) => println!("success, {:?}", a),
+        Err(err) => println!("failed: {:?}", err),
+    }
 }
 
 // 按分类查找

@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use crate::models::{Nodes, NodeBody, NewNode, Taxonomies};
 use crate::typings::{
-    BodyFormat, DetailNode, Count,
+    BodyFormat, DetailNode, Count, ResListData,
 };
 use oicnp_core::{
     DatabaseConnection,
@@ -14,74 +14,7 @@ use oicnp_core::{
     typings::{NodeBundle},
     services as core_services,
 };
-use oicnp_core::entities::cms_node_body::Relation::Node;
 
-/*#[py_sql("
-SELECT n.*, nb.body, nb.body_format, nb.summary,
-  t.name AS category_name, t.vid as category_vid,
-  t.bundle as category_bundle, t.tid,
-  a.uid as author_uid, a.username as author_username,
-  a.nickname as author_nickname,
-  cu.username as created_by_username,
-  cu.nickname as created_by_nickname,
-  uu.username as updated_by_username,
-  uu.nickname as updated_by_nickname
-  FROM nodes n
-  LEFT JOIN node_body nb ON n.nid=nb.nid
-  LEFT JOIN node_taxonomies_map ntm ON ntm.nid=n.nid
-  LEFT JOIN taxonomies t ON t.tid=ntm.tid
-  LEFT JOIN users cu ON n.created_by=cu.uid
-  LEFT JOIN users uu on n.updated_by=uu.uid
-  LEFT JOIN users a ON n.uid=a.uid
-  WHERE n.deleted = false
-  AND n.bundle = '${bundle}'
-  AND t.bundle = 'category'
-
-  for index,item in filters:
-    AND ${item}
-
-  if category != '':
-    AND t.name = '${category}'
-
-  ORDER BY n.${order_name} ${order_dir}
-  OFFSET ${offset}
-  LIMIT ${limit}
-")]*/
-pub async fn find_detail_nodes(
-    db: &DatabaseConnection,
-    category: &str,
-    filters: &Vec<String>,
-    order_name: &str, // created_at
-    order_dir: &str, // DESC
-    offset: &i32,
-    limit: &i32,
-) -> Result<Vec<DetailNode>> {
-    Err(anyhow!("map not exist"))
-}
-
-/*#[py_sql("
-SELECT n.*
-  FROM nodes n
-  LEFT JOIN node_body nb ON n.nid=nb.nid
-  LEFT JOIN node_taxonomies_map ntm ON ntm.nid=n.nid
-  LEFT JOIN taxonomies t ON t.tid=ntm.tid
-  LEFT JOIN users cu ON n.created_by=cu.uid
-  LEFT JOIN users uu on n.updated_by=uu.uid
-  LEFT JOIN users a ON n.uid=a.uid
-  WHERE n.deleted = false
-  AND n.bundle = '${bundle}'
-  AND t.bundle = 'category'
-
-  for index,item in filters:
-    AND ${item}
-
-  if category != '':
-    AND t.name = '${category}'
-
-  ORDER BY n.${order_name} ${order_dir}
-  OFFSET ${offset}
-  LIMIT ${limit}
-")]*/
 pub async fn find_nodes(
     db: &DatabaseConnection,
     bundle: &str,
@@ -89,10 +22,28 @@ pub async fn find_nodes(
     filters: &Vec<String>,
     order_name: &str, // created_at
     order_dir: &str, // DESC
-    offset: &i32,
-    limit: &i32,
-) -> Result<Vec<Nodes>> {
-    Err(anyhow!("map not exist"))
+    page: u64,
+    page_size: u64,
+) -> Result<ResListData<DetailNode>> {
+    let res = core_services::find_nodes(
+        db, bundle, category, filters, order_name, order_dir, page, page_size
+    ).await?;
+
+    let data = res.data
+        .iter()
+        .map(|item| {
+            DetailNode::from(item)
+        })
+        .collect::<Vec<DetailNode>>();
+
+    let res_list_data = ResListData {
+        data,
+        page: res.page,
+        page_size: res.page_size,
+        total_pages: res.total_pages,
+        total_count: res.total_count,
+    };
+    Ok(res_list_data)
 }
 
 /*#[py_sql("
@@ -113,7 +64,6 @@ SELECT count(n.nid) AS count
 ")]*/
 pub async fn find_nodes_count(
     db: &DatabaseConnection,
-    bundle: &str,
     category: &str,
 ) -> Result<Count> {
     Err(anyhow!("map not exist"))

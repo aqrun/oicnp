@@ -15,6 +15,7 @@ use oicnp_core::{
     prelude::{
         chrono::prelude::*,
     },
+    models::{DetailNode as CoreDetailNode},
 };
 use serde::{Serialize, Deserialize};
 
@@ -30,13 +31,10 @@ pub struct DetailNode {
     pub created_by: String,
     pub updated_at: NaiveDateTime,
     pub updated_by: String,
-    pub created_by_username: String,
-    pub created_by_nickname: String,
     pub updated_by_username: String,
     pub updated_by_nickname: String,
 
     pub tid: String,
-    pub category_bundle: String,
     pub category_name: String,
     pub category_vid: String,
 
@@ -58,7 +56,6 @@ impl DetailNode {
     async fn vid(&self) -> &str {
         self.vid.as_str()
     }
-
     async fn bundle(&self) -> &str {
         self.bundle.as_str()
     }
@@ -72,48 +69,6 @@ impl DetailNode {
         self.deleted
     }
 
-    async fn created_by(&self) -> Users {
-        let a = self.clone();
-        let now = Local::now().naive_local();
-        Users {
-            uid: String::from(&a.created_by),
-            username: a.created_by_username,
-            nickname: a.created_by_nickname,
-            password: "".to_string(),
-            status: 0,
-            email: "".to_string(),
-            admin: false,
-            intro: "".to_string(),
-            last_login_on: now,
-            salt: "".to_string(),
-            must_change_password: false,
-            password_changed_on: 0,
-            created_at: now,
-            updated_at: now,
-        }
-    }
-
-    async fn updated_by(&self) -> Users {
-        let a = self.clone();
-        let now = Local::now().naive_local();
-        Users {
-            uid: a.updated_by,
-            username: a.updated_by_username,
-            nickname: a.updated_by_nickname,
-            password: "".to_string(),
-            status: 0,
-            email: "".to_string(),
-            admin: false,
-            intro: "".to_string(),
-            last_login_on: now,
-            salt: "".to_string(),
-            must_change_password: false,
-            password_changed_on: 0,
-            created_at: now,
-            updated_at: now,
-        }
-    }
-
     async fn created_at(&self) -> String {
         self.created_at.format(&DateFormat::Normal.to_string()).to_string()
     }
@@ -121,62 +76,78 @@ impl DetailNode {
         self.updated_at.format(&DateFormat::Normal.to_string()).to_string()
     }
 
-    async fn author(&self) -> Users {
-        let n = self.clone();
-        let now = Local::now().naive_local();
-        Users {
-            uid: n.created_by,
-            username: n.author_username,
-            nickname: n.author_nickname,
-            password: "".to_string(),
-            status: 0,
-            email: "".to_string(),
-            admin: false,
-            intro: "".to_string(),
-            last_login_on: now,
-            salt: "".to_string(),
-            must_change_password: false,
-            password_changed_on: 0,
-            created_at: now,
-            updated_at: now,
-        }
+    async fn created_by(&self) -> &str {
+        self.created_by.as_str()
+    }
+    async fn updated_by(&self) -> &str {
+        self.updated_by.as_str()
+    }
+    async fn updated_by_username(&self) -> &str {
+        self.updated_by_username.as_str()
+    }
+    async fn updated_by_nickname(&self) -> &str {
+        self.updated_by_nickname.as_str()
     }
 
-    async fn category(&self) -> Taxonomies {
-        let n = self.clone();
-        Taxonomies {
-            tid: n.tid,
-            vid: n.category_vid,
-            pid: "".to_string(),
-            name: n.category_name,
-            description: "".to_string(),
-            description_format: "".to_string(),
-            weight: 0,
-        }
+    async fn tid(&self) -> &str {
+        self.tid.as_str()
+    }
+    async fn category_name(&self) -> &str {
+        self.category_name.as_str()
+    }
+    async fn category_vid(&self) -> &str {
+        self.category_vid.as_str()
     }
 
-    async fn node_body(&self) -> NodeBody {
-        let n = self.clone();
-        NodeBody {
-            nid: n.nid,
-            summary: n.summary,
-            summary_format: n.summary_format,
-            body: n.body,
-            body_format: n.body_format
-        }
+    async fn author_uid(&self) -> &str {
+        self.author_uid.as_str()
+    }
+    async fn author_username(&self) -> &str {
+        self.author_username.as_str()
+    }
+    async fn author_nickname(&self) -> &str {
+        self.author_nickname.as_str()
     }
 
-    async fn tags(
-        &self,
-        ctx: &Context<'_>
-    ) -> Result<Vec<Taxonomies>, String> {
-        let db = ctx.data_unchecked::<DatabaseConnection>();
-        let res = find_node_taxonomies(db, &self.nid)
-            .await;
+    async fn summary(&self) -> &str {
+        self.summary.as_str()
+    }
+    async fn summary_format(&self) -> &str {
+        self.summary_format.as_str()
+    }
+    async fn body(&self) -> &str {
+        self.body.as_str()
+    }
+    async fn body_format(&self) -> &str {
+        self.body_format.as_str()
+    }
+}
 
-        match res {
-            Ok(res) => Ok(res),
-            Err(err) => Err(format!("No tags, {}", err.to_string()))
+impl From<&CoreDetailNode> for DetailNode {
+    fn from(n: &CoreDetailNode) -> Self {
+        Self {
+            nid: String::from(n.nid.as_str()),
+            vid: String::from(n.vid.as_str()),
+            bundle: String::from(n.bundle.as_str()),
+            title: String::from(n.title.as_str()),
+            viewed: n.viewed,
+            deleted: n.deleted.eq("1"),
+            created_at: n.created_at,
+            created_by: String::from(n.created_by.as_str()),
+            updated_at: n.updated_at,
+            updated_by: String::from(n.updated_by.as_str()),
+            updated_by_username: String::from(n.updated_by_username.as_str()),
+            updated_by_nickname: String::from(n.updated_by_nickname.as_str()),
+            tid: String::from(n.tid.as_str()),
+            category_name: String::from(n.category_name.as_str()),
+            category_vid: String::from(n.category_vid.as_str()),
+            author_uid: String::from(n.author_uid.as_str()),
+            author_username: String::from(n.author_username.as_str()),
+            author_nickname: String::from(n.author_nickname.as_str()),
+            summary: String::from(n.summary.as_str()),
+            summary_format: String::from(n.summary_format.as_str()),
+            body: String::from(n.body.as_str()),
+            body_format:String::from(n.body_format.as_str()),
         }
     }
 }

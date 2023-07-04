@@ -10,7 +10,7 @@ use crate::typings::{
     DetailNode, PagerInfo, ResListData,
 };
 use crate::services::{
-    find_detail_nodes,
+    find_nodes,
     find_nodes_count,
     find_node_by_nid,
     find_node_by_vid,
@@ -18,7 +18,6 @@ use crate::services::{
 };
 use oicnp_core::{
     DatabaseConnection,
-    services::find_nodes,
     typings::NodeBundle,
     prelude::{
         anyhow::{anyhow, Result},
@@ -38,77 +37,43 @@ impl NodeQuery {
         order_dir: Option<String>,
         page: Option<i32>,
         page_size: Option<i32>,
-        #[graphql(desc = "返回指定ID相关的列表")]
-        target_nid: Option<i32>,
-    ) -> Result<ResListData<DetailNode>> /* Result<Connection<i32, DetailNode, PagerInfo, EmptyFields>> */ {
+    ) -> Result<ResListData<DetailNode>> {
         let db = ctx.data_unchecked::<DatabaseConnection>();
         let page = page.unwrap_or(1);
         let page_size = page_size.unwrap_or(10);
         let category = category.unwrap_or(String::from(""));
-        let limit = page_size;
-        let offset = (page - 1 ) * limit;
         let order_name = order_name.unwrap_or(String::from("created_at"));
         let order_dir = order_dir.unwrap_or(String::from("DESC"));
         let filters: Vec<String> = vec!();
-
-        let mut total_count = 0;
-        let mut data: Vec<DetailNode> = vec![];
+        let bundle = NodeBundle::Article.to_string();
 
         println!("-----res2 start---");
-        let res2 = find_nodes(
+        let res = find_nodes(
             db,
+            bundle.as_str(),
             &category,
             &filters,
             &order_name,
             &order_dir,
-            offset,
-            limit
+            page as u64,
+            page_size as u64,
         ).await;
 
-        println!("{:?}------res2", res2);
+        println!("{:?}------res2", res);
 
-        let res = match target_nid {
-            Some(target_nid) => find_nodes_with_target_id(
-                db,
-                &category,
-                &filters,
-                &order_name,
-                &order_dir,
-                &limit,
-                &target_nid
-            ).await,
-            _ => find_detail_nodes(
-                db,
-                &category,
-                &filters,
-                &order_name,
-                &order_dir,
-                &offset,
-                &limit
-            ).await,
-        };
-
-        // 查询数据列表
-        if let Ok(res) = res {
-            data = res;
+        match res {
+            Ok(res) => Ok(res),
+            Err(err) => {
+                println!("Err find_nodes: {:?}", err);
+                ResListData {
+                    data: Vec::new(),
+                    page: 0,
+                    page_size: 0,
+                    total_pages: 0,
+                    total_count: 0,
+                }
+            }
         }
-
-        // 获取当前筛选条件对应的数据总数
-        if let Ok(res) = find_nodes_count(
-            db,
-            &bundle,
-            &category,
-        ).await {
-            total_count = res.count;
-        }
-
-        let res_data = ResListData {
-            data,
-            page,
-            page_size,
-            total_count,
-        };
-        Ok(res_data)
     }
 
     async fn node(

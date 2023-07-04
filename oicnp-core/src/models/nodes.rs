@@ -22,11 +22,10 @@ pub struct Node {
     pub deleted_at: Option<DateTime>,
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, FromQueryResult)]
 pub struct DetailNode {
     pub nid: String,
     pub vid: String,
-    pub uid: String,
     pub bundle: String,
     pub title: String,
     pub viewed: i32,
@@ -35,19 +34,16 @@ pub struct DetailNode {
     pub created_by: String,
     pub updated_at: DateTime,
     pub updated_by: String,
-    pub created_by_username: String,
-    pub created_by_nickname: String,
-    pub updated_by_username: String,
-    pub updated_by_nickname: String,
+    pub updated_by_username: Option<String>,
+    pub updated_by_nickname: Option<String>,
 
     pub tid: String,
-    pub category_bundle: String,
     pub category_name: String,
     pub category_vid: String,
 
-    pub author_uid: String,
-    pub author_username: String,
-    pub author_nickname: String,
+    pub author_uid: Option<String>,
+    pub author_username: Option<String>,
+    pub author_nickname: Option<String>,
 
     pub summary: String,
     pub body: String,
