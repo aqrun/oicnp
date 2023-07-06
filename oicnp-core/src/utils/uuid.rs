@@ -1,11 +1,19 @@
+use once_cell::sync::Lazy;
 use snowflake::SnowflakeIdBucket;
 use snowflake::SnowflakeIdGenerator;
-use std::thread::sleep;
-use std::time::Duration;
+use std::sync::Mutex;
 
 const ALL_CHARS: &'static str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_";
-const RANDOM_CHARS: &'static str = "nXjU7PK3LbqszfmDvpScrHwAhiOk8IeWgVGBoRdZY4JT9MxNuQt05Ea12F6lyC-_";
+const RANDOM_CHARS: &'static str =
+    "nXjU7PK3LbqszfmDvpScrHwAhiOk8IeWgVGBoRdZY4JT9MxNuQt05Ea12F6lyC-_";
 const RANDOM_36: &'static str = "ms9gwn2xvbr4ioqhy1680j3uzc5eadpkt7fl";
+
+pub static SNOW_ID_GENERATOR: Lazy<Mutex<SnowflakeIdGenerator>> =
+    Lazy::new(|| Mutex::new(SnowflakeIdGenerator::new(2, 3)));
+
+pub static SNOW_ID_BUCKET: Lazy<Mutex<SnowflakeIdBucket>> = Lazy::new(|| {
+    Mutex::new(SnowflakeIdBucket::new(1, 1))
+});
 
 /// 10 进制转 11 - 64 进制
 ///
@@ -56,8 +64,6 @@ pub fn random_base_10_to_n(num: u128, radix: u32) -> String {
     format!("{}{}", start, end)
 }
 
-
-
 /// 11 - 64 进制解析为 10 进制
 ///
 /// ```
@@ -70,7 +76,10 @@ pub fn base_n_to_10(num_str: &str, radix: u32) -> u128 {
     for i in 0..num_str.len() {
         result *= radix as u128;
         let target_char = num_str.chars().nth(i).unwrap_or('0');
-        let data = ALL_CHARS.chars().position(|i| i == target_char).unwrap_or(0);
+        let data = ALL_CHARS
+            .chars()
+            .position(|i| i == target_char)
+            .unwrap_or(0);
         result += data as u128;
     }
     result
@@ -80,28 +89,19 @@ pub fn base_n_to_10(num_str: &str, radix: u32) -> u128 {
 ///
 /// let (id, raw_id) = generate_snow_id(36);
 pub fn generate_snow_id(radix: u32) -> (String, u128) {
-    // 暂停1毫秒
-    sleep(Duration::from_nanos(1));
-    let mut b = SnowflakeIdBucket::new(1, 1);
-    let raw_id = b.get_id() as u128;
+    let raw_id = SNOW_ID_BUCKET.lock().unwrap().get_id() as u128;
     (base_10_to_n(raw_id, radix), raw_id)
 }
 
 pub fn unique_id(radix: u32) -> (String, u128) {
-    // 暂停1毫秒
-    sleep(Duration::from_nanos(1));
-    let mut id_generator = SnowflakeIdGenerator::new(2, 3);
-    let raw_id = id_generator.real_time_generate() as u128;
+    let raw_id = SNOW_ID_GENERATOR.lock().unwrap().real_time_generate() as u128;
     (base_10_to_n(raw_id, radix), raw_id)
 }
 
 pub fn uuid() -> String {
     let radix = 36;
-    // 暂停1毫秒
-    sleep(Duration::from_nanos(1));
-    let mut id_generator = SnowflakeIdGenerator::new(2, 3);
-    let raw_id = id_generator.real_time_generate() as u128;
-    
+    let raw_id = SNOW_ID_GENERATOR.lock().unwrap().real_time_generate() as u128;
+
     random_36(raw_id, radix)
 }
 

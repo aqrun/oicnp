@@ -1,10 +1,6 @@
-use crate::{DateTime,
-    entities::{
-        cms_node_taxonomies_map,
-    },
-};
-use serde::{Deserialize, Serialize};
+use crate::{entities::cms_node_taxonomies_map, DateTime};
 use sea_orm::FromQueryResult;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize, FromQueryResult)]
 pub struct Node {
@@ -46,6 +42,7 @@ pub struct DetailNode {
     pub author_nickname: Option<String>,
 
     pub summary: String,
+    pub summary_format: String,
     pub body: String,
     pub body_format: String,
 }

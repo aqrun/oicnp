@@ -1,30 +1,16 @@
-use anyhow::{anyhow, Result};
-use crate::{
-    DatabaseConnection,
-    models::{
-        NewTaxonomy, Taxonomies,
-    },
-    typings::{
-        NodeBundle,
-    },
-    entities::{
-        prelude::{
-            CmsTaxonomies,
-        },
-        cms_taxonomies,
-    },
-};
-use sea_orm::*;
 use crate::utils::uuid;
+use crate::{
+    entities::{cms_taxonomies, prelude::CmsTaxonomies},
+    models::{NewTaxonomy, Taxonomies},
+    typings::NodeBundle,
+    DatabaseConnection,
+};
+use anyhow::{anyhow, Result};
+use sea_orm::*;
 
-pub async fn find_taxonomy_by_tid() {
+pub async fn find_taxonomy_by_tid() {}
 
-}
-
-pub async fn find_taxonomy_by_vid(
-    db: &DatabaseConnection,
-    vid: &str,
-) -> Result<Taxonomies> {
+pub async fn find_taxonomy_by_vid(db: &DatabaseConnection, vid: &str) -> Result<Taxonomies> {
     let mut q = CmsTaxonomies::find();
     q = q.filter(cms_taxonomies::Column::Vid.eq(vid));
 
@@ -32,7 +18,7 @@ pub async fn find_taxonomy_by_vid(
         Ok(data) => data,
         Err(err) => {
             return Err(anyhow!("Taxonomies not exist: {}, {:?}", vid, err));
-        },
+        }
     };
 
     if let Some(data) = res {
@@ -45,7 +31,7 @@ pub async fn find_taxonomy_by_vid(
 /// 保存一条数据
 pub async fn save_taxonomy(
     db: &DatabaseConnection,
-    new_taxonomy: &NewTaxonomy
+    new_taxonomy: &NewTaxonomy,
 ) -> Result<Taxonomies> {
     if let Ok(data) = find_taxonomy_by_vid(db, &new_taxonomy.vid).await {
         return Ok(data);
@@ -70,7 +56,7 @@ pub async fn save_taxonomy(
 /// 保存多条数据
 pub async fn save_taxonomies(
     db: &DatabaseConnection,
-    new_taxonomies: &Vec<NewTaxonomy>
+    new_taxonomies: &Vec<NewTaxonomy>,
 ) -> Result<String> {
     let mut filtered_taxonomies: Vec<&NewTaxonomy> = Vec::new();
 
@@ -82,26 +68,20 @@ pub async fn save_taxonomies(
 
     let taxonomy_models = filtered_taxonomies
         .into_iter()
-        .map(|item| {
-            cms_taxonomies::ActiveModel {
-                tid: Set(uuid()),
-                vid: Set(Some(String::from(&item.vid))),
-                pid: Set(Some(String::from(&item.pid))),
-                name: Set(Some(String::from(&item.name))),
-                description: Set(Some(String::from(&item.description))),
-                description_format: Set(Some(String::from(&item.description_format))),
-                weight: Set(Some(item.weight)),
-                ..Default::default()
-            }
+        .map(|item| cms_taxonomies::ActiveModel {
+            tid: Set(uuid()),
+            vid: Set(Some(String::from(&item.vid))),
+            pid: Set(Some(String::from(&item.pid))),
+            name: Set(Some(String::from(&item.name))),
+            description: Set(Some(String::from(&item.description))),
+            description_format: Set(Some(String::from(&item.description_format))),
+            weight: Set(Some(item.weight)),
+            ..Default::default()
         })
         .collect::<Vec<cms_taxonomies::ActiveModel>>();
 
     match CmsTaxonomies::insert_many(taxonomy_models).exec(db).await {
-        Ok(_data) => {
-            Ok("".to_string())
-        },
-        Err(err) => {
-            Err(anyhow!("Save Taxonomies failed {:?}", err))
-        }
+        Ok(_data) => Ok("".to_string()),
+        Err(err) => Err(anyhow!("Save Taxonomies failed {:?}", err)),
     }
 }

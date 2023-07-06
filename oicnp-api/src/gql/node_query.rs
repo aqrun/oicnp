@@ -1,27 +1,16 @@
-use async_graphql::{
-    Object, Context, FieldResult,
-    connection::{
-        Connection, EmptyFields,
-        query, Edge,
-    },
-};
 use crate::models::Nodes;
-use crate::typings::{
-    DetailNode, PagerInfo, ResListData,
-};
 use crate::services::{
-    find_nodes,
-    find_nodes_count,
-    find_node_by_nid,
-    find_node_by_vid,
-    find_nodes_with_target_id,
+    find_node_by_nid, find_node_by_vid, find_nodes, find_nodes_count, find_nodes_with_target_id,
+};
+use crate::typings::{DetailNode, PagerInfo, ResListData};
+use async_graphql::{
+    connection::{query, Connection, Edge, EmptyFields},
+    Context, FieldResult, Object,
 };
 use oicnp_core::{
-    DatabaseConnection,
+    prelude::anyhow::{anyhow, Result},
     typings::NodeBundle,
-    prelude::{
-        anyhow::{anyhow, Result},
-    },
+    DatabaseConnection,
 };
 
 #[derive(Default)]
@@ -44,7 +33,7 @@ impl NodeQuery {
         let category = category.unwrap_or(String::from(""));
         let order_name = order_name.unwrap_or(String::from("created_at"));
         let order_dir = order_dir.unwrap_or(String::from("DESC"));
-        let filters: Vec<String> = vec!();
+        let filters: Vec<String> = vec![];
         let bundle = NodeBundle::Article.to_string();
 
         println!("-----res2 start---");
@@ -57,7 +46,8 @@ impl NodeQuery {
             &order_dir,
             page as u64,
             page_size as u64,
-        ).await;
+        )
+        .await;
 
         println!("{:?}------res2", res);
 
@@ -65,13 +55,13 @@ impl NodeQuery {
             Ok(res) => Ok(res),
             Err(err) => {
                 println!("Err find_nodes: {:?}", err);
-                ResListData {
+                Ok(ResListData {
                     data: Vec::new(),
                     page: 0,
                     page_size: 0,
                     total_pages: 0,
                     total_count: 0,
-                }
+                })
             }
         }
     }
@@ -81,7 +71,7 @@ impl NodeQuery {
         ctx: &Context<'_>,
         bundle: String,
         nid: Option<String>,
-        vid: Option<String>
+        vid: Option<String>,
     ) -> Result<Nodes, String> {
         let db = ctx.data_unchecked::<DatabaseConnection>();
         let bundle_data = NodeBundle::from(bundle.as_str());
@@ -91,9 +81,7 @@ impl NodeQuery {
         if let Some(vid) = &vid {
             real_vid = String::from(vid);
 
-            let res = find_node_by_vid(
-                db, &vid, &bundle_data
-            ).await;
+            let res = find_node_by_vid(db, &vid, &bundle_data).await;
 
             if let Ok(res) = res {
                 return Ok(res);
@@ -103,9 +91,7 @@ impl NodeQuery {
         if let Some(nid) = nid {
             real_nid = nid;
 
-            let res = find_node_by_nid(
-                db, real_nid.as_str(), &bundle_data
-            ).await;
+            let res = find_node_by_nid(db, real_nid.as_str(), &bundle_data).await;
 
             if let Ok(res) = res {
                 return Ok(res);

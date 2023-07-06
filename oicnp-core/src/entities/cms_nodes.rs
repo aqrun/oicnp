@@ -43,3 +43,13 @@ impl Related<super::cms_taxonomies::Entity> for Entity {
 }
 
 impl ActiveModelBehavior for ActiveModel {}
+
+impl From<&str> for Column {
+    fn from(name: &str) -> Self {
+        match name {
+            "created_at" => Column::CreatedAt,
+            _ => Column::Nid,
+        }
+    }
+}
+

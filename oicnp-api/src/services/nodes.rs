@@ -1,18 +1,11 @@
-use std::sync::Arc;
-use crate::models::{Nodes, NodeBody, NewNode, Taxonomies};
-use crate::typings::{
-    BodyFormat, DetailNode, Count, ResListData,
-};
+use crate::models::{NewNode, NodeBody, Nodes, Taxonomies};
+use crate::typings::{BodyFormat, Count, DetailNode, ResListData};
 use oicnp_core::{
-    DatabaseConnection,
-    entities::{
-        cms_nodes,
-    },
-    prelude::{
-        anyhow::{anyhow, Result}
-    },
-    typings::{NodeBundle},
+    entities::cms_nodes,
+    prelude::anyhow::{anyhow, Result},
     services as core_services,
+    typings::NodeBundle,
+    DatabaseConnection,
 };
 
 pub async fn find_nodes(
@@ -21,19 +14,19 @@ pub async fn find_nodes(
     category: &str,
     filters: &Vec<String>,
     order_name: &str, // created_at
-    order_dir: &str, // DESC
+    order_dir: &str,  // DESC
     page: u64,
     page_size: u64,
 ) -> Result<ResListData<DetailNode>> {
     let res = core_services::find_nodes(
-        db, bundle, category, filters, order_name, order_dir, page, page_size
-    ).await?;
+        db, bundle, category, filters, order_name, order_dir, page, page_size,
+    )
+    .await?;
 
-    let data = res.data
-        .iter()
-        .map(|item| {
-            DetailNode::from(item)
-        })
+    let data = res
+        .data
+        .into_iter()
+        .map(move |item| DetailNode { data: item })
         .collect::<Vec<DetailNode>>();
 
     let res_list_data = ResListData {
@@ -62,15 +55,15 @@ SELECT count(n.nid) AS count
   if category != '':
     AND t.name = #{category}
 ")]*/
-pub async fn find_nodes_count(
-    db: &DatabaseConnection,
-    category: &str,
-) -> Result<Count> {
+pub async fn find_nodes_count(db: &DatabaseConnection, category: &str) -> Result<Count> {
     Err(anyhow!("map not exist"))
 }
 
-
-pub async fn find_node_by_vid(db: &DatabaseConnection, vid: &str, bundle: &NodeBundle) -> Result<Nodes> {
+pub async fn find_node_by_vid(
+    db: &DatabaseConnection,
+    vid: &str,
+    bundle: &NodeBundle,
+) -> Result<Nodes> {
     let res = core_services::find_node_by_vid(db, vid, bundle).await;
 
     if let Ok(node) = res {
@@ -80,7 +73,11 @@ pub async fn find_node_by_vid(db: &DatabaseConnection, vid: &str, bundle: &NodeB
     Err(anyhow!("Node not exist: {}", ""))
 }
 
-pub async fn find_node_by_nid(db: &DatabaseConnection, nid: &str, bundle: &NodeBundle) -> Result<Nodes> {
+pub async fn find_node_by_nid(
+    db: &DatabaseConnection,
+    nid: &str,
+    bundle: &NodeBundle,
+) -> Result<Nodes> {
     let res = core_services::find_node_by_nid(db, nid, bundle).await;
 
     if let Ok(node) = res {
@@ -144,16 +141,11 @@ pub async fn save_node(
     Err(anyhow!("Node save failed: {}", 1))
 }
 
-pub async fn find_node_taxonomies(
-    db: &DatabaseConnection,
-    nid: &str,
-) -> Result<Vec<Taxonomies>> {
+pub async fn find_node_taxonomies(db: &DatabaseConnection, nid: &str) -> Result<Vec<Taxonomies>> {
     let res = core_services::find_node_taxonomies(db, nid).await?;
     let data = res
         .iter()
-        .map(|item| {
-            Taxonomies::from(item)
-        })
+        .map(|item| Taxonomies::from(item))
         .collect::<Vec<Taxonomies>>();
     Ok(data)
 }
@@ -166,9 +158,9 @@ pub async fn find_nodes_with_target_id(
     category: &str,
     filters: &Vec<String>,
     order_name: &str, // created_at
-    order_dir: &str, // DESC
+    order_dir: &str,  // DESC
     limit: &i32,
-    target_nid: &i32
+    target_nid: &i32,
 ) -> Result<Vec<DetailNode>> {
     // let mut data: Vec<DetailNode> = vec!();
     // let mut target_arr: Vec<DetailNode> = vec![];

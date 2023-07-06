@@ -1,32 +1,25 @@
-use crate::{Cli, models::{Blog, Category}};
-use std::fs::File;
-use std::io::prelude::*;
-use std::ops::Deref;
-use oicnp_core::{DatabaseConnection, DbConn, DB, establish_connection,
+use crate::cmd::truncate_all_tables;
+use crate::constants::CATEGORIES;
+use crate::{models::Blog, Cli};
+use oicnp_core::{
+    establish_connection,
+    models::{NewNode, NewTaxonomy, Node},
     prelude::{
-        anyhow::{Result, anyhow},
-        chrono::{NaiveDateTime},
+        anyhow::{anyhow, Result},
+        chrono::NaiveDateTime,
         serde_json,
-        sea_orm_migration::prelude::*,
-    },
-    typings::{
-        BodyFormat, NodeBundle,
     },
     services::{
-        save_node_content, save_node, save_taxonomies, save_node_taxonomies_map,
-        find_taxonomy_by_vid,
+        find_taxonomy_by_vid, save_node, save_node_content, save_node_taxonomies_map,
+        save_taxonomies,
     },
-    models::{
-        NewNode, Node, NewTaxonomy, NodeTaxonomiesMap,
-    },
+    typings::{BodyFormat, NodeBundle},
+    DatabaseConnection, DbConn, DB,
 };
-use rand::{Rng, thread_rng};
-use crate::constants::{init_categories, CATEGORIES};
-use migration::types as tables;
-use crate::cmd::truncate_all_tables;
+use rand::{thread_rng, Rng};
 use std::collections::HashMap;
-use oicnp_core::models::Taxonomies;
-use oicnp_core::prelude::sea_orm::ColIdx;
+use std::fs::File;
+use std::io::prelude::*;
 
 pub async fn save_blogs(cli: &Cli) {
     let all_blogs = get_all_blogs(&cli.dist_file);
@@ -62,27 +55,29 @@ pub async fn save_blogs(cli: &Cli) {
                     node.nid.as_str(),
                     body,
                     BodyFormat::Markdown,
-                    blog.excerpt.as_str()
-                ).await;
+                    blog.excerpt.as_str(),
+                )
+                .await;
 
                 if let Err(err) = res {
                     println!("Save node content failed: {}", err);
                 }
 
-                if let Ok(cat_data) = find_taxonomy_by_vid(db, blog.category.as_str())
-                    .await {
+                if let Ok(cat_data) = find_taxonomy_by_vid(db, blog.category.as_str()).await {
                     if let Err(res) = save_node_taxonomies_map(
                         db,
                         node.bundle.as_str(),
                         node.nid.as_str(),
-                        cat_data.tid.as_str()
-                    ).await {
+                        cat_data.tid.as_str(),
+                    )
+                    .await
+                    {
                         println!("Save Node_taxonomies_map failed: {}", res);
                     }
                 }
 
                 _i += 1;
-            },
+            }
             Err(err) => {
                 println!("Restore error: {}", err.to_string());
             }
@@ -98,9 +93,7 @@ async fn save_blog(db: &DatabaseConnection, blog: &Blog, index: i32) -> Result<N
     let minute = format!("{:02}", rng.gen_range(0..59));
     let second = format!("{:02}", rng.gen_range(0..59));
     let data_str = format!("{} {}:{}:{}", &blog.date, hour, minute, second);
-    let date = NaiveDateTime::parse_from_str(
-        &data_str, "%Y-%m-%d %H:%M:%S"
-    ).unwrap();
+    let date = NaiveDateTime::parse_from_str(&data_str, "%Y-%m-%d %H:%M:%S").unwrap();
     let node = NewNode {
         vid: String::from(&blog.slug),
         bundle: bundle.to_string(),
@@ -116,14 +109,13 @@ async fn save_blog(db: &DatabaseConnection, blog: &Blog, index: i32) -> Result<N
 
     match res {
         Ok(node) => Ok(node),
-        Err(err) => Err(format!("Node save failed: {}", &blog.slug))
+        Err(_err) => Err(format!("Node save failed: {}", &blog.slug)),
     }
 }
 
 /// 从JSON文件读取数据
 fn get_all_blogs(dist_file: &str) -> Vec<Blog> {
-    let mut file = File::open(dist_file)
-        .expect("Dist file read failed");
+    let mut file = File::open(dist_file).expect("Dist file read failed");
     let mut contents = String::new();
     file.read_to_string(&mut contents)
         .expect("Content read err");
@@ -136,8 +128,9 @@ fn get_all_blogs(dist_file: &str) -> Vec<Blog> {
 }
 
 async fn save_taxonomies_data(db: &DbConn) -> Result<String> {
-    let categories = CATEGORIES.get_or_init(init_categories);
-    let mut err = String::from("");
+    let categories = &CATEGORIES;
+
+    //let mut err = String::from("");
     // 要存储的父级数据
     let mut parent_taxonomies: Vec<NewTaxonomy> = Vec::new();
 
@@ -145,7 +138,7 @@ async fn save_taxonomies_data(db: &DbConn) -> Result<String> {
     for item in categories.iter() {
         if item.parent.eq("") {
             parent_taxonomies.push(NewTaxonomy {
-                vid: item.name.to_string(),
+                vid: item.vid.to_string(),
                 pid: item.parent.to_string(),
                 name: item.name.to_string(),
                 description: "".to_string(),
@@ -156,7 +149,7 @@ async fn save_taxonomies_data(db: &DbConn) -> Result<String> {
     }
 
     match save_taxonomies(db, &parent_taxonomies).await {
-        Ok(_data) => {},
+        Ok(_data) => {}
         Err(err) => {
             println!("Save parent taxonmies failed {:?}", err);
         }
@@ -187,7 +180,7 @@ async fn save_taxonomies_data(db: &DbConn) -> Result<String> {
         }
 
         new_taxonomies.push(NewTaxonomy {
-            vid: item.name.to_string(),
+            vid: item.vid.to_string(),
             pid,
             name: item.name.to_string(),
             description: "".to_string(),
@@ -197,11 +190,8 @@ async fn save_taxonomies_data(db: &DbConn) -> Result<String> {
     }
 
     match save_taxonomies(db, &new_taxonomies).await {
-        Err(err) => {
-            Err(anyhow!(err))
-        },
-        _ => {
-            Ok("success".to_string())
-        },
+        Err(err) => Err(anyhow!(err)),
+        _ => Ok("success".to_string()),
     }
 }
+

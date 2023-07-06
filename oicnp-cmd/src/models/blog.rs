@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug)]
 pub struct Category<'a> {
     pub name: &'a str,
+    pub vid: &'a str,
     pub dir: &'a str,
     pub weight: i32,
     pub parent: &'a str,
@@ -29,7 +30,7 @@ impl Blog {
             file: String::from(""),
             file_path: String::from(""),
             title: String::from(""),
-            tags: vec!(),
+            tags: vec![],
             excerpt: String::from(""),
             category: String::from(""),
             content: Some(String::from("")),
@@ -49,3 +50,4 @@ pub struct BlogMatter {
     pub description: Option<String>,
     pub taxonomies: Option<MatterTaxonomy>,
 }
+

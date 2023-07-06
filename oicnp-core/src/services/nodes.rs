@@ -1,22 +1,19 @@
-use anyhow::{anyhow, Result};
-use crate::models::{Node, NodeBody, NewNode, Taxonomies, DetailNode, NodeCount,
-    NodeTaxonomiesMap,
-};
-use crate::typings::{
-    BodyFormat, NodeBundle, Count, ListData,
-};
-use crate::{DatabaseConnection};
 use crate::entities::{
-    cms_nodes, cms_node_body, cms_node_taxonomies_map, cms_taxonomies, sys_users,
-    prelude::{
-        CmsNodes, CmsNodeBody, CmsNodeTaxonomiesMap, CmsTaxonomies, SysUsers,
-    },
+    cms_node_body, cms_node_taxonomies_map, cms_nodes, cms_taxonomies,
+    prelude::{CmsNodeBody, CmsNodeTaxonomiesMap, CmsNodes, CmsTaxonomies, SysUsers},
+    sys_users,
 };
+use crate::models::{
+    DetailNode, NewNode, Node, NodeBody, NodeCount, NodeTaxonomiesMap, Taxonomies,
+};
+use crate::typings::{BodyFormat, Count, ListData, NodeBundle};
+use crate::utils::uuid;
+use crate::DatabaseConnection;
+use anyhow::{anyhow, Result};
+use chrono::prelude::*;
+use log::info;
 use sea_orm::*;
 use sea_query::{Alias, Expr};
-use log::{info};
-use crate::utils::uuid;
-use chrono::prelude::*;
 
 pub async fn find_detail_nodes(
     db: &DatabaseConnection,
@@ -24,7 +21,7 @@ pub async fn find_detail_nodes(
     category: &str,
     filters: &Vec<String>,
     order_name: &str, // created_at
-    order_dir: &str, // DESC
+    order_dir: &str,  // DESC
     offset: &i32,
     limit: &i32,
 ) -> Result<Vec<DetailNode>> {
@@ -32,35 +29,35 @@ pub async fn find_detail_nodes(
 }
 
 /**
- * SELECT n.*
-  FROM nodes n
-  LEFT JOIN node_body nb ON n.nid=nb.nid
-  LEFT JOIN node_taxonomies_map ntm ON ntm.nid=n.nid
-  LEFT JOIN taxonomies t ON t.tid=ntm.tid
-  LEFT JOIN users cu ON n.created_by=cu.uid
-  LEFT JOIN users uu on n.updated_by=uu.uid
-  LEFT JOIN users a ON n.uid=a.uid
-  WHERE n.deleted = false
-  AND n.bundle = '${bundle}'
-  AND t.bundle = 'category'
+* SELECT n.*
+ FROM nodes n
+ LEFT JOIN node_body nb ON n.nid=nb.nid
+ LEFT JOIN node_taxonomies_map ntm ON ntm.nid=n.nid
+ LEFT JOIN taxonomies t ON t.tid=ntm.tid
+ LEFT JOIN users cu ON n.created_by=cu.uid
+ LEFT JOIN users uu on n.updated_by=uu.uid
+ LEFT JOIN users a ON n.uid=a.uid
+ WHERE n.deleted = false
+ AND n.bundle = '${bundle}'
+ AND t.bundle = 'category'
 
-  for index,item in filters:
-    AND ${item}
+ for index,item in filters:
+   AND ${item}
 
-  if category != '':
-    AND t.name = '${category}'
+ if category != '':
+   AND t.name = '${category}'
 
-  ORDER BY n.${order_name} ${order_dir}
-  OFFSET ${offset}
-  LIMIT ${limit}
- */
+ ORDER BY n.${order_name} ${order_dir}
+ OFFSET ${offset}
+ LIMIT ${limit}
+*/
 pub async fn find_nodes(
     db: &DatabaseConnection,
     bundle: &str,
     category: &str,
     filters: &Vec<String>,
     order_name: &str, // created_at
-    order_dir: &str, // DESC
+    order_dir: &str,  // DESC
     page: u64,
     page_size: u64,
 ) -> Result<ListData<DetailNode>> {
@@ -82,6 +79,7 @@ pub async fn find_nodes(
             cms_nodes::Column::DeletedAt,
         ])
         .column_as(cms_node_body::Column::Summary, "summary")
+        .column_as(cms_node_body::Column::SummaryFormat, "summary_format")
         .column_as(cms_node_body::Column::Body, "body")
         .column_as(cms_node_body::Column::BodyFormat, "body_format")
         .column_as(cms_taxonomies::Column::Tid, "tid")
@@ -89,37 +87,37 @@ pub async fn find_nodes(
         .column_as(cms_taxonomies::Column::Name, "category_name")
         .column_as(
             Expr::col((Alias::new("cu"), sys_users::Column::Uid)),
-            "author_uid"
+            "author_uid",
         )
         .column_as(
             Expr::col((Alias::new("cu"), sys_users::Column::Username)),
-            "author_username"
+            "author_username",
         )
         .column_as(
             Expr::col((Alias::new("cu"), sys_users::Column::Nickname)),
-            "author_nickname"
+            "author_nickname",
         )
         .column_as(
             Expr::col((Alias::new("uu"), sys_users::Column::Username)),
-            "updated_by_username"
+            "updated_by_username",
         )
         .column_as(
             Expr::col((Alias::new("uu"), sys_users::Column::Nickname)),
-            "updated_by_nickname"
+            "updated_by_nickname",
         )
         .join(
             JoinType::LeftJoin,
             CmsNodes::belongs_to(CmsNodeBody)
                 .from(cms_nodes::Column::Nid)
                 .to(cms_node_body::Column::Nid)
-                .into()
+                .into(),
         )
         .join(
             JoinType::LeftJoin,
             CmsNodes::belongs_to(CmsNodeTaxonomiesMap)
                 .from(cms_nodes::Column::Nid)
                 .to(cms_node_taxonomies_map::Column::Nid)
-                .into()
+                .into(),
         )
         .join(
             JoinType::LeftJoin,
@@ -168,9 +166,7 @@ pub async fn find_nodes(
 
     // 获取全部数据条数据
     let total = query.clone().count(db).await?;
-    let pager = query
-        .into_model::<DetailNode>()
-        .paginate(db, page_size);
+    let pager = query.into_model::<DetailNode>().paginate(db, page_size);
     let total_pages = pager.num_pages().await?;
     let list = pager.fetch_page(page).await?;
 
@@ -198,18 +194,20 @@ pub async fn find_nodes_count(
             CmsNodes::belongs_to(CmsNodeTaxonomiesMap)
                 .from(cms_nodes::Column::Nid)
                 .to(cms_node_taxonomies_map::Column::Nid)
-                .into()
-        ).join(
+                .into(),
+        )
+        .join(
             JoinType::LeftJoin,
             CmsNodeTaxonomiesMap::belongs_to(CmsTaxonomies)
                 .from(cms_node_taxonomies_map::Column::Tid)
                 .to(cms_taxonomies::Column::Tid)
-                .into()
-        ).filter(
+                .into(),
+        )
+        .filter(
             Condition::all()
                 .add(cms_nodes::Column::Deleted.eq("0"))
                 .add(cms_nodes::Column::Bundle.eq(bundle))
-                .add(cms_taxonomies::Column::Name.eq(category))
+                .add(cms_taxonomies::Column::Name.eq(category)),
         );
 
     /*
@@ -221,13 +219,16 @@ pub async fn find_nodes_count(
         ;
     println!("data: {:?}", data);
     */
-    let total = q.count(db).await?;    
-    
+    let total = q.count(db).await?;
+
     Ok(total as i32)
 }
 
-
-pub async fn find_node_by_vid(db: &DatabaseConnection, vid: &str, bundle: &NodeBundle) -> Result<Node> {
+pub async fn find_node_by_vid(
+    db: &DatabaseConnection,
+    vid: &str,
+    bundle: &NodeBundle,
+) -> Result<Node> {
     let mut q = CmsNodes::find();
     q = q.filter(cms_nodes::Column::Vid.eq(vid));
     q = q.filter(cms_nodes::Column::Bundle.eq(bundle.to_string()));
@@ -242,7 +243,11 @@ pub async fn find_node_by_vid(db: &DatabaseConnection, vid: &str, bundle: &NodeB
     Err(anyhow!("Node not exist: {}", vid))
 }
 
-pub async fn find_node_by_nid(db: &DatabaseConnection, nid: &str, bundle: &NodeBundle) -> Result<Node> {
+pub async fn find_node_by_nid(
+    db: &DatabaseConnection,
+    nid: &str,
+    bundle: &NodeBundle,
+) -> Result<Node> {
     let mut q = CmsNodes::find();
     q = q.filter(cms_nodes::Column::Nid.eq(nid));
     q = q.filter(cms_nodes::Column::Bundle.eq(bundle.to_string()));
@@ -259,7 +264,7 @@ pub async fn find_node_by_nid(db: &DatabaseConnection, nid: &str, bundle: &NodeB
 pub async fn find_node_body(db: &DatabaseConnection, nid: &str) -> Result<NodeBody> {
     let mut q = CmsNodeBody::find();
     q = q.filter(cms_node_body::Column::Nid.eq(nid));
-    
+
     let res = q.into_model::<NodeBody>().one(db).await?;
 
     if let Some(node_body) = res {
@@ -291,7 +296,7 @@ pub async fn save_node_content(
             return Err(anyhow!("Node Body save failed {}", err.to_string()));
         }
     };
-    
+
     Ok(res.nid)
 }
 
@@ -345,7 +350,7 @@ pub async fn save_node_taxonomies_map(
     db: &DatabaseConnection,
     bundle: &str,
     nid: &str,
-    tid: &str
+    tid: &str,
 ) -> Result<NodeTaxonomiesMap> {
     let n = cms_node_taxonomies_map::ActiveModel {
         bundle: Set(Some(String::from(bundle))),
@@ -357,22 +362,17 @@ pub async fn save_node_taxonomies_map(
     Ok(data)
 }
 
-pub async fn find_node_taxonomies(
-    db: &DatabaseConnection,
-    nid: &str,
-) -> Result<Vec<Taxonomies>> {
+pub async fn find_node_taxonomies(db: &DatabaseConnection, nid: &str) -> Result<Vec<Taxonomies>> {
     let q = CmsTaxonomies::find()
         .join(
             JoinType::LeftJoin,
             CmsTaxonomies::belongs_to(CmsNodeTaxonomiesMap)
                 .from(cms_taxonomies::Column::Tid)
                 .to(cms_node_taxonomies_map::Column::Tid)
-                .into()
+                .into(),
         )
         .filter(
-            Condition::all()
-                .add(cms_node_taxonomies_map::Column::Nid.eq(nid))
-                // .add(cms_node_taxonomies_map::Column::Bundle.eq(bundle))
+            Condition::all().add(cms_node_taxonomies_map::Column::Nid.eq(nid)), // .add(cms_node_taxonomies_map::Column::Bundle.eq(bundle))
         );
 
     // let data = // q.into_model::<Node>()
@@ -392,9 +392,9 @@ pub async fn find_nodes_width_target_id(
     category: &str,
     filters: &Vec<String>,
     order_name: &str, // created_at
-    order_dir: &str, // DESC
+    order_dir: &str,  // DESC
     limit: &i32,
-    target_nid: &i32
+    target_nid: &i32,
 ) -> Result<Vec<DetailNode>> {
     // let mut data: Vec<DetailNode> = vec!();
     // let mut target_arr: Vec<DetailNode> = vec![];
