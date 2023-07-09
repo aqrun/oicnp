@@ -1,14 +1,17 @@
 use crate::entities::{
     cms_node_body, cms_node_taxonomies_map, cms_nodes, cms_taxonomies,
+    cms_node_tags_map,
     prelude::{CmsNodeBody, CmsNodeTaxonomiesMap, CmsNodes, CmsTaxonomies, SysUsers},
     sys_users,
 };
 use crate::models::{
     DetailNode, NewNode, Node, NodeBody, NodeCount, NodeTaxonomiesMap, Taxonomies,
+    NodeTagsMap,
 };
 use crate::typings::{BodyFormat, Count, ListData, NodeBundle};
 use crate::utils::uuid;
 use crate::DatabaseConnection;
+use crate::services::update_tag_count_by_id;
 use anyhow::{anyhow, Result};
 use chrono::prelude::*;
 use log::info;
@@ -359,6 +362,25 @@ pub async fn save_node_taxonomies_map(
     };
     let res = n.insert(db).await?;
     let data = NodeTaxonomiesMap::from_model(&res);
+    Ok(data)
+}
+
+pub async fn save_node_tags_map(
+    db: &DatabaseConnection,
+    bundle: &str,
+    nid: &str,
+    tag_id: &str,
+) -> Result<NodeTagsMap> {
+    let n = cms_node_tags_map::ActiveModel {
+        bundle: Set(Some(String::from(bundle))),
+        tag_id: Set(String::from(tag_id)),
+        nid: Set(String::from(nid)),
+    };
+    let res = n.insert(db).await?;
+    let data = NodeTagsMap::from_model(&res);
+
+    update_tag_count_by_id(db, tag_id).await?;
+
     Ok(data)
 }
 

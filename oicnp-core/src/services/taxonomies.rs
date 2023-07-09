@@ -1,12 +1,18 @@
 use crate::utils::uuid;
 use crate::{
-    entities::{cms_taxonomies, prelude::CmsTaxonomies},
-    models::{NewTaxonomy, Taxonomies},
+    entities::{
+        cms_taxonomies, cms_tags,
+        prelude::{
+            CmsTaxonomies, CmsTags,
+        },
+    },
+    models::{NewTaxonomy, Taxonomies, Tag, NewTag},
     typings::NodeBundle,
-    DatabaseConnection,
+    DatabaseConnection, DbConn,
 };
 use anyhow::{anyhow, Result};
 use sea_orm::*;
+use sea_orm::sea_query::Expr;
 
 pub async fn find_taxonomy_by_tid() {}
 
@@ -26,6 +32,42 @@ pub async fn find_taxonomy_by_vid(db: &DatabaseConnection, vid: &str) -> Result<
     }
 
     Err(anyhow!("Taxonomies not exist: {}", vid))
+}
+
+pub async fn find_tag_by_vid(db: &DbConn, vid: &str) -> Result<Tag> {
+    let mut q = CmsTags::find();
+    q = q.filter(cms_tags::Column::Vid.eq(vid));
+
+    match q.into_model::<Tag>().one(db).await {
+        Ok(data) => {
+            if let Some(data) = data {
+                return Ok(data);
+            }
+        },
+        Err(err) => {
+            return Err(anyhow!("Tag not exist: {}, {:?}", vid, err));
+        }
+    };
+
+    Err(anyhow!("Tag not exist: {}", vid))
+}
+
+pub async fn find_tag_by_tag_id(db: &DbConn, tag_id: &str) -> Result<Tag> {
+    let mut q = CmsTags::find();
+    q = q.filter(cms_tags::Column::TagId.eq(tag_id));
+
+    match q.into_model::<Tag>().one(db).await {
+        Ok(data) => {
+            if let Some(data) = data {
+                return Ok(data);
+            }
+        },
+        Err(err) => {
+            return Err(anyhow!("Tag not exist: {}, {:?}", tag_id, err));
+        }
+    };
+
+    Err(anyhow!("Tag not exist: {}", tag_id))
 }
 
 /// 保存一条数据
@@ -84,4 +126,45 @@ pub async fn save_taxonomies(
         Ok(_data) => Ok("".to_string()),
         Err(err) => Err(anyhow!("Save Taxonomies failed {:?}", err)),
     }
+}
+
+pub async fn save_tags(
+    db: &DbConn,
+    new_tags: &[NewTag]
+) -> Result<String> {
+    let mut filtered_new_tags: Vec<NewTag> = Vec::new();
+
+    for item in new_tags.iter() {
+        if let Err(_err) = find_tag_by_vid(db, item.vid.as_str()).await {
+            filtered_new_tags.push(item.clone());
+        }
+    }
+
+    let tag_models = filtered_new_tags
+        .into_iter()
+        .map(|item| cms_tags::ActiveModel {
+            tag_id: Set(uuid()),
+            vid: Set(Some(String::from(&item.vid))),
+            name: Set(Some(String::from(&item.name))),
+            weight: Set(Some(item.weight)),
+            count: Set(Some(item.count as i64)),
+        })
+        .collect::<Vec<cms_tags::ActiveModel>>();
+
+    match CmsTags::insert_many(tag_models).exec(db).await {
+        Ok(_data) => Ok("".to_string()),
+        Err(err) => Err(anyhow!("Save tags failed {:?}", err)),
+    }
+}
+
+pub async fn update_tag_count_by_id(db: &DbConn, tag_id: &str) -> Result<String> {
+    let tag = find_tag_by_tag_id(db, tag_id).await?;
+
+    CmsTags::update_many()
+        .col_expr(cms_tags::Column::Count, Expr::value(tag.count + 1))
+        .filter(cms_tags::Column::TagId.eq(tag_id))
+        .exec(db)
+        .await?;
+
+    Ok("update success".to_string())
 }

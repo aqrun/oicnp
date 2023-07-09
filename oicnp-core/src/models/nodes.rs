@@ -1,4 +1,8 @@
-use crate::{entities::cms_node_taxonomies_map, DateTime};
+use crate::{
+    entities::{
+        cms_node_taxonomies_map, cms_node_tags_map,
+    }, DateTime
+};
 use sea_orm::FromQueryResult;
 use serde::{Deserialize, Serialize};
 
@@ -82,6 +86,23 @@ impl NodeTaxonomiesMap {
             bundle: model.clone().bundle.unwrap_or("".to_string()),
             nid: model.clone().nid,
             tid: model.clone().tid,
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct NodeTagsMap {
+    pub bundle: String,
+    pub nid: String,
+    pub tag_id: String,
+}
+
+impl NodeTagsMap {
+    pub fn from_model(model: &cms_node_tags_map::Model) -> Self {
+        Self {
+            bundle: model.clone().bundle.unwrap_or("".to_string()),
+            nid: model.clone().nid,
+            tag_id: model.clone().tag_id,
         }
     }
 }

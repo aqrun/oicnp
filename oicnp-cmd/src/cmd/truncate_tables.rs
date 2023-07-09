@@ -19,9 +19,13 @@ pub async fn truncate_all_tables(db: &DatabaseConnection) {
         .await.expect("truncate failed");
     manager.truncate_table(Table::truncate().table(tables::CmsTaxonomies::Table).to_owned())
         .await.expect("truncate failed");
+    manager.truncate_table(Table::truncate().table(tables::CmsTags::Table).to_owned())
+        .await.expect("truncate failed");
     manager.truncate_table(Table::truncate().table(tables::CmsNodeBody::Table).to_owned())
         .await.expect("truncate failed");
     manager.truncate_table(Table::truncate().table(tables::CmsNodeTaxonomiesMap::Table).to_owned())
+        .await.expect("truncate failed");
+    manager.truncate_table(Table::truncate().table(tables::CmsNodeTagsMap::Table).to_owned())
         .await.expect("truncate failed");
     println!("truncat table complete!!!");
 }

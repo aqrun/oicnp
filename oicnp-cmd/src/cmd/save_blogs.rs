@@ -3,7 +3,7 @@ use crate::constants::CATEGORIES;
 use crate::{models::Blog, Cli};
 use oicnp_core::{
     establish_connection,
-    models::{NewNode, NewTaxonomy, Node},
+    models::{NewNode, NewTaxonomy, Node, NewTag},
     prelude::{
         anyhow::{anyhow, Result},
         chrono::NaiveDateTime,
@@ -11,11 +11,12 @@ use oicnp_core::{
     },
     services::{
         find_taxonomy_by_vid, save_node, save_node_content, save_node_taxonomies_map,
-        save_taxonomies,
+        save_taxonomies, save_tags, find_tag_by_vid, save_node_tags_map,
     },
     typings::{BodyFormat, NodeBundle},
     DatabaseConnection, DbConn, DB,
 };
+use oicnp_api::utils::generate_slug;
 use rand::{thread_rng, Rng};
 use std::collections::HashMap;
 use std::fs::File;
@@ -24,12 +25,16 @@ use std::io::prelude::*;
 pub async fn save_blogs(cli: &Cli) {
     let all_blogs = get_all_blogs(&cli.dist_file);
     let db = DB.get_or_init(establish_connection).await;
-
+    // 清空历史数据
     truncate_all_tables(db).await;
 
     if let Err(err) = save_taxonomies_data(db).await {
         println!("Taxonomies data save failed {}", err);
     }
+
+     if let Err(err) = save_tags_data(db, all_blogs.as_slice()).await {
+         println!("Tags data save failed {}", err);
+     }
 
     let mut date = "";
     if let Some(blog) = all_blogs.get(0) {
@@ -75,6 +80,12 @@ pub async fn save_blogs(cli: &Cli) {
                         println!("Save Node_taxonomies_map failed: {}", res);
                     }
                 }
+
+                save_node_tags_map_data(
+                    db,
+                    &node,
+                    blog.tags.as_slice()
+                ).await;
 
                 _i += 1;
             }
@@ -192,6 +203,57 @@ async fn save_taxonomies_data(db: &DbConn) -> Result<String> {
     match save_taxonomies(db, &new_taxonomies).await {
         Err(err) => Err(anyhow!(err)),
         _ => Ok("success".to_string()),
+    }
+}
+
+async fn save_tags_data(db: &DbConn, all_blogs: &[Blog]) -> Result<String> {
+    let mut all_tags: Vec<String> = Vec::new();
+    // 收集所有标签
+    for item in all_blogs.iter() {
+        for tag_str in item.tags.iter() {
+            if !all_tags.contains(tag_str) {
+                all_tags.push(String::from(tag_str));
+            }
+        }
+    }
+
+    let new_tags = all_tags.iter().map(|item| {
+        let (_date, slug) = generate_slug(item);
+
+        return NewTag {
+            vid: slug,
+            name: String::from(item),
+            weight: 0,
+            count: 0,
+        };
+    }).collect::<Vec<NewTag>>();
+
+    match save_tags(db, new_tags.as_slice()).await {
+        Err(err) => Err(anyhow!(err)),
+        _ => Ok("success".to_string()),
+    }
+}
+
+// 保存node tag 关联关系
+async fn save_node_tags_map_data(db: &DbConn, node: &Node, blog_tags: &[String]) {
+    for item in blog_tags.iter() {
+        let (_date, vid) = generate_slug(item.as_str());
+
+        match find_tag_by_vid(db, vid.as_str()).await {
+            Ok(res) => {
+                if let Err(res) = save_node_tags_map(
+                    db,
+                    node.bundle.as_str(),
+                    node.nid.as_str(),
+                    res.tag_id.as_str(),
+                ).await {
+                    println!("Save Node_taxonomies_map failed: {}", res);
+                }
+            },
+            Err(err) => {
+                println!("find tab err: {:?}", err);
+            }
+        }
     }
 }
 

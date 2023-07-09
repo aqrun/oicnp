@@ -31,6 +31,15 @@ impl Taxonomies {
     }
 }
 
+#[derive(Clone, Debug, FromQueryResult)]
+pub struct Tag {
+    pub tag_id: String,
+    pub vid: String,
+    pub name: String,
+    pub weight: i32,
+    pub count: i64,
+}
+
 #[derive(Clone, Debug)]
 pub struct NewTaxonomy {
     pub vid: String,
@@ -39,4 +48,12 @@ pub struct NewTaxonomy {
     pub description: String,
     pub description_format: String,
     pub weight: i32,
+}
+
+#[derive(Clone, Debug)]
+pub struct NewTag {
+    pub vid: String,
+    pub name: String,
+    pub weight: i32,
+    pub count: i32,
 }
