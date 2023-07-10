@@ -1,7 +1,7 @@
 use async_graphql::{Object, Context};
 use oicnp_core::{
     models::{
-        Taxonomies as CoreTaxonomies,
+        Taxonomies as CoreTaxonomies, Tag as CoreTag,
     },
 };
 
@@ -63,4 +63,28 @@ pub struct NewTaxonomy {
     pub description: String,
     pub description_format: String,
     pub weight: i32,
+}
+
+#[derive(Debug, Clone)]
+pub struct Tag {
+    pub data: CoreTag,
+}
+
+#[Object]
+impl Tag {
+    async fn id(&self) -> &str {
+        self.data.tag_id.as_str()
+    }
+    async fn vid(&self) -> &str {
+        self.data.vid.as_str()
+    }
+    async fn name(&self) -> &str {
+        self.data.name.as_str()
+    }
+    async fn weight(&self) -> i32 {
+        self.data.weight
+    }
+    async fn count(&self) -> i64 {
+        self.data.count
+    }
 }

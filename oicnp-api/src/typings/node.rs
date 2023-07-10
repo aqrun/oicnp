@@ -1,7 +1,14 @@
 use crate::typings::DateFormat;
-use async_graphql::Object;
+use async_graphql::{Object, Context};
 use oicnp_core::models::DetailNode as CoreDetailNode;
 use serde::{Deserialize, Serialize};
+use oicnp_core::{
+    DbConn,
+};
+use crate::models::{Tag};
+use oicnp_core::services::{
+    find_node_tags,
+};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct DetailNode {
@@ -97,5 +104,27 @@ impl DetailNode {
     }
     async fn body_format(&self) -> &str {
         self.data.body_format.as_str()
+    }
+
+    async fn tags(
+        &self,
+        ctx: &Context<'_>,
+    ) -> Vec<Tag> {
+        let db = ctx.data_unchecked::<DbConn>();
+        let res = find_node_tags(
+            db,
+            self.data.nid.as_str()
+        ).await;
+
+        if let Ok(res) = res {
+            let data = res.into_iter().map(|item| {
+                Tag {
+                    data: item,
+                }
+            }).collect::<Vec<Tag>>();
+            return data;
+        }
+
+        return Vec::new();
     }
 }

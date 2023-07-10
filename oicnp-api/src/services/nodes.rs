@@ -26,7 +26,11 @@ pub async fn find_nodes(
     let data = res
         .data
         .into_iter()
-        .map(move |item| DetailNode { data: item })
+        .map(move |item| {
+            return DetailNode {
+                data: item,
+            };
+        })
         .collect::<Vec<DetailNode>>();
 
     let res_list_data = ResListData {

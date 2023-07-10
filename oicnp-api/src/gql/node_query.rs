@@ -36,7 +36,7 @@ impl NodeQuery {
         let filters: Vec<String> = vec![];
         let bundle = NodeBundle::Article.to_string();
 
-        println!("-----res2 start---");
+        // println!("-----res2 start---");
         let res = find_nodes(
             db,
             bundle.as_str(),
@@ -49,7 +49,7 @@ impl NodeQuery {
         )
         .await;
 
-        println!("{:?}------res2", res);
+        // println!("{:?}------res2", res);
 
         match res {
             Ok(res) => Ok(res),

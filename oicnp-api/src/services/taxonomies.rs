@@ -1,5 +1,5 @@
 use crate::models::{
-    Taxonomies, NewTaxonomy, NodeTaxonomiesMap,
+    Taxonomies, NewTaxonomy, NodeTaxonomiesMap, Tag,
 };
 use crate::typings::{
     TaxonomyBundle,
@@ -12,7 +12,7 @@ use oicnp_core::{
     typings::NodeBundle,
     prelude::{
         anyhow::{anyhow, Result}
-    }
+    },
 };
 
 // #[py_sql("UPDATE taxonomies SET count = count + 1 WHERE tid = #{tid}")]

@@ -1,12 +1,14 @@
 use crate::entities::{
     cms_node_body, cms_node_taxonomies_map, cms_nodes, cms_taxonomies,
-    cms_node_tags_map,
-    prelude::{CmsNodeBody, CmsNodeTaxonomiesMap, CmsNodes, CmsTaxonomies, SysUsers},
+    cms_node_tags_map, cms_tags,
+    prelude::{CmsNodeBody, CmsNodeTaxonomiesMap, CmsNodes, CmsTaxonomies, SysUsers,
+              CmsTags, CmsNodeTagsMap,
+    },
     sys_users,
 };
 use crate::models::{
     DetailNode, NewNode, Node, NodeBody, NodeCount, NodeTaxonomiesMap, Taxonomies,
-    NodeTagsMap,
+    NodeTagsMap, Tag,
 };
 use crate::typings::{BodyFormat, Count, ListData, NodeBundle};
 use crate::utils::uuid;
@@ -151,7 +153,7 @@ pub async fn find_nodes(
         query = query.filter(cms_nodes::Column::Bundle.eq(bundle));
     }
 
-    if !category.eq("") {
+    if !category.is_empty() {
         query = query.filter(cms_taxonomies::Column::Vid.eq(category));
     }
 
@@ -169,9 +171,11 @@ pub async fn find_nodes(
 
     // 获取全部数据条数据
     let total = query.clone().count(db).await?;
-    let pager = query.into_model::<DetailNode>().paginate(db, page_size);
+    let pager = query
+        .into_model::<DetailNode>()
+        .paginate(db, page_size);
     let total_pages = pager.num_pages().await?;
-    let list = pager.fetch_page(page).await?;
+    let list = pager.fetch_page(page - 1).await?;
 
     let list_data = ListData {
         data: list,
@@ -403,6 +407,23 @@ pub async fn find_node_taxonomies(db: &DatabaseConnection, nid: &str) -> Result<
     let res = q.into_model::<Taxonomies>().all(db).await?;
     return Ok(res);
     // println!("----{:?}", res);
+}
+
+pub async fn find_node_tags(db: &DatabaseConnection, nid: &str) -> Result<Vec<Tag>> {
+    let q = CmsTags::find()
+        .join(
+            JoinType::LeftJoin,
+            CmsTags::belongs_to(CmsNodeTagsMap)
+                .from(cms_tags::Column::TagId)
+                .to(cms_node_tags_map::Column::TagId)
+                .into(),
+        )
+        .filter(
+            cms_node_tags_map::Column::Nid.eq(nid)
+        );
+
+    let res = q.into_model::<Tag>().all(db).await?;
+    return Ok(res);
 }
 
 ///
