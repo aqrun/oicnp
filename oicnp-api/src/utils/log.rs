@@ -1,25 +1,27 @@
-use std::ops::Deref;
 use oicnp_core::{
-    G,
     prelude::{
-        log,
-        fast_log::{self, Config,
+        fast_log::{
+            self,
             consts::LogSize,
             plugin::file_split::{Packer, RollingType},
-            plugin::packer::{LZ4Packer, ZipPacker, LogPacker, GZipPacker},
-        }
-    }
+            plugin::packer::{GZipPacker, LZ4Packer, LogPacker, ZipPacker},
+            Config,
+        },
+        log::LevelFilter,
+    },
+    G,
 };
 use std::time::Duration;
 
 pub fn init_log() {
     //create log dir
-    std::fs::create_dir_all(&G.log_dir);
+    let _ = std::fs::create_dir_all(&G.log_dir);
 
-    // let packer = choose_packer(&G.config.log_pack_compress);
+    // let packer = choose_packer(&G.log_pack_compress);
     //init fast log
     let fast_log_config = Config::new()
         .console()
+        .level(str_to_log_level(&G.log_level))
         .file_split(
             &G.log_dir,
             str_to_temp_size(&G.log_temp_size),
@@ -83,13 +85,13 @@ fn str_to_rolling(arg: &str) -> RollingType {
     }
 }
 
-fn str_to_log_level(arg: &str) -> log::Level {
+fn str_to_log_level(arg: &str) -> LevelFilter {
     return match arg {
-        "warn" => log::Level::Warn,
-        "error" => log::Level::Error,
-        "trace" => log::Level::Trace,
-        "info" => log::Level::Info,
-        "debug" => log::Level::Debug,
-        _ => log::Level::Info,
+        "warn" => LevelFilter::Warn,
+        "error" => LevelFilter::Error,
+        "trace" => LevelFilter::Trace,
+        "info" => LevelFilter::Info,
+        "debug" => LevelFilter::Debug,
+        _ => LevelFilter::Info,
     };
 }

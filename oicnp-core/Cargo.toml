@@ -11,7 +11,7 @@ serde_json = "^1"
 serde_yaml = "^0"
 lazy_static = "^1"
 tracing = "^0"
-tokio = { version = "^1", features = ["macros", "rt-multi-thread", "sync", "parking_lot"] }
+tokio = { version = "^1", features = ["macros", "rt-multi-thread", "sync", "parking_lot"i, "signal"] }
 chrono = { version = "^0", features = ["serde"] }
 anyhow = "^1"
 strum = "^0"

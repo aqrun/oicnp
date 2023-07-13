@@ -1,54 +1,64 @@
 pub mod mutations;
+pub mod node_query;
 pub mod queries;
 pub mod user_query;
-pub mod node_query;
 
-pub use queries::*;
 pub use mutations::*;
-pub use user_query::*;
 pub use node_query::*;
+pub use queries::*;
+pub use user_query::*;
 
-use poem::{
-    IntoResponse, web::{Html, Data, Json}, handler
-};
+use crate::typings::{State, Token};
 use async_graphql::{
-    Schema, EmptySubscription,
-    http::{
-        GraphQLPlaygroundConfig, playground_source,
-    },
-    Request, Response,
+    http::{playground_source, GraphQLPlaygroundConfig},
+    EmptySubscription, Schema,
 };
-use crate::typings::{State};
-use oicnp_core::{G, DB, establish_connection};
+use async_graphql_poem::{GraphQLRequest, GraphQLResponse};
+use oicnp_core::{establish_connection, DB, G};
+use poem::{
+    handler,
+    http::HeaderMap,
+    web::{Data, Html},
+    IntoResponse,
+};
 
 pub type GqlResult<T> = std::result::Result<T, async_graphql::Error>;
 
 pub async fn build_schema() -> Schema<QueryRoot, MutationRoot, EmptySubscription> {
     let db = DB.get_or_init(establish_connection).await;
 
-    Schema::build(
-        QueryRoot::default(),
-        MutationRoot,
-        EmptySubscription,
-    )
+    Schema::build(QueryRoot::default(), MutationRoot, EmptySubscription)
         .data(db.clone())
         .finish()
 }
 
 #[handler]
-pub async fn graphql(data: Data<&State>, req: Json<Request>) -> Json<Response> {
+pub async fn graphql(
+    data: Data<&State>,
+    headers: &HeaderMap,
+    req: GraphQLRequest,
+) -> GraphQLResponse {
+    let mut req = req.0;
     let schema = data.0.schema.clone();
-    Json(schema.execute(req.0).await)
+
+    if let Some(token) = get_token_from_headers(headers) {
+        req = req.data(token);
+    } else {
+        req = req.data(Token(String::from("anomouse---123")));
+    }
+
+    schema.execute(req).await.into()
 }
 
 #[handler]
 pub fn graphiql() -> impl IntoResponse {
-    Html(playground_source(
-        GraphQLPlaygroundConfig::new(
-            &G.graphql_url
-        )
-    ))
+    Html(playground_source(GraphQLPlaygroundConfig::new(
+        &G.graphql_url,
+    )))
 }
 
-
-
+fn get_token_from_headers(headers: &HeaderMap) -> Option<Token> {
+    headers
+        .get("Token")
+        .and_then(|value| value.to_str().map(|s| Token(s.to_string())).ok())
+}
