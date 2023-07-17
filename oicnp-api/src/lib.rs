@@ -5,7 +5,7 @@
 extern crate rand;
 
 mod run;
-
+pub mod middlewares;
 pub mod utils;
 pub mod typings;
 pub mod constants;
