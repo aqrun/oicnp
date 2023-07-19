@@ -32,12 +32,12 @@ reqwest = { version = "0.11", features = ["json"]}
 jsonwebtoken = "^8.2"
 
 [dependencies.sea-orm]
-version = "^0.10"
+version = "^0.11"
 default-features = false
 features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "with-chrono"]
 
 [dependencies.sea-orm-migration]
-version = "^0.10"
+version = "^0.11"
 features = [
     "runtime-tokio-rustls",  # `ASYNC_RUNTIME` feature
     "sqlx-postgres",         # `DATABASE_DRIVER` feature
