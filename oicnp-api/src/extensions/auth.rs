@@ -1,19 +1,17 @@
-use std::{fmt::Write, sync::Arc};
-use regex::Regex;
-use oicnp_core::{
-    prelude::{anyhow::{anyhow, Result}},
-    services::auth::decode_jwt,
-};
 use crate::typings::Token;
 use async_graphql::{
-    extensions::{Extension, ExtensionContext, ExtensionFactory, NextExecute, NextParseQuery,
-                 ResolveInfo, NextResolve,
-    },
-    parser::types::{ExecutableDocument, OperationType, Selection},
-    PathSegment, Response, ServerResult, Variables, Value, ServerError
+    extensions::{Extension, ExtensionContext, ExtensionFactory, NextParseQuery},
+    parser::types::ExecutableDocument,
+    ServerError, ServerResult, Variables,
 };
+use oicnp_core::{
+    prelude::anyhow::{anyhow, Result},
+    services::auth::decode_jwt,
+};
+use regex::Regex;
+use std::sync::Arc;
 
-/// Logger extension
+/// Auth extension
 #[cfg_attr(docsrs, doc(cfg(feature = "log")))]
 pub struct Auth;
 
@@ -42,9 +40,7 @@ impl Extension for AuthExtension {
         let auth_res = check_auth(query, token_jwt);
 
         match auth_res {
-            Ok(_) => {
-                Ok(document)
-            },
+            Ok(_) => Ok(document),
             Err(err) => {
                 // 用户信息解析失败 返回错误信息
                 Err(ServerError::new(format!("{:?}", err), None))
@@ -86,6 +82,11 @@ fn check_is_public_query(query: &str) -> bool {
         let query_prefix = format!("{{{}(", item);
         // 有名字的匹配前缀
         let named_query_prefix = format!("query{}{{", item);
+        let mutation_prefix = format!("mutation{{{}", item);
+
+        if query.starts_with(mutation_prefix.as_str()) {
+            return true;
+        }
 
         if query.starts_with(named_query_prefix.as_str()) {
             return true;
@@ -105,3 +106,4 @@ fn check_is_public_query(query: &str) -> bool {
 
     false
 }
+

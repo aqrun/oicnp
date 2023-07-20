@@ -1,16 +1,15 @@
-use async_graphql::{Object, Context};
-use crate::typings::{DateFormat};
+use crate::models::Files;
 use crate::services;
-use crate::models::{Files};
+use crate::typings::DateFormat;
+use async_graphql::{Context, Object};
 use oicnp_core::{
-    DateTime, DatabaseConnection,
-    entities::{
-        cms_nodes,
-    },
+    entities::cms_nodes,
+    models::auth::LoginInfo as CoreLoginInfo,
     prelude::{
         anyhow::{anyhow, Result},
         chrono::prelude::*,
-    }
+    },
+    DatabaseConnection, DateTime,
 };
 use serde::{Deserialize, Serialize};
 
@@ -63,7 +62,9 @@ impl Users {
     }
 
     async fn last_login_on(&self) -> String {
-        self.last_login_on.format(&DateFormat::Normal.to_string()).to_string()
+        self.last_login_on
+            .format(&DateFormat::Normal.to_string())
+            .to_string()
     }
 
     async fn salt(&self) -> &str {
@@ -79,11 +80,15 @@ impl Users {
     }
 
     async fn created_at(&self) -> String {
-        self.last_login_on.format(&DateFormat::Normal.to_string()).to_string()
+        self.last_login_on
+            .format(&DateFormat::Normal.to_string())
+            .to_string()
     }
 
     async fn updated_at(&self) -> String {
-        self.last_login_on.format(&DateFormat::Normal.to_string()).to_string()
+        self.last_login_on
+            .format(&DateFormat::Normal.to_string())
+            .to_string()
     }
 
     async fn avatar(&self, ctx: &Context<'_>) -> Option<Files> {
@@ -130,4 +135,24 @@ pub struct UserPictures {
     pub height: i32,
 }
 
-    
+#[derive(Debug)]
+pub struct LoginInfo {
+    pub data: CoreLoginInfo,
+}
+
+#[Object]
+impl LoginInfo {
+    async fn token(&self) -> &str {
+        self.data.token.as_str()
+    }
+    async fn uid(&self) -> &str {
+        self.data.uid.as_str()
+    }
+    async fn role(&self) -> &str {
+        self.data.role.as_str()
+    }
+    async fn exp(&self) -> usize {
+        self.data.exp
+    }
+}
+   

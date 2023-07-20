@@ -1,15 +1,13 @@
-pub mod mutations;
-pub mod node_query;
-pub mod queries;
-pub mod user_query;
+pub mod node;
+mod roots;
+pub mod user;
 
-pub use mutations::*;
-pub use node_query::*;
-pub use queries::*;
-pub use user_query::*;
+pub use node::*;
+pub use roots::*;
+pub use user::*;
 
-use crate::typings::{State, Token};
 use crate::extensions::Auth as AuthExt;
+use crate::typings::{State, Token};
 use async_graphql::{
     http::{playground_source, GraphQLPlaygroundConfig},
     EmptySubscription, Schema,
@@ -28,10 +26,14 @@ pub type GqlResult<T> = std::result::Result<T, async_graphql::Error>;
 pub async fn build_schema() -> Schema<QueryRoot, MutationRoot, EmptySubscription> {
     let db = DB.get_or_init(establish_connection).await;
 
-    Schema::build(QueryRoot::default(), MutationRoot, EmptySubscription)
-        .data(db.clone())
-        .extension(AuthExt)
-        .finish()
+    Schema::build(
+        QueryRoot::default(),
+        MutationRoot::default(),
+        EmptySubscription,
+    )
+    .data(db.clone())
+    .extension(AuthExt)
+    .finish()
 }
 
 #[handler]
@@ -60,13 +62,15 @@ pub fn graphiql() -> impl IntoResponse {
 }
 
 fn get_token_from_headers(headers: &HeaderMap) -> Option<Token> {
-    headers
-        .get("Token")
-        .and_then(|value| {
-            value.to_str().map(|s| {
+    headers.get("Token").and_then(|value| {
+        value
+            .to_str()
+            .map(|s| {
                 // Bearer [token]  形式分割获取后一部分
                 let mut auth_arr = s.split(" ").collect::<Vec<&str>>();
                 Token(auth_arr.pop().unwrap_or("").to_string())
-            }).ok()
-        })
+            })
+            .ok()
+    })
 }
+

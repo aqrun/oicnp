@@ -6,3 +6,11 @@ pub struct Claims {
     pub role: String,
     pub exp: usize,
 }
+
+#[derive(Debug)]
+pub struct LoginInfo {
+    pub token: String,
+    pub uid: String,
+    pub role: String,
+    pub exp: usize,
+}

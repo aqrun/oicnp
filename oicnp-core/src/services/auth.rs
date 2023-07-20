@@ -1,13 +1,13 @@
-use anyhow::{anyhow, Result};
-use jsonwebtoken as jwt;
-use chrono::Utc;
-use crate::models::auth::{Claims};
+use crate::models::auth::{Claims, LoginInfo};
 use crate::G;
+use anyhow::{anyhow, Result};
+use chrono::Utc;
+use jsonwebtoken as jwt;
 use log::error;
 
-pub fn create_jwt(uid: &str, role: &str) -> Result<String> {
+pub fn create_jwt(uid: &str, role: &str) -> Result<LoginInfo> {
     let expiration = Utc::now()
-        .checked_add_signed(chrono::Duration::seconds(60))
+        .checked_add_signed(chrono::Duration::days(7))
         .expect("valid timestamp")
         .timestamp();
 
@@ -22,10 +22,15 @@ pub fn create_jwt(uid: &str, role: &str) -> Result<String> {
     let code = jwt::encode(&header, &claims, &key);
 
     match code {
-        Ok(code) => Ok(code),
+        Ok(code) => Ok(LoginInfo {
+            token: code,
+            uid: claims.uid,
+            role: claims.role,
+            exp: claims.exp,
+        }),
         Err(err) => {
             error!("Jwt 生成失败, {}, {:?}", uid, err);
-            Ok(String::from(""))
+            Err(anyhow!("Create failed"))
         }
     }
 }
@@ -44,12 +49,13 @@ pub fn decode_jwt(header_jwt: &str) -> Result<Claims> {
     let decoded = jwt::decode::<Claims>(
         &header_jwt,
         &jwt::DecodingKey::from_secret(G.jwt_secret.as_bytes()),
-        &jwt::Validation::new(jwt::Algorithm::HS512),
+        &jwt::Validation::new(jwt::Algorithm::HS256),
     );
 
     match decoded {
         Ok(decoded) => Ok(decoded.claims),
         Err(err) => {
+            error!("JWT 解析失败: {:}", err);
             Ok(anonymous)
         }
     }
