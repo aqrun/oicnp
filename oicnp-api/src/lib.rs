@@ -12,6 +12,7 @@ pub mod gql;
 pub mod models;
 pub mod services;
 pub mod extensions;
+pub mod middleware;
 
 pub use run::*;
 

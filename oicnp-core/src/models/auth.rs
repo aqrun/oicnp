@@ -7,7 +7,7 @@ pub struct Claims {
     pub exp: usize,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct LoginInfo {
     pub token: String,
     pub uid: String,

@@ -35,8 +35,9 @@ pub fn create_jwt(uid: &str, role: &str) -> Result<LoginInfo> {
     }
 }
 
-pub fn decode_jwt(header_jwt: &str) -> Result<Claims> {
-    let anonymous = Claims {
+pub fn decode_jwt(header_jwt: &str, log_error: bool) -> Result<LoginInfo> {
+    let anonymous = LoginInfo {
+        token: String::from(header_jwt),
         uid: String::from(""),
         role: String::from("Anonymous"),
         exp: 0,
@@ -53,9 +54,19 @@ pub fn decode_jwt(header_jwt: &str) -> Result<Claims> {
     );
 
     match decoded {
-        Ok(decoded) => Ok(decoded.claims),
+        Ok(decoded) => {
+            let info = LoginInfo {
+                token: String::from(header_jwt),
+                uid: decoded.claims.uid,
+                role: decoded.claims.role,
+                exp: decoded.claims.exp,
+            };
+            Ok(info)
+        },
         Err(err) => {
-            error!("JWT 解析失败: {:}", err);
+            if log_error {
+                error!("JWT 解析失败: {:}", err);
+            }
             Ok(anonymous)
         }
     }

@@ -6,7 +6,7 @@ pub use node::*;
 pub use roots::*;
 pub use user::*;
 
-use crate::extensions::Auth as AuthExt;
+// use crate::extensions::Auth as AuthExt;
 use crate::typings::{State, Token};
 use async_graphql::{
     http::{playground_source, GraphQLPlaygroundConfig},
@@ -32,7 +32,7 @@ pub async fn build_schema() -> Schema<QueryRoot, MutationRoot, EmptySubscription
         EmptySubscription,
     )
     .data(db.clone())
-    .extension(AuthExt)
+    // .extension(AuthExt)
     .finish()
 }
 
@@ -42,14 +42,8 @@ pub async fn graphql(
     headers: &HeaderMap,
     req: GraphQLRequest,
 ) -> GraphQLResponse {
-    let mut req = req.0;
+    let req = req.0;
     let schema = data.0.schema.clone();
-
-    if let Some(token) = get_token_from_headers(headers) {
-        req = req.data(token);
-    } else {
-        req = req.data(Token(String::from("Anonymous")));
-    }
 
     schema.execute(req).await.into()
 }
@@ -60,17 +54,3 @@ pub fn graphiql() -> impl IntoResponse {
         &G.graphql_url,
     )))
 }
-
-fn get_token_from_headers(headers: &HeaderMap) -> Option<Token> {
-    headers.get("Token").and_then(|value| {
-        value
-            .to_str()
-            .map(|s| {
-                // Bearer [token]  形式分割获取后一部分
-                let mut auth_arr = s.split(" ").collect::<Vec<&str>>();
-                Token(auth_arr.pop().unwrap_or("").to_string())
-            })
-            .ok()
-    })
-}
-

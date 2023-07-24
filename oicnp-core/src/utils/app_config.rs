@@ -34,6 +34,8 @@ pub struct AppConfig {
     pub sms_cache_send_key_prefix: String,
     /// jwt 密钥
     pub jwt_secret: String,
+    /// 超级管理员用户ID
+    pub super_user: Vec<String>,
     /// 白名单接口
     pub white_list_api: Vec<String>,
     /// 权限缓存类型

@@ -1,6 +1,7 @@
 use crate::gql::{build_schema, graphiql, graphql};
 use crate::typings::State;
 use crate::utils::log;
+use crate::middleware::{AuthMiddleware, CtxMiddleware};
 use async_graphql::Result;
 use oicnp_core::{
     prelude::tokio::{self, time::Duration},
@@ -23,7 +24,10 @@ pub async fn run() -> Result<(), std::io::Error> {
     let state = State { schema };
     let app = Route::new()
         .at(path, get(graphiql).post(graphql))
-        .data(state);
+        .data(state)
+        .with(AuthMiddleware)
+        .with(CtxMiddleware)
+        ;
 
     println!("Playground: https://{}:{}", address, port);
 

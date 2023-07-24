@@ -37,10 +37,13 @@ sms_cache_send_key_prefix: "sms:send:"
 login_fail_retry: 3
 #登陆失败重试次数限制超过后提示的等待时间（秒）
 login_fail_retry_wait_sec: 30
-
+# 超级管理员用户ID
+super_user:
+    - "00TV87DDOBJPU75J4TGUOC3NNG"
+    - "00TV876BOIIDCR9H7JA1KNNIGH"
 #接口白名单（免登陆直接访问）
 white_list_api:
-  - "/"
-  - "/admin/sys_login"
-  - "/admin/captcha"
+    - "/"
+    - "/admin/sys_login"
+    - "/admin/captcha"
   
