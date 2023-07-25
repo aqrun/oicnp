@@ -30,6 +30,9 @@ once_cell = "1"
 sha2 = "0.10"
 reqwest = { version = "0.11", features = ["json"]}
 jsonwebtoken = "^8.2"
+ring = "^0.16"
+data-encoding = "^2.4"
+rand = "^0.8"
 
 [dependencies.sea-orm]
 version = "^0.11"

@@ -18,7 +18,7 @@ pub static SNOW_ID_BUCKET: Lazy<Mutex<SnowflakeIdBucket>> = Lazy::new(|| {
 /// 10 进制转 11 - 64 进制
 ///
 /// ```
-///  use oicnp_api::utils::base_10_to_n;
+///  use oicnp_core::utils::base_10_to_n;
 /// let raw_id = 6888076346770202619;
 /// assert_eq!(base_10_to_n(raw_id, 36), "1gbyra5idyk8r");
 /// ```
@@ -67,7 +67,7 @@ pub fn random_base_10_to_n(num: u128, radix: u32) -> String {
 /// 11 - 64 进制解析为 10 进制
 ///
 /// ```
-/// use oicnp_api::utils::base_n_to_10;
+/// use oicnp_core::utils::base_n_to_10;
 /// let id = "1gbyra5idyk8r";
 /// assert_eq!(base_n_to_10(id, 36) as u64, 6888076346770202619u64);
 /// ```
