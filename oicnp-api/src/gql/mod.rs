@@ -45,9 +45,7 @@ pub async fn graphql(
     let schema = data.0.schema.clone();
 
     // 将 poem 中生成请求上下文转入 graphql
-    if let Some(req_ctx) = data.0.req_ctx.clone() {
-        gql_req = gql_req.data(req_ctx);
-    }
+    gql_req = gql_req.data(data.0.req_ctx.clone());
 
     schema.execute(gql_req).await.into()
 }

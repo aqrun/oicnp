@@ -2,6 +2,7 @@ use crate::gql::{build_schema, graphiql, graphql};
 use crate::typings::State;
 use crate::utils::log;
 use crate::middleware::{AuthMiddleware, CtxMiddleware};
+use crate::models::init_default_req_ctx;
 use async_graphql::Result;
 use oicnp_core::{
     prelude::tokio::{self, time::Duration},
@@ -23,7 +24,7 @@ pub async fn run() -> Result<(), std::io::Error> {
     let schema = build_schema().await;
     let state = State {
         schema,
-        req_ctx: None
+        req_ctx: init_default_req_ctx(),
     };
     let app = Route::new()
         .at(path, get(graphiql).post(graphql))

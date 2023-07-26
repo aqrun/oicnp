@@ -94,7 +94,7 @@ impl<E: Endpoint> Endpoint for ContextEndpoint<E> {
             // 生成新的 State
             let new_state = State {
                 schema: state.schema.clone(),
-                req_ctx: Some(req_ctx.clone()),
+                req_ctx,
             };
             req.extensions_mut().insert(new_state);
         }

@@ -24,23 +24,22 @@ impl<E: Endpoint> Endpoint for AuthEndpoint<E> {
     type Output = E::Output;
 
     async fn call(&self, req: Request) -> Result<Self::Output> {
-        if let Some(state) = req.extensions().get::<State>() {
-            if let Some(ctx) = state.clone().req_ctx {
-                // 是公开的数据接口直接放行 如 login register
-                if ctx.gql_is_public_query || ctx.method.eq("GET") {
-                    return self.ep.call(req).await;
-                }
+        let state = req.extensions().get::<State>().expect("[AuthMiddleware]State not exist");
+        let ctx = state.req_ctx.clone();
 
-                // 如果是超级用户，则不需要验证权限，直接放行
-                if !ctx.login_info.uid.is_empty() && G.super_user.contains(&ctx.login_info.uid) {
-                    return self.ep.call(req).await;
-                }
+        // 是公开的数据接口直接放行 如 login register
+        if ctx.gql_is_public_query || ctx.method.eq("GET") {
+            return self.ep.call(req).await;
+        }
 
-                // 用户存在且不是非法用户直接放行
-                if !ctx.login_info.uid.is_empty() && !ctx.login_info.role.eq("Anonymous") {
-                    return self.ep.call(req).await;
-                }
-            }
+        // 如果是超级用户，则不需要验证权限，直接放行
+        if !ctx.login_info.uid.is_empty() && G.super_user.contains(&ctx.login_info.uid) {
+            return self.ep.call(req).await;
+        }
+
+        // 用户存在且不是非法用户直接放行
+        if !ctx.login_info.uid.is_empty() && !ctx.login_info.role.eq("Anonymous") {
+            return self.ep.call(req).await;
         }
 
         let body = Body::from_json(serde_json::json!({

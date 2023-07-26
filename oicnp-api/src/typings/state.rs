@@ -9,5 +9,5 @@ pub struct State {
         MutationRoot,
         EmptySubscription,
     >,
-    pub req_ctx: Option<ReqCtx>,
+    pub req_ctx: ReqCtx,
 }
