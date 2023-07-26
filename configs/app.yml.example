@@ -43,7 +43,8 @@ super_user:
     - "00TV876BOIIDCR9H7JA1KNNIGH"
 #接口白名单（免登陆直接访问）
 white_list_api:
-    - "/"
-    - "/admin/sys_login"
-    - "/admin/captcha"
+    - "register"
+    - "login"
+    - "logout"
+    - "IntrospectionQuery"
   

@@ -1,8 +1,6 @@
-use poem::{http::StatusCode, Endpoint, Error, Middleware, Request, Result, Response, Body};
 use crate::models::auth::ReqCtx;
-use oicnp_core::{
-    G,
-};
+use oicnp_core::G;
+use poem::{http::StatusCode, Body, Endpoint, Error, Middleware, Request, Response, Result};
 
 /// 菜单授权中间件
 #[derive(Clone, Debug)]
@@ -28,28 +26,25 @@ impl<E: Endpoint> Endpoint for AuthEndpoint<E> {
         let ctx = req.extensions().get::<ReqCtx>().expect("ReqCtx not found");
 
         // 是公开的数据接口直接放行 如 login register
-        if ctx.gql_is_public_query {
+        if ctx.gql_is_public_query || ctx.method.eq("GET") {
             return self.ep.call(req).await;
         }
 
         // 如果是超级用户，则不需要验证权限，直接放行
-        if !ctx.login_info.uid.is_empty()
-            && G.super_user.contains(&ctx.login_info.uid)
-        {
+        if !ctx.login_info.uid.is_empty() && G.super_user.contains(&ctx.login_info.uid) {
             return self.ep.call(req).await;
         }
 
         // 用户存在且不是非法用户直接放行
-        if !ctx.login_info.uid.is_empty()
-            && !ctx.login_info.role.eq("Anonymous")
-        {
+        if !ctx.login_info.uid.is_empty() && !ctx.login_info.role.eq("Anonymous") {
             return self.ep.call(req).await;
         }
 
         let body = Body::from_json(serde_json::json!({
             "code": "403",
             "message": "你没有权限访问该API"
-        })).unwrap();
+        }))
+        .unwrap();
         let err_response = Response::builder()
             .status(StatusCode::FORBIDDEN)
             .header("Content-Type", "application/json; charset=utf-8")
@@ -70,3 +65,4 @@ impl<E: Endpoint> Endpoint for AuthEndpoint<E> {
         return Err(Error::from_response(err_response));
     }
 }
+

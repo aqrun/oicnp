@@ -1,8 +1,6 @@
-pub mod string;
 pub mod log;
-pub mod password;
 mod req;
+pub mod string;
 
-pub use string::*;
-pub use password::*;
 pub use req::*;
+pub use string::*;

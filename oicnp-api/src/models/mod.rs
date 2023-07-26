@@ -1,10 +1,11 @@
-pub mod users;
-pub mod taxonomies;
-pub mod nodes;
-pub mod file;
 pub mod auth;
+pub mod file;
+pub mod nodes;
+pub mod taxonomies;
+pub mod users;
 
-pub use users::*;
-pub use taxonomies::*;
-pub use nodes::*;
+pub use auth::*;
 pub use file::*;
+pub use nodes::*;
+pub use taxonomies::*;
+pub use users::*;

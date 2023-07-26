@@ -1,26 +1,22 @@
-use poem::{Request};
-use regex::Regex;
 use oicnp_core::{
     prelude::anyhow::{anyhow, Result},
     services::auth::decode_jwt,
+    G,
 };
+use poem::Request;
+use regex::Regex;
 
 /// 解析头部的 Authorization: "Bearer [token]"
 pub fn get_request_auth_token(req: &Request) -> String {
-    let auth_token = req.headers()
+    let auth_token = req
+        .headers()
         .get("Authorization")
-        .and_then(|value| {
-            value.to_str().ok()
-        })
+        .and_then(|value| value.to_str().ok())
         .ok_or("");
 
     match auth_token {
-        Ok(token) => {
-            token.replace("Bearer ", "")
-        },
-        _ => {
-            String::from("")
-        }
+        Ok(token) => token.replace("Bearer ", ""),
+        _ => String::from(""),
     }
 }
 
@@ -53,9 +49,9 @@ pub fn check_auth(query: &str, auth_token: &str) -> Result<String> {
 
 /// 当前请求是否为公开接口
 pub fn check_is_public_query(query: &str) -> bool {
-    let public_auth_handles: Vec<&str> = vec!["register", "login", "IntrospectionQuery"];
+    let public_auth_handles: &[String] = G.white_list_api.as_slice();
 
-    let target = public_auth_handles.into_iter().find(|item| {
+    let target = public_auth_handles.iter().find(|item| {
         // 没有名字的匹配前缀
         let query_prefix = format!("{{{}(", item);
         // 有名字的匹配前缀

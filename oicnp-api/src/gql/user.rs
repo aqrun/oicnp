@@ -57,13 +57,6 @@ impl UserQuery {
         //     }
         // }
 
-        // if let Some(user) = user {
-        //     let valid_pass = utils::check_is_valid_password(&user.password, &password);
-        //     if valid_pass {
-        //         return Ok(user);
-        //     }
-        // }
-
         Err(anyhow!("Data not valid try again"))
     }
 }
@@ -76,16 +69,4 @@ impl UserMutations {
     async fn add(&self) -> GqlResult<usize> {
         Ok(0usize)
     }
-
-    async fn login(
-        &self,
-        username: Option<String>,
-        email: Option<String>,
-        password: String,
-    ) -> Result<LoginInfo> {
-        let info = create_jwt("abc", "Admin")?;
-        let res = LoginInfo { data: info };
-        Ok(res)
-    }
 }
-

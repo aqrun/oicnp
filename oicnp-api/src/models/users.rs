@@ -134,25 +134,4 @@ pub struct UserPictures {
     pub width: i32,
     pub height: i32,
 }
-
-#[derive(Debug)]
-pub struct LoginInfo {
-    pub data: CoreLoginInfo,
-}
-
-#[Object]
-impl LoginInfo {
-    async fn token(&self) -> &str {
-        self.data.token.as_str()
-    }
-    async fn uid(&self) -> &str {
-        self.data.uid.as_str()
-    }
-    async fn role(&self) -> &str {
-        self.data.role.as_str()
-    }
-    async fn exp(&self) -> usize {
-        self.data.exp
-    }
-}
-   
+  

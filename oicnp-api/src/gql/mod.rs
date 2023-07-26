@@ -1,13 +1,15 @@
+mod auth;
 pub mod node;
 mod roots;
 pub mod user;
 
+pub use auth::*;
 pub use node::*;
 pub use roots::*;
 pub use user::*;
 
 // use crate::extensions::Auth as AuthExt;
-use crate::typings::{State, Token};
+use crate::{models::ReqCtx, typings::State};
 use async_graphql::{
     http::{playground_source, GraphQLPlaygroundConfig},
     EmptySubscription, Schema,
@@ -16,9 +18,8 @@ use async_graphql_poem::{GraphQLRequest, GraphQLResponse};
 use oicnp_core::{establish_connection, DB, G};
 use poem::{
     handler,
-    http::HeaderMap,
     web::{Data, Html},
-    IntoResponse,
+    IntoResponse, Request,
 };
 
 pub type GqlResult<T> = std::result::Result<T, async_graphql::Error>;
@@ -39,13 +40,18 @@ pub async fn build_schema() -> Schema<QueryRoot, MutationRoot, EmptySubscription
 #[handler]
 pub async fn graphql(
     data: Data<&State>,
-    headers: &HeaderMap,
-    req: GraphQLRequest,
+    gql_req: GraphQLRequest,
+    req: &Request,
 ) -> GraphQLResponse {
-    let req = req.0;
+    let mut gql_req = gql_req.0;
     let schema = data.0.schema.clone();
 
-    schema.execute(req).await.into()
+    // 将 poem 中生成请求上下文转入 graphql
+    if let Some(req_ctx) = req.extensions().get::<ReqCtx>() {
+        gql_req = gql_req.data(req_ctx.clone());
+    }
+
+    schema.execute(gql_req).await.into()
 }
 
 #[handler]
@@ -54,3 +60,4 @@ pub fn graphiql() -> impl IntoResponse {
         &G.graphql_url,
     )))
 }
+
