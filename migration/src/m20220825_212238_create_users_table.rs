@@ -25,7 +25,7 @@ impl MigrationTrait for Migration {
             .col(ColumnDef::new(SysUsers::Username).string_len(60).default(""))
             .col(ColumnDef::new(SysUsers::Nickname).string_len(60).default(""))
             .col(ColumnDef::new(SysUsers::Password).string_len(32).default(""))
-            .col(ColumnDef::new(SysUsers::Salt).string_len(32).default(""))
+            .col(ColumnDef::new(SysUsers::Salt).string_len(64).default(""))
             .col(ColumnDef::new(SysUsers::Status).char_len(1).default("0"))
             .col(ColumnDef::new(SysUsers::Email).string_len(100).default(""))
             .col(ColumnDef::new(SysUsers::Gender).char_len(1).default("0"))

@@ -33,7 +33,6 @@ pub async fn build_schema() -> Schema<QueryRoot, MutationRoot, EmptySubscription
         EmptySubscription,
     )
     .data(db.clone())
-    // .extension(AuthExt)
     .finish()
 }
 
@@ -41,14 +40,13 @@ pub async fn build_schema() -> Schema<QueryRoot, MutationRoot, EmptySubscription
 pub async fn graphql(
     data: Data<&State>,
     gql_req: GraphQLRequest,
-    req: &Request,
 ) -> GraphQLResponse {
     let mut gql_req = gql_req.0;
     let schema = data.0.schema.clone();
 
     // 将 poem 中生成请求上下文转入 graphql
-    if let Some(req_ctx) = req.extensions().get::<ReqCtx>() {
-        gql_req = gql_req.data(req_ctx.clone());
+    if let Some(req_ctx) = data.0.req_ctx.clone() {
+        gql_req = gql_req.data(req_ctx);
     }
 
     schema.execute(gql_req).await.into()

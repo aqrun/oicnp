@@ -21,12 +21,15 @@ pub async fn run() -> Result<(), std::io::Error> {
     let port = &G.port;
 
     let schema = build_schema().await;
-    let state = State { schema };
+    let state = State {
+        schema,
+        req_ctx: None
+    };
     let app = Route::new()
         .at(path, get(graphiql).post(graphql))
-        .data(state)
         .with(AuthMiddleware)
         .with(CtxMiddleware)
+        .data(state)
         ;
 
     println!("Playground: https://{}:{}", address, port);

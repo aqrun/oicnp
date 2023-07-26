@@ -8,6 +8,8 @@ use poem::{http::StatusCode, Body, Endpoint, Error, FromRequest, Middleware, Req
 use crate::models::auth::{ReqCtx, GraphqlBody};
 use crate::utils::{get_request_auth_token, trim_gql_query, check_is_public_query};
 use std::collections::HashMap;
+use crate::typings::State;
+use std::sync::Arc;
 
 /// req上下文注入中间件 同时进行jwt授权验证
 pub struct Context;
@@ -31,6 +33,14 @@ impl<E: Endpoint> Endpoint for ContextEndpoint<E> {
     // type Output = Response;
 
     async fn call(&self, req: Request) -> Result<Self::Output> {
+        let mut state: Option<State> = None;
+
+        {
+            if let Some(state_data) = req.extensions().get::<State>() {
+                state = Some(state_data.clone());
+            }
+        }
+
         // 请求信息ctx注入
         let auth_token = get_request_auth_token(&req);
 
@@ -56,6 +66,7 @@ impl<E: Endpoint> Endpoint for ContextEndpoint<E> {
             gql_is_public_query = check_is_public_query(gql_trimmed_query.as_str());
         }
 
+        // 解析JWT TOKEN
         let login_info= decode_jwt(
             auth_token.as_str(),
             !gql_is_public_query
@@ -74,8 +85,19 @@ impl<E: Endpoint> Endpoint for ContextEndpoint<E> {
             gql_is_public_query,
         };
 
+        // 生成新的 Request对象
         let mut req = Request::from_parts(req_parts, Body::from(bytes));
-        req.extensions_mut().insert(req_ctx);
+
+        if let Some(state) = state {
+            // 移除旧数据
+            req.extensions_mut().remove::<State>();
+            // 生成新的 State
+            let new_state = State {
+                schema: state.schema.clone(),
+                req_ctx: Some(req_ctx.clone()),
+            };
+            req.extensions_mut().insert(new_state);
+        }
 
         // 开始请求数据
         self.inner.call(req).await
