@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use regex::Regex;
 use once_cell::sync::Lazy;
-use std::path::{PathBuf, Path};
+use std::path::{Path};
 
 // Based on https://regex101.com/r/H2n38Z/1/tests
 // A regex parsing RFC3339 date followed by {_,-} and some characters

@@ -13,7 +13,7 @@ impl MigrationName for Migration {
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let table = Table::create()
-            .table(SysMenus::Table)
+            .table(SysOperationLogs::Table)
             .if_not_exists()
             .col(
                 ColumnDef::new(SysOperationLogs::Id)

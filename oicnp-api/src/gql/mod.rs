@@ -9,7 +9,7 @@ pub use roots::*;
 pub use user::*;
 
 // use crate::extensions::Auth as AuthExt;
-use crate::{models::ReqCtx, typings::State};
+use crate::{typings::State};
 use async_graphql::{
     http::{playground_source, GraphQLPlaygroundConfig},
     EmptySubscription, Schema,
@@ -19,7 +19,7 @@ use oicnp_core::{establish_connection, DB, G};
 use poem::{
     handler,
     web::{Data, Html},
-    IntoResponse, Request,
+    IntoResponse,
 };
 
 pub type GqlResult<T> = std::result::Result<T, async_graphql::Error>;
