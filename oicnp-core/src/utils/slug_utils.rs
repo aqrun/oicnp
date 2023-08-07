@@ -106,7 +106,7 @@ pub fn capture_file_name(s: &str) -> CapturedFile {
 /// 去除文件名的日期
 pub fn slugify_paths_without_date(s: &str) -> (String, String) {
     let mut date_time = String::new();
-    let mut captured_file = capture_file_name(s);
+    let captured_file = capture_file_name(s);
     let mut file_path = String::from(captured_file.file_stem.as_str());
 
     // 正则匹配包含日期的文件名 无日期则不会匹配
