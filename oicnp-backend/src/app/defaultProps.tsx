@@ -17,26 +17,26 @@ const defaultProps = {
       },
       {
         path: '/admin',
-        name: '管理页',
+        name: '内容管理',
         icon: <CrownFilled />,
         access: 'canAdmin',
         component: './Admin',
         routes: [
           {
-            path: '/admin/sub-page1',
-            name: '一级页面',
+            path: '/admin/nodes',
+            name: '文章',
             icon: 'https://gw.alipayobjects.com/zos/antfincdn/upvrAjAPQX/Logo_Tech%252520UI.svg',
             component: './Welcome',
           },
           {
-            path: '/admin/sub-page2',
-            name: '二级页面',
+            path: '/admin/categories',
+            name: '分类',
             icon: <CrownFilled />,
             component: './Welcome',
           },
           {
-            path: '/admin/sub-page3',
-            name: '三级页面',
+            path: '/admin/tags',
+            name: '标签',
             icon: <CrownFilled />,
             component: './Welcome',
           },

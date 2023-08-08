@@ -29,6 +29,9 @@ importers:
       '@types/react-dom':
         specifier: 18.2.7
         version: 18.2.7
+      ahooks:
+        specifier: ^3.1.1
+        version: 3.1.1(react@18.2.0)
       antd:
         specifier: '5'
         version: 5.8.2(react-dom@18.2.0)(react@18.2.0)
@@ -65,12 +68,22 @@ importers:
       react-dom:
         specifier: 18.2.0
         version: 18.2.0(react@18.2.0)
+      recoil:
+        specifier: ^0.7.7
+        version: 0.7.7(react-dom@18.2.0)(react@18.2.0)
+      styled-components:
+        specifier: ^5.3.3
+        version: 5.3.3(@babel/core@7.22.9)(react-dom@18.2.0)(react-is@18.2.0)(react@18.2.0)
       tailwindcss:
         specifier: 3.3.3
         version: 3.3.3
       typescript:
         specifier: 5.1.6
         version: 5.1.6
+    devDependencies:
+      '@types/styled-components':
+        specifier: ^5.1.19
+        version: 5.1.19
 
   oicnp-frontend:
     dependencies:
@@ -1534,7 +1547,6 @@ packages:
       '@types/hoist-non-react-statics': 3.3.1
       '@types/react': 18.2.18
       csstype: 3.1.2
-    dev: false
 
   /@types/unist@2.0.7:
     resolution: {integrity: sha512-cputDpIbFgLUaGQn6Vqg3/YsJwxUwHLO13v3i5ouxT4lat0khip9AEWxtERujXV9wxIB1EyF97BSJFt6vpdI8g==}
@@ -1991,7 +2003,7 @@ packages:
       react: ^16.8.6 || ^17.0
     dependencies:
       ahooks-v3-count: 1.0.0
-      dayjs: 1.10.7
+      dayjs: 1.11.9
       intersection-observer: 0.12.2
       js-cookie: 3.0.5
       lodash: 4.17.21
