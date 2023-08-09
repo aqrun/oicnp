@@ -16,26 +16,26 @@ const defaultProps = {
         component: './Welcome',
       },
       {
-        path: '/admin',
+        path: '/cms',
         name: '内容管理',
         icon: <CrownFilled />,
         access: 'canAdmin',
-        component: './Admin',
+        component: './cms',
         routes: [
           {
-            path: '/admin/nodes',
+            path: '/cms/nodes',
             name: '文章',
             icon: 'https://gw.alipayobjects.com/zos/antfincdn/upvrAjAPQX/Logo_Tech%252520UI.svg',
-            component: './Welcome',
+            component: './cms/nodes',
           },
           {
-            path: '/admin/categories',
+            path: '/cms/categories',
             name: '分类',
             icon: <CrownFilled />,
             component: './Welcome',
           },
           {
-            path: '/admin/tags',
+            path: '/cms/tags',
             name: '标签',
             icon: <CrownFilled />,
             component: './Welcome',

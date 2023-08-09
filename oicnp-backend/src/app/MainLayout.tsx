@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { Metadata } from 'next'
+import Link from 'next/link';
 import {
   PageContainer,
   ProCard,
@@ -107,7 +108,8 @@ const MainLayout: React.FC<React.PropsWithChildren<{}>> = ({
           onMenuHeaderClick={(e) => console.log(e)}
           menuItemRender={(item, dom) => {
             return (
-              <div
+              <Link
+                href={item?.path || '/'}
                 onClick={() => {
                   console.log('menu---', item);
                   setPathname(item.path || '/welcome');
@@ -115,7 +117,7 @@ const MainLayout: React.FC<React.PropsWithChildren<{}>> = ({
                 className="oic-menu-item-render"
               >
                 {dom}
-              </div>
+              </Link>
             );
           }}
           menuFooterRender={(props) => {
@@ -134,58 +136,7 @@ const MainLayout: React.FC<React.PropsWithChildren<{}>> = ({
           }}
           {...settings}
         >
-          <PageContainer
-              token={{
-                paddingInlinePageContainerContent: num,
-              }}
-              extra={[
-                <Button key="3">操作</Button>,
-                <Button key="2">操作</Button>,
-                <Button
-                  key="1"
-                  type="primary"
-                  onClick={() => {
-                    setNum(num > 0 ? 0 : 40);
-                  }}
-                >
-                  主操作
-                </Button>,
-              ]}
-              subTitle="简单的描述"
-              footer={[
-                <Button key="3">重置</Button>,
-                <Button key="2" type="primary">
-                  提交
-                </Button>,
-              ]}
-            >
-              <ProCard
-                style={{
-                  height: '200vh',
-                  minHeight: 800,
-                }}
-              >
-                <div style={{ border: '2px solid #555'}}>
-                  {children}
-                </div>
-              </ProCard>
-            </PageContainer>
-            
-            {/*
-            <SettingDrawer
-              pathname={pathname}
-              enableDarkTheme
-              getContainer={(e: any) => {
-                if (typeof window === 'undefined') return e;
-                return document.getElementById('test-pro-layout');
-              }}
-              settings={settings}
-              onSettingChange={(changeSetting) => {
-                setSetting(changeSetting);
-              }}
-              disableUrlParams={true}
-            />
-            */}
+          {children}
         </ProLayout>
       </ConfigProvider>
     </ProConfigProvider>

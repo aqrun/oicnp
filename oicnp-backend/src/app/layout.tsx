@@ -58,8 +58,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const user = false;
-
   return (
     <html lang="en">
       <body>

@@ -1,7 +1,7 @@
 export default function Welcome() {
   return (
     <div>
-      welcome
+      welcome 234234
     </div>
   )
 }
