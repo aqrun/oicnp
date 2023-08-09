@@ -31,12 +31,12 @@ import { MenuCard, SearchInput } from '~/components';
 import layoutProps from './defaultProps';
 import { useMemoizedFn } from 'ahooks';
 import { useRecoilState } from 'recoil';
-import { authState } from '~/atoms/authState';
+import { useAuthState } from '~/hooks';
 
 const MainLayout: React.FC<React.PropsWithChildren<{}>> = ({
   children,
 }) => {
-  const [, setAuthState] = useRecoilState(authState);
+  const [, setAuthState] = useAuthState();
   const [settings, setSetting] = useState<Partial<ProSettings> | undefined>({
     fixSiderbar: true,
     layout: 'mix',

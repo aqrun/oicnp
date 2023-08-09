@@ -27,3 +27,13 @@ body {
   margin: 0;
   padding: 0;
 }
+
+.oicnp-loading-container {
+  width: 100%;
+  height: calc(100vh);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80px;
+  color: #999;
+}

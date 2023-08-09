@@ -1,12 +1,15 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './globals.css'
 import type { Metadata } from 'next'
 import MainLayout from './MainLayout';
 import UserLogin from '~/containers/UserLogin';
-import { RecoilRoot, useRecoilState } from 'recoil';
-import { authState } from '~/atoms/authState';
+import { RecoilRoot } from 'recoil';
+import { useAuthState } from '~/hooks';
+import {
+  SyncOutlined,
+} from '@ant-design/icons';
 
 const metadata: Metadata = {
   title: 'Create Next App111',
@@ -19,9 +22,22 @@ const metadata: Metadata = {
 const LayoutWidget: React.FC<React.PropsWithChildren<{}>> = ({
   children,
 }) => {
-  const [auth] = useRecoilState(authState);
+  const [auth] = useAuthState(true);
+  const [initLoading, setInitLoading] = useState(true);
 
-  if (!auth.user) {
+  useEffect(() => {
+    setInitLoading(false);
+  }, []);
+
+  if (initLoading) {
+    return (
+      <div className="oicnp-loading-container">
+        <SyncOutlined spin />
+      </div>
+    );
+  }
+
+  if (!auth?.user) {
     return (
       <UserLogin />
     );

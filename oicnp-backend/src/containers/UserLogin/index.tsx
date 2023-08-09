@@ -15,7 +15,7 @@ import type { CSSProperties } from 'react';
 import { Container } from './index.styled';
 import { useMemoizedFn } from 'ahooks';
 import { useRecoilState } from 'recoil';
-import { authState } from '~/atoms/authState';
+import { useAuthState } from '~/hooks';
 
 type LoginType = 'phone' | 'account';
 
@@ -27,7 +27,7 @@ const iconStyles: CSSProperties = {
 };
 
 const UserLogin = () => {
-  const [, setAuthState] = useRecoilState(authState);
+  const [, setAuthState] = useAuthState();
   const [loginType, setLoginType] = useState<LoginType>('account');
 
   const formSubmitHandle = useMemoizedFn(async (formData: Record<string, string>) => {
