@@ -16,7 +16,6 @@ use crate::DatabaseConnection;
 use crate::services::update_tag_count_by_id;
 use anyhow::{anyhow, Result};
 use chrono::prelude::*;
-use log::info;
 use sea_orm::*;
 use sea_query::{Alias, Expr};
 
@@ -177,7 +176,7 @@ pub async fn find_nodes(
     let total_pages = pager.num_pages().await?;
     let list = pager.fetch_page(page - 1).await?;
 
-    let list_data = ListData {
+    let list_data: ListData<DetailNode> = ListData {
         data: list,
         page,
         page_size,

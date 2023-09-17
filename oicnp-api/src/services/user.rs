@@ -11,6 +11,13 @@ use oicnp_core::{
     }
 };
 
+/**
+ * 创建用户
+ */
+pub async fn create_user() {
+
+}
+
 // #[py_sql("SELECT f.* FROM file f
 //  LEFT JOIN user_picture u
 //  ON f.fid = u.fid

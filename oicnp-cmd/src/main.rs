@@ -16,6 +16,7 @@ mod cli;
 mod cmd;
 mod models;
 mod constants;
+mod services;
 
 #[tokio::main]
 async fn main() {
