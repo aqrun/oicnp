@@ -1,7 +1,6 @@
 use async_graphql::{Object, Context};
 use crate::models::{Taxonomies, Users};
 use crate::services::{
-    find_user_by_id,
     find_node_body,
     find_node_taxonomies,
 };

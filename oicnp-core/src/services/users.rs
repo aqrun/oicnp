@@ -23,7 +23,26 @@ pub async fn find_users() -> ListData<()>{
 }
 
 ///
-/// 查找用户信息
+/// 根据用户ID查找用户信息
+///
+pub async fn find_user_by_uid(
+    db: &DbConn,
+    uid: &str,
+) -> Result<User> {
+    let mut q = SysUsers::find();
+    q = q.filter(sys_users::Column::Uid.eq(uid));
+
+    let res = q.into_model::<User>().one(db).await?;
+
+    if let Some(user) = res {
+        return Ok(user);
+    }
+
+    Err(anyhow!("用户不存在uid: {}", uid))
+}
+
+///
+/// 根据username查找用户信息
 /// 
 pub async fn find_user_by_username(
     db: &DbConn,
@@ -38,7 +57,7 @@ pub async fn find_user_by_username(
         return Ok(user);
     }
 
-    Err(anyhow!("User not exist: {}", username))
+    Err(anyhow!("用户不存在username: {}", username))
 }
 
 ///
@@ -47,9 +66,9 @@ pub async fn find_user_by_username(
 pub async fn create_user(
     db: &DbConn,
     new_user: &NewUser,
-) -> Result<User> {
+) -> Result<String> {
     if let Ok(user) = find_user_by_username(db, &new_user.username.as_str()).await {
-        return Ok(user);
+        return Err(anyhow!("用户已存在: {}", &new_user.username.as_str()));
     }
 
     let mut avatar: Option<String> = None;
@@ -73,8 +92,10 @@ pub async fn create_user(
         remark = Some(item.to_owned());
     }
 
-    let _ = sys_users::ActiveModel {
-        uid: Set(uuid()),
+    let uid = uuid();
+
+    let user_model = sys_users::ActiveModel {
+        uid: Set(String::from(uid.as_str())),
         username: Set(Some(String::from(&new_user.username))),
         nickname: Set(Some(String::from(&new_user.nickname))),
         password: Set(Some(String::from(&new_user.password))),
@@ -98,11 +119,13 @@ pub async fn create_user(
         ..Default::default()
     };
 
-    if let Ok(user) = find_user_by_username(db, &new_user.username.as_str()).await {
-        return Ok(user);
+    let res = SysUsers::insert(user_model).exec(db).await?;
+
+    if let InsertResult { last_insert_id } = res {
+        return Ok(last_insert_id);
     }
 
-    Err(anyhow!("User save failed: {}", &new_user.username))
+    return Err(anyhow!("用户保存失败：{:?}", &new_user.username));
 }
 
 ///

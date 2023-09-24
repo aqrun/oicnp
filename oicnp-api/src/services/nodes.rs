@@ -123,7 +123,7 @@ pub async fn save_node_content(
     Ok(format!(""))
 }
 
-pub async fn save_node(
+pub async fn create_node(
     db: &DatabaseConnection,
     new_node: &NewNode,
     bundle: &NodeBundle,

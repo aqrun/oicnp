@@ -2,7 +2,7 @@ use crate::DateTime;
 use sea_orm::FromQueryResult;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct NewUser {
     pub username: String,
     pub nickname: String,
