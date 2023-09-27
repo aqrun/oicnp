@@ -1,17 +1,22 @@
-pub fn oic_result_success<T>(data: T) -> OicResult<T> {
-    OicResult {
-        code: Some(String::from("200")),
+use crate::typings::OicRes;
+use oicnp_core::prelude::anyhow::Result;
+
+pub fn oic_ok<T>(data: T) -> Result<OicRes<T>> {
+    let res = OicRes {
+        code: String::from("200"),
+        message: None,
         is_success: true,
-        data,
-        ..OicResult::default()
-    }
+        data: Some(data),
+    };
+    Ok(res)
 }
 
-pub fn oic_result_error<T>(code: &str, message: &str) -> OicResult<T> {
-    OicResult {
-        code: Some(String::from(code)),
-        message: Some(String::from(message)),
+pub fn oic_err<T>(code: &str, msg: String) -> Result<OicRes<T>> {
+    let res = OicRes {
+        code: String::from(code),
+        message: Some(msg),
         is_success: false,
-        ..OicResult::default()
-    }
+        data: None,
+    };
+    Ok(res)
 }

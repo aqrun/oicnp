@@ -58,35 +58,27 @@ impl<T> ResListData<T>
 ///
 /// 返回单个数据信息
 ///
-#[derive(Debug, Clone, Deserialize, Serialize, Default)]
-pub struct OicResult<T> {
-    code: Option<String>,
-    message: Option<String>,
-    is_success: bool,
-    data: Option<T>,
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct OicRes<T> {
+    pub code: String,
+    pub message: Option<String>,
+    pub is_success: bool,
+    pub data: Option<T>,
 }
 
 #[Object]
-impl<T> OicResult<T> where T: Send + Sync + OutputType {
-    async fn code(&self) -> String {
-        if let Some(item) = &self.code {
-            return String::from(item);
-        }
-        return String::from("")
+impl<T> OicRes<T> where T: Send + Sync + OutputType {
+    async fn code(&self) -> &str {
+        self.code.as_str()
     }
-    async fn message(&self) -> String {
-        if let Some(item) = &self.message {
-            return String::from(item);
-        }
-        return String::from("")
+    async fn message(&self) -> &Option<String> {
+        &self.message
     }
     async fn is_success(&self) -> bool {
         self.is_success
     }
-    async fn data(&self) -> Option<T> {
-        if let Some(item) = self.data {
-            return Some(item);
-        }
-        return None;
+    async fn data(&self) -> &Option<T> {
+        &self.data
     }
 }
+
