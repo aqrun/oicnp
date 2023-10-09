@@ -8,7 +8,7 @@ pub use node::*;
 pub use roots::*;
 pub use user::*;
 
-// use crate::extensions::Auth as AuthExt;
+use crate::extensions::Resp as RespExt;
 use crate::{typings::State};
 use async_graphql::{
     http::{playground_source, GraphQLPlaygroundConfig},
@@ -22,8 +22,6 @@ use poem::{
     IntoResponse,
 };
 
-pub type GqlResult<T> = std::result::Result<T, async_graphql::Error>;
-
 pub async fn build_schema() -> Schema<QueryRoot, MutationRoot, EmptySubscription> {
     let db = DB.get_or_init(establish_connection).await;
 
@@ -32,8 +30,9 @@ pub async fn build_schema() -> Schema<QueryRoot, MutationRoot, EmptySubscription
         MutationRoot::default(),
         EmptySubscription,
     )
-    .data(db.clone())
-    .finish()
+        .data(db.clone())
+        .extension(RespExt)
+        .finish()
 }
 
 #[handler]

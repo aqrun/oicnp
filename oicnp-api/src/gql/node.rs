@@ -1,11 +1,11 @@
-use crate::models::Nodes;
+use crate::models::{Nodes, ResDetailNodeList};
 use crate::services::{
-    find_node_by_nid, find_node_by_vid, find_nodes, find_nodes_count, find_nodes_with_target_id,
+    find_node_by_nid, find_node_by_vid, find_nodes,
 };
-use crate::typings::{DetailNode, PagerInfo, ResListData};
+use crate::typings::GqlResult;
+use crate::utils::oic_err;
 use async_graphql::{
-    connection::{query, Connection, Edge, EmptyFields},
-    Context, FieldResult, Object,
+    Context, Object,
 };
 use oicnp_core::{
     prelude::anyhow::{anyhow, Result},
@@ -26,7 +26,7 @@ impl NodeQuery {
         order_dir: Option<String>,
         page: Option<i32>,
         page_size: Option<i32>,
-    ) -> Result<ResListData<DetailNode>> {
+    ) -> GqlResult<ResDetailNodeList> {
         let db = ctx.data_unchecked::<DatabaseConnection>();
         let page = page.unwrap_or(1);
         let page_size = page_size.unwrap_or(10);
@@ -51,19 +51,13 @@ impl NodeQuery {
 
         // println!("{:?}------res2", res);
 
-        match res {
+        return match res {
             Ok(res) => Ok(res),
             Err(err) => {
-                println!("Err find_nodes: {:?}", err);
-                Ok(ResListData {
-                    data: Vec::new(),
-                    page: 0,
-                    page_size: 0,
-                    total_pages: 0,
-                    total_count: 0,
-                })
+                let msg = err.to_string();
+                return Err(oic_err("400", msg.as_str()));
             }
-        }
+        };
     }
 
     async fn node(
@@ -111,7 +105,8 @@ pub struct NodeMutations;
 #[Object]
 impl NodeMutations {
     async fn create_node(&self, ctx: &Context<'_>, title: String) -> Result<String> {
-        Ok(format!("Node create success {}", title))
+        // Ok(format!("Node create success {}", title))
+        return Err(anyhow!(""))
     }
 }
 

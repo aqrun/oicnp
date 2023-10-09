@@ -1,5 +1,5 @@
 use crate::typings::DateFormat;
-use async_graphql::{InputObject, Object};
+use async_graphql::{InputObject, Object, SimpleObject};
 use oicnp_core::{
     models as core_models,
 };
@@ -86,7 +86,7 @@ impl Users {
                 .to_string()
         }
 
-        return String::from("")
+        String::from("")
     }
 
     async fn created_by(&self) -> &str {
@@ -110,7 +110,7 @@ impl Users {
                 .to_string()
         }
 
-        return String::from("")
+        String::from("")
     }
 
     async fn deleted_at(&self) -> String {
@@ -120,7 +120,7 @@ impl Users {
                 .to_string()
         }
 
-        return String::from("")
+        String::from("")
     }
 }
 
@@ -184,7 +184,7 @@ impl NewUser {
         }
 
         if let Some(item) = &self.is_admin {
-            nickname = String::from(item);
+            is_admin = String::from(item);
         }
 
         if let Some(item) = &self.department_id {
@@ -210,6 +210,101 @@ impl NewUser {
     }
 }
 
+#[derive(Clone, Debug, Default, InputObject)]
+pub struct UpdateUser {
+    pub uid: String,
+    pub username: Option<String>,
+    pub nickname: Option<String>,
+    pub password: Option<String>,
+    pub salt: Option<String>,
+    pub status: Option<String>,
+    pub email: Option<String>,
+    pub gender: Option<String>,
+    pub phone: Option<String>,
+    pub avatar: Option<String>,
+    pub role_id: Option<String>,
+    pub department_id: Option<String>,
+    pub remark: Option<String>,
+    pub is_admin: Option<String>,
+}
+
+impl UpdateUser {
+    pub fn to_core_update_user(&self) -> core_models::UpdateUser {
+        let mut username: Option<String> = None;
+        let mut nickname: Option<String> = None;
+        let mut password: Option<String> = None;
+        let mut status: Option<String> = None;
+        let mut email: Option<String> = None;
+        let mut gender: Option<String> = None;
+        let mut phone: Option<String> = None;
+        let mut avatar: Option<String> = None;
+        let mut role_id: Option<String> = None;
+        let mut department_id: Option<String> = None;
+        let mut remark: Option<String> = None;
+        let mut is_admin: Option<String> = None;
+
+        if let Some(item) = &self.username {
+            username = Some(String::from(item));
+        }
+        if let Some(item) = &self.nickname {
+            nickname = Some(String::from(item));
+        }
+        if let Some(item) = &self.password {
+            password = Some(String::from(item));
+        }
+        if let Some(item) = &self.status {
+            status = Some(String::from(item));
+        }
+        if let Some(item) = &self.email {
+            email = Some(String::from(item));
+        }
+        if let Some(item) = &self.gender {
+            gender = Some(String::from(item));
+        }
+        if let Some(item) = &self.phone {
+            phone = Some(String::from(item));
+        }
+        if let Some(item) = &self.avatar {
+            avatar = Some(String::from(item));
+        }
+        if let Some(item) = &self.role_id {
+            role_id = Some(String::from(item));
+        }
+        if let Some(item) = &self.department_id {
+            department_id = Some(String::from(item));
+        }
+        if let Some(item) = &self.remark {
+            remark = Some(String::from(item));
+        }
+        if let Some(item) = &self.is_admin {
+            is_admin = Some(String::from(item));
+        }
+
+        core_models::UpdateUser {
+            uid: String::from(&self.uid),
+            username,
+            nickname,
+            password,
+            status,
+            email,
+            gender,
+            phone,
+            avatar,
+            role_id,
+            department_id,
+            remark,
+            is_admin,
+            last_login_ip: None,
+            last_login_at: None,
+            created_by: None,
+            updated_by: None,
+            created_at: None,
+            updated_at: None,
+            deleted_at: None,
+        }
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct UserPictures {
     pub bundle: String,
@@ -220,4 +315,13 @@ pub struct UserPictures {
     pub title: String,
     pub width: i32,
     pub height: i32,
+}
+
+///
+/// 带分页的用户列表数据
+///
+#[derive(SimpleObject, Debug, Clone)]
+pub struct ResUserList {
+    pub data: Vec<Users>,
+    pub page_info: crate::typings::PagerInfo,
 }

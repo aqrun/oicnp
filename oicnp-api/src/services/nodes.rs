@@ -1,5 +1,5 @@
-use crate::models::{NewNode, NodeBody, Nodes, Taxonomies};
-use crate::typings::{BodyFormat, Count, DetailNode, ResListData};
+use crate::models::{NewNode, NodeBody, Nodes, Taxonomies, ResDetailNodeList};
+use crate::typings::{BodyFormat, Count, DetailNode};
 use oicnp_core::{
     entities::cms_nodes,
     prelude::anyhow::{anyhow, Result},
@@ -17,7 +17,7 @@ pub async fn find_nodes(
     order_dir: &str,  // DESC
     page: u64,
     page_size: u64,
-) -> Result<ResListData<DetailNode>> {
+) -> Result<ResDetailNodeList> {
     let res = core_services::find_nodes(
         db, bundle, category, filters, order_name, order_dir, page, page_size,
     )
@@ -33,12 +33,13 @@ pub async fn find_nodes(
         })
         .collect::<Vec<DetailNode>>();
 
-    let res_list_data = ResListData {
+    let res_list_data = ResDetailNodeList {
         data,
-        page: res.page,
-        page_size: res.page_size,
-        total_pages: res.total_pages,
-        total_count: res.total_count,
+        page_info: crate::typings::PagerInfo {
+            page: res.page as i32,
+            page_size: res.page_size as i32,
+            total_count: res.total_count as i32,
+        },
     };
     Ok(res_list_data)
 }

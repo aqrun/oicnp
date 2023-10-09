@@ -1,23 +1,17 @@
-use async_graphql::{Object, Context};
+use async_graphql::{Object, Context, SimpleObject};
 use crate::models::{Taxonomies, Users};
 use crate::services::{
     find_node_body,
     find_node_taxonomies,
 };
-use crate::typings::{DateFormat, TaxonomyBundle};
+use crate::typings::DateFormat;
 use oicnp_core::{
     DateTime, DatabaseConnection,
-    entities::{
-        cms_nodes,
-    },
     prelude::{
-        chrono::prelude::*,
         anyhow::{anyhow, Result}
     },
     models::{Node, NodeBody as CoreNodeBody},
-    typings::NodeBundle,
 };
-use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug)]
 pub struct Nodes {
@@ -218,4 +212,16 @@ pub struct NodeImagesMap {
     pub title: String,
     pub width: i32,
     pub height: i32,
+}
+
+#[derive(SimpleObject, Debug, Clone)]
+pub struct ResNodeList {
+    pub data: Vec<Nodes>,
+    pub page_info: crate::typings::PagerInfo,
+}
+
+#[derive(SimpleObject, Debug, Clone)]
+pub struct ResDetailNodeList {
+    pub data: Vec<crate::typings::DetailNode>,
+    pub page_info: crate::typings::PagerInfo,
 }

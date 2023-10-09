@@ -6,6 +6,8 @@ use oicnp_core::{
 };
 use serde::{Serialize, Deserialize};
 
+pub type GqlResult<T> = std::result::Result<T, async_graphql::Error>;
+
 #[derive(Display, Debug)]
 pub enum TaxonomyBundle {
     #[strum(serialize = "category")]
