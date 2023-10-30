@@ -6,10 +6,9 @@ use crate::prelude::*;
 use crate::models::{NewUser, User, UpdateUser};
 use crate::entities::{
     sys_users,
-    prelude::{SysUsers},
+    prelude::SysUsers,
 };
 use crate::utils::{uuid, encrypt_password, generate_salt};
-use chrono::prelude::NaiveDateTime;
 
 ///
 /// 查询用户列表
@@ -132,7 +131,7 @@ pub async fn create_user(
     new_user: &NewUser,
     user_id: &str,
 ) -> Result<String> {
-    if let Ok(user) = find_user_by_username(db, &new_user.username.as_str()).await {
+    if let Ok(_) = find_user_by_username(db, &new_user.username.as_str()).await {
         return Err(anyhow!("用户已存在: {}", &new_user.username.as_str()));
     }
 
@@ -140,6 +139,9 @@ pub async fn create_user(
     let mut role_id: Option<String> = None;
     let mut department_id: Option<String> = None;
     let mut remark: Option<String> = None;
+
+    let salt = generate_salt();
+    let pass = encrypt_password(salt.as_str(), &new_user.password);
 
     if let Some(item) = &new_user.avatar {
         avatar = Some(item.to_owned());
@@ -158,13 +160,14 @@ pub async fn create_user(
     }
 
     let uid = uuid();
+    let now = chrono::Utc::now();
 
     let user_model = sys_users::ActiveModel {
         uid: Set(String::from(uid.as_str())),
         username: Set(Some(String::from(&new_user.username))),
         nickname: Set(Some(String::from(&new_user.nickname))),
-        password: Set(Some(String::from(&new_user.password))),
-        salt: Set(Some(String::from(&new_user.salt))),
+        password: Set(Some(String::from(pass.as_str()))),
+        salt: Set(Some(String::from(salt.as_str()))),
         status: Set(Some(String::from(&new_user.status))),
         email: Set(Some(String::from(&new_user.email))),
         gender: Set(Some(String::from(&new_user.gender))),
@@ -178,7 +181,7 @@ pub async fn create_user(
         last_login_at: Set(new_user.last_login_at),
         created_by: Set(String::from(user_id)),
         updated_by: Set(Some(String::from(""))),
-        created_at: Set(new_user.created_at),
+        created_at: Set(now.naive_local()),
         updated_at: Set(None),
         deleted_at: Set(new_user.deleted_at),
         ..Default::default()
@@ -306,6 +309,20 @@ pub async fn remove_user(
         return Err(anyhow!("NOT_AUTHORIZED"));
     }
 
+    SysUsers::delete_many()
+        .filter(sys_users::Column::Uid.eq(uid))
+        .exec(db)
+        .await?;
+    Ok(String::from("清除成功"))
+}
+
+///
+/// 强制清除用户
+///
+pub async fn force_remove_user(
+    db: &DbConn,
+    uid: &str,
+) -> Result<String> {
     SysUsers::delete_many()
         .filter(sys_users::Column::Uid.eq(uid))
         .exec(db)

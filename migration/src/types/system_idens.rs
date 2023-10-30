@@ -1,5 +1,5 @@
 use oicnp_core::prelude::sea_orm_migration::prelude::*;
-use oicnp_derives::{Column as OicColumn};
+use oicnp_derives::Column as OicColumn;
 
 #[derive(Iden, OicColumn)]
 pub enum SysApiDb {
@@ -434,9 +434,9 @@ pub enum SysUsers {
     Username,
     #[oic(type = "string", len = 60, default(""), comment = "")]
     Nickname,
-    #[oic(type = "string", len = 32, default(""), comment = "")]
+    #[oic(type = "string", len = 64, default(""), comment = "")]
     Password,
-    #[oic(type = "string", len = 32, default(""), comment = "")]
+    #[oic(type = "string", len = 64, default(""), comment = "")]
     Salt,
     #[oic(type = "char", len = 1, default(""), comment = "")]
     Status,

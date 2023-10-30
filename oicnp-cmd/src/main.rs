@@ -7,6 +7,7 @@ use cmd::{
     run as blog_run, save_blogs,
     my_test::run as my_test_run,
     truncate_tables,
+    init_user::run as init_user_run,
 };
 use oicnp_core::prelude::dotenv;
 use oicnp_core::utils::get_env_config;
@@ -16,7 +17,6 @@ mod cli;
 mod cmd;
 mod models;
 mod constants;
-mod services;
 
 #[tokio::main]
 async fn main() {
@@ -36,6 +36,9 @@ async fn main() {
         },
         Command::TruncateTables => {
             truncate_tables().await;
-        }
+        },
+        Command::InitUser => {
+            init_user_run().await;
+        },
     }
 }

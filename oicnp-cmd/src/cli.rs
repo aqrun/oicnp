@@ -22,4 +22,5 @@ pub enum Command {
     SaveBlogs,
     MyTest,
     TruncateTables,
+    InitUser,
 }
