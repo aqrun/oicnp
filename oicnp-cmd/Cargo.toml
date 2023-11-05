@@ -4,6 +4,10 @@ version = "0.0.1"
 authors = ["Aqrun <aqrun@sina.com>"]
 edition = "2021"
 
+[[bin]]
+path = "src/main.rs"
+name = "oic"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
@@ -15,7 +19,7 @@ tokio = { version = "^1", features = ["macros", "rt-multi-thread", "sync", "park
 regex = "^1"
 gray_matter = "^0"
 rand = "^0"
-scru128 = "^2"
+scru128 = "^3"
 clap = { version = "^4", features = ["derive"] }
 async-std = { version = "^1", features = ["attributes", "tokio1"] }
 lazy_static = "^1"

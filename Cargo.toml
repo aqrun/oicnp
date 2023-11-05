@@ -1,4 +1,12 @@
 [workspace]
-members = ["oicnp-api", "migration", "oicnp-derives", "oicnp-core", "oicnp-cmd", "oicnp-links"]
+members = [
+    "oicnp-api",
+    "migration",
+    "oicnp-derives",
+    "oicnp-core",
+    "oicnp-cmd",
+    "oicnp-links",
+    "frontend"
+]
 exclude = ["oicnp-backend", "oicnp-frontend", "oicnp-yew", "docs"]
 default-members = ["oicnp-api"]

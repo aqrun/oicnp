@@ -100,6 +100,7 @@ export const NODES_QUERY = gql`
 `;
 
 export const queryNodes = (options: Partial<QueryNodesRequestParams> = {}) => {
+  return null;
   const variables = {
     ...options,
   };

@@ -47,6 +47,7 @@ module.exports = withLess({
 
 module.exports = (phase, { defaultConfig }) => {
   const config = {
+    transpilePackages: ['ahooks'],
     trailingSlash: false,
     compiler: {
       styledComponents: true,

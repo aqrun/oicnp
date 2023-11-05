@@ -24,7 +24,7 @@ const Blog: React.FC<BlogProps> = ({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export const getServerSideProps1: GetServerSideProps = async ({ params }) => {
   const slug = (params?.slug || '') as string;
   const nid = Number(params?.nid) || 0;
 
