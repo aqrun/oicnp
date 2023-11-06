@@ -10,3 +10,9 @@ cargo run --features ssr --release
 
 dx serve --features ssr --hot-reload --platform desktop
 ```
+
+## tailwind
+
+```fish
+pnpm tailwindcss -i ./input.css -o ./public/tailwind.css --watch
+```
