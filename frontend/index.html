@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{app_title}</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+    <meta name="description" content="An elegant GUI library for Rust, inspired by React. Supports Web, Desktop, SSR, Liveview, and Mobile.">
+
+    <link rel="icon shortcut" type="image/png" href="{base_path}static/favicon.png" />
+    <!-- Social meta stuff -->
+    <!-- open graph -->
+    <meta
+      property="og:title"
+      content="Dioxus - Reliable Rust apps that run anywhere"
+    />
+
+    <meta property="og:type" content="website" />
+
+    <meta
+      property="og:description"
+      content="An elegant GUI library for Rust, inspired by React. Supports Web, Desktop, SSR, Liveview, and Mobile."
+    />
+
+    <meta property="og:url" content="https://oicnp.com/dioxus/" />
+
+    <meta
+      property="og:image"
+      content="https://oicnp.com/dioxus/static/opengraph.png"
+    />
+
+    <!-- twitter -->
+    <meta
+      name="twitter:title"
+      content="Dioxus - Reliable Rust apps that run anywhere"
+    />
+    <meta
+      name="twitter:description"
+      content="An elegant GUI library for Rust, inspired by React. Supports Web, Desktop, SSR, Liveview, and Mobile."
+    />
+    <meta
+      name="twitter:image"
+      content="https://oicnp.com/dioxus/static/opengraph.png"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    {style_include}
+  </head>
+
+  <body>
+    <div id="main"></div>
+    <!-- Note the usage of `type=module` here as this is an ES6 module -->
+    <script type="module">
+      import init from "{base_path}assets/dioxus/{app_name}.js";
+      init("{base_path}assets/dioxus/{app_name}_bg.wasm").then((wasm) => {
+        if (wasm.__wbindgen_start == undefined) {
+          wasm.main();
+        }
+      });
+    </script>
+    {script_include}
+  </body>
+</html>

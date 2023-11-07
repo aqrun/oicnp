@@ -4,12 +4,21 @@ module.exports = {
     content: ["./src/**/*.{rs,html,css}", "./docs/**/*.html"],
     theme: {
       extend: {
+        height: {
+            800: '800px',
+        },
         colors: {
-          ghmetal: "#24292f",
-          ghdarkmetal: "#161b22",
-          ideblack: "#0e1116",
-          // ideblack: "#0a0a0a",
-          // ideblack: "#0E1116",
+            purple: {
+                300: '#8a4baf',
+                DEFAULT: '#663399',
+                500: '#542c85',
+                900: '#11081f',
+            },
+            black: {
+                300: '#97a3b7',
+                DEFAULT: '#48434f',
+                500: '#232129',
+            },
         },
         fontFamily: {
           sans: ["Lexend", "sans-serif"],
