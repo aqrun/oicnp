@@ -4,14 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "css": "pnpm tailwindcss -i ./input.css -o ./public/tailwind.css --watch",
-    "dev": "dx serve --features ssr --hot-reload --platform desktop",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start-style": "concurrently 'npm:start-sass' 'npm:start-tailwind'",
+    "start-sass": "sass src/styles/index.scss node_modules/input.css -w --no-source-map",
+    "start-tailwind": "pnpm tailwindcss -i node_modules/input.css -o ./public/tailwind.css --watch",
+    "start-dioxus-web": "dx serve --features web --hot-reload",
+    "start-dioxus-ssr": "dx serve --features ssr --hot-reload --platform desktop"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
+  "devDependencies": {
+    "autoprefixer": "^10.4.16",
+    "concurrently": "^8.2.2",
+    "postcss": "^8.4.31",
     "tailwindcss": "^3.3.5"
   }
 }

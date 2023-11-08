@@ -5,7 +5,15 @@ module.exports = {
     theme: {
       extend: {
         height: {
-            800: '800px',
+            // 58px
+            58: '3.625rem',
+            800: '50rem',
+        },
+        lineHeight: {
+            58: '3.625rem',
+        },
+        padding: {
+            58: '3.625rem',
         },
         colors: {
             purple: {

@@ -11,8 +11,15 @@ cargo run --features ssr --release
 dx serve --features ssr --hot-reload --platform desktop
 ```
 
+## sass 安装
+
+```fish
+npm install -g sass
+```
+
 ## tailwind
 
 ```fish
-pnpm tailwindcss -i ./input.css -o ./public/tailwind.css --watch
+sass -w input.scss node_modules/input.css
+pnpm tailwindcss -i node_modules/input.css -o ./public/tailwind.css --watch
 ```

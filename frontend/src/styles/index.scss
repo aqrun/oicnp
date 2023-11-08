@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-size: 16px;
+    min-height: 100vh;
+  }
+
+  body {
+    font-family: 'PingFang SC','Microsoft YaHei', 'WenQuanYi Micro Hei', 'Verdana','Helvetica Neue', 'Arial', 'Hiragino Sans GB', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .oic-header-nav {
+    a {
+      &.oic-active {
+        opacity: 1;
+      }
+    }
+  }
+
+  .oic-btn-default {
+    @apply inline-flex items-center cursor-pointer justify-center no-underline
+     text-white font-bold text-lg py-2 px-5 bg-purple border border-solid
+      border-purple rounded-lg hover:bg-purple-500 transition-all duration-200;
+  }
+
+  .oic-btn-simple {
+    @apply inline-flex items-center cursor-pointer justify-center 
+    text-purple-300 font-bold no-underline text-lg py-2 px-5 
+    bg-transparent border border-solid border-transparent rounded-lg 
+    transition-all duration-200 hover:text-purple;
+  }
+
+  .oic-widget {
+    @apply clear-both mb-4 bg-white rounded-md overflow-hidden;
+  }
+
+  .oic-widget-title {
+    @apply relative m-0 h-9 leading-9 px-4 text-sm bg-slate-100 font-semibold border-b border-solid border-slate-200;
+  }
+
+  .oic-hot-tags {
+    @apply pt-4 pl-3 pb-3 pr-4;
+
+    .oic-tag-item {
+      &:nth-child(9n) {
+        background-color: #4a4a4a
+      }
+
+      &:nth-child(9n+1) {
+        background-color: #428bca
+      }
+
+      &:nth-child(9n+2) {
+        background-color: #5cb85c
+      }
+
+      &:nth-child(9n+3) {
+        background-color: #d9534f
+      }
+
+      &:nth-child(9n+4) {
+        background-color: #567e95
+      }
+
+      &:nth-child(9n+5) {
+        background-color: #b433ff
+      }
+
+      &:nth-child(9n+6) {
+        background-color: #00aba9
+      }
+
+      &:nth-child(9n+7) {
+        background-color: #b37333
+      }
+
+      &:nth-child(9n+8) {
+        background-color: #f60
+      }
+    }
+  }
+}

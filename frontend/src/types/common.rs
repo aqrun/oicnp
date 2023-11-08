@@ -8,9 +8,23 @@ pub enum MenuId {
     Diary = 600,
 }
 
+impl MenuId {
+    pub fn get_vid(&self) -> &str {
+        match self {
+            Self::Home => "home",
+            Self::Backend => "backend",
+            Self::Frontend => "frontend",
+            Self::Server => "server",
+            Self::Rust => "rust",
+            Self::Diary => "diary",
+            _ => "home",
+        }
+    }
+}
+
 pub struct MenuItem {
     pub id: MenuId,
-    pub name: String,
-    pub href: String,
-    pub vid: String,
+    pub name: &'static str,
+    pub href: &'static str,
+    pub vid: &'static str,
 }
