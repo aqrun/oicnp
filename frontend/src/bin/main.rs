@@ -1,10 +1,7 @@
 fn main() {
-    let use_web_render = false;
+    #[cfg(feature = "web")]
+    dioxus_web::launch(frontend::App);
 
-    if use_web_render {
-        #[cfg(feature = "web")]
-        dioxus_web::launch(frontend::App);
-    } else {
-        frontend::app_run();
-    }
+    #[cfg(feature = "ssr")]
+    frontend::app_run();
 }

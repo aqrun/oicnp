@@ -36,11 +36,11 @@ watch_path = ["src", "public"]
 
 # CSS style file
 style = [
-    "https://at.alicdn.com/t/c/font_3063613_ze5igclnbh.css",
+    "https://at.alicdn.com/t/c/font_3063613_mx8r4aut8y.css",
     "https://cdn.bootcdn.net/ajax/libs/highlight.js/11.3.1/styles/base16/solarized-dark.min.css",
     "https://cdn.staticfile.org/normalize/6.0.0/normalize.min.css",
     "https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css",
-    "tailwind.css",
+    "tailwind.css?v=0.1",
 ]
 
 # Javascript code file
