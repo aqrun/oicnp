@@ -39,7 +39,7 @@ export const ArticleItem: React.FC<ArticleItemProps> = () => {
                 如何去阅读源码，18条心法祝你修炼神功！
               </p>
             </div>
-        )}
+          )}
         </div>
         <div className="oic-article-img 
           ml-5 w-44

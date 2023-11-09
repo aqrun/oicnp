@@ -1,6 +1,9 @@
 use dioxus::prelude::*;
 use super::Banner;
-use crate::components::layouts::{Header, Footer};
+use super::Article;
+use crate::components::layouts::{
+    Header, Footer, PageMain, MainSection,
+};
 use crate::types::MenuId;
 
 pub fn HomePage(cx: Scope) -> Element {
@@ -10,9 +13,19 @@ pub fn HomePage(cx: Scope) -> Element {
             Header {
                 active_vid: MenuId::Home.get_vid(),
             }
-            main {
-                class: "oic-main-sections mx-auto grid",
+            PageMain {
+                class: "oic-home-main",
                 Banner {}
+                MainSection {
+                    div {
+                        class: "oic-article-list",
+                        (1..10).map(|_| {
+                            rsx! (
+                                Article {}
+                            )
+                        })
+                    }
+                }
             }
             Footer {}
         }

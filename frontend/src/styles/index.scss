@@ -12,6 +12,7 @@
     font-family: 'PingFang SC','Microsoft YaHei', 'WenQuanYi Micro Hei', 'Verdana','Helvetica Neue', 'Arial', 'Hiragino Sans GB', sans-serif;
     font-size: 14px;
     min-height: 100vh;
+    @apply bg-slate-100;
   }
 }
 
@@ -33,7 +34,7 @@
   .oic-btn-simple {
     @apply inline-flex items-center cursor-pointer justify-center 
     text-purple-300 font-bold no-underline text-lg py-2 px-5 
-    bg-transparent border border-solid border-transparent rounded-lg 
+    bg-transparent border border-solid border-purple rounded-lg 
     transition-all duration-200 hover:text-purple;
   }
 
@@ -42,7 +43,8 @@
   }
 
   .oic-widget-title {
-    @apply relative m-0 h-9 leading-9 px-4 text-sm bg-slate-100 font-semibold border-b border-solid border-slate-200;
+    @apply relative m-0 h-9 leading-9 px-4 text-sm bg-purple text-slate-200 
+        font-semibold border-b border-solid border-slate-200;
   }
 
   .oic-hot-tags {
