@@ -1,6 +1,5 @@
 use dioxus::prelude::*;
-use super::Banner;
-use super::Article;
+use super::{Banner, Article, Projects, Roster};
 use crate::components::layouts::{
     Header, Footer, PageMain, MainSection,
 };
@@ -26,6 +25,9 @@ pub fn HomePage(cx: Scope) -> Element {
                         })
                     }
                 }
+                Projects {}
+
+                Roster {}
             }
             Footer {}
         }

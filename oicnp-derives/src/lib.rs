@@ -1,3 +1,5 @@
+#[allow(dead_code)]
+
 pub(crate) mod attributes;
 pub(crate) mod column;
 pub(crate) mod utils;

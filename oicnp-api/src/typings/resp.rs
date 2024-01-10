@@ -1,5 +1,31 @@
-use async_graphql::{Object, OutputType};
+use async_graphql::{Object, SimpleObject};
 use serde::{Deserialize, Serialize};
+use serde_json::{json, Value};
+
+#[derive(SimpleObject, Debug, Clone, Serialize, Deserialize)]
+pub struct JsonResponse {
+    code: Value,
+    message: Value,
+    data: Value,
+}
+
+impl JsonResponse {
+    pub fn success(data: Value) -> Self {
+        Self {
+            code: json!("200"),
+            message: Value::Null,
+            data,
+        }
+    }
+
+    pub fn error(code: Value, message: Value) -> Self {
+        Self {
+            code,
+            message,
+            data: Value::Null,
+        }
+    }
+}
 
 ///
 /// 分页数据信息

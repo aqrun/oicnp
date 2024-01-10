@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use dioxus_router::prelude::*;
 use web_sys::{console, Document};
 use crate::get_url;
-use crate::constants::MAIN_MENU_ITEMS;
+use crate::constants::{MAIN_MENU_ITEMS, SITE_NAME};
 
 #[inline_props]
 pub fn Header(
@@ -43,7 +43,7 @@ pub fn Header(
                     }
                     span {
                         class: "oic-logo-text text-white text-xl break-keep",
-                        "爱习网"
+                        SITE_NAME
                     }
                 }
             }

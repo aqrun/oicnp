@@ -16,7 +16,7 @@ asset_dir = "public"
 [web.app]
 
 # HTML title tag content
-title = "爱习网 | ⛺"
+title = "爱喜 | ⛺"
 
 base_path = "/"
 

@@ -4,7 +4,7 @@ use oicnp_derives::Column as OicColumn;
 #[derive(Iden, OicColumn)]
 pub enum SysApiDb {
     Table,
-    #[oic()]
+    // #[oic()]
     ApiId,
     Db,
 }

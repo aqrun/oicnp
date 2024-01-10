@@ -1,0 +1,20 @@
+[
+    {
+        "name": "SeaORM",
+        "desc": "🐚 异步动态ORM",
+        "href": "https://www.oicnp.com/sea-orm/",
+        "tags": [
+            { "name": "GitHub", "href": "https://github.com/SeaQL/sea-orm" },
+            { "name": "Docs", "href": "https://www.oicnp.com/sea-orm/SeaORM/" }
+        ]
+    },
+    {
+        "name": "Prisma Client Rust",
+        "desc": "🔱 Prisma Rust 客户端",
+        "href": "https://oicnp.com/rust-prisma/",
+        "tags": [
+            { "name": "GitHub", "href": "https://github.com/SeaQL/sea-orm" },
+            { "name": "Docs", "href": "https://oicnp.com/rust-prisma/" }
+        ]
+    }
+]

@@ -1,28 +1,24 @@
 use oicnp_core::{
     entities::{
-        cms_node_body, cms_nodes, cms_taxonomies,
-        prelude::{CmsNodeBody, CmsNodes, CmsTaxonomies},
+        cms_nodes, cms_taxonomies,
+        prelude::{CmsNodes, CmsTaxonomies},
     },
     establish_connection,
-    models::{Node, NodeBody},
-    prelude::{
-        sea_orm::*,
-        serde::{Deserialize, Serialize},
-        snowflake::{SnowflakeIdBucket, SnowflakeIdGenerator},
-    },
-    services::{find_node_taxonomies, find_nodes, find_nodes_count, find_taxonomy_by_vid},
+    prelude::sea_orm::*,
+    services::{find_node_taxonomies, find_nodes},
     typings::NodeBundle,
     utils::{
-        capture_file_name, get_config_file_path, slugify_paths_without_date, uuid, youdao_translate,
+        get_config_file_path, slugify_paths_without_date, uuid,
     },
     DatabaseConnection, DB,
 };
+use migration::types::CmsFiles;
 
 pub async fn run() {
     println!("Test run----");
-    let db = DB.get_or_init(establish_connection).await;
-    let bundle = NodeBundle::Article.to_string();
-    let category = "rust";
+    // let db = DB.get_or_init(establish_connection).await;
+    // let bundle = NodeBundle::Article.to_string();
+    // let category = "rust";
 
     // let count = find_nodes_count(db, &bundle, category).await;
     // let res = find_taxonomy_by_vid(db, category).await;
@@ -35,7 +31,13 @@ pub async fn run() {
     // get_node_taxonomies(db).await;
     //
     // column_from_str();
-    generate_uuid();
+    // generate_uuid();
+    derive_test();
+}
+
+fn derive_test() {
+    let file_name = CmsFiles::table_name("oic_");
+    println!("file____  {:?} --- {}", file_name.to_string(), CmsFiles::Table.to_string());
 }
 
 fn generate_uuid() {

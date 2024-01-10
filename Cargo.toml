@@ -6,7 +6,8 @@ members = [
     "oicnp-core",
     "oicnp-cmd",
     "oicnp-links",
-    "frontend"
+    "frontend",
+    "oicnp-zino",
 ]
 exclude = ["oicnp-backend", "oicnp-frontend", "oicnp-yew", "docs"]
 default-members = ["oicnp-api"]

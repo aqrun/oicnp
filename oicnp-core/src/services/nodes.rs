@@ -7,10 +7,10 @@ use crate::entities::{
     sys_users,
 };
 use crate::models::{
-    DetailNode, NewNode, Node, NodeBody, NodeCount, NodeTaxonomiesMap, Taxonomies,
+    DetailNode, NewNode, Node, NodeBody, NodeTaxonomiesMap, Taxonomies,
     NodeTagsMap, Tag,
 };
-use crate::typings::{BodyFormat, Count, ListData, NodeBundle};
+use crate::typings::{BodyFormat, ListData, NodeBundle};
 use crate::utils::uuid;
 use crate::DatabaseConnection;
 use crate::services::update_tag_count_by_id;
@@ -239,8 +239,9 @@ pub async fn find_node_by_vid(
     q = q.filter(cms_nodes::Column::Vid.eq(vid));
     q = q.filter(cms_nodes::Column::Bundle.eq(bundle.to_string()));
     q = q.filter(cms_nodes::Column::Deleted.eq("0"));
-
-    let res = q.into_model::<Node>().one(db).await?;
+    let a = q.clone().into_json().one(db).await?;
+    let res = q.clone().into_model::<Node>().one(db).await?;
+    let b = q.clone().into_model::<cms_nodes::Model>().one(db).await?;
 
     if let Some(node) = res {
         return Ok(node);

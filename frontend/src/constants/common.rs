@@ -2,6 +2,8 @@ use crate::types::{MenuId, MenuItem};
 use once_cell::sync::Lazy;
 use std::sync::Arc;
 
+pub const SITE_NAME: &'static str = "爱喜";
+
 /// 主菜单项
 pub static MAIN_MENU_ITEMS: Lazy<Vec<MenuItem>> = Lazy::new(|| {
     vec![

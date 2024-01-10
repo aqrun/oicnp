@@ -16,3 +16,4 @@ bae = "^0"
 darling = "^0"
 proc-macro-crate = "^1"
 thiserror = "^1"
+oicnp_core = { path = "../oicnp-core" }

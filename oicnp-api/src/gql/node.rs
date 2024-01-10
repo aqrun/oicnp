@@ -2,7 +2,7 @@ use crate::models::{Nodes, ResDetailNodeList};
 use crate::services::{
     find_node_by_nid, find_node_by_vid, find_nodes,
 };
-use crate::typings::GqlResult;
+use crate::typings::{GqlResult, JsonResponse};
 use crate::utils::oic_err;
 use async_graphql::{
     Context, Object,
@@ -11,13 +11,21 @@ use oicnp_core::{
     prelude::anyhow::{anyhow, Result},
     typings::NodeBundle,
     DatabaseConnection,
+    entities::cms_nodes,
 };
+use serde_json::json;
 
 #[derive(Default)]
 pub struct NodeQuery;
 
 #[Object]
 impl NodeQuery {
+    async fn find_node(
+        &self,
+    ) -> GqlResult<JsonResponse> {
+        Ok(JsonResponse::success(json!({})))
+    }
+
     async fn nodes(
         &self,
         ctx: &Context<'_>,
@@ -51,13 +59,13 @@ impl NodeQuery {
 
         // println!("{:?}------res2", res);
 
-        return match res {
+        match res {
             Ok(res) => Ok(res),
             Err(err) => {
                 let msg = err.to_string();
                 return Err(oic_err("400", msg.as_str()));
             }
-        };
+        }
     }
 
     async fn node(

@@ -41,7 +41,7 @@ pub fn BannerText(cx: Scope) -> Element {
                     class: "text-3xl lg:text-4xl font-bold text-black-500",
                     b {
                         class: "text-purple",
-                        "爱而习之"
+                        "爱而喜之"
                     }
                     br {}
                     "学而不思则惘，思而不学则殆"

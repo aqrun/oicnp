@@ -1,0 +1,308 @@
+  [2m2023-12-21T21:00:03.74792+08:00[0m [34mDEBUG[0m [1;34mzino::middleware::tower_tracing[0m[34m: [34mstarted processing request[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/middleware/tower_tracing.rs:134
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "8000000001"
+
+  [2m2023-12-21T21:00:03.749635+08:00[0m [32m INFO[0m [1;32mzino::middleware::tower_tracing[0m[32m: [32mfinished processing request[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/middleware/tower_tracing.rs:162
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "8000000001", [1mhttp.response.header.traceparent[0m: "00-018c8c762b2475a2bb00e3f6e955fb1b-0000008000000001-03", [1mhttp.response.header.tracestate[0m: "zino=8000000001", [1mhttp.response.header.server_timing[0m: "total;dur=0.494", [1mcontext.trace_id[0m: "018c8c76-2b24-75a2-bb00-e3f6e955fb1b", [1mcontext.request_id[0m: "018c8c76-2b24-795e-ba94-c9d147120709", [1mhttp.response.status_code[0m: 200, [1motel.status_code[0m: "OK"
+
+  [2m2023-12-21T21:00:03.752859+08:00[0m [34mDEBUG[0m [1;34mzino::middleware::tower_tracing[0m[34m: [34mflushed 128 bytes[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/middleware/tower_tracing.rs:166
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "8000000001", [1mhttp.response.header.traceparent[0m: "00-018c8c762b2475a2bb00e3f6e955fb1b-0000008000000001-03", [1mhttp.response.header.tracestate[0m: "zino=8000000001", [1mhttp.response.header.server_timing[0m: "total;dur=0.494", [1mcontext.trace_id[0m: "018c8c76-2b24-75a2-bb00-e3f6e955fb1b", [1mcontext.request_id[0m: "018c8c76-2b24-795e-ba94-c9d147120709", [1mhttp.response.status_code[0m: 200, [1motel.status_code[0m: "OK"
+
+  [2m2023-12-21T21:19:59.231729+08:00[0m [33m WARN[0m [1;33mzino_core::orm::manager[0m[33m: [33mclosing the connection pool for the `main` service[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/orm/manager.rs:91
+
+  [2m2023-12-21T21:19:59.360167+08:00[0m [33m WARN[0m [1;33mzino_core::orm::manager[0m[33m: [33mclosing the connection pool for the `main` service[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/orm/manager.rs:91
+
+  [2m2023-12-21T21:19:59.362208+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33msignal received, starting graceful shutdown[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:277
+
+  [2m2023-12-21T21:19:59.39496+08:00[0m [33m WARN[0m [1;33mzino_core::orm::manager[0m[33m: [33mclosing the connection pool for the `main` service[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/orm/manager.rs:91
+
+  [2m2023-12-21T21:19:59.394998+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33msignal received, starting graceful shutdown[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:277
+
+  [2m2023-12-21T21:19:59.39506+08:00[0m [33m WARN[0m [1;33mzino_core::orm::manager[0m[33m: [33mclosing the connection pool for the `main` service[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/orm/manager.rs:91
+
+  [2m2023-12-21T21:19:59.395084+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33msignal received, starting graceful shutdown[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:277
+
+  [2m2023-12-21T21:19:59.395485+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33msignal received, starting graceful shutdown[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:277
+
+  [2m2023-12-21T21:34:07.855651+08:00[0m [32m INFO[0m [1;32mzino_core::state::config[0m[32m: [32m`config.dev.toml` loaded, [1;32menv[0m[32m: "dev"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/state/config.rs:32
+
+  [2m2023-12-21T21:34:07.856204+08:00[0m [33m WARN[0m [1;33mzino_core::state[0m[33m: [33mraw password `1****6` should be encypted, [1;33mencrypted_password[0m[33m: "TuxWjessH1QsMQaprK8NBQTQmWxV8w"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/state/mod.rs:207
+
+  [2m2023-12-21T21:34:07.856916+08:00[0m [33m WARN[0m [1;33mzino_core::orm[0m[33m: [33mconnect to database services lazily, [1;33mdriver[0m[33m: "postgres"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/orm/mod.rs:250
+
+  [2m2023-12-21T21:34:08.065602+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33mlisten on `127.0.0.1:6070`, [1;33mserver_tag[0m[33m: "debug", [1;33mapp_env[0m[33m: "dev", [1;33mapp_name[0m[33m: "data-cube", [1;33mapp_version[0m[33m: "0.6.4"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:86
+
+  [2m2023-12-21T21:34:08.066279+08:00[0m [32m INFO[0m [1;32mzino::application::axum_cluster[0m[32m: [32mRapiDoc router `/rapidoc` is registered for `127.0.0.1:6070`[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:197
+
+  [2m2023-12-21T21:34:08.066599+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33mlisten on `127.0.0.1:6080`, [1;33mserver_tag[0m[33m: "main", [1;33mapp_env[0m[33m: "dev", [1;33mapp_name[0m[33m: "data-cube", [1;33mapp_version[0m[33m: "0.6.4"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:86
+
+  [2m2023-12-21T21:34:08.066703+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33mlisten on `127.0.0.1:6081`, [1;33mserver_tag[0m[33m: "portal", [1;33mapp_env[0m[33m: "dev", [1;33mapp_name[0m[33m: "data-cube", [1;33mapp_version[0m[33m: "0.6.4"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:86
+
+  [2m2023-12-21T21:34:08.066806+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33mlisten on `127.0.0.1:6082`, [1;33mserver_tag[0m[33m: "admin", [1;33mapp_env[0m[33m: "dev", [1;33mapp_name[0m[33m: "data-cube", [1;33mapp_version[0m[33m: "0.6.4"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:86
+
+  [2m2023-12-21T21:34:15.479355+08:00[0m [34mDEBUG[0m [1;34mzino::middleware::tower_tracing[0m[34m: [34mstarted processing request[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/middleware/tower_tracing.rs:134
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1"
+
+  [2m2023-12-21T21:34:15.538843+08:00[0m [34mDEBUG[0m [1;34mzino_core::model::hook[0m[34m: [1;34mquery_id[0m[34m: "018c8c95-79f2-7abf-828a-70d34495d264", [1;34mquery[0m[34m: "SELECT * FROM \"ic_user\" \"user\"   ;"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/model/hook.rs:62
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1"
+
+  [2m2023-12-21T21:34:15.540653+08:00[0m [32m INFO[0m [1;32mzino_core::model::hook[0m[32m: [32mno rows affected or fetched, [1;32mquery_id[0m[32m: "018c8c95-79f2-7abf-828a-70d34495d264", [1;32mquery[0m[32m: "SELECT * FROM \"ic_user\" \"user\"   ;", [1;32marguments[0m[32m: "", [1;32mexecution_time_millis[0m[32m: 1[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/model/hook.rs:81
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1"
+
+  [2m2023-12-21T21:34:15.541866+08:00[0m [32m INFO[0m [1;32mzino::middleware::tower_tracing[0m[32m: [32mfinished processing request[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/middleware/tower_tracing.rs:162
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1", [1mhttp.response.header.traceparent[0m: "00-018c8c9579b873f9987b9f64cdb74252-0000000000000001-03", [1mhttp.response.header.tracestate[0m: "zino=1", [1mhttp.response.header.server_timing[0m: "total;dur=61.226", [1mcontext.trace_id[0m: "018c8c95-79b8-73f9-987b-9f64cdb74252", [1mcontext.request_id[0m: "018c8c95-79b7-74b1-bda8-56b6ea60533b", [1mhttp.response.status_code[0m: 200, [1motel.status_code[0m: "OK"
+
+  [2m2023-12-21T21:34:15.542396+08:00[0m [34mDEBUG[0m [1;34mzino::middleware::tower_tracing[0m[34m: [34mflushed 128 bytes[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/middleware/tower_tracing.rs:166
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1", [1mhttp.response.header.traceparent[0m: "00-018c8c9579b873f9987b9f64cdb74252-0000000000000001-03", [1mhttp.response.header.tracestate[0m: "zino=1", [1mhttp.response.header.server_timing[0m: "total;dur=61.226", [1mcontext.trace_id[0m: "018c8c95-79b8-73f9-987b-9f64cdb74252", [1mcontext.request_id[0m: "018c8c95-79b7-74b1-bda8-56b6ea60533b", [1mhttp.response.status_code[0m: 200, [1motel.status_code[0m: "OK"
+
+  [2m2023-12-21T21:35:38.572439+08:00[0m [34mDEBUG[0m [1;34mzino::middleware::tower_tracing[0m[34m: [34mstarted processing request[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/middleware/tower_tracing.rs:134
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "4000000001"
+
+  [2m2023-12-21T21:35:38.573012+08:00[0m [34mDEBUG[0m [1;34mzino_core::model::hook[0m[34m: [1;34mquery_id[0m[34m: "018c8c96-be4c-7097-974c-616653018ec0", [1;34mquery[0m[34m: "SELECT * FROM \"ic_user\" \"user\"   ;"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/model/hook.rs:62
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "4000000001"
+
+  [2m2023-12-21T21:35:38.576127+08:00[0m [32m INFO[0m [1;32mzino_core::model::hook[0m[32m: [32m2 rows affected or fetched, [1;32mquery_id[0m[32m: "018c8c96-be4c-7097-974c-616653018ec0", [1;32mquery[0m[32m: "SELECT * FROM \"ic_user\" \"user\"   ;", [1;32marguments[0m[32m: "", [1;32mexecution_time_millis[0m[32m: 3[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/model/hook.rs:81
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "4000000001"
+
+  [2m2023-12-21T21:35:38.576927+08:00[0m [32m INFO[0m [1;32mzino::middleware::tower_tracing[0m[32m: [32mfinished processing request[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/middleware/tower_tracing.rs:162
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "4000000001", [1mhttp.response.header.traceparent[0m: "00-018c8c96be4c7119b24e209e68e0e28e-0000004000000001-03", [1mhttp.response.header.tracestate[0m: "zino=4000000001", [1mhttp.response.header.server_timing[0m: "total;dur=3.686", [1mcontext.trace_id[0m: "018c8c96-be4c-7119-b24e-209e68e0e28e", [1mcontext.request_id[0m: "018c8c96-be4c-7e3b-84ff-4f3d792d99c1", [1mhttp.response.status_code[0m: 200, [1motel.status_code[0m: "OK"
+
+  [2m2023-12-21T21:35:38.577232+08:00[0m [34mDEBUG[0m [1;34mzino::middleware::tower_tracing[0m[34m: [34mflushed 128 bytes[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/middleware/tower_tracing.rs:166
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "4000000001", [1mhttp.response.header.traceparent[0m: "00-018c8c96be4c7119b24e209e68e0e28e-0000004000000001-03", [1mhttp.response.header.tracestate[0m: "zino=4000000001", [1mhttp.response.header.server_timing[0m: "total;dur=3.686", [1mcontext.trace_id[0m: "018c8c96-be4c-7119-b24e-209e68e0e28e", [1mcontext.request_id[0m: "018c8c96-be4c-7e3b-84ff-4f3d792d99c1", [1mhttp.response.status_code[0m: 200, [1motel.status_code[0m: "OK"
+
+  [2m2023-12-21T21:46:26.568386+08:00[0m [33m WARN[0m [1;33mzino_core::orm::manager[0m[33m: [33mclosing the connection pool for the `main` service[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/orm/manager.rs:91
+
+  [2m2023-12-21T21:46:26.603515+08:00[0m [33m WARN[0m [1;33mzino_core::orm::manager[0m[33m: [33mclosing the connection pool for the `main` service[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/orm/manager.rs:91
+
+  [2m2023-12-21T21:46:26.603647+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33msignal received, starting graceful shutdown[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:277
+
+  [2m2023-12-21T21:46:26.607975+08:00[0m [33m WARN[0m [1;33mzino_core::orm::manager[0m[33m: [33mclosing the connection pool for the `main` service[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/orm/manager.rs:91
+
+  [2m2023-12-21T21:46:26.607999+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33msignal received, starting graceful shutdown[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:277
+
+  [2m2023-12-21T21:46:26.608037+08:00[0m [33m WARN[0m [1;33mzino_core::orm::manager[0m[33m: [33mclosing the connection pool for the `main` service[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/orm/manager.rs:91
+
+  [2m2023-12-21T21:46:26.608056+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33msignal received, starting graceful shutdown[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:277
+
+  [2m2023-12-21T21:46:26.608143+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33msignal received, starting graceful shutdown[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:277
+
+  [2m2023-12-21T21:46:35.676914+08:00[0m [32m INFO[0m [1;32mzino_core::state::config[0m[32m: [32m`config.dev.toml` loaded, [1;32menv[0m[32m: "dev"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/state/config.rs:32
+
+  [2m2023-12-21T21:46:35.677337+08:00[0m [33m WARN[0m [1;33mzino_core::state[0m[33m: [33mraw password `1****6` should be encypted, [1;33mencrypted_password[0m[33m: "1EqfqKDEwNCq+xHxB5rBgxYd4qexjQ"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/state/mod.rs:207
+
+  [2m2023-12-21T21:46:35.677821+08:00[0m [33m WARN[0m [1;33mzino_core::orm[0m[33m: [33mconnect to database services lazily, [1;33mdriver[0m[33m: "postgres"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/orm/mod.rs:250
+
+  [2m2023-12-21T21:46:35.889791+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33mlisten on `127.0.0.1:6070`, [1;33mserver_tag[0m[33m: "debug", [1;33mapp_env[0m[33m: "dev", [1;33mapp_name[0m[33m: "data-cube", [1;33mapp_version[0m[33m: "0.6.4"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:86
+
+  [2m2023-12-21T21:46:35.890568+08:00[0m [32m INFO[0m [1;32mzino::application::axum_cluster[0m[32m: [32mRapiDoc router `/rapidoc` is registered for `127.0.0.1:6070`[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:197
+
+  [2m2023-12-21T21:46:35.890932+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33mlisten on `127.0.0.1:6080`, [1;33mserver_tag[0m[33m: "main", [1;33mapp_env[0m[33m: "dev", [1;33mapp_name[0m[33m: "data-cube", [1;33mapp_version[0m[33m: "0.6.4"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:86
+
+  [2m2023-12-21T21:46:35.891038+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33mlisten on `127.0.0.1:6081`, [1;33mserver_tag[0m[33m: "portal", [1;33mapp_env[0m[33m: "dev", [1;33mapp_name[0m[33m: "data-cube", [1;33mapp_version[0m[33m: "0.6.4"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:86
+
+  [2m2023-12-21T21:46:35.891143+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33mlisten on `127.0.0.1:6082`, [1;33mserver_tag[0m[33m: "admin", [1;33mapp_env[0m[33m: "dev", [1;33mapp_name[0m[33m: "data-cube", [1;33mapp_version[0m[33m: "0.6.4"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:86
+
+  [2m2023-12-21T21:47:00.368017+08:00[0m [34mDEBUG[0m [1;34mzino::middleware::tower_tracing[0m[34m: [34mstarted processing request[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/middleware/tower_tracing.rs:134
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1"
+
+  [2m2023-12-21T21:47:00.372227+08:00[0m [32m INFO[0m [1;32msqlx::postgres::notice[0m[32m: [32mrelation "ic_user" already exists, skipping[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/sqlx-postgres-0.7.3/src/connection/stream.rs:163
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1"
+
+  [2m2023-12-21T21:47:00.386122+08:00[0m [32m INFO[0m [1;32msqlx::postgres::notice[0m[32m: [32mrelation "ic_user_text_search_english_index" already exists, skipping[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/sqlx-postgres-0.7.3/src/connection/stream.rs:163
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1"
+
+  [2m2023-12-21T21:47:00.386426+08:00[0m [34mDEBUG[0m [1;34mzino_core::model::hook[0m[34m: [1;34mquery_id[0m[34m: "018c8ca1-25a2-7052-b5b9-cc416359f107", [1;34mquery[0m[34m: "SELECT * FROM \"ic_user\" \"user\"   ;"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/model/hook.rs:62
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1"
+
+  [2m2023-12-21T21:47:00.387593+08:00[0m [32m INFO[0m [1;32mzino_core::model::hook[0m[32m: [32m2 rows affected or fetched, [1;32mquery_id[0m[32m: "018c8ca1-25a2-7052-b5b9-cc416359f107", [1;32mquery[0m[32m: "SELECT * FROM \"ic_user\" \"user\"   ;", [1;32marguments[0m[32m: "", [1;32mexecution_time_millis[0m[32m: 1[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/model/hook.rs:81
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1"
+
+  [2m2023-12-21T21:47:00.388245+08:00[0m [32m INFO[0m [1;32mzino::middleware::tower_tracing[0m[32m: [32mfinished processing request[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/middleware/tower_tracing.rs:162
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1", [1mhttp.response.header.traceparent[0m: "00-018c8ca125907df99be246cf2b64c2a6-0000000000000001-03", [1mhttp.response.header.tracestate[0m: "zino=1", [1mhttp.response.header.server_timing[0m: "total;dur=19.122", [1mcontext.trace_id[0m: "018c8ca1-2590-7df9-9be2-46cf2b64c2a6", [1mcontext.request_id[0m: "018c8ca1-2590-75eb-b194-9350f7600187", [1mhttp.response.status_code[0m: 200, [1motel.status_code[0m: "OK"
+
+  [2m2023-12-21T21:47:00.388635+08:00[0m [34mDEBUG[0m [1;34mzino::middleware::tower_tracing[0m[34m: [34mflushed 201 bytes[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/middleware/tower_tracing.rs:166
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1", [1mhttp.response.header.traceparent[0m: "00-018c8ca125907df99be246cf2b64c2a6-0000000000000001-03", [1mhttp.response.header.tracestate[0m: "zino=1", [1mhttp.response.header.server_timing[0m: "total;dur=19.122", [1mcontext.trace_id[0m: "018c8ca1-2590-7df9-9be2-46cf2b64c2a6", [1mcontext.request_id[0m: "018c8ca1-2590-75eb-b194-9350f7600187", [1mhttp.response.status_code[0m: 200, [1motel.status_code[0m: "OK"
+
+                                                                                                                                                                                                                                                                                                          [2m2023-12-21T21:49:03.040544+08:00[0m [32m INFO[0m [1;32mzino_core::state::config[0m[32m: [32m`config.dev.toml` loaded, [1;32menv[0m[32m: "dev"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/state/config.rs:32
+
+  [2m2023-12-21T21:49:03.041056+08:00[0m [33m WARN[0m [1;33mzino_core::state[0m[33m: [33mraw password `1****6` should be encypted, [1;33mencrypted_password[0m[33m: "nTfAJv/IQPKsWodYlhfk5PXqcwXhhA"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/state/mod.rs:207
+
+  [2m2023-12-21T21:49:03.041654+08:00[0m [33m WARN[0m [1;33mzino_core::orm[0m[33m: [33mconnect to database services lazily, [1;33mdriver[0m[33m: "postgres"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/orm/mod.rs:250
+
+  [2m2023-12-21T21:49:03.251368+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33mlisten on `127.0.0.1:6070`, [1;33mserver_tag[0m[33m: "debug", [1;33mapp_env[0m[33m: "dev", [1;33mapp_name[0m[33m: "data-cube", [1;33mapp_version[0m[33m: "0.6.4"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:86
+
+  [2m2023-12-21T21:49:03.252087+08:00[0m [32m INFO[0m [1;32mzino::application::axum_cluster[0m[32m: [32mRapiDoc router `/rapidoc` is registered for `127.0.0.1:6070`[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:197
+
+  [2m2023-12-21T21:49:03.25245+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33mlisten on `127.0.0.1:6080`, [1;33mserver_tag[0m[33m: "main", [1;33mapp_env[0m[33m: "dev", [1;33mapp_name[0m[33m: "data-cube", [1;33mapp_version[0m[33m: "0.6.4"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:86
+
+  [2m2023-12-21T21:49:03.252556+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33mlisten on `127.0.0.1:6081`, [1;33mserver_tag[0m[33m: "portal", [1;33mapp_env[0m[33m: "dev", [1;33mapp_name[0m[33m: "data-cube", [1;33mapp_version[0m[33m: "0.6.4"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:86
+
+  [2m2023-12-21T21:49:03.252656+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33mlisten on `127.0.0.1:6082`, [1;33mserver_tag[0m[33m: "admin", [1;33mapp_env[0m[33m: "dev", [1;33mapp_name[0m[33m: "data-cube", [1;33mapp_version[0m[33m: "0.6.4"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:86
+
+  [2m2023-12-21T21:49:06.830247+08:00[0m [34mDEBUG[0m [1;34mzino::middleware::tower_tracing[0m[34m: [34mstarted processing request[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/middleware/tower_tracing.rs:134
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1"
+
+  [2m2023-12-21T21:49:06.834926+08:00[0m [32m INFO[0m [1;32msqlx::postgres::notice[0m[32m: [32mrelation "ic_user" already exists, skipping[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/sqlx-postgres-0.7.3/src/connection/stream.rs:163
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1"
+
+  [2m2023-12-21T21:49:06.855518+08:00[0m [33m WARN[0m [1;33mzino_core::orm::schema[0m[33m: [33ma new column `age` has been added, [1;33mmodel_name[0m[33m: "user", [1;33mtable_name[0m[33m: "ic_user", [1;33mcolumn_name[0m[33m: "age"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/orm/schema.rs:256
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1"
+
+  [2m2023-12-21T21:49:06.857155+08:00[0m [32m INFO[0m [1;32msqlx::postgres::notice[0m[32m: [32mrelation "ic_user_text_search_english_index" already exists, skipping[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/sqlx-postgres-0.7.3/src/connection/stream.rs:163
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1"
+
+  [2m2023-12-21T21:49:06.857388+08:00[0m [34mDEBUG[0m [1;34mzino_core::model::hook[0m[34m: [1;34mquery_id[0m[34m: "018c8ca3-13a9-7ea6-8c81-4b4d94826a3a", [1;34mquery[0m[34m: "SELECT * FROM \"ic_user\" \"user\"   ;"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/model/hook.rs:62
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1"
+
+  [2m2023-12-21T21:49:06.858826+08:00[0m [32m INFO[0m [1;32mzino_core::model::hook[0m[32m: [32m2 rows affected or fetched, [1;32mquery_id[0m[32m: "018c8ca3-13a9-7ea6-8c81-4b4d94826a3a", [1;32mquery[0m[32m: "SELECT * FROM \"ic_user\" \"user\"   ;", [1;32marguments[0m[32m: "", [1;32mexecution_time_millis[0m[32m: 1[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/model/hook.rs:81
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1"
+
+  [2m2023-12-21T21:49:06.859408+08:00[0m [32m INFO[0m [1;32mzino::middleware::tower_tracing[0m[32m: [32mfinished processing request[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/middleware/tower_tracing.rs:162
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1", [1mhttp.response.header.traceparent[0m: "00-018c8ca3138e7aba8f259283ecd9b7d0-0000000000000001-03", [1mhttp.response.header.tracestate[0m: "zino=1", [1mhttp.response.header.server_timing[0m: "total;dur=28.193", [1mcontext.trace_id[0m: "018c8ca3-138e-7aba-8f25-9283ecd9b7d0", [1mcontext.request_id[0m: "018c8ca3-138e-76a7-8b84-035084d66cce", [1mhttp.response.status_code[0m: 200, [1motel.status_code[0m: "OK"
+
+  [2m2023-12-21T21:49:06.859742+08:00[0m [34mDEBUG[0m [1;34mzino::middleware::tower_tracing[0m[34m: [34mflushed 217 bytes[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/middleware/tower_tracing.rs:166
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1", [1mhttp.response.header.traceparent[0m: "00-018c8ca3138e7aba8f259283ecd9b7d0-0000000000000001-03", [1mhttp.response.header.tracestate[0m: "zino=1", [1mhttp.response.header.server_timing[0m: "total;dur=28.193", [1mcontext.trace_id[0m: "018c8ca3-138e-7aba-8f25-9283ecd9b7d0", [1mcontext.request_id[0m: "018c8ca3-138e-76a7-8b84-035084d66cce", [1mhttp.response.status_code[0m: 200, [1motel.status_code[0m: "OK"
+
+  [2m2023-12-21T21:51:53.251596+08:00[0m [33m WARN[0m [1;33mzino_core::orm::manager[0m[33m: [33mclosing the connection pool for the `main` service[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/orm/manager.rs:91
+
+  [2m2023-12-21T21:51:53.2525+08:00[0m [33m WARN[0m [1;33mzino_core::orm::manager[0m[33m: [33mclosing the connection pool for the `main` service[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/orm/manager.rs:91
+
+  [2m2023-12-21T21:51:53.253165+08:00[0m [33m WARN[0m [1;33mzino_core::orm::manager[0m[33m: [33mclosing the connection pool for the `main` service[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/orm/manager.rs:91
+
+  [2m2023-12-21T21:51:53.25335+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33msignal received, starting graceful shutdown[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:277
+
+  [2m2023-12-21T21:51:53.253687+08:00[0m [33m WARN[0m [1;33mzino_core::orm::manager[0m[33m: [33mclosing the connection pool for the `main` service[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/orm/manager.rs:91
+
+  [2m2023-12-21T21:51:53.25379+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33msignal received, starting graceful shutdown[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:277
+
+  [2m2023-12-21T21:51:53.254677+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33msignal received, starting graceful shutdown[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:277
+
+  [2m2023-12-21T21:51:53.255158+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33msignal received, starting graceful shutdown[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:277
+
+  [2m2023-12-21T21:52:00.279678+08:00[0m [32m INFO[0m [1;32mzino_core::state::config[0m[32m: [32m`config.dev.toml` loaded, [1;32menv[0m[32m: "dev"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/state/config.rs:32
+
+  [2m2023-12-21T21:52:00.280112+08:00[0m [33m WARN[0m [1;33mzino_core::state[0m[33m: [33mraw password `1****6` should be encypted, [1;33mencrypted_password[0m[33m: "fzcgDg0smZzMqShLMrnePZ+zaApOPA"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/state/mod.rs:207
+
+  [2m2023-12-21T21:52:00.280605+08:00[0m [33m WARN[0m [1;33mzino_core::orm[0m[33m: [33mconnect to database services lazily, [1;33mdriver[0m[33m: "postgres"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/orm/mod.rs:250
+
+  [2m2023-12-21T21:52:00.488575+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33mlisten on `127.0.0.1:6070`, [1;33mserver_tag[0m[33m: "debug", [1;33mapp_env[0m[33m: "dev", [1;33mapp_name[0m[33m: "data-cube", [1;33mapp_version[0m[33m: "0.6.4"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:86
+
+  [2m2023-12-21T21:52:00.489093+08:00[0m [32m INFO[0m [1;32mzino::application::axum_cluster[0m[32m: [32mRapiDoc router `/rapidoc` is registered for `127.0.0.1:6070`[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:197
+
+  [2m2023-12-21T21:52:00.489413+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33mlisten on `127.0.0.1:6080`, [1;33mserver_tag[0m[33m: "main", [1;33mapp_env[0m[33m: "dev", [1;33mapp_name[0m[33m: "data-cube", [1;33mapp_version[0m[33m: "0.6.4"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:86
+
+  [2m2023-12-21T21:52:00.489509+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33mlisten on `127.0.0.1:6081`, [1;33mserver_tag[0m[33m: "portal", [1;33mapp_env[0m[33m: "dev", [1;33mapp_name[0m[33m: "data-cube", [1;33mapp_version[0m[33m: "0.6.4"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:86
+
+  [2m2023-12-21T21:52:00.489598+08:00[0m [33m WARN[0m [1;33mzino::application::axum_cluster[0m[33m: [33mlisten on `127.0.0.1:6082`, [1;33mserver_tag[0m[33m: "admin", [1;33mapp_env[0m[33m: "dev", [1;33mapp_name[0m[33m: "data-cube", [1;33mapp_version[0m[33m: "0.6.4"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/application/axum_cluster.rs:86
+
+  [2m2023-12-21T21:52:04.918601+08:00[0m [34mDEBUG[0m [1;34mzino::middleware::tower_tracing[0m[34m: [34mstarted processing request[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/middleware/tower_tracing.rs:134
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1"
+
+  [2m2023-12-21T21:52:04.922719+08:00[0m [32m INFO[0m [1;32msqlx::postgres::notice[0m[32m: [32mrelation "ic_user" already exists, skipping[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/sqlx-postgres-0.7.3/src/connection/stream.rs:163
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1"
+
+  [2m2023-12-21T21:52:04.940707+08:00[0m [32m INFO[0m [1;32msqlx::postgres::notice[0m[32m: [32mrelation "ic_user_text_search_english_index" already exists, skipping[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/sqlx-postgres-0.7.3/src/connection/stream.rs:163
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1"
+
+  [2m2023-12-21T21:52:04.941368+08:00[0m [34mDEBUG[0m [1;34mzino_core::model::hook[0m[34m: [1;34mquery_id[0m[34m: "018c8ca5-cb4d-72ae-b107-92bc30919656", [1;34mquery[0m[34m: "SELECT * FROM \"ic_user\" \"user\" WHERE \"age\" > 20  ;"[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/model/hook.rs:62
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1"
+
+  [2m2023-12-21T21:52:04.943342+08:00[0m [32m INFO[0m [1;32mzino_core::model::hook[0m[32m: [32m2 rows affected or fetched, [1;32mquery_id[0m[32m: "018c8ca5-cb4d-72ae-b107-92bc30919656", [1;32mquery[0m[32m: "SELECT * FROM \"ic_user\" \"user\" WHERE \"age\" > 20  ;", [1;32marguments[0m[32m: "", [1;32mexecution_time_millis[0m[32m: 2[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-core-0.17.2/src/model/hook.rs:81
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1"
+
+  [2m2023-12-21T21:52:04.944537+08:00[0m [32m INFO[0m [1;32mzino::middleware::tower_tracing[0m[32m: [32mfinished processing request[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/middleware/tower_tracing.rs:162
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1", [1mhttp.response.header.traceparent[0m: "00-018c8ca5cb37764482a21fa02d37a254-0000000000000001-03", [1mhttp.response.header.tracestate[0m: "zino=1", [1mhttp.response.header.server_timing[0m: "total;dur=24.614", [1mcontext.trace_id[0m: "018c8ca5-cb37-7644-82a2-1fa02d37a254", [1mcontext.request_id[0m: "018c8ca5-cb37-70eb-b15e-ec6d2cdc44f3", [1mhttp.response.status_code[0m: 200, [1motel.status_code[0m: "OK"
+
+  [2m2023-12-21T21:52:04.945017+08:00[0m [34mDEBUG[0m [1;34mzino::middleware::tower_tracing[0m[34m: [34mflushed 223 bytes[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-0dccff568467c15b/zino-0.16.2/src/middleware/tower_tracing.rs:166
+    [2;3min[0m zino::middleware::tower_tracing::[1mHTTP request[0m [2;3mwith[0m [1motel.kind[0m: "server", [1motel.name[0m: "data-cube", [1murl.path[0m: "/user/list", [1mhttp.request.method[0m: "GET", [1muser_agent.original[0m: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", [1mcontext.span_id[0m: "1", [1mhttp.response.header.traceparent[0m: "00-018c8ca5cb37764482a21fa02d37a254-0000000000000001-03", [1mhttp.response.header.tracestate[0m: "zino=1", [1mhttp.response.header.server_timing[0m: "total;dur=24.614", [1mcontext.trace_id[0m: "018c8ca5-cb37-7644-82a2-1fa02d37a254", [1mcontext.request_id[0m: "018c8ca5-cb37-70eb-b15e-ec6d2cdc44f3", [1mhttp.response.status_code[0m: 200, [1motel.status_code[0m: "OK"
+
