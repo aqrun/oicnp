@@ -1,7 +1,7 @@
 use proc_macro2::{TokenStream, Literal};
 use quote::quote;
 use syn::{DeriveInput, Lit};
-use oicnp_core::prelude::sea_orm::sea_query::Alias;
+use heck::ToSnakeCase;
 
 use crate::error::GeneratorResult;
 use crate::attributes::Oic as OicAttributes;
@@ -9,6 +9,8 @@ use crate::attributes::Oic as OicAttributes;
 pub(crate) fn generate(input: DeriveInput) -> GeneratorResult<TokenStream> {
     // ident 当前枚举名称
     let DeriveInput { ident, .. } = input;
+
+    let mut valid_table_name = ident.to_string().to_snake_case();
 
     let default_lit_str = Lit::new(Literal::string(""));
     let default_lit_i32 = Lit::new(Literal::i32_unsuffixed(0));
@@ -23,9 +25,14 @@ pub(crate) fn generate(input: DeriveInput) -> GeneratorResult<TokenStream> {
         for variant in variants {
             // 当前枚举项名称如 Alex, Box
             let ident_item = &variant.ident;
+
+            // 存在 table 字段
+            let is_table_field = ident_item.eq("Table");
+
             // 根据属性值转为 OicAttributes 定义的结构化数据
             // Oic 结体体名需要和属性名对应
-            if let Ok(column) = OicAttributes::from_attributes(&variant.attrs) {                
+            if let Ok(column) = OicAttributes::from_attributes(&variant.attrs) {
+                let name = &column.name.unwrap_or(default_lit_str.clone());             
                 let comment = &column.comment.unwrap_or(default_lit_str.clone());
                 let data_type = &column.data_type.unwrap_or(default_lit_str.clone());
                 let len = &column.len.unwrap_or(default_lit_i32.clone());
@@ -40,12 +47,17 @@ pub(crate) fn generate(input: DeriveInput) -> GeneratorResult<TokenStream> {
                     _ => default_lit_str.clone(),
                 };
 
-                if let Some(name) = &column.name {
-                    name_arms.push(quote! ( #ident::#ident_item => #name ));
-                } else {
-                    name_arms.push(quote! ( #ident::#ident_item => #ident_item ));
+                let mut name_arm = quote! ( #ident::#ident_item => #name );
+
+                // Table  有指定name 属性
+                if is_table_field {
+                    if let syn::Lit::Str(item) = name {
+                        valid_table_name = String::from(item.value().as_str());
+                        name_arm = quote! ( #ident::#ident_item => #valid_table_name );
+                    }
                 }
 
+                name_arms.push(name_arm);
                 data_type_arms.push(quote! ( #ident::#ident_item => #data_type ));
                 len_arms.push(quote! ( #ident::#ident_item => #len ));
                 default_value_arms.push(quote! ( #ident::#ident_item => #default_value ));
@@ -65,10 +77,9 @@ pub(crate) fn generate(input: DeriveInput) -> GeneratorResult<TokenStream> {
 
     let expanded = quote! {
         impl #ident {
-            pub fn table_name(prefix: &str) -> Alias {
-                let name = Self::Table.to_string();
-                let name = format!("{}{}", prefix, name);
-                Alias::new(name.as_str())
+            pub fn table_name(prefix: &str) -> oicnp_core::prelude::sea_orm::sea_query::Alias {
+                let name = format!("{}{}", prefix, #valid_table_name);
+                oicnp_core::prelude::sea_orm::sea_query::Alias::new(name.as_str())
             }
 
             ///  字段名称

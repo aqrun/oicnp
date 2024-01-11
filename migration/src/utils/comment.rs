@@ -1,4 +1,4 @@
-use oicnp_core::prelude::sea_orm_migration::prelude::*;
+use sea_orm_migration::prelude::*;
 
 pub async fn comment_table(
     db: &DatabaseConnection,

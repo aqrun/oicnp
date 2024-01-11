@@ -12,7 +12,7 @@ use oicnp_core::{
     },
     DatabaseConnection, DB,
 };
-use migration::types::CmsFiles;
+use migration::types::SysDepartments;
 
 pub async fn run() {
     println!("Test run----");
@@ -36,8 +36,9 @@ pub async fn run() {
 }
 
 fn derive_test() {
-    let file_name = CmsFiles::table_name("oic_");
-    println!("file____  {:?} --- {}", file_name.to_string(), CmsFiles::Table.to_string());
+    let file_name = SysDepartments::table_name("oic_");
+    println!("file____  {:?} --- {:?}", file_name.to_string(), SysDepartments::Weight.default_value());
+    println!("Status: {:?}", SysDepartments::Status.default_value());
 }
 
 fn generate_uuid() {
