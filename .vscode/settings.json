@@ -1,0 +1,9 @@
+{
+    "cSpell.words": [
+        "oicnp", "dotenv", "graphiql", "chrono", "consts", "aqrun",
+    ],
+    "rust-analyzer.linkedProjects": [
+        "./frontend/Cargo.toml"
+    ],
+    "rust-analyzer.showUnlinkedFileNotification": false
+}

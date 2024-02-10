@@ -1,11 +1,11 @@
-use crate::models::auth::{Claims, LoginInfo};
+use crate::models::{Claims, LoginInfo};
 use crate::G;
 use anyhow::{anyhow, Result};
 use chrono::Utc;
 use jsonwebtoken as jwt;
 use log::error;
 
-pub fn create_jwt(uid: &str, role: &str) -> Result<LoginInfo> {
+pub fn create_jwt(uid: i64, role: &str) -> Result<LoginInfo> {
     let expiration = Utc::now()
         .checked_add_signed(chrono::Duration::days(7))
         .expect("valid timestamp")
@@ -13,7 +13,7 @@ pub fn create_jwt(uid: &str, role: &str) -> Result<LoginInfo> {
 
     let header = jwt::Header::new(jwt::Algorithm::HS256);
     let claims = Claims {
-        uid: String::from(uid),
+        uid: uid,
         role: String::from(role),
         exp: expiration as usize,
     };
@@ -38,7 +38,7 @@ pub fn create_jwt(uid: &str, role: &str) -> Result<LoginInfo> {
 pub fn decode_jwt(header_jwt: &str, log_error: bool) -> Result<LoginInfo> {
     let anonymous = LoginInfo {
         token: String::from(header_jwt),
-        uid: String::from(""),
+        uid: 0,
         role: String::from("Anonymous"),
         exp: 0,
     };

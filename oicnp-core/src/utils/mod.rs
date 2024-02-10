@@ -5,6 +5,9 @@ mod slug_utils;
 mod youdao;
 mod auth;
 mod fns;
+mod resp;
+pub mod log;
+mod string;
 
 pub use app_config::*;
 pub use uuid::*;
@@ -13,3 +16,5 @@ pub use slug_utils::*;
 pub use youdao::*;
 pub use auth::*;
 pub use fns::*;
+pub use resp::*;
+pub use string::*;

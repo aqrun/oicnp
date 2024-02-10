@@ -1,40 +1,36 @@
-use oicnp_core::prelude::sea_orm_migration::prelude::*;
+use sea_orm_migration::prelude::*;
 use super::types::*;
 
+#[derive(DeriveMigrationName)]
 pub struct Migration;
-
-impl MigrationName for Migration {
-    fn name(&self) -> &str {
-        "m20220825_212320_create_user_online_table"
-    }
-}
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let table = Table::create()
-            .table(SysUserOnline::Table)
+            .table(UserOnline::Table)
             .if_not_exists()
             .col(
-                ColumnDef::new(SysUserOnline::Uid)
-                    .string_len(32)
+                ColumnDef::new(UserOnline::Uid)
+                    .big_integer()
                     .not_null()
                     .primary_key()
                     .unique_key(),
             )
-            .col(ColumnDef::new(SysUserOnline::TokenId).string_len(32).default(""))
-            .col(ColumnDef::new(SysUserOnline::TokenExpire).big_integer().default("0"))
-            .col(ColumnDef::new(SysUserOnline::LoginAt)
+            .col(ColumnDef::new(UserOnline::TokenId).string_len(32).not_null().default(""))
+            .col(ColumnDef::new(UserOnline::TokenExpire).big_integer().not_null().default("0"))
+            .col(ColumnDef::new(UserOnline::LoginAt)
                 .date_time()
+                .not_null()
                 .default(Value::Int(None)))
-            .col(ColumnDef::new(SysUserOnline::Username).string_len(60).default(""))
-            .col(ColumnDef::new(SysUserOnline::DepartmentName).string_len(100).default(""))
-            .col(ColumnDef::new(SysUserOnline::Net).string_len(10).default(""))
-            .col(ColumnDef::new(SysUserOnline::Ip).string_len(100).default(""))
-            .col(ColumnDef::new(SysUserOnline::Location).string_len(255).default(""))
-            .col(ColumnDef::new(SysUserOnline::Device).string_len(50).default(""))
-            .col(ColumnDef::new(SysUserOnline::Browser).string_len(30).default(""))
-            .col(ColumnDef::new(SysUserOnline::Os).string_len(30).default(""))
+            .col(ColumnDef::new(UserOnline::Username).string_len(60).not_null().default(""))
+            .col(ColumnDef::new(UserOnline::DptName).string_len(100).not_null().default(""))
+            .col(ColumnDef::new(UserOnline::Net).string_len(10).not_null().default(""))
+            .col(ColumnDef::new(UserOnline::Ip).string_len(100).not_null().default(""))
+            .col(ColumnDef::new(UserOnline::Location).string_len(255).not_null().default(""))
+            .col(ColumnDef::new(UserOnline::Device).string_len(50).not_null().default(""))
+            .col(ColumnDef::new(UserOnline::Browser).string_len(30).not_null().default(""))
+            .col(ColumnDef::new(UserOnline::Os).string_len(30).not_null().default(""))
             .to_owned();
 
         manager.create_table(table).await
@@ -42,7 +38,7 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager.drop_table(
-            Table::drop().table(SysUserOnline::Table).to_owned()
+            Table::drop().table(UserOnline::Table).to_owned()
         ).await
     }
 }

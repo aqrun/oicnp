@@ -1,39 +1,34 @@
-use oicnp_core::prelude::sea_orm_migration::prelude::*;
+use sea_orm_migration::prelude::*;
 use super::types::*;
 
+#[derive(DeriveMigrationName)]
 pub struct Migration;
-
-impl MigrationName for Migration {
-    fn name(&self) -> &str {
-        "m20220825_212010_create_login_logs_table"
-    }
-}
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let table = Table::create()
-            .table(SysLoginLogs::Table)
+            .table(LoginLogs::Table)
             .if_not_exists()
             .col(
-                ColumnDef::new(SysLoginLogs::Id)
-                    .string_len(32)
+                ColumnDef::new(LoginLogs::Id)
+                    .big_integer()
                     .not_null()
                     .primary_key()
-                    .unique_key(),
+                    .auto_increment(),
             )
-            .col(ColumnDef::new(SysLoginLogs::LoginName).string_len(50).default(""))
-            .col(ColumnDef::new(SysLoginLogs::Net).string_len(10).default(""))
-            .col(ColumnDef::new(SysLoginLogs::Ip).string_len(50).default(""))
-            .col(ColumnDef::new(SysLoginLogs::Location).string_len(255).default(""))
-            .col(ColumnDef::new(SysLoginLogs::Browser).string_len(50).default(""))
-            .col(ColumnDef::new(SysLoginLogs::Os).string_len(50).default(""))
-            .col(ColumnDef::new(SysLoginLogs::Device).string_len(50).default(""))
-            .col(ColumnDef::new(SysLoginLogs::Status).char_len(1).default("1"))
-            .col(ColumnDef::new(SysLoginLogs::Message).string_len(255).default(""))
-            .col(ColumnDef::new(SysLoginLogs::Module).string_len(30).default(""))
+            .col(ColumnDef::new(LoginLogs::LoginName).string_len(50).not_null().default(""))
+            .col(ColumnDef::new(LoginLogs::Net).string_len(10).not_null().default(""))
+            .col(ColumnDef::new(LoginLogs::Ip).string_len(50).not_null().default(""))
+            .col(ColumnDef::new(LoginLogs::Location).string_len(255).not_null().default(""))
+            .col(ColumnDef::new(LoginLogs::Browser).string_len(50).not_null().default(""))
+            .col(ColumnDef::new(LoginLogs::Os).string_len(50).not_null().default(""))
+            .col(ColumnDef::new(LoginLogs::Device).string_len(50).not_null().default(""))
+            .col(ColumnDef::new(LoginLogs::Status).char_len(1).not_null().default("1"))
+            .col(ColumnDef::new(LoginLogs::Message).string_len(255).not_null().default(""))
+            .col(ColumnDef::new(LoginLogs::Module).string_len(30).not_null().default(""))
             .col(
-                ColumnDef::new(SysLoginLogs::LoginAt)
+                ColumnDef::new(LoginLogs::LoginAt)
                     .date_time()
                     .default(Value::Int(None)),
             )
@@ -44,7 +39,7 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager.drop_table(
-            Table::drop().table(SysLoginLogs::Table).to_owned()
+            Table::drop().table(LoginLogs::Table).to_owned()
         ).await
     }
 }

@@ -1,41 +1,36 @@
-use oicnp_core::prelude::sea_orm_migration::prelude::*;
+use sea_orm_migration::prelude::*;
 use super::types::*;
 
+#[derive(DeriveMigrationName)]
 pub struct Migration;
-
-impl MigrationName for Migration {
-    fn name(&self) -> &str {
-        "m20220825_212141_create_roles_table"
-    }
-}
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let table = Table::create()
-            .table(SysRoles::Table)
+            .table(Roles::Table)
             .if_not_exists()
             .col(
-                ColumnDef::new(SysRoles::Id)
-                    .string_len(32)
+                ColumnDef::new(Roles::RoleId)
+                    .big_integer()
                     .not_null()
                     .primary_key()
-                    .unique_key(),
+                    .auto_increment(),
             )
-            .col(ColumnDef::new(SysRoles::Vid).string_len(64).default(""))
-            .col(ColumnDef::new(SysRoles::Name).string_len(64).default(""))
-            .col(ColumnDef::new(SysRoles::Weight).integer().default(0))
-            .col(ColumnDef::new(SysRoles::Scope).char_len(1).default("0"))
-            .col(ColumnDef::new(SysRoles::Status).char_len(1).default(""))
-            .col(ColumnDef::new(SysRoles::Remark).string_len(255).default(""))
+            .col(ColumnDef::new(Roles::Vid).string_len(64).not_null().default(""))
+            .col(ColumnDef::new(Roles::Name).string_len(64).not_null().default(""))
+            .col(ColumnDef::new(Roles::Weight).integer().not_null().default(0))
+            .col(ColumnDef::new(Roles::Scope).char_len(1).not_null().default("0"))
+            .col(ColumnDef::new(Roles::Status).char_len(1).not_null().default(""))
+            .col(ColumnDef::new(Roles::Remark).string_len(255).not_null().default(""))
             .col(
-                ColumnDef::new(SysRoles::CreatedAt)
+                ColumnDef::new(Roles::CreatedAt)
                     .date_time()
                     .not_null()
                     .extra("DEFAULT CURRENT_TIMESTAMP".to_string()),
             )
             .col(
-                ColumnDef::new(SysRoles::UpdatedAt)
+                ColumnDef::new(Roles::UpdatedAt)
                     .date_time()
                     .default(Value::Int(None)),
             )
@@ -46,7 +41,7 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager.drop_table(
-            Table::drop().table(SysRoles::Table).to_owned()
+            Table::drop().table(Roles::Table).to_owned()
         ).await
     }
 }

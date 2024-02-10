@@ -1,35 +1,30 @@
-use oicnp_core::prelude::sea_orm_migration::prelude::*;
+use sea_orm_migration::prelude::*;
 use super::types::*;
 
+#[derive(DeriveMigrationName)]
 pub struct Migration;
-
-impl MigrationName for Migration {
-    fn name(&self) -> &str {
-        "m20230607_204902_create_short_links_table"
-    }
-}
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let table = Table::create()
-            .table(CmsShortLinks::Table)
+            .table(ShortLinks::Table)
             .if_not_exists()
             .col(
-                ColumnDef::new(CmsShortLinks::Id)
-                    .string_len(32)
+                ColumnDef::new(ShortLinks::Id)
+                    .big_integer()
                     .not_null()
                     .primary_key()
-                    .unique_key(),
+                    .auto_increment(),
             )
-            .col(ColumnDef::new(CmsShortLinks::Link).string_len(512).default(""))
-            .col(ColumnDef::new(CmsShortLinks::Name).string_len(255).default(""))
-            .col(ColumnDef::new(CmsShortLinks::Description).string_len(512).default(""))
-            .col(ColumnDef::new(CmsShortLinks::Viewed).integer().default(0))
-            .col(ColumnDef::new(CmsShortLinks::Deleted).char_len(1).default("0"))
-            .col(ColumnDef::new(CmsShortLinks::CreatedBy).string_len(32).default(""))
+            .col(ColumnDef::new(ShortLinks::Link).string_len(512).not_null().default(""))
+            .col(ColumnDef::new(ShortLinks::Name).string_len(255).not_null().default(""))
+            .col(ColumnDef::new(ShortLinks::Description).string_len(512).not_null().default(""))
+            .col(ColumnDef::new(ShortLinks::Viewed).integer().not_null().default(0))
+            .col(ColumnDef::new(ShortLinks::Deleted).char_len(1).not_null().default("0"))
+            .col(ColumnDef::new(ShortLinks::CreatedBy).big_integer().not_null().default(0))
             .col(
-                ColumnDef::new(CmsShortLinks::CreatedAt)
+                ColumnDef::new(ShortLinks::CreatedAt)
                     .date_time()
                     .not_null()
                     .extra("DEFAULT CURRENT_TIMESTAMP".to_string()),
@@ -41,7 +36,7 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
-            .drop_table(Table::drop().table(CmsShortLinks::Table).to_owned())
+            .drop_table(Table::drop().table(ShortLinks::Table).to_owned())
             .await
     }
 }

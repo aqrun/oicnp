@@ -1,58 +1,53 @@
-use oicnp_core::prelude::sea_orm_migration::prelude::*;
+use sea_orm_migration::prelude::*;
 use super::types::*;
 
+#[derive(DeriveMigrationName)]
 pub struct Migration;
-
-impl MigrationName for Migration {
-    fn name(&self) -> &str {
-        "m20220825_212018_create_menus_table"
-    }
-}
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let table = Table::create()
-            .table(SysMenus::Table)
+            .table(Menus::Table)
             .if_not_exists()
             .col(
-                ColumnDef::new(SysMenus::Id)
-                    .string_len(32)
+                ColumnDef::new(Menus::Id)
+                    .integer()
                     .not_null()
                     .primary_key()
-                    .unique_key(),
+                    .auto_increment(),
             )
-            .col(ColumnDef::new(SysMenus::Pid).string_len(32).not_null())
-            .col(ColumnDef::new(SysMenus::Path).string_len(255).default(""))
-            .col(ColumnDef::new(SysMenus::Name).string_len(100).default(""))
-            .col(ColumnDef::new(SysMenus::Icon).string_len(50).default(""))
-            .col(ColumnDef::new(SysMenus::Type).char_len(1).default(""))
-            .col(ColumnDef::new(SysMenus::Query).string_len(255).default(""))
-            .col(ColumnDef::new(SysMenus::Weight).integer().default(0))
-            .col(ColumnDef::new(SysMenus::Api).string_len(255).default(""))
-            .col(ColumnDef::new(SysMenus::Status).char_len(1).default("1"))
-            .col(ColumnDef::new(SysMenus::Method).string_len(10).default(""))
-            .col(ColumnDef::new(SysMenus::Component).string_len(100).default(""))
-            .col(ColumnDef::new(SysMenus::Visible).char_len(1).default("1"))
-            .col(ColumnDef::new(SysMenus::IsCache).char_len(1).default("1"))
-            .col(ColumnDef::new(SysMenus::LogMethod).char_len(1).default("0"))
-            .col(ColumnDef::new(SysMenus::DataCacheMethod).char_len(1).default("0"))
-            .col(ColumnDef::new(SysMenus::IsFrame).char_len(1).default("0"))
-            .col(ColumnDef::new(SysMenus::DataScope).char_len(1).default("0"))
-            .col(ColumnDef::new(SysMenus::Remark).string_len(255).default(""))
+            .col(ColumnDef::new(Menus::Pid).string_len(32).not_null())
+            .col(ColumnDef::new(Menus::Path).string_len(255).not_null().default(""))
+            .col(ColumnDef::new(Menus::Name).string_len(100).not_null().default(""))
+            .col(ColumnDef::new(Menus::Icon).string_len(50).not_null().default(""))
+            .col(ColumnDef::new(Menus::Type).char_len(1).not_null().default(""))
+            .col(ColumnDef::new(Menus::Query).string_len(255).not_null().default(""))
+            .col(ColumnDef::new(Menus::Weight).integer().not_null().default(0))
+            .col(ColumnDef::new(Menus::Api).string_len(255).not_null().default(""))
+            .col(ColumnDef::new(Menus::Status).char_len(1).not_null().default("1"))
+            .col(ColumnDef::new(Menus::Method).string_len(10).not_null().default(""))
+            .col(ColumnDef::new(Menus::Component).string_len(100).not_null().default(""))
+            .col(ColumnDef::new(Menus::Visible).char_len(1).not_null().default("1"))
+            .col(ColumnDef::new(Menus::IsCache).char_len(1).not_null().default("1"))
+            .col(ColumnDef::new(Menus::LogMethod).char_len(1).not_null().default("0"))
+            .col(ColumnDef::new(Menus::DataCacheMethod).char_len(1).not_null().default("0"))
+            .col(ColumnDef::new(Menus::IsFrame).char_len(1).not_null().default("0"))
+            .col(ColumnDef::new(Menus::DataScope).char_len(1).not_null().default("0"))
+            .col(ColumnDef::new(Menus::Remark).string_len(255).not_null().default(""))
             .col(
-                ColumnDef::new(SysMenus::CreatedAt)
+                ColumnDef::new(Menus::CreatedAt)
                     .date_time()
                     .not_null()
                     .extra("DEFAULT CURRENT_TIMESTAMP".to_string()),
             )
             .col(
-                ColumnDef::new(SysMenus::UpdatedAt)
+                ColumnDef::new(Menus::UpdatedAt)
                     .date_time()
                     .default(Value::Int(None)),
             )
             .col(
-                ColumnDef::new(SysMenus::DeletedAt)
+                ColumnDef::new(Menus::DeletedAt)
                     .date_time()
                     .default(Value::Int(None)),
             )
@@ -63,7 +58,7 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager.drop_table(
-            Table::drop().table(SysMenus::Table).to_owned()
+            Table::drop().table(Menus::Table).to_owned()
         ).await
     }
 }

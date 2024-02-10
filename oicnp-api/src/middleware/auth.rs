@@ -1,7 +1,5 @@
-use crate::models::auth::ReqCtx;
-use oicnp_core::G;
+use oicnp_core::{G, typings::State};
 use poem::{http::StatusCode, Body, Endpoint, Error, Middleware, Request, Response, Result};
-use crate::typings::State;
 
 /// 菜单授权中间件
 #[derive(Clone, Debug)]
@@ -33,12 +31,12 @@ impl<E: Endpoint> Endpoint for AuthEndpoint<E> {
         }
 
         // 如果是超级用户，则不需要验证权限，直接放行
-        if !ctx.login_info.uid.is_empty() && G.super_user.contains(&ctx.login_info.uid) {
+        if ctx.login_info.uid != 0 && G.super_user.contains(&ctx.login_info.uid) {
             return self.ep.call(req).await;
         }
 
         // 用户存在且不是非法用户直接放行
-        if !ctx.login_info.uid.is_empty() && !ctx.login_info.role.eq("Anonymous") {
+        if ctx.login_info.uid != 0 && !ctx.login_info.role.eq("Anonymous") {
             return self.ep.call(req).await;
         }
 

@@ -1,31 +1,27 @@
 use anyhow::{anyhow, Result};
 use crate::models::{NewShortLink, ShortLink};
-use crate::{DbConn};
+use crate::DbConn;
 use crate::entities::{
-    cms_short_links,
-    prelude::{
-        CmsShortLinks,
-    },
+    short_link,
+    prelude::*,
 };
 use sea_orm::*;
-use sea_query::{Alias, Expr};
-use crate::utils::uuid;
+use sea_query::Expr;
 
 pub async fn save_short_link(
     db: &DbConn,
     new_short_link: &NewShortLink
-) -> Result<String> {
-    let model_data = cms_short_links::ActiveModel {
-        id: Set(uuid()),
+) -> Result<i64> {
+    let model_data = short_link::ActiveModel {
         link: Set(String::from(&new_short_link.link)),
         name: Set(String::from(&new_short_link.name)),
         description: Set(String::from(&new_short_link.description)),
         deleted: Set(String::from(&new_short_link.deleted)),
-        created_by: Set(String::from(&new_short_link.created_by)),
+        created_by: Set(new_short_link.created_by),
         ..Default::default()
     };
 
-    let res: cms_short_links::Model = match model_data.insert(db).await {
+    let res: short_link::Model = match model_data.insert(db).await {
         Ok(data) => data,
         Err(err) => {
             return Err(anyhow!("Short links save failed {}", err.to_string()));
@@ -36,9 +32,9 @@ pub async fn save_short_link(
 }
 
 pub async fn find_short_link_by_id(db: &DbConn, id: &str) -> Result<ShortLink> {
-    let mut q = CmsShortLinks::find();
-    q = q.filter(cms_short_links::Column::Id.eq(id));
-    q = q.filter(cms_short_links::Column::Deleted.eq("0".to_string()));
+    let mut q = ShortLinkEntity::find();
+    q = q.filter(short_link::Column::Id.eq(id));
+    q = q.filter(short_link::Column::Deleted.eq("0".to_string()));
 
     let res = q.into_model::<ShortLink>().one(db).await?;
 
@@ -51,9 +47,9 @@ pub async fn find_short_link_by_id(db: &DbConn, id: &str) -> Result<ShortLink> {
 
 pub async fn update_short_link_viewed(db: &DbConn, id: &str) -> Result<i32> {
     if let Ok(res) = find_short_link_by_id(db, id).await {
-        CmsShortLinks::update_many()
-            .col_expr(cms_short_links::Column::Viewed, Expr::value(res.viewed + 1))
-            .filter(cms_short_links::Column::Id.eq(id))
+        ShortLinkEntity::update_many()
+            .col_expr(short_link::Column::Viewed, Expr::value(res.viewed + 1))
+            .filter(short_link::Column::Id.eq(id))
             .exec(db)
             .await?;
         return Ok(res.viewed + 1);

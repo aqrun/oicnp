@@ -4,5 +4,5 @@
 .idea
 Cargo.lock
 .env
-.vscode
+!.vscode
 node_modules
