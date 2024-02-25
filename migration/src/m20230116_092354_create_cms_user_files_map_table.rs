@@ -1,42 +1,37 @@
-use oicnp_core::prelude::sea_orm_migration::prelude::*;
+use sea_orm_migration::prelude::*;
 use super::types::*;
 
+#[derive(DeriveMigrationName)]
 pub struct Migration;
-
-impl MigrationName for Migration {
-    fn name(&self) -> &str {
-        "m20230116_092354_create_cms_user_files_map_table"
-    }
-}
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let table = Table::create()
-            .table(CmsUserFilesMap::Table)
+            .table(UserFilesMap::Table)
             .if_not_exists()
             .col(
-                ColumnDef::new(CmsUserFilesMap::Uid)
-                    .string_len(32)
+                ColumnDef::new(UserFilesMap::Uid)
+                    .big_integer()
                     .not_null()
-                    .default(""),
+                    .default(0),
             )
             .col(
-                ColumnDef::new(CmsUserFilesMap::Fid)
-                .string_len(32)
+                ColumnDef::new(UserFilesMap::FileId)
+                .big_integer()
                 .not_null()
-                .default(""),
+                .default(0),
             )
-            .col(ColumnDef::new(CmsUserFilesMap::Bundle).string_len(32).default(""))
-            .col(ColumnDef::new(CmsUserFilesMap::Weight).integer().default(0))
-            .col(ColumnDef::new(CmsUserFilesMap::Alt).string_len(512).default(""))
-            .col(ColumnDef::new(CmsUserFilesMap::Title).string_len(512).default(""))
-            .col(ColumnDef::new(CmsUserFilesMap::Width).big_integer().default(0))
-            .col(ColumnDef::new(CmsUserFilesMap::Height).big_integer().default(0))
+            .col(ColumnDef::new(UserFilesMap::Bundle).string_len(32).not_null().default(""))
+            .col(ColumnDef::new(UserFilesMap::Weight).integer().not_null().default(0))
+            .col(ColumnDef::new(UserFilesMap::Alt).string_len(512).not_null().default(""))
+            .col(ColumnDef::new(UserFilesMap::Title).string_len(512).not_null().default(""))
+            .col(ColumnDef::new(UserFilesMap::Width).big_integer().not_null().default(0))
+            .col(ColumnDef::new(UserFilesMap::Height).big_integer().not_null().default(0))
             .primary_key(
                 Index::create()
-                    .col(CmsUserFilesMap::Uid)
-                    .col(CmsUserFilesMap::Fid),
+                    .col(UserFilesMap::Uid)
+                    .col(UserFilesMap::FileId),
             )
             .to_owned();
         
@@ -45,7 +40,7 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
-            .drop_table(Table::drop().table(CmsUserFilesMap::Table).to_owned())
+            .drop_table(Table::drop().table(UserFilesMap::Table).to_owned())
             .await
     }
 }

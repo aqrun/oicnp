@@ -1,51 +1,50 @@
-use oicnp_core::prelude::sea_orm_migration::prelude::*;
+use sea_orm_migration::prelude::*;
 use super::types::*;
 
 const INDEX_PARENT_ID: &'static str = "idx-departments-parentId";
 
+#[derive(DeriveMigrationName)]
 pub struct Migration;
-
-impl MigrationName for Migration {
-    fn name(&self) -> &str {
-        "m20220825_211845_create_departments_table"
-    }
-}
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let table = Table::create()
-            .table(SysDepartments::Table)
+            .table(Departments::Table)
             .if_not_exists()
             .col(
-                ColumnDef::new(SysDepartments::Id)
-                    .string_len(32)
+                ColumnDef::new(Departments::DptId)
+                    .big_integer()
                     .not_null()
                     .primary_key()
-                    .unique_key(),
+                    .auto_increment(),
             )
-            .col(ColumnDef::new(SysDepartments::ParentId).string_len(32).not_null())
-            .col(ColumnDef::new(SysDepartments::Name).string_len(32).default(""))
-            .col(ColumnDef::new(SysDepartments::Weight).small_integer().default(0))
-            .col(ColumnDef::new(SysDepartments::Leader).string_len(20).default(""))
-            .col(ColumnDef::new(SysDepartments::Phone).string_len(11).default(""))
-            .col(ColumnDef::new(SysDepartments::Email).string_len(50).default(""))
-            .col(ColumnDef::new(SysDepartments::Status).char_len(1).default("1"))
-            .col(ColumnDef::new(SysDepartments::CreatedBy).string_len(32).not_null())
-            .col(ColumnDef::new(SysDepartments::UpdatedBy).string_len(32).default(""))
             .col(
-                ColumnDef::new(SysDepartments::CreatedAt)
+                ColumnDef::new(Departments::Pid)
+                .big_integer()
+                .not_null()
+                .default(0)
+            )
+            .col(ColumnDef::new(Departments::Name).string_len(32).not_null().default(""))
+            .col(ColumnDef::new(Departments::Weight).small_integer().not_null().default(0))
+            .col(ColumnDef::new(Departments::Leader).string_len(20).not_null().default(""))
+            .col(ColumnDef::new(Departments::Phone).string_len(11).not_null().default(""))
+            .col(ColumnDef::new(Departments::Email).string_len(50).not_null().default(""))
+            .col(ColumnDef::new(Departments::Status).char_len(1).not_null().default("1"))
+            .col(ColumnDef::new(Departments::CreatedBy).big_integer().not_null().default(0))
+            .col(ColumnDef::new(Departments::UpdatedBy).big_integer().not_null().default(0))
+            .col(
+                ColumnDef::new(Departments::CreatedAt)
                     .date_time()
-                    .not_null()
                     .extra("DEFAULT CURRENT_TIMESTAMP".to_string()),
             )
             .col(
-                ColumnDef::new(SysDepartments::UpdatedAt)
+                ColumnDef::new(Departments::UpdatedAt)
                     .date_time()
                     .default(Value::Int(None)),
             )
             .col(
-                ColumnDef::new(SysDepartments::DeletedAt)
+                ColumnDef::new(Departments::DeletedAt)
                     .date_time()
                     .default(Value::Int(None)),
             )
@@ -56,8 +55,8 @@ impl MigrationTrait for Migration {
         let idx_parent_id = Index::create()
             .if_not_exists()
             .name(INDEX_PARENT_ID)
-            .table(SysDepartments::Table)
-            .col(SysDepartments::ParentId)
+            .table(Departments::Table)
+            .col(Departments::Pid)
             .to_owned();
 
         manager.create_table(table).await?;
@@ -68,11 +67,11 @@ impl MigrationTrait for Migration {
         manager.drop_index(
             Index::drop()
                 .name(INDEX_PARENT_ID)
-                .table(SysDepartments::Table)
+                .table(Departments::Table)
                 .to_owned(),
         ).await?;
         manager.drop_table(
-            Table::drop().table(SysDepartments::Table).to_owned()
+            Table::drop().table(Departments::Table).to_owned()
         ).await
     }
 }

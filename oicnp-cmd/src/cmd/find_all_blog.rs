@@ -2,7 +2,7 @@ use crate::constants::CATEGORIES;
 use crate::models::{Blog, BlogMatter, Category, MatterTaxonomy};
 use gray_matter::engine::YAML;
 use gray_matter::Matter;
-use oicnp_api::utils::{generate_slug, is_valid_matter_content};
+use oicnp_core::utils::{generate_slug, is_valid_matter_content};
 use oicnp_core::prelude::{
     anyhow::{anyhow, Result},
     chrono::prelude::*,
@@ -18,7 +18,7 @@ use std::fs;
 use std::io::Read;
 use std::path::PathBuf;
 
-pub async fn run(format: &str, blog_base: &str, dist_file: &str) {
+pub async fn run(_format: &str, blog_base: &str, dist_file: &str) {
     fast_log::init(
         fast_log::Config::new()
             .console()
@@ -48,13 +48,13 @@ pub async fn run(format: &str, blog_base: &str, dist_file: &str) {
         }
         _ => {
             info!(
-                "\n[OICP] Blog save completed! total: {}",
+                "\n[OICNP] Blog save completed! total: {}",
                 &all_blogs.capacity()
             );
         }
     }
     info!(
-        "\n[OICP] Blog handle end at: {}",
+        "\n[OICNP] Blog handle end at: {}",
         Local::now().format("%Y-%m-%d %H:%M:%S")
     );
 }

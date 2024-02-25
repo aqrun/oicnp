@@ -40,7 +40,7 @@ pub fn check_auth(query: &str, auth_token: &str) -> Result<String> {
     // 不是公开接口 需要检测用户token的合法性
     let claims = decode_jwt(auth_token, !is_public_query)?;
 
-    if claims.uid.is_empty() {
+    if claims.uid == 0 {
         return Err(anyhow!("Anonymous"));
     }
 

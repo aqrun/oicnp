@@ -3,20 +3,20 @@ use crate::constants::CATEGORIES;
 use crate::{models::Blog, Cli};
 use oicnp_core::{
     establish_connection,
-    models::{NewNode, NewTaxonomy, Node, NewTag},
+    models::{NewNode, NewCategory, Node, NewTag},
     prelude::{
         anyhow::{anyhow, Result},
         chrono::NaiveDateTime,
         serde_json,
     },
     services::{
-        find_taxonomy_by_vid, save_node, save_node_content, save_node_taxonomies_map,
-        save_taxonomies, save_tags, find_tag_by_vid, save_node_tags_map,
+        find_category_by_vid, save_node, save_node_content, save_node_categories_map,
+        save_categories, save_tags, find_tag_by_vid, save_node_tags_map,
     },
     typings::{BodyFormat, NodeBundle},
     DatabaseConnection, DbConn, DB,
 };
-use oicnp_api::utils::generate_slug;
+use oicnp_core::utils::generate_slug;
 use rand::{thread_rng, Rng};
 use std::collections::HashMap;
 use std::fs::File;
@@ -57,7 +57,7 @@ pub async fn save_blogs(cli: &Cli) {
                 let body = blog.content.as_ref().unwrap().as_str();
                 let res = save_node_content(
                     db,
-                    node.nid.as_str(),
+                    node.nid,
                     body,
                     BodyFormat::Markdown,
                     blog.excerpt.as_str(),
@@ -68,12 +68,12 @@ pub async fn save_blogs(cli: &Cli) {
                     println!("Save node content failed: {}", err);
                 }
 
-                if let Ok(cat_data) = find_taxonomy_by_vid(db, blog.category.as_str()).await {
-                    if let Err(res) = save_node_taxonomies_map(
+                if let Ok(cat_data) = find_category_by_vid(db, blog.category.as_str()).await {
+                    if let Err(res) = save_node_categories_map(
                         db,
                         node.bundle.as_str(),
-                        node.nid.as_str(),
-                        cat_data.tid.as_str(),
+                        node.nid,
+                        cat_data.cat_id,
                     )
                     .await
                     {
@@ -110,8 +110,8 @@ async fn save_blog(db: &DatabaseConnection, blog: &Blog, index: i32) -> Result<N
         bundle: bundle.to_string(),
         title: String::from(&blog.title),
         deleted: false,
-        created_by: "1".to_string(),
-        updated_by: "1".to_string(),
+        created_by: 1,
+        updated_by: 1,
         created_at: date,
         updated_at: date,
         published_at: Some(date),
@@ -143,69 +143,70 @@ async fn save_taxonomies_data(db: &DbConn) -> Result<String> {
 
     //let mut err = String::from("");
     // 要存储的父级数据
-    let mut parent_taxonomies: Vec<NewTaxonomy> = Vec::new();
+    let mut parent_taxonomies: Vec<NewCategory> = Vec::new();
 
     // 先把第一父级保存
     for item in categories.iter() {
         if item.parent.eq("") {
-            parent_taxonomies.push(NewTaxonomy {
+            parent_taxonomies.push(NewCategory {
                 vid: item.vid.to_string(),
-                pid: item.parent.to_string(),
+                pid: 0,
                 name: item.name.to_string(),
-                description: "".to_string(),
-                description_format: "".to_string(),
+                desc: "".to_string(),
+                desc_format: "".to_string(),
                 weight: item.weight,
             });
         }
     }
 
-    match save_taxonomies(db, &parent_taxonomies).await {
+    match save_categories(db, &parent_taxonomies).await {
         Ok(_data) => {}
         Err(err) => {
             println!("Save parent taxonmies failed {:?}", err);
         }
     };
 
-    let mut new_taxonomies: Vec<NewTaxonomy> = Vec::new();
+    let mut new_taxonomies: Vec<NewCategory> = Vec::new();
     // 缓存父级 tid Map{vid: tid}
-    let mut parent_taxonomies: HashMap<String, String> = HashMap::new();
+    let mut parent_taxonomies: HashMap<String, i64> = HashMap::new();
 
     for item in categories.iter() {
         // 跳过已保存的父级
         if item.parent.eq("") {
             continue;
         }
-        let mut pid = "".to_string();
+        let mut pid: i64 = 0;
 
         // 先获取缓存数据
         if let Some(data) = parent_taxonomies.get(item.parent) {
-            pid = data.to_string();
+            pid = *data;
         }
 
         // 缓存数据不存在 且 parent不为空
-        if pid.eq("") && !item.parent.eq("") {
-            if let Ok(res) = find_taxonomy_by_vid(db, item.parent).await {
-                pid = String::from(&res.tid);
-                parent_taxonomies.insert(item.parent.to_string(), String::from(&res.tid));
+        if pid == 0 && !item.parent.eq("") {
+            if let Ok(res) = find_category_by_vid(db, item.parent).await {
+                pid = res.cat_pid;
+                parent_taxonomies.insert(item.parent.to_string(), res.cat_id);
             }
         }
 
-        new_taxonomies.push(NewTaxonomy {
+        new_taxonomies.push(NewCategory {
             vid: item.vid.to_string(),
             pid,
             name: item.name.to_string(),
-            description: "".to_string(),
-            description_format: "".to_string(),
+            desc: "".to_string(),
+            desc_format: "".to_string(),
             weight: item.weight,
         });
     }
 
-    match save_taxonomies(db, &new_taxonomies).await {
+    match save_categories(db, &new_taxonomies).await {
         Err(err) => Err(anyhow!(err)),
         _ => Ok("success".to_string()),
     }
 }
 
+/// 存储标签数据
 async fn save_tags_data(db: &DbConn, all_blogs: &[Blog]) -> Result<String> {
     let mut all_tags: Vec<String> = Vec::new();
     // 收集所有标签
@@ -244,8 +245,8 @@ async fn save_node_tags_map_data(db: &DbConn, node: &Node, blog_tags: &[String])
                 if let Err(res) = save_node_tags_map(
                     db,
                     node.bundle.as_str(),
-                    node.nid.as_str(),
-                    res.tag_id.as_str(),
+                    node.nid,
+                    res.tag_id,
                 ).await {
                     println!("Save Node_taxonomies_map failed: {}", res);
                 }

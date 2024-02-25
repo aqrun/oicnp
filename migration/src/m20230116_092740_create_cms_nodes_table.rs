@@ -1,52 +1,48 @@
-use oicnp_core::prelude::sea_orm_migration::prelude::*;
+use sea_orm_migration::prelude::*;
 use super::types::*;
 
+#[derive(DeriveMigrationName)]
 pub struct Migration;
-
-impl MigrationName for Migration {
-    fn name(&self) -> &str {
-        "m20230116_092740_create_cms_nodes_table"
-    }
-}
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let table = Table::create()
-            .table(CmsNodes::Table)
+            .table(Nodes::Table)
             .if_not_exists()
             .col(
-                ColumnDef::new(CmsNodes::Nid)
-                    .string_len(32)
+                ColumnDef::new(Nodes::Nid)
+                    .big_integer()
                     .not_null()
                     .primary_key()
-                    .unique_key(),
+                    .auto_increment(),
             )
-            .col(ColumnDef::new(CmsNodes::Vid).string_len(255).default(""))
-            .col(ColumnDef::new(CmsNodes::Bundle).string_len(64).default(""))
-            .col(ColumnDef::new(CmsNodes::Title).string_len(512).default(""))
-            .col(ColumnDef::new(CmsNodes::Viewed).integer().default(0))
-            .col(ColumnDef::new(CmsNodes::Deleted).char_len(1).default("0"))
+            .col(ColumnDef::new(Nodes::Uuid).string_len(32).not_null().default(""))
+            .col(ColumnDef::new(Nodes::Vid).string_len(255).not_null().default(""))
+            .col(ColumnDef::new(Nodes::Bundle).string_len(64).not_null().default(""))
+            .col(ColumnDef::new(Nodes::Title).string_len(512).not_null().default(""))
+            .col(ColumnDef::new(Nodes::Viewed).integer().not_null().default(0))
+            .col(ColumnDef::new(Nodes::Deleted).char_len(1).not_null().default("0"))
             .col(
-                ColumnDef::new(CmsNodes::PublishedAt)
+                ColumnDef::new(Nodes::PublishedAt)
                     .date_time()
                     .default(Value::Int(None)),
             )
-            .col(ColumnDef::new(CmsNodes::CreatedBy).string_len(32).default(""))
-            .col(ColumnDef::new(CmsNodes::UpdatedBy).string_len(32).default(""))
+            .col(ColumnDef::new(Nodes::CreatedBy).big_integer().not_null().default(0))
+            .col(ColumnDef::new(Nodes::UpdatedBy).big_integer().not_null().default(0))
             .col(
-                ColumnDef::new(CmsNodes::CreatedAt)
+                ColumnDef::new(Nodes::CreatedAt)
                     .date_time()
                     .not_null()
                     .extra("DEFAULT CURRENT_TIMESTAMP".to_string()),
             )
             .col(
-                ColumnDef::new(CmsNodes::UpdatedAt)
+                ColumnDef::new(Nodes::UpdatedAt)
                     .date_time()
                     .default(Value::Int(None)),
             )
             .col(
-                ColumnDef::new(CmsNodes::DeletedAt)
+                ColumnDef::new(Nodes::DeletedAt)
                     .date_time()
                     .default(Value::Int(None))
             )
@@ -57,7 +53,7 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
-            .drop_table(Table::drop().table(CmsNodes::Table).to_owned())
+            .drop_table(Table::drop().table(Nodes::Table).to_owned())
             .await
     }
 }

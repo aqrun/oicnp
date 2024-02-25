@@ -1,41 +1,36 @@
-use oicnp_core::prelude::sea_orm_migration::prelude::*;
+use sea_orm_migration::prelude::*;
 use super::types::*;
 
+#[derive(DeriveMigrationName)]
 pub struct Migration;
-
-impl MigrationName for Migration {
-    fn name(&self) -> &str {
-        "m20220825_212250_create_user_department_map_table"
-    }
-}
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let table = Table::create()
-            .table(SysUserDepartmentMap::Table)
+            .table(UserDepartmentMap::Table)
             .if_not_exists()
             .col(
-                ColumnDef::new(SysUserDepartmentMap::Uid)
-                    .string_len(32)
+                ColumnDef::new(UserDepartmentMap::Uid)
+                    .big_integer()
                     .not_null(),
             )
             .col(
-                ColumnDef::new(SysUserDepartmentMap::DepartmentId)
-                    .string_len(32)
+                ColumnDef::new(UserDepartmentMap::DptId)
+                    .big_integer()
                     .not_null(),
             )
-            .col(ColumnDef::new(SysUserDepartmentMap::CreatedBy).string_len(32).default(""))
+            .col(ColumnDef::new(UserDepartmentMap::CreatedBy).big_integer().default(0))
             .col(
-                ColumnDef::new(SysUserDepartmentMap::CreatedAt)
+                ColumnDef::new(UserDepartmentMap::CreatedAt)
                     .date_time()
                     .not_null()
                     .extra("DEFAULT CURRENT_TIMESTAMP".to_string()),
             )
             .primary_key(
                 Index::create()
-                    .col(SysUserDepartmentMap::Uid)
-                    .col(SysUserDepartmentMap::DepartmentId),
+                    .col(UserDepartmentMap::Uid)
+                    .col(UserDepartmentMap::DptId),
             )
             .to_owned();
 
@@ -44,7 +39,7 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager.drop_table(
-            Table::drop().table(SysUserDepartmentMap::Table).to_owned()
+            Table::drop().table(UserDepartmentMap::Table).to_owned()
         ).await
     }
 }

@@ -1,46 +1,41 @@
-use oicnp_core::prelude::sea_orm_migration::prelude::*;
+use sea_orm_migration::prelude::*;
 use super::types::*;
 
+#[derive(DeriveMigrationName)]
 pub struct Migration;
-
-impl MigrationName for Migration {
-    fn name(&self) -> &str {
-        "m20220825_212228_create_update_logs_table"
-    }
-}
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let table = Table::create()
-            .table(SysUpdateLogs::Table)
+            .table(UpdateLogs::Table)
             .if_not_exists()
             .col(
-                ColumnDef::new(SysUpdateLogs::Id)
-                    .string_len(32)
+                ColumnDef::new(UpdateLogs::Id)
+                    .big_integer()
                     .not_null()
                     .primary_key()
-                    .unique_key(),
+                    .auto_increment(),
             )
-            .col(ColumnDef::new(SysUpdateLogs::AppVersion).string_len(10).default(""))
-            .col(ColumnDef::new(SysUpdateLogs::BackendVersion).string_len(10).default(""))
-            .col(ColumnDef::new(SysUpdateLogs::Title).string_len(100).default(""))
-            .col(ColumnDef::new(SysUpdateLogs::Content).text().default(""))
-            .col(ColumnDef::new(SysUpdateLogs::CreatedBy).string_len(32).not_null())
-            .col(ColumnDef::new(SysUpdateLogs::UpdatedBy).string_len(32).default(""))
+            .col(ColumnDef::new(UpdateLogs::AppVersion).string_len(10).not_null().default(""))
+            .col(ColumnDef::new(UpdateLogs::BackendVersion).string_len(10).not_null().default(""))
+            .col(ColumnDef::new(UpdateLogs::Title).string_len(100).not_null().default(""))
+            .col(ColumnDef::new(UpdateLogs::Content).text().not_null().default(""))
+            .col(ColumnDef::new(UpdateLogs::CreatedBy).big_integer().not_null().default(0))
+            .col(ColumnDef::new(UpdateLogs::UpdatedBy).big_integer().not_null().default(0))
             .col(
-                ColumnDef::new(SysUpdateLogs::CreatedAt)
+                ColumnDef::new(UpdateLogs::CreatedAt)
                     .date_time()
                     .not_null()
                     .extra("DEFAULT CURRENT_TIMESTAMP".to_string()),
             )
             .col(
-                ColumnDef::new(SysUpdateLogs::UpdatedAt)
+                ColumnDef::new(UpdateLogs::UpdatedAt)
                     .date_time()
                     .default(Value::Int(None)),
             )
             .col(
-                ColumnDef::new(SysUpdateLogs::DeletedAt)
+                ColumnDef::new(UpdateLogs::DeletedAt)
                     .date_time()
                     .default(Value::Int(None)),
             )
@@ -51,7 +46,7 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager.drop_table(
-            Table::drop().table(SysUpdateLogs::Table).to_owned()
+            Table::drop().table(UpdateLogs::Table).to_owned()
         ).await
     }
 }

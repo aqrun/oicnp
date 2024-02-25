@@ -1,29 +1,24 @@
-use oicnp_core::prelude::sea_orm_migration::prelude::*;
+use sea_orm_migration::prelude::*;
 use super::types::*;
 
+#[derive(DeriveMigrationName)]
 pub struct Migration;
-
-impl MigrationName for Migration {
-    fn name(&self) -> &str {
-        "m20230116_092714_create_cms_comment_body_table"
-    }
-}
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let table = Table::create()
-            .table(CmsCommentBody::Table)
+            .table(CommentBody::Table)
             .if_not_exists()
             .col(
-                ColumnDef::new(CmsCommentBody::CommentId)
-                    .string_len(32)
+                ColumnDef::new(CommentBody::CommentId)
+                    .big_integer()
                     .not_null()
                     .primary_key()
                     .unique_key(),
             )
-            .col(ColumnDef::new(CmsCommentBody::Body).text().default(""))
-            .col(ColumnDef::new(CmsCommentBody::BodyFormat).string_len(20).default(""))
+            .col(ColumnDef::new(CommentBody::Body).text().not_null().default(""))
+            .col(ColumnDef::new(CommentBody::BodyFormat).string_len(20).not_null().default(""))
             .to_owned();
         
         manager.create_table(table).await
@@ -31,7 +26,7 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
-            .drop_table(Table::drop().table(CmsCommentBody::Table).to_owned())
+            .drop_table(Table::drop().table(CommentBody::Table).to_owned())
             .await
     }
 }
