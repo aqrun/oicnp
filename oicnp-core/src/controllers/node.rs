@@ -113,5 +113,15 @@ impl NodeMutations {
         // Ok(format!("Node create success {}", title))
         return Err(anyhow!(""))
     }
+
+    async fn update_node(&self, ctx: &Context<'_>, title: String) -> Result<String> {
+        // Ok(format!("Node create success {}", title))
+        return Err(anyhow!(""))
+    }
+
+    async fn delete_node(&self, ctx: &Context<'_>, title: String) -> Result<String> {
+        // Ok(format!("Node create success {}", title))
+        return Err(anyhow!(""))
+    }
 }
 

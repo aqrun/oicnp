@@ -1,4 +1,4 @@
-use crate::constants::CATEGORIES;
+use crate::constants::{CATEGORIES, VID_READING};
 use crate::models::{Blog, BlogMatter, Category, MatterTaxonomy};
 use gray_matter::engine::YAML;
 use gray_matter::Matter;
@@ -127,7 +127,15 @@ fn find_all_blogs(categories: &Vec<Category>, blog_base: &str) -> Vec<Blog> {
     let base = PathBuf::from(blog_base);
     let mut all_blogs: Vec<Blog> = vec![];
 
-    for item in categories.iter() {
+    // 内容分类
+    let article_categories = categories
+        .iter()
+        .filter(|item| {
+            item.parent.eq("cms") && !item.vid.eq(VID_READING)
+        })
+        .collect::<Vec<&Category>>();
+
+    for item in article_categories.iter() {
         if item.dir.eq("") {
             continue;
         }
