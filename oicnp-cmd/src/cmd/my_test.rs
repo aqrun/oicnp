@@ -1,18 +1,13 @@
 use oicnp_core::{
-    entities::{
-        cms_nodes, cms_taxonomies,
-        prelude::{CmsNodes, CmsTaxonomies},
-    },
-    establish_connection,
+    entities::prelude::*,
     prelude::sea_orm::*,
-    services::{find_node_taxonomies, find_nodes},
-    typings::NodeBundle,
+    services::{find_node_categories, find_nodes},
     utils::{
         get_config_file_path, slugify_paths_without_date, uuid,
     },
-    DatabaseConnection, DB,
+    DatabaseConnection,
 };
-use migration::types::SysDepartments;
+use migration::types::Departments;
 
 pub async fn run() {
     println!("Test run----");
@@ -36,9 +31,9 @@ pub async fn run() {
 }
 
 fn derive_test() {
-    let file_name = SysDepartments::table_name("oic_");
-    println!("file____  {:?} --- {:?}", file_name.to_string(), SysDepartments::Weight.default_value());
-    println!("Status: {:?}", SysDepartments::Status.default_value());
+    let file_name = Departments::table_name("oic_");
+    println!("file____  {:?} --- {:?}", file_name.to_string(), Departments::Weight.default_value());
+    println!("Status: {:?}", Departments::Status.default_value());
 }
 
 fn generate_uuid() {
@@ -51,10 +46,10 @@ fn generate_uuid() {
 }
 
 fn column_from_str() {
-    let a = cms_nodes::Column::try_from("created_at").unwrap();
+    let a = NodeColumn::try_from("created_at").unwrap();
 
     match a {
-        cms_nodes::Column::CreatedAt => {
+        NodeColumn::CreatedAt => {
             println!("matched createdat {:?}", a);
         }
         _ => {
@@ -63,8 +58,8 @@ fn column_from_str() {
     };
 }
 
-async fn get_node_taxonomies(db: &DbConn) {
-    let a = find_node_taxonomies(db, "1hss6so1js8ac").await;
+async fn get_node_categories(db: &DbConn) {
+    let a = find_node_categories(db, 1).await;
 }
 
 /// slug 函数测试
@@ -133,16 +128,16 @@ pub async fn find_node_with_body(db: &DatabaseConnection) {
 }
 
 // 按分类查找
-pub async fn find_nodes_by_taxonomy(db: &DatabaseConnection) {
+pub async fn find_nodes_by_category(db: &DatabaseConnection) {
     let page_size = 2;
     let page = 2;
-    let q = CmsNodes::find()
-        .find_also_related(CmsTaxonomies)
+    let q = NodeEntity::find()
+        .find_also_related(CategoryEntity)
         // .select_only()
         // .column(cms_nodes::Column::Nid)
         // .column(cms_nodes::Column::Title)
         // .column(cms_taxonomies::Column::Name)
-        .filter(cms_taxonomies::Column::Name.eq("rust"));
+        .filter(CategoryColumn::CatName.eq("rust"));
 
     let paginator = q.paginate(db, page_size);
     let total_page = paginator.num_pages().await.unwrap();

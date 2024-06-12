@@ -10,6 +10,8 @@ pub struct AppConfig {
     pub redis_url: String,
     /// 数据库地址
     pub database_url: String,
+    /// 数据表前缀
+    pub table_prefix: String,
     /// graphql 地址
     pub graphql_url: String,
     /// 逻辑删除字段
@@ -35,7 +37,7 @@ pub struct AppConfig {
     /// jwt 密钥
     pub jwt_secret: String,
     /// 超级管理员用户ID
-    pub super_user: Vec<String>,
+    pub super_user: Vec<i64>,
     /// 白名单接口
     pub white_list_api: Vec<String>,
     /// 权限缓存类型

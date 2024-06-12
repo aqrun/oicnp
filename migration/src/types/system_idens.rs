@@ -2,7 +2,7 @@ use sea_orm_migration::prelude::*;
 use oicnp_derives::Column as OicColumn;
 
 #[derive(Iden, OicColumn)]
-pub enum SysApiDb {
+pub enum ApiDb {
     Table,
     // #[oic()]
     ApiId,
@@ -12,107 +12,107 @@ pub enum SysApiDb {
 // sys_dept
 #[derive(Iden, OicColumn)]
 #[oic(comment = "部门表")]
-pub enum SysDepartments {
+pub enum Departments {
     Table,
-    #[oic(data_type = "string", len = 32, comment = "部门ID")]
-    Id,
-    #[oic(data_type = "string", len = 32, default = "" comment = "父部门id")]
-    ParentId,
-    #[oic(data_type = "string", len = 32, default = "" comment = "部门名称")]
+    #[oic(data_type = "bigInt", comment = "部门ID")]
+    DptId,
+    #[oic(data_type = "bigInt", default = 0, comment = "父部门id")]
+    Pid,
+    #[oic(data_type = "string", len = 32, default = "", comment = "部门名称")]
     Name,
-    #[oic(data_type = "int", len = 4, default = 0 comment = "权重")]
+    #[oic(data_type = "int", len = 4, default = 0, comment = "权重")]
     Weight,
-    #[oic(data_type = "string", len = 20, default = "" comment = "负责人")]
+    #[oic(data_type = "string", len = 20, default = "", comment = "负责人")]
     Leader,
-    #[oic(data_type = "string", len = 11, default = "" comment = "联系电话")]
+    #[oic(data_type = "string", len = 11, default = "", comment = "联系电话")]
     Phone,
-    #[oic(data_type = "string", len = 50, default = "" comment = "邮箱")]
+    #[oic(data_type = "string", len = 50, default = "", comment = "邮箱")]
     Email,
-    #[oic(data_type = "char", len = 1, default = "0" comment = "部门状态（0正常 1停用）")]
+    #[oic(data_type = "char", len = 1, default = "0", comment = "部门状态（0正常 1停用）")]
     Status,
-    #[oic(data_type = "string", len = 32, default = "" comment = "创建者")]
+    #[oic(data_type = "bigInt", len = 20, default = 0, comment = "创建者")]
     CreatedBy,
     #[oic(data_type = "datetime", comment = "创建时间")]
     CreatedAt,
-    #[oic(data_type = "string", len = 32, default = "" comment = "更新者")]
+    #[oic(data_type = "bigInt", len = 20, default = 0, comment = "更新者")]
     UpdatedBy,
-    #[oic(data_type = "datetime", default = "null" comment = "更新时间")]
+    #[oic(data_type = "datetime", default = "null", comment = "更新时间")]
     UpdatedAt,
-    #[oic(data_type = "datetime", default = "null" comment = "删除时间")]
+    #[oic(data_type = "datetime", default = "null", comment = "删除时间")]
     DeletedAt,
 }
 
 // sys_dict_type
 #[derive(Iden, OicColumn)]
 #[oic(comment = "字典类型表")]
-pub enum SysAttributes {
+pub enum Attributes {
     Table,
-    #[oic(data_type = "string", len = 32, default = "" comment = "字典主键")]
+    #[oic(data_type = "bigInt", len = 20, comment = "字典主键")]
     Id,
     // 原 type
-    #[oic(data_type = "string", len = 100, unique = true, default = "" comment = "字典类型")]
+    #[oic(data_type = "string", len = 100, unique = true, default = "", comment = "字典类型")]
     Vid,
-    #[oic(data_type = "string", len = 100, default = "" comment = "字典名称")]
+    #[oic(data_type = "string", len = 100, default = "", comment = "字典名称")]
     Name,
-    #[oic(data_type = "char", len = 1, default = "0" comment = "状态（0正常 1停用）")]
+    #[oic(data_type = "char", len = 1, default = "0", comment = "状态（0正常 1停用）")]
     Status,
-    #[oic(data_type = "string", len = 500, default = "" comment = "备注")]
+    #[oic(data_type = "string", len = 500, default = "", comment = "备注")]
     Remark,
-    #[oic(data_type = "string", len = 32, default = "" comment = "创建者")]
+    #[oic(data_type = "bigInt", len = 20, default = 0, comment = "创建者")]
     CreatedBy,
     #[oic(data_type = "datetime", comment = "创建时间")]
     CreatedAt,
-    #[oic(data_type = "string", len = 32, default = "" comment = "更新者")]
+    #[oic(data_type = "bigInt", len = 20, default = 0, comment = "更新者")]
     UpdatedBy,
-    #[oic(data_type = "datetime", default = "null" comment = "更新时间")]
+    #[oic(data_type = "datetime", default = "null", comment = "更新时间")]
     UpdatedAt,
-    #[oic(data_type = "datetime", default = "null" comment = "删除时间")]
+    #[oic(data_type = "datetime", default = "null", comment = "删除时间")]
     DeletedAt,
 }
 
 // sys_dict_data
 #[derive(Iden, OicColumn)]
 #[oic(comment = "字典数据表")]
-pub enum SysAttributeValues {
+pub enum AttributeValues {
     Table,
-    #[oic(data_type = "string", len = 32, default = "" comment = "字典主键")]
+    #[oic(data_type = "bigInt", len = 20, default = "", comment = "字典主键")]
     Id,
-    #[oic(data_type = "string", len = 100, default = "" comment = "字典类型")]
-    AttributeVid,
-    #[oic(data_type = "string", len = 100, default = "" comment = "字典标签")]
+    #[oic(data_type = "string", len = 100, default = "", comment = "字典类型")]
+    Vid,
+    #[oic(data_type = "string", len = 100, default = "", comment = "字典标签")]
     Label,
-    #[oic(data_type = "string", len = 100, default = "" comment = "字典键值")]
+    #[oic(data_type = "string", len = 100, default = "", comment = "字典键值")]
     Value,
-    #[oic(data_type = "int", len = 4, default = 0 comment = "权重")]
+    #[oic(data_type = "int", len = 4, default = 0, comment = "权重")]
     Weight,
-    #[oic(data_type = "string", len = 100, default = "" comment = "样式属性（其他样式扩展）")]
+    #[oic(data_type = "string", len = 100, default = "", comment = "样式属性（其他样式扩展）")]
     CssClass,
-    #[oic(data_type = "string", len = 100, default = "" comment = "表格回显样式")]
+    #[oic(data_type = "string", len = 100, default = "", comment = "表格回显样式")]
     ListClass,
-    #[oic(data_type = "char", len = 1, default = "N" comment = "是否默认（Y是 N否）")]
+    #[oic(data_type = "char", len = 1, default = "N", comment = "是否默认（Y是 N否）")]
     IsDefault,
-    #[oic(data_type = "char", len = 1, default = "0" comment = "状态（0正常 1停用）")]
+    #[oic(data_type = "char", len = 1, default = "0", comment = "状态（0正常 1停用）")]
     Status,
-    #[oic(data_type = "string", len = 500, default = "" comment = "备注")]
+    #[oic(data_type = "string", len = 500, default = "", comment = "备注")]
     Remark,
-    #[oic(data_type = "string", len = 32, default = "" comment = "创建者")]
+    #[oic(data_type = "bigInt", len = 20, default = 0, comment = "创建者")]
     CreatedBy,
     #[oic(data_type = "datetime", comment = "创建时间")]
     CreatedAt,
-    #[oic(data_type = "string", len = 32, default = "" comment = "更新者")]
+    #[oic(data_type = "bigInt", len = 20, default = 0, comment = "更新者")]
     UpdatedBy,
-    #[oic(data_type = "datetime", default = "null" comment = "更新时间")]
+    #[oic(data_type = "datetime", default = "null", comment = "更新时间")]
     UpdatedAt,
-    #[oic(data_type = "datetime", default = "null" comment = "删除时间")]
+    #[oic(data_type = "datetime", default = "null", comment = "删除时间")]
     DeletedAt,
 }
 
 // sys_job
 #[derive(Iden, OicColumn)]
 #[oic(comment = "定时任务调度表")]
-pub enum SysCrons {
+pub enum Crons {
     Table,
-    #[oic(data_type = "string", len = 32, comment = "任务ID")]
+    #[oic(data_type = "bigInt", comment = "任务ID")]
     Id,
     #[oic(data_type = "string", len = 100, default = "", comment = "vid")]
     Vid,
@@ -144,11 +144,11 @@ pub enum SysCrons {
     NextTime,
     #[oic(data_type = "datetime", default = "null", comment = "结束时间")]
     EndTime,
-    #[oic(data_type = "string", len = 32, default = "", comment = "创建者")]
+    #[oic(data_type = "bigInt", len = 20, default = 0 comment = "创建者")]
     CreatedBy,
     #[oic(data_type = "datetime", comment = "创建时间")]
     CreatedAt,
-    #[oic(data_type = "string", len = 32, default = "", comment = "更新者")]
+    #[oic(data_type = "bigInt", len = 20, default = 0 comment = "更新者")]
     UpdatedBy,
     #[oic(data_type = "datetime", default = "null", comment = "更新时间")]
     UpdatedAt,
@@ -158,13 +158,13 @@ pub enum SysCrons {
 
 // sys_job_log
 #[derive(Iden, OicColumn)]
-pub enum SysCronLogs {
+pub enum CronLogs {
     Table,
-    #[oic(data_type = "string", len = 32, comment = "任务日志ID")]
+    #[oic(data_type = "bigInt", len = 20, comment = "任务日志ID")]
     Id,
-    #[oic(data_type = "string", len = 32, comment = "cron id")]
+    #[oic(data_type = "bigInt", len = 20, comment = "cron id")]
     CronId,
-    #[oic(data_type = "string", len = 32, default = "", comment = "")]
+    #[oic(data_type = "bitInt", len = 20, default = 0, comment = "")]
     LotId,
     #[oic(data_type = "int", len = 4, default = 0, comment = "权重")]
     Weight,
@@ -192,9 +192,9 @@ pub enum SysCronLogs {
 
 // sys_login_log
 #[derive(Iden, OicColumn)]
-pub enum SysLoginLogs {
+pub enum LoginLogs {
     Table,
-    #[oic(data_type = "string", len = 32, comment = "id")]
+    #[oic(data_type = "bigInt", len = 20, comment = "id")]
     Id,
     #[oic(data_type = "string", len = 50, default = "", comment = "")]
     LoginName,
@@ -222,11 +222,11 @@ pub enum SysLoginLogs {
 
 // sys_menus
 #[derive(Iden, OicColumn)]
-pub enum SysMenus {
+pub enum Menus {
     Table,
-    #[oic(data_type = "string", len = 32, comment = "id")]
+    #[oic(data_type = "bigInt", comment = "id")]
     Id,
-    #[oic(data_type = "string", len = 32, default = "", comment = "")]
+    #[oic(data_type = "bigInt", default = "", comment = "")]
     Pid,
     #[oic(data_type = "string", len = 255, default = "", comment = "")]
     Path,
@@ -273,11 +273,11 @@ pub enum SysMenus {
 
 // sys_oper_log
 #[derive(Iden, OicColumn)]
-pub enum SysOperationLogs {
+pub enum OperationLogs {
     Table,
-    #[oic(data_type = "string", len = 32, comment = "ID")]
+    #[oic(data_type = "bigInt", len = 20, comment = "ID")]
     Id,
-    #[oic(data_type = "bigint", default = 0, comment = "")]
+    #[oic(data_type = "bigInt", len = 20, default = 0, comment = "")]
     TimeId,
     #[oic(data_type = "string", len = 50, default = "", comment = "")]
     Title,
@@ -317,13 +317,13 @@ pub enum SysOperationLogs {
 
 // sys_post
 #[derive(Iden, OicColumn)]
-pub enum SysPositions {
+pub enum Positions {
     Table,
-    #[oic(data_type = "string", len = 32, comment = "")]
-    Id,
+    #[oic(data_type = "bigInt", comment = "")]
+    PositionId,
     #[oic(data_type = "string", len = 64, default = "", comment = "")]
     Vid,
-    #[oic(data_type = "string", len = 50, default = "", comment = "")]
+    #[oic(data_type = "string", len = 64, default = "", comment = "")]
     Name,
     #[oic(data_type = "int", default = 0, comment = "权重")]
     Weight,
@@ -331,11 +331,11 @@ pub enum SysPositions {
     Status,
     #[oic(data_type = "string", len = 500, default = "", comment = "")]
     Remark,
-    #[oic(data_type = "string", len = 32, default = "" comment = "创建者")]
+    #[oic(data_type = "bigInt", len = 20, default = 0 comment = "创建者")]
     CreatedBy,
     #[oic(data_type = "datetime", comment = "创建时间")]
     CreatedAt,
-    #[oic(data_type = "string", len = 32, default = "" comment = "更新者")]
+    #[oic(data_type = "bigInt", len = 20, default = 0 comment = "更新者")]
     UpdatedBy,
     #[oic(data_type = "datetime", default = "null" comment = "更新时间")]
     UpdatedAt,
@@ -345,10 +345,10 @@ pub enum SysPositions {
 
 // sys_role
 #[derive(Iden, OicColumn)]
-pub enum SysRoles {
+pub enum Roles {
     Table,
-    #[oic(data_type = "string", len = 32, comment = "")]
-    Id,
+    #[oic(data_type = "bigInt", comment = "")]
+    RoleId,
     #[oic(data_type = "string", len = 64, default = "", comment = "")]
     Vid,
     #[oic(data_type = "string", len = 64, default = "", comment = "")]
@@ -369,17 +369,17 @@ pub enum SysRoles {
 
 // sys_role_api
 #[derive(Iden, OicColumn)]
-pub enum SysRoleApiMap {
+pub enum RoleApiMap {
     Table,
-    #[oic(data_type = "string", len = 32, comment = "")]
+    #[oic(data_type = "bigInt", comment = "")]
     Id,
-    #[oic(data_type = "string", len = 32, comment = "")]
+    #[oic(data_type = "bigInt", comment = "")]
     RoleId,
     #[oic(data_type = "string", len = 255, comment = "")]
     Api,
     #[oic(data_type = "char", len = 10, default = "", comment = "")]
     Method,
-    #[oic(data_type = "datetime", comment = "")]
+    #[oic(data_type = "bigInt", len = 20, default = 0, comment = "")]
     CreatedBy,
     #[oic(data_type = "datetime", comment = "")]
     CreatedAt,
@@ -388,81 +388,95 @@ pub enum SysRoleApiMap {
 // sys_role_dept
 #[derive(Iden, OicColumn)]
 // #[oic_index(columns = ["role_id", "department_id"])]
-pub enum SysRoleDepartmentMap {
+pub enum RoleDepartmentMap {
     Table,
-    #[oic(data_type = "string", len = 32, comment = "")]
+    #[oic(data_type = "bigInt", comment = "")]
     RoleId,
-    #[oic(data_type = "string", len = 32, comment = "")]
-    DepartmentId,
+    #[oic(data_type = "bigInt", comment = "")]
+    DptId,
     #[oic(data_type = "datetime", comment = "")]
     CreatedAt,
 }
 
 // sys_update_log
 #[derive(Iden, OicColumn)]
-pub enum SysUpdateLogs {
+pub enum UpdateLogs {
     Table,
-    #[oic(data_type = "string", len = 32, comment = "")]
+    #[oic(data_type = "bigInt", len = 20, comment = "")]
     Id,
     #[oic(data_type = "char", len = 10, comment = "")]
     AppVersion,
-    #[oic(data_type = "char", len = 10, default(""), comment = "")]
+    #[oic(data_type = "char", len = 10, default = "", comment = "")]
     BackendVersion,
-    #[oic(data_type = "string", len = 100, default(""), comment = "")]
+    #[oic(data_type = "string", len = 100, default = "", comment = "")]
     Title,
-    #[oic(data_type = "text", default(""), comment = "")]
+    #[oic(data_type = "text", default = "", comment = "")]
     Content,
-    #[oic(data_type = "string", len = 32, default = "" comment = "创建者")]
+    #[oic(data_type = "bigInt", len = 20, default = 0 comment = "创建者")]
     CreatedBy,
     #[oic(data_type = "datetime", comment = "创建时间")]
     CreatedAt,
-    #[oic(data_type = "string", len = 32, default = "" comment = "更新者")]
+    #[oic(data_type = "bigInt", len = 20, default = 0, comment = "更新者")]
     UpdatedBy,
-    #[oic(data_type = "datetime", default = "null" comment = "更新时间")]
+    #[oic(data_type = "datetime", default = "null", comment = "更新时间")]
     UpdatedAt,
-    #[oic(data_type = "datetime", default = "null" comment = "删除时间")]
+    #[oic(data_type = "datetime", default = "null", comment = "删除时间")]
     DeletedAt,
 }
 
 // sys_users
 #[derive(Iden, OicColumn)]
-pub enum SysUsers {
+pub enum Users {
     Table,
-    #[oic(data_type = "string", len = 32, comment = "")]
+    #[oic(data_type = "bigInt", len = 20, comment = "用户ID")]
     Uid,
-    #[oic(data_type = "string", len = 60, default(""), comment = "")]
+    #[oic(data_type = "string", len = 64, default = "", comment = "")]
+    Uuid,
+    #[oic(data_type = "string", len = 64, default = "", comment = "")]
     Username,
-    #[oic(data_type = "string", len = 60, default(""), comment = "")]
+    #[oic(data_type = "string", len = 64, default = "", comment = "")]
     Nickname,
-    #[oic(data_type = "string", len = 64, default(""), comment = "")]
+    #[oic(data_type = "string", len = 64, default = "", comment = "")]
     Password,
-    #[oic(data_type = "string", len = 64, default(""), comment = "")]
+    #[oic(data_type = "string", len = 64, default = "", comment = "")]
     Salt,
-    #[oic(data_type = "char", len = 1, default(""), comment = "")]
+    #[oic(data_type = "string", len = 128, default = "", comment = "接口KEY")]
+    ApiKey,
+    #[oic(data_type = "string", len = 128, default = "", comment = "密码重置凭证")]
+    ResetToken,
+    #[oic(data_type = "datetime", default = "null", comment = "凭证生成时间")]
+    ResetSentAt,
+    #[oic(data_type = "string", len = 128, default = "", comment = "密码重置凭证")]
+    EmailVerifyToken,
+    #[oic(data_type = "datetime", default = "null", comment = "凭证生成时间")]
+    EmailVerifySentAt,
+    #[oic(data_type = "datetime", default = "null", comment = "凭证生成时间")]
+    EmailVerifiedAt,
+    #[oic(data_type = "char", len = 1, default = "", comment = "")]
     Status,
-    #[oic(data_type = "string", len = 100, default("1"), comment = "")]
+    #[oic(data_type = "string", len = 100, default = "", comment = "")]
     Email,
-    #[oic(data_type = "char", len = 1, default("0"), comment = "")]
+    #[oic(data_type = "char", len = 1, default = "0", comment = "")]
     Gender,
-    #[oic(data_type = "string", len = 255, default(""), comment = "")]
+    #[oic(data_type = "string", len = 255, default = "", comment = "")]
     Avatar,
-    #[oic(data_type = "string", len = 32, default(""), comment = "")]
+    #[oic(data_type = "bigInt", len = 20, default = 0, comment = "")]
     RoleId,
-    #[oic(data_type = "string", len = 32, default(""), comment = "")]
-    DepartmentId,
-    #[oic(data_type = "string", len = 255, default(""), comment = "")]
+    #[oic(data_type = "bigInt", len = 20, default = 0, comment = "")]
+    DptId,
+    #[oic(data_type = "string", len = 255, default = "", comment = "")]
     Remark,
-    #[oic(data_type = "char", len = 1, default("0"), comment = "")]
+    #[oic(data_type = "char", len = 1, default = "0", comment = "")]
     IsAdmin,
-    #[oic(data_type = "string", len = 20, default(""), comment = "")]
+    #[oic(data_type = "string", len = 20, default = "", comment = "")]
     Phone,
-    #[oic(data_type = "string", len = 20, default(""), comment = "")]
+    #[oic(data_type = "string", len = 20, default = "", comment = "")]
     LastLoginIp,
-    #[oic(data_type = "datetime", default("null"), comment = "")]
+    #[oic(data_type = "datetime", default = "null", comment = "")]
     LastLoginAt,
-    #[oic(data_type = "string", len = 32, default(""), comment = "")]
+    #[oic(data_type = "bigInt", len = 20, default = "", comment = "")]
     CreatedBy,
-    #[oic(data_type = "string", len = 32, default(""), comment = "")]
+    #[oic(data_type = "bigInt", len = 20, default = "", comment = "")]
     UpdatedBy,
     #[oic(data_type = "datetime", comment = "创建时间")]
     CreatedAt,
@@ -474,12 +488,12 @@ pub enum SysUsers {
 
 // sys_user_dept
 #[derive(Iden, OicColumn)]
-pub enum SysUserDepartmentMap {
+pub enum UserDepartmentMap {
     Table,
-    #[oic(data_type = "string", len = 32, comment = "")]
+    #[oic(data_type = "bigInt", len = 20, comment = "")]
     Uid,
-    #[oic(data_type = "string", len = 32, comment = "")]
-    DepartmentId,
+    #[oic(data_type = "bigInt", comment = "")]
+    DptId,
     #[oic(data_type = "string", len = 32)]
     CreatedBy,
     #[oic(data_type = "datetime", comment = "创建时间")]
@@ -488,11 +502,11 @@ pub enum SysUserDepartmentMap {
 
 // sys_user_post
 #[derive(Iden, OicColumn)]
-pub enum SysUserPositionMap {
+pub enum UserPositionMap {
     Table,
-    #[oic(data_type = "string", len = 32, comment = "")]
+    #[oic(data_type = "bigInt", len = 20, comment = "")]
     Uid,
-    #[oic(data_type = "string", len = 32, comment = "")]
+    #[oic(data_type = "bigInt", comment = "")]
     PositionId,
     #[oic(data_type = "datetime", comment = "创建时间")]
     CreatedAt,
@@ -500,11 +514,11 @@ pub enum SysUserPositionMap {
 
 // sys_user_role
 #[derive(Iden, OicColumn)]
-pub enum SysUserRoleMap {
+pub enum UserRoleMap {
     Table,
-    #[oic(data_type = "string", len = 32, comment = "")]
+    #[oic(data_type = "bigInt", len = 20, comment = "")]
     Uid,
-    #[oic(data_type = "string", len = 32, comment = "")]
+    #[oic(data_type = "bigInt", comment = "")]
     RoleId,
     #[oic(data_type = "string", len = 32)]
     CreatedBy,
@@ -514,20 +528,20 @@ pub enum SysUserRoleMap {
 
 // sys_user_online
 #[derive(Iden, OicColumn)]
-pub enum SysUserOnline {
+pub enum UserOnline {
     Table,
-    #[oic(data_type = "string", len = 32, comment = "")]
+    #[oic(data_type = "bigInt", len = 20, comment = "")]
     Uid,
     #[oic(data_type = "string", len = 32, comment = "")]
     TokenId,
-    #[oic(data_type = "biginteger", comment = "")]
+    #[oic(data_type = "bigInt", comment = "")]
     TokenExpire,
     #[oic(data_type = "datetime", comment = "登录时间")]
     LoginAt,
     #[oic(data_type = "string", len = 60, comment = "")]
     Username,
     #[oic(data_type = "string", len = 100, comment = "")]
-    DepartmentName,
+    DptName,
     #[oic(data_type = "string", len = 10, comment = "")]
     Net,
     #[oic(data_type = "string", len = 100, comment = "")]

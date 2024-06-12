@@ -1,6 +1,4 @@
-use crate::constants::{
-    ENV_CONFIG_NAME,
-};
+use crate::constants::ENV_CONFIG_NAME;
 use std::ffi::OsString;
 
 /// 根据ENV获取配置文件路径

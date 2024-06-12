@@ -1,11 +1,8 @@
 use strum_macros::Display;
 use serde::{Deserialize, Serialize};
+use async_graphql::{OutputType, Error};
 
-// #[cfg(target_os = "windows")]
-// pub type oic_usize = u64;
-//
-// #[cfg(not(target_os = "windows"))]
-// pub type oic_usize = u64;
+pub type GqlResult<T: OutputType> = std::result::Result<T, Error>;
 
 #[derive(Display, Debug)]
 pub enum TaxonomyBundle {
@@ -52,3 +49,6 @@ pub enum UserPicturesBundle {
 pub struct Count {
     pub count: i32,
 }
+
+#[derive(Debug)]
+pub struct Token(pub String);

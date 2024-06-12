@@ -12,6 +12,7 @@ cache_type: "mem"
 redis_url: "redis://127.0.0.1:6379"
 #数据库地址
 database_url: "postgres://postgres:123456@localhost:5432/oicnp"
+table_prefix: "oic_"
 graphql_url: ""
 #逻辑删除字段
 logic_column: "del"
@@ -39,8 +40,8 @@ login_fail_retry: 3
 login_fail_retry_wait_sec: 30
 # 超级管理员用户ID
 super_user:
-    - "00TV87DDOBJPU75J4TGUOC3NNG"
-    - "00TV876BOIIDCR9H7JA1KNNIGH"
+    - 1
+    - 2
 #接口白名单（免登陆直接访问）
 white_list_api:
     - "register"

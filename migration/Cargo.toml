@@ -9,15 +9,9 @@ name = "migration"
 path = "src/lib.rs"
 
 [dependencies]
-oicnp_core = { path = "../oicnp-core" }
-async-std = { version = "^1", features = ["attributes", "tokio1"] }
-oicnp_derives = { path = "../oicnp-derives" }
-lazy_static = "^1"
-
-[dependencies.sea-orm-migration]
-version = "^0.12"
-features = [
-    "runtime-tokio-rustls",  # `ASYNC_RUNTIME` feature
-    "sqlx-postgres",         # `DATABASE_DRIVER` feature
-]
+oicnp_core = { workspace = true }
+async-std = { workspace = true }
+oicnp_derives = { workspace = true }
+lazy_static = { workspace = true }
+sea-orm-migration = { workspace = true }
 

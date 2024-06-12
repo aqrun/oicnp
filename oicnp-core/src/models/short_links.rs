@@ -1,4 +1,4 @@
-use crate::{DateTime};
+use crate::DateTime;
 use serde::{Deserialize, Serialize};
 use sea_orm::FromQueryResult;
 
@@ -20,5 +20,5 @@ pub struct NewShortLink {
     pub name: String,
     pub description: String,
     pub deleted: String,
-    pub created_by: String,
+    pub created_by: i64,
 }

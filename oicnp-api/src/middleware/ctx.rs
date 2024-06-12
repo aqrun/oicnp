@@ -1,15 +1,11 @@
 use bytes::Bytes;
 use oicnp_core::{
-    G,
-    models::auth::{Claims, LoginInfo},
-    services::auth::decode_jwt,
+    services::auth::decode_jwt, typings::State,
+    models::{ReqCtx, GraphqlBody}
 };
-use poem::{http::StatusCode, Body, Endpoint, Error, FromRequest, Middleware, Request, Result};
-use crate::models::auth::{ReqCtx, GraphqlBody};
+use poem::{http::StatusCode, Body, Endpoint, Error, Middleware, Request, Result};
 use crate::utils::{get_request_auth_token, trim_gql_query, check_is_public_query};
 use std::collections::HashMap;
-use crate::typings::State;
-use std::sync::Arc;
 
 /// req上下文注入中间件 同时进行jwt授权验证
 pub struct Context;

@@ -1,40 +1,35 @@
-use oicnp_core::prelude::sea_orm_migration::prelude::*;
+use sea_orm_migration::prelude::*;
 use super::types::*;
 
+#[derive(DeriveMigrationName)]
 pub struct Migration;
-
-impl MigrationName for Migration {
-    fn name(&self) -> &str {
-        "m20220825_212215_create_role_department_map_table"
-    }
-}
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let table = Table::create()
-            .table(SysRoleDepartmentMap::Table)
+            .table(RoleDepartmentMap::Table)
             .if_not_exists()
             .col(
-                ColumnDef::new(SysRoleDepartmentMap::RoleId)
-                    .string_len(32)
+                ColumnDef::new(RoleDepartmentMap::RoleId)
+                    .big_integer()
                     .not_null(),
             )
             .col(
-                ColumnDef::new(SysRoleDepartmentMap::DepartmentId)
-                    .string_len(32)
+                ColumnDef::new(RoleDepartmentMap::DptId)
+                    .big_integer()
                     .not_null(),
             )
             .col(
-                ColumnDef::new(SysRoleDepartmentMap::CreatedAt)
+                ColumnDef::new(RoleDepartmentMap::CreatedAt)
                     .date_time()
                     .not_null()
                     .extra("DEFAULT CURRENT_TIMESTAMP".to_string()),
             )
             .primary_key(
                 Index::create()
-                    .col(SysRoleDepartmentMap::RoleId)
-                    .col(SysRoleDepartmentMap::DepartmentId)
+                    .col(RoleDepartmentMap::RoleId)
+                    .col(RoleDepartmentMap::DptId)
             )
             .to_owned();
 
@@ -43,7 +38,7 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager.drop_table(
-            Table::drop().table(SysRoleDepartmentMap::Table).to_owned()
+            Table::drop().table(RoleDepartmentMap::Table).to_owned()
         ).await
     }
 }

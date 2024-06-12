@@ -15,6 +15,6 @@ proc-macro2 = "^1"
 bae = "^0"
 darling = "^0"
 proc-macro-crate = "^1"
-thiserror = "^1"
-oicnp_core = { path = "../oicnp-core" }
+thiserror = { workspace = true }
+oicnp_core = { workspace = true }
 heck = { version = "0.4", default-features = false }
