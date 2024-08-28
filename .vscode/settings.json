@@ -1,4 +1,7 @@
 {
+  "cSpell.words": [
+      "oicnp", "dotenv", "graphiql", "chrono", "consts", "aqrun",
+  ],
   "eslint.workingDirectories": [
     {
       "mode": "auto"

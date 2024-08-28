@@ -34,3 +34,12 @@ yarn-error.log*
 
 # ui
 dist/
+
+/target
+/configs/app.yml
+/backend/target
+.idea
+Cargo.lock
+.env
+!.vscode
+node_modules
