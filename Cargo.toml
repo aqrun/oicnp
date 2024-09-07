@@ -9,25 +9,58 @@ description = "A fast content management system"
 homepage = "https://www.oicnp.com"
 repository = "https://github.com/aqrun/oicnp"
 keywords = ["site", "cms"]
-
 include = ["src/**/*", "LICENSE", "README.md"]
-
-[[bin]]
-path = "src/bin/main.rs"
-name = "oic"
+# default-members = ["oic-cmd"]
+default-run = "oic"
 
 [dependencies]
-oic_cmd = { workspace = true }
+# oic_cmd = { workspace = true }
+loco-rs = { workspace = true }
+migration = { workspace = true }
 tokio = { workspace = true }
+axum = { workspace = true }
+include_dir = { workspace = true }
+uuid = { workspace = true }
+tracing-subscriber = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+async-trait = { workspace = true }
+tracing = { workspace = true }
+chrono = { workspace = true }
+validator = { workspace = true }
+sea-orm = { workspace = true }
+
+# view engine i18n
+fluent-templates = { workspace = true }
+unic-langid = { workspace = true }
+# /view engine
+
+[dev-dependencies]
+serial_test = { workspace = true }
+rstest = { workspace = true }
+loco-rs = { workspace = true, features = ["testing"] }
+insta = { workspace = true }
+
+[[bin]]
+name = "oic"
+path = "src/bin/main.rs"
+required-features = []
+
+[[bin]]
+name = "tool"
+path = "src/bin/tool.rs"
+required-features = []
 
 [workspace]
 resolver = "2"
-members = ["crates/*"]
+members = ["crates/*", "migration"]
 
 [workspace.dependencies]
 # oicnp_core = { path = "oicnp-core" }
 # oicnp_derives = { path = "oicnp-derives" }
+migration = { path = "migration" }
 oic_cmd = { path = "crates/oic-cmd" }
+loco-rs = { version = "0.8.1" }
 clap = { version = "^4", features = ["derive"] }
 async-std = { version = "^1", features = ["attributes", "tokio1"] }
 async-graphql = {version = "^7", features = ["bson", "chrono"]}
@@ -51,6 +84,18 @@ async-trait = "^0.1"
 thiserror = "^1"
 once_cell = "1"
 dotenv = "^0"
+axum = "0.7.5"
+include_dir = "0.7"
+uuid = { version = "1.6.0", features = ["v4"] }
+tracing-subscriber = { version = "0.3.17", features = ["env-filter", "json"] }
+# view engine i18n
+fluent-templates = { version = "0.8.0", features = ["tera"] }
+unic-langid = "0.9.4"
+# /view engine
+serial_test = "3.1.1"
+rstest = "0.21.0"
+insta = { version = "1.34.0", features = ["redactions", "yaml", "filters"] }
+validator = { version = "0.16" }
 
 [workspace.dependencies.sea-orm]
 version = "^1"
