@@ -1,1 +1,4 @@
-pub const _NAME: &'static str = "alex";
+
+pub mod entities;
+pub mod models;
+pub mod utils;

@@ -11,7 +11,7 @@ path = "src/bin/main.rs"
 name = "ic"
 
 [dependencies]
-# oicnp_core = { workspace = true }
+# oic_core = { workspace = true }
 # oicnp_api = { workspace = true }
 # migration = { workspace = true }
 sea-orm = { workspace = true }

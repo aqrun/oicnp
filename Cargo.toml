@@ -56,10 +56,10 @@ resolver = "2"
 members = ["crates/*", "migration"]
 
 [workspace.dependencies]
-# oicnp_core = { path = "oicnp-core" }
-# oicnp_derives = { path = "oicnp-derives" }
-migration = { path = "migration" }
+oic_core = { path = "crates/oic-core" }
+oic_derives = { path = "crates/oic-derives" }
 oic_cmd = { path = "crates/oic-cmd" }
+migration = { path = "migration" }
 loco-rs = { version = "0.8.1" }
 clap = { version = "^4", features = ["derive"] }
 async-std = { version = "^1", features = ["attributes", "tokio1"] }

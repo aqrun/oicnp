@@ -3,8 +3,14 @@ use chrono::offset::Local;
 use loco_rs::{auth::jwt, hash, prelude::*};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use crate::utils::uuid as getUuid;
 
-pub use super::_entities::users::{self, ActiveModel, Entity, Model};
+pub use crate::entities::prelude::{
+  UserActiveModel,
+  UserEntity,
+  UserModel,
+  UserColumn,
+};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct LoginParams {
@@ -16,7 +22,7 @@ pub struct LoginParams {
 pub struct RegisterParams {
     pub email: String,
     pub password: String,
-    pub name: String,
+    pub username: String,
 }
 
 #[derive(Debug, Validate, Deserialize)]
@@ -27,17 +33,17 @@ pub struct Validator {
     pub email: String,
 }
 
-impl Validatable for super::_entities::users::ActiveModel {
+impl Validatable for UserActiveModel {
     fn validator(&self) -> Box<dyn Validate> {
         Box::new(Validator {
-            name: self.name.as_ref().to_owned(),
+            name: self.username.as_ref().to_owned(),
             email: self.email.as_ref().to_owned(),
         })
     }
 }
 
 #[async_trait::async_trait]
-impl ActiveModelBehavior for super::_entities::users::ActiveModel {
+impl ActiveModelBehavior for UserActiveModel {
     async fn before_save<C>(self, _db: &C, insert: bool) -> Result<Self, DbErr>
     where
         C: ConnectionTrait,
@@ -45,7 +51,7 @@ impl ActiveModelBehavior for super::_entities::users::ActiveModel {
         self.validate()?;
         if insert {
             let mut this = self;
-            this.pid = ActiveValue::Set(Uuid::new_v4());
+            this.uuid = ActiveValue::Set(getUuid());
             this.api_key = ActiveValue::Set(format!("lo-{}", Uuid::new_v4()));
             Ok(this)
         } else {
@@ -55,12 +61,12 @@ impl ActiveModelBehavior for super::_entities::users::ActiveModel {
 }
 
 #[async_trait]
-impl Authenticable for super::_entities::users::Model {
+impl Authenticable for UserModel {
     async fn find_by_api_key(db: &DatabaseConnection, api_key: &str) -> ModelResult<Self> {
-        let user = users::Entity::find()
+        let user = UserEntity::find()
             .filter(
                 model::query::condition()
-                    .eq(users::Column::ApiKey, api_key)
+                    .eq(UserColumn::ApiKey, api_key)
                     .build(),
             )
             .one(db)
@@ -73,17 +79,17 @@ impl Authenticable for super::_entities::users::Model {
     }
 }
 
-impl super::_entities::users::Model {
+impl UserModel {
     /// finds a user by the provided email
     ///
     /// # Errors
     ///
     /// When could not find user by the given token or DB query error
     pub async fn find_by_email(db: &DatabaseConnection, email: &str) -> ModelResult<Self> {
-        let user = users::Entity::find()
+        let user = UserEntity::find()
             .filter(
                 model::query::condition()
-                    .eq(users::Column::Email, email)
+                    .eq(UserColumn::Email, email)
                     .build(),
             )
             .one(db)
@@ -100,10 +106,10 @@ impl super::_entities::users::Model {
         db: &DatabaseConnection,
         token: &str,
     ) -> ModelResult<Self> {
-        let user = users::Entity::find()
+        let user = UserEntity::find()
             .filter(
                 model::query::condition()
-                    .eq(users::Column::EmailVerificationToken, token)
+                    .eq(UserColumn::EmailVerifyToken, token)
                     .build(),
             )
             .one(db)
@@ -117,10 +123,10 @@ impl super::_entities::users::Model {
     ///
     /// When could not find user by the given token or DB query error
     pub async fn find_by_reset_token(db: &DatabaseConnection, token: &str) -> ModelResult<Self> {
-        let user = users::Entity::find()
+        let user = UserEntity::find()
             .filter(
                 model::query::condition()
-                    .eq(users::Column::ResetToken, token)
+                    .eq(UserColumn::ResetToken, token)
                     .build(),
             )
             .one(db)
@@ -134,11 +140,11 @@ impl super::_entities::users::Model {
     ///
     /// When could not find user  or DB query error
     pub async fn find_by_pid(db: &DatabaseConnection, pid: &str) -> ModelResult<Self> {
-        let parse_uuid = Uuid::parse_str(pid).map_err(|e| ModelError::Any(e.into()))?;
-        let user = users::Entity::find()
+        // let parse_uuid = Uuid::parse_str(pid).map_err(|e| ModelError::Any(e.into()))?;
+        let user = UserEntity::find()
             .filter(
                 model::query::condition()
-                    .eq(users::Column::Pid, parse_uuid)
+                    .eq(UserColumn::Uuid, pid)
                     .build(),
             )
             .one(db)
@@ -152,10 +158,10 @@ impl super::_entities::users::Model {
     ///
     /// When could not find user by the given token or DB query error
     pub async fn find_by_api_key(db: &DatabaseConnection, api_key: &str) -> ModelResult<Self> {
-        let user = users::Entity::find()
+        let user = UserEntity::find()
             .filter(
                 model::query::condition()
-                    .eq(users::Column::ApiKey, api_key)
+                    .eq(UserColumn::ApiKey, api_key)
                     .build(),
             )
             .one(db)
@@ -185,10 +191,10 @@ impl super::_entities::users::Model {
     ) -> ModelResult<Self> {
         let txn = db.begin().await?;
 
-        if users::Entity::find()
+        if UserEntity::find()
             .filter(
                 model::query::condition()
-                    .eq(users::Column::Email, &params.email)
+                    .eq(UserColumn::Email, &params.email)
                     .build(),
             )
             .one(&txn)
@@ -200,10 +206,10 @@ impl super::_entities::users::Model {
 
         let password_hash =
             hash::hash_password(&params.password).map_err(|e| ModelError::Any(e.into()))?;
-        let user = users::ActiveModel {
+        let user = UserActiveModel {
             email: ActiveValue::set(params.email.to_string()),
             password: ActiveValue::set(password_hash),
-            name: ActiveValue::set(params.name.to_string()),
+            username: ActiveValue::set(params.username.to_string()),
             ..Default::default()
         }
         .insert(&txn)
@@ -220,11 +226,11 @@ impl super::_entities::users::Model {
     ///
     /// when could not convert user claims to jwt token
     pub fn generate_jwt(&self, secret: &str, expiration: &u64) -> ModelResult<String> {
-        Ok(jwt::JWT::new(secret).generate_token(expiration, self.pid.to_string(), None)?)
+        Ok(jwt::JWT::new(secret).generate_token(expiration, self.uuid.to_string(), None)?)
     }
 }
 
-impl super::_entities::users::ActiveModel {
+impl UserActiveModel {
     /// Sets the email verification information for the user and
     /// updates it in the database.
     ///
@@ -237,9 +243,9 @@ impl super::_entities::users::ActiveModel {
     pub async fn set_email_verification_sent(
         mut self,
         db: &DatabaseConnection,
-    ) -> ModelResult<Model> {
-        self.email_verification_sent_at = ActiveValue::set(Some(Local::now().into()));
-        self.email_verification_token = ActiveValue::Set(Some(Uuid::new_v4().to_string()));
+    ) -> ModelResult<UserModel> {
+        self.email_verify_sent_at = ActiveValue::set(Some(Local::now().into()));
+        self.email_verify_token = ActiveValue::Set(Uuid::new_v4().to_string());
         Ok(self.update(db).await?)
     }
 
@@ -255,9 +261,9 @@ impl super::_entities::users::ActiveModel {
     /// # Errors
     ///
     /// when has DB query error
-    pub async fn set_forgot_password_sent(mut self, db: &DatabaseConnection) -> ModelResult<Model> {
+    pub async fn set_forgot_password_sent(mut self, db: &DatabaseConnection) -> ModelResult<UserModel> {
         self.reset_sent_at = ActiveValue::set(Some(Local::now().into()));
-        self.reset_token = ActiveValue::Set(Some(Uuid::new_v4().to_string()));
+        self.reset_token = ActiveValue::Set(Uuid::new_v4().to_string());
         Ok(self.update(db).await?)
     }
 
@@ -270,7 +276,7 @@ impl super::_entities::users::ActiveModel {
     /// # Errors
     ///
     /// when has DB query error
-    pub async fn verified(mut self, db: &DatabaseConnection) -> ModelResult<Model> {
+    pub async fn verified(mut self, db: &DatabaseConnection) -> ModelResult<UserModel> {
         self.email_verified_at = ActiveValue::set(Some(Local::now().into()));
         Ok(self.update(db).await?)
     }
@@ -287,10 +293,10 @@ impl super::_entities::users::ActiveModel {
         mut self,
         db: &DatabaseConnection,
         password: &str,
-    ) -> ModelResult<Model> {
+    ) -> ModelResult<UserModel> {
         self.password =
             ActiveValue::set(hash::hash_password(password).map_err(|e| ModelError::Any(e.into()))?);
-        self.reset_token = ActiveValue::Set(None);
+        self.reset_token = ActiveValue::Set(String::from(""));
         self.reset_sent_at = ActiveValue::Set(None);
         Ok(self.update(db).await?)
     }

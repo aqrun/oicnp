@@ -29,7 +29,7 @@ slug = "0.1"
 regex = { workspace = true }
 once_cell = { workspace = true }
 sha2 = "0.10"
-reqwest = { version = "0.11", features = ["json"]}
+reqwest = { version = "0.12", features = ["json"]}
 jsonwebtoken = "^9.1"
 ring = "^0.17"
 data-encoding = "^2.4"
@@ -38,5 +38,7 @@ thiserror = { workspace = true }
 sea-orm = { workspace = true }
 sea-orm-migration = { workspace = true }
 async-trait = { workspace = true }
-
+loco-rs = { workspace = true, features = ["testing"] }
+uuid = { workspace = true }
+validator = { workspace = true }
 

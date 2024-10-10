@@ -9,8 +9,9 @@ name = "migration"
 path = "src/lib.rs"
 
 [dependencies]
+oic_derives = { workspace = true }
 async-std = { version = "1", features = ["attributes", "tokio1"] }
-loco-rs = { version = "0.8.1" }
+loco-rs = { workspace = true }
 
 [dependencies.sea-orm-migration]
 version = "1.0.0"

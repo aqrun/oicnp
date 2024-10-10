@@ -2,8 +2,8 @@ use crate::constants::{CATEGORIES, VID_READING};
 use crate::models::{Blog, BlogMatter, Category, MatterTaxonomy};
 use gray_matter::engine::YAML;
 use gray_matter::Matter;
-use oicnp_core::utils::{generate_slug, is_valid_matter_content};
-use oicnp_core::prelude::{
+use oic_core::utils::{generate_slug, is_valid_matter_content};
+use oic_core::prelude::{
     anyhow::{anyhow, Result},
     chrono::prelude::*,
     fast_log::{
