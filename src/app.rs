@@ -13,10 +13,10 @@ use loco_rs::{
 };
 use migration::Migrator;
 use sea_orm::DatabaseConnection;
+use oic_core::entities::prelude::*;
 
 use crate::{
     controllers, initializers,
-    models::_entities::{notes, users},
     tasks,
     workers::downloader::DownloadWorker,
 };
@@ -64,14 +64,14 @@ impl Hooks for App {
     }
 
     async fn truncate(db: &DatabaseConnection) -> Result<()> {
-        truncate_table(db, users::Entity).await?;
-        truncate_table(db, notes::Entity).await?;
+        truncate_table(db, UserEntity).await?;
+        truncate_table(db, NoteEntity).await?;
         Ok(())
     }
 
     async fn seed(db: &DatabaseConnection, base: &Path) -> Result<()> {
-        db::seed::<users::ActiveModel>(db, &base.join("users.yaml").display().to_string()).await?;
-        db::seed::<notes::ActiveModel>(db, &base.join("notes.yaml").display().to_string()).await?;
+        db::seed::<UserActiveModel>(db, &base.join("users.yaml").display().to_string()).await?;
+        db::seed::<NoteActiveModel>(db, &base.join("notes.yaml").display().to_string()).await?;
         Ok(())
     }
 }

@@ -2,9 +2,6 @@
 #![allow(clippy::wildcard_imports)]
 pub use sea_orm_migration::prelude::*;
 
-// mod m20220101_000001_users;
-// mod m20231103_114510_notes;
-
 pub mod types;
 
 mod m20220825_211845_create_departments_table;
@@ -40,6 +37,7 @@ mod m20230116_092919_create_cms_node_files_map_table;
 mod m20230116_092931_create_cms_node_comments_map_table;
 mod m20230116_092944_create_cms_configs_table;
 mod m20230607_204902_create_short_links_table;
+mod m20241011_131809_crate_notes_table;
 
 pub struct Migrator;
 
@@ -47,8 +45,6 @@ pub struct Migrator;
 impl MigratorTrait for Migrator {
     fn migrations() -> Vec<Box<dyn MigrationTrait>> {
         vec![
-            // Box::new(m20220101_000001_users::Migration),
-            // Box::new(m20231103_114510_notes::Migration),
             Box::new(m20220825_211845_create_departments_table::Migration),
             Box::new(m20220825_211904_create_api_db_table::Migration),
             Box::new(m20220825_211916_create_attributes_table::Migration),
@@ -82,6 +78,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20230116_092931_create_cms_node_comments_map_table::Migration),
             Box::new(m20230116_092944_create_cms_configs_table::Migration),
             Box::new(m20230607_204902_create_short_links_table::Migration),
+            Box::new(m20241011_131809_crate_notes_table::Migration),
         ]
     }
 }

@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
-
-use crate::models::_entities::users;
+use oic_core::entities::prelude::*;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct LoginResponse {
@@ -12,11 +11,11 @@ pub struct LoginResponse {
 
 impl LoginResponse {
     #[must_use]
-    pub fn new(user: &users::Model, token: &String) -> Self {
+    pub fn new(user: &UserModel, token: &String) -> Self {
         Self {
             token: token.to_string(),
-            pid: user.pid.to_string(),
-            name: user.name.clone(),
+            pid: user.uuid.to_string(),
+            name: user.username.clone(),
             is_verified: user.email_verified_at.is_some(),
         }
     }

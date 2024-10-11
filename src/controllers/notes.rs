@@ -4,8 +4,7 @@
 use axum::debug_handler;
 use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
-
-use crate::models::_entities::notes::{ActiveModel, Entity, Model};
+use oic_core::entities::prelude::*;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
@@ -14,25 +13,25 @@ pub struct Params {
 }
 
 impl Params {
-    fn update(&self, item: &mut ActiveModel) {
+    fn update(&self, item: &mut NoteActiveModel) {
         item.title = Set(self.title.clone());
         item.content = Set(self.content.clone());
     }
 }
 
-async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
-    let item = Entity::find_by_id(id).one(&ctx.db).await?;
+async fn load_item(ctx: &AppContext, id: i32) -> Result<NoteModel> {
+    let item = NoteEntity::find_by_id(id).one(&ctx.db).await?;
     item.ok_or_else(|| Error::NotFound)
 }
 
 #[debug_handler]
 pub async fn list(State(ctx): State<AppContext>) -> Result<Response> {
-    format::json(Entity::find().all(&ctx.db).await?)
+    format::json(NoteEntity::find().all(&ctx.db).await?)
 }
 
 #[debug_handler]
 pub async fn add(State(ctx): State<AppContext>, Json(params): Json<Params>) -> Result<Response> {
-    let mut item = ActiveModel {
+    let mut item = NoteActiveModel {
         ..Default::default()
     };
     params.update(&mut item);

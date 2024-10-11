@@ -3,8 +3,7 @@
 
 use loco_rs::prelude::*;
 use serde_json::json;
-
-use crate::models::users;
+use oic_core::entities::prelude::*;
 
 static welcome: Dir<'_> = include_dir!("src/mailers/auth/welcome");
 static forgot: Dir<'_> = include_dir!("src/mailers/auth/forgot");
@@ -20,15 +19,15 @@ impl AuthMailer {
     /// # Errors
     ///
     /// When email sending is failed
-    pub async fn send_welcome(ctx: &AppContext, user: &users::Model) -> Result<()> {
+    pub async fn send_welcome(ctx: &AppContext, user: &UserModel) -> Result<()> {
         Self::mail_template(
             ctx,
             &welcome,
             mailer::Args {
                 to: user.email.to_string(),
                 locals: json!({
-                  "name": user.name,
-                  "verifyToken": user.email_verification_token,
+                  "name": user.username,
+                  "verifyToken": user.email_verify_token,
                   "domain": ctx.config.server.full_url()
                 }),
                 ..Default::default()
@@ -44,14 +43,14 @@ impl AuthMailer {
     /// # Errors
     ///
     /// When email sending is failed
-    pub async fn forgot_password(ctx: &AppContext, user: &users::Model) -> Result<()> {
+    pub async fn forgot_password(ctx: &AppContext, user: &UserModel) -> Result<()> {
         Self::mail_template(
             ctx,
             &forgot,
             mailer::Args {
                 to: user.email.to_string(),
                 locals: json!({
-                  "name": user.name,
+                  "name": user.username,
                   "resetToken": user.reset_token,
                   "domain": ctx.config.server.full_url()
                 }),

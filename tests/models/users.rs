@@ -2,8 +2,10 @@ use insta::assert_debug_snapshot;
 use loco_rs::{model::ModelError, testing};
 use oic::{
     app::App,
-    models::users::{self, Model, RegisterParams},
+    // models::users::{self, Model, RegisterParams},
 };
+use oic_core::entities::prelude::*;
+use oic_core::models::users::RegisterParams;
 use sea_orm::{ActiveModelTrait, ActiveValue, IntoActiveModel};
 use serial_test::serial;
 
@@ -23,8 +25,8 @@ async fn test_can_validate_model() {
 
     let boot = testing::boot_test::<App>().await.unwrap();
 
-    let res = users::ActiveModel {
-        name: ActiveValue::set("1".to_string()),
+    let res = UserActiveModel {
+        username: ActiveValue::set("1".to_string()),
         email: ActiveValue::set("invalid-email".to_string()),
         ..Default::default()
     }
@@ -44,9 +46,9 @@ async fn can_create_with_password() {
     let params = RegisterParams {
         email: "test@framework.com".to_string(),
         password: "1234".to_string(),
-        name: "framework".to_string(),
+        username: "framework".to_string(),
     };
-    let res = Model::create_with_password(&boot.app_context.db, &params).await;
+    let res = UserModel::create_with_password(&boot.app_context.db, &params).await;
 
     insta::with_settings!({
         filters => testing::cleanup_user_model()
@@ -63,12 +65,12 @@ async fn handle_create_with_password_with_duplicate() {
     let boot = testing::boot_test::<App>().await.unwrap();
     testing::seed::<App>(&boot.app_context.db).await.unwrap();
 
-    let new_user: Result<Model, ModelError> = Model::create_with_password(
+    let new_user: Result<UserModel, ModelError> = UserModel::create_with_password(
         &boot.app_context.db,
         &RegisterParams {
             email: "user1@example.com".to_string(),
             password: "1234".to_string(),
-            name: "framework".to_string(),
+            username: "framework".to_string(),
         },
     )
     .await;
@@ -83,9 +85,9 @@ async fn can_find_by_email() {
     let boot = testing::boot_test::<App>().await.unwrap();
     testing::seed::<App>(&boot.app_context.db).await.unwrap();
 
-    let existing_user = Model::find_by_email(&boot.app_context.db, "user1@example.com").await;
+    let existing_user = UserModel::find_by_email(&boot.app_context.db, "user1@example.com").await;
     let non_existing_user_results =
-        Model::find_by_email(&boot.app_context.db, "un@existing-email.com").await;
+    UserModel::find_by_email(&boot.app_context.db, "un@existing-email.com").await;
 
     assert_debug_snapshot!(existing_user);
     assert_debug_snapshot!(non_existing_user_results);
@@ -100,9 +102,9 @@ async fn can_find_by_pid() {
     testing::seed::<App>(&boot.app_context.db).await.unwrap();
 
     let existing_user =
-        Model::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111").await;
+    UserModel::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111").await;
     let non_existing_user_results =
-        Model::find_by_pid(&boot.app_context.db, "23232323-2323-2323-2323-232323232323").await;
+    UserModel::find_by_pid(&boot.app_context.db, "23232323-2323-2323-2323-232323232323").await;
 
     assert_debug_snapshot!(existing_user);
     assert_debug_snapshot!(non_existing_user_results);
@@ -116,12 +118,12 @@ async fn can_verification_token() {
     let boot = testing::boot_test::<App>().await.unwrap();
     testing::seed::<App>(&boot.app_context.db).await.unwrap();
 
-    let user = Model::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
+    let user = UserModel::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
         .await
         .unwrap();
 
-    assert!(user.email_verification_sent_at.is_none());
-    assert!(user.email_verification_token.is_none());
+    assert!(user.email_verify_sent_at.is_none());
+    assert!(user.email_verify_token.is_empty());
 
     assert!(user
         .into_active_model()
@@ -129,12 +131,12 @@ async fn can_verification_token() {
         .await
         .is_ok());
 
-    let user = Model::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
+    let user = UserModel::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
         .await
         .unwrap();
 
-    assert!(user.email_verification_sent_at.is_some());
-    assert!(user.email_verification_token.is_some());
+    assert!(user.email_verify_sent_at.is_some());
+    assert!(user.email_verify_token.is_empty());
 }
 
 #[tokio::test]
@@ -145,12 +147,12 @@ async fn can_set_forgot_password_sent() {
     let boot = testing::boot_test::<App>().await.unwrap();
     testing::seed::<App>(&boot.app_context.db).await.unwrap();
 
-    let user = Model::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
+    let user = UserModel::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
         .await
         .unwrap();
 
     assert!(user.reset_sent_at.is_none());
-    assert!(user.reset_token.is_none());
+    assert!(user.reset_token.is_empty());
 
     assert!(user
         .into_active_model()
@@ -158,12 +160,12 @@ async fn can_set_forgot_password_sent() {
         .await
         .is_ok());
 
-    let user = Model::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
+    let user = UserModel::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
         .await
         .unwrap();
 
     assert!(user.reset_sent_at.is_some());
-    assert!(user.reset_token.is_some());
+    assert!(user.reset_token.is_empty());
 }
 
 #[tokio::test]
@@ -174,7 +176,7 @@ async fn can_verified() {
     let boot = testing::boot_test::<App>().await.unwrap();
     testing::seed::<App>(&boot.app_context.db).await.unwrap();
 
-    let user = Model::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
+    let user = UserModel::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
         .await
         .unwrap();
 
@@ -186,7 +188,7 @@ async fn can_verified() {
         .await
         .is_ok());
 
-    let user = Model::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
+    let user = UserModel::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
         .await
         .unwrap();
 
@@ -201,7 +203,7 @@ async fn can_reset_password() {
     let boot = testing::boot_test::<App>().await.unwrap();
     testing::seed::<App>(&boot.app_context.db).await.unwrap();
 
-    let user = Model::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
+    let user = UserModel::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
         .await
         .unwrap();
 
@@ -215,7 +217,7 @@ async fn can_reset_password() {
         .is_ok());
 
     assert!(
-        Model::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
+        UserModel::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
             .await
             .unwrap()
             .verify_password("new-password")

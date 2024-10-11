@@ -13,7 +13,7 @@ impl Oic {
     pub fn from_attributes(attrs: &[syn::Attribute]) -> syn::Result<Self> {
         let mut oic = Oic::default();
         for attr in attrs {
-            println!("{:?}", attr);
+            // println!("{:?}", attr);
             // if attr.path.is_ident("oic") {
             //     oic.name = attr.parse_meta()?.lit_str();
             // }

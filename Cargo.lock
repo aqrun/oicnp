@@ -3227,6 +3227,7 @@ dependencies = [
  "insta",
  "loco-rs",
  "migration",
+ "oic_core",
  "rstest",
  "sea-orm",
  "serde",

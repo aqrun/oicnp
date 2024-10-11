@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
-
-use crate::models::_entities::users;
+use oic_core::entities::prelude::*;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CurrentResponse {
@@ -11,10 +10,10 @@ pub struct CurrentResponse {
 
 impl CurrentResponse {
     #[must_use]
-    pub fn new(user: &users::Model) -> Self {
+    pub fn new(user: &UserModel) -> Self {
         Self {
-            pid: user.pid.to_string(),
-            name: user.name.clone(),
+            pid: user.uuid.to_string(),
+            name: user.username.clone(),
             email: user.email.clone(),
         }
     }

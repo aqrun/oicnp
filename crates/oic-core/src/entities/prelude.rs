@@ -198,3 +198,9 @@ pub use super::user::{
     Column as UserColumn,
     ActiveModel as UserActiveModel,
 };
+pub use super::note::{
+    Entity as NoteEntity,
+    Model as NoteModel,
+    Column as NoteColumn,
+    ActiveModel as NoteActiveModel,
+};

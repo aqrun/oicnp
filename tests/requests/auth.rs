@@ -1,6 +1,7 @@
 use insta::{assert_debug_snapshot, with_settings};
 use loco_rs::testing;
-use oic::{app::App, models::users};
+use oic::app::App;
+use oic_core::entities::prelude::*;
 use rstest::rstest;
 use serial_test::serial;
 
@@ -31,7 +32,7 @@ async fn can_register() {
         });
 
         let _response = request.post("/api/auth/register").json(&payload).await;
-        let saved_user = users::Model::find_by_email(&ctx.db, email).await;
+        let saved_user: Result<UserModel, loco_rs::prelude::ModelError> = UserModel::find_by_email(&ctx.db, email).await;
 
         with_settings!({
             filters => testing::cleanup_user_model()
@@ -70,9 +71,9 @@ async fn can_login_with_verify(#[case] test_name: &str, #[case] password: &str) 
             .json(&register_payload)
             .await;
 
-        let user = users::Model::find_by_email(&ctx.db, email).await.unwrap();
+        let user = UserModel::find_by_email(&ctx.db, email).await.unwrap();
         let verify_payload = serde_json::json!({
-            "token": user.email_verification_token,
+            "token": user.email_verify_token,
         });
         request.post("/api/auth/verify").json(&verify_payload).await;
 
@@ -86,7 +87,7 @@ async fn can_login_with_verify(#[case] test_name: &str, #[case] password: &str) 
             .await;
 
         // Make sure email_verified_at is set
-        assert!(users::Model::find_by_email(&ctx.db, email)
+        assert!(UserModel::find_by_email(&ctx.db, email)
             .await
             .unwrap()
             .email_verified_at
@@ -152,10 +153,10 @@ async fn can_reset_password() {
         });
         _ = request.post("/api/auth/forgot").json(&forgot_payload).await;
 
-        let user = users::Model::find_by_email(&ctx.db, &login_data.user.email)
+        let user = UserModel::find_by_email(&ctx.db, &login_data.user.email)
             .await
             .unwrap();
-        assert!(user.reset_token.is_some());
+        assert!(user.reset_token.is_empty());
         assert!(user.reset_sent_at.is_some());
 
         let new_password = "new-password";
@@ -166,11 +167,11 @@ async fn can_reset_password() {
 
         let reset_response = request.post("/api/auth/reset").json(&reset_payload).await;
 
-        let user = users::Model::find_by_email(&ctx.db, &user.email)
+        let user = UserModel::find_by_email(&ctx.db, &user.email)
             .await
             .unwrap();
 
-        assert!(user.reset_token.is_none());
+        assert!(user.reset_token.is_empty());
         assert!(user.reset_sent_at.is_none());
 
         assert_debug_snapshot!((reset_response.status_code(), reset_response.text()));

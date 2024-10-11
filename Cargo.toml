@@ -15,6 +15,7 @@ default-run = "oic"
 
 [dependencies]
 # oic_cmd = { workspace = true }
+oic_core = { workspace = true }
 loco-rs = { workspace = true }
 migration = { workspace = true }
 tokio = { workspace = true }

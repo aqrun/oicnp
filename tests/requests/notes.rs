@@ -1,8 +1,9 @@
 use insta::{assert_debug_snapshot, with_settings};
 use loco_rs::testing;
-use oic::{app::App, models::_entities::notes::Entity};
+use oic::app::App;
 use sea_orm::entity::prelude::*;
 use serial_test::serial;
+use oic_core::entities::prelude::*;
 
 // TODO: see how to dedup / extract this to app-local test utils
 // not to framework, because that would require a runtime dep on insta
@@ -101,7 +102,7 @@ async fn can_delete_note() {
     testing::request::<App, _, _>(|request, ctx| async move {
         testing::seed::<App>(&ctx.db).await.unwrap();
 
-        let count_before_delete = Entity::find().all(&ctx.db).await.unwrap().len();
+        let count_before_delete = NoteEntity::find().all(&ctx.db).await.unwrap().len();
         let delete_note_request = request.delete("/api/notes/1").await;
 
         with_settings!({
@@ -116,7 +117,7 @@ async fn can_delete_note() {
         );
         });
 
-        let count_after_delete = Entity::find().all(&ctx.db).await.unwrap().len();
+        let count_after_delete = NoteEntity::find().all(&ctx.db).await.unwrap().len();
         assert_eq!(count_after_delete, count_before_delete - 1);
     })
     .await;
