@@ -8,6 +8,8 @@ edition = "2021"
 [dependencies]
 async-graphql = { workspace = true }
 serde = { workspace = true }
+axum = { workspace = true }
+axum-extra = { workspace = true }
 serde_json = { workspace = true }
 serde_yaml = { workspace = true }
 lazy_static = { workspace = true }

@@ -4,8 +4,9 @@ use oic_core::entities::prelude::*;
 #[derive(Debug, Deserialize, Serialize)]
 pub struct LoginResponse {
     pub token: String,
-    pub pid: String,
-    pub name: String,
+    pub uid: String,
+    pub uuid: String,
+    pub username: String,
     pub is_verified: bool,
 }
 
@@ -14,8 +15,9 @@ impl LoginResponse {
     pub fn new(user: &UserModel, token: &String) -> Self {
         Self {
             token: token.to_string(),
-            pid: user.uuid.to_string(),
-            name: user.username.clone(),
+            uid: user.uid.to_string(),
+            uuid: user.uuid.to_string(),
+            username: user.username.clone(),
             is_verified: user.email_verified_at.is_some(),
         }
     }

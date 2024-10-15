@@ -1,9 +1,10 @@
 use async_trait::async_trait;
-use chrono::offset::Local;
-use loco_rs::{auth::jwt, hash, prelude::*};
+use chrono::offset::Utc;
+use loco_rs::{hash, prelude::*};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use crate::utils::uuid as getUuid;
+use crate::auth::JWT;
 
 pub use crate::entities::prelude::{
   UserActiveModel,
@@ -52,7 +53,7 @@ impl ActiveModelBehavior for UserActiveModel {
         if insert {
             let mut this = self;
             this.uuid = ActiveValue::Set(getUuid());
-            this.api_key = ActiveValue::Set(format!("lo-{}", Uuid::new_v4()));
+            this.api_key = ActiveValue::Set(format!("api-{}", Uuid::new_v4()));
             Ok(this)
         } else {
             Ok(self)
@@ -75,7 +76,7 @@ impl Authenticable for UserModel {
     }
 
     async fn find_by_claims_key(db: &DatabaseConnection, claims_key: &str) -> ModelResult<Self> {
-        Self::find_by_pid(db, claims_key).await
+        Self::find_by_uid(db, claims_key).await
     }
 }
 
@@ -134,17 +135,35 @@ impl UserModel {
         user.ok_or_else(|| ModelError::EntityNotFound)
     }
 
-    /// finds a user by the provided pid
+    /// finds a user by the provided uid
     ///
     /// # Errors
     ///
     /// When could not find user  or DB query error
-    pub async fn find_by_pid(db: &DatabaseConnection, pid: &str) -> ModelResult<Self> {
+    pub async fn find_by_uid(db: &DatabaseConnection, uid: &str) -> ModelResult<Self> {
         // let parse_uuid = Uuid::parse_str(pid).map_err(|e| ModelError::Any(e.into()))?;
         let user = UserEntity::find()
             .filter(
                 model::query::condition()
-                    .eq(UserColumn::Uuid, pid)
+                    .eq(UserColumn::Uid, uid)
+                    .build(),
+            )
+            .one(db)
+            .await?;
+        user.ok_or_else(|| ModelError::EntityNotFound)
+    }
+
+    /// finds a user by the provided uuid
+    ///
+    /// # Errors
+    ///
+    /// When could not find user  or DB query error
+    pub async fn find_by_uuid(db: &DatabaseConnection, uuid: &str) -> ModelResult<Self> {
+        // let parse_uuid = Uuid::parse_str(pid).map_err(|e| ModelError::Any(e.into()))?;
+        let user = UserEntity::find()
+            .filter(
+                model::query::condition()
+                    .eq(UserColumn::Uuid, uuid)
                     .build(),
             )
             .one(db)
@@ -226,7 +245,7 @@ impl UserModel {
     ///
     /// when could not convert user claims to jwt token
     pub fn generate_jwt(&self, secret: &str, expiration: &u64) -> ModelResult<String> {
-        Ok(jwt::JWT::new(secret).generate_token(expiration, self.uuid.to_string(), None)?)
+        Ok(JWT::new(secret).generate_token(expiration, self.uid.to_string(), self.uuid.to_string(), None)?)
     }
 }
 
@@ -244,7 +263,7 @@ impl UserActiveModel {
         mut self,
         db: &DatabaseConnection,
     ) -> ModelResult<UserModel> {
-        self.email_verify_sent_at = ActiveValue::set(Some(Local::now().into()));
+        self.email_verify_sent_at = ActiveValue::set(Some(Utc::now().naive_utc().into()));
         self.email_verify_token = ActiveValue::Set(Uuid::new_v4().to_string());
         Ok(self.update(db).await?)
     }
@@ -262,7 +281,7 @@ impl UserActiveModel {
     ///
     /// when has DB query error
     pub async fn set_forgot_password_sent(mut self, db: &DatabaseConnection) -> ModelResult<UserModel> {
-        self.reset_sent_at = ActiveValue::set(Some(Local::now().into()));
+        self.reset_sent_at = ActiveValue::set(Some(Utc::now().naive_utc().into()));
         self.reset_token = ActiveValue::Set(Uuid::new_v4().to_string());
         Ok(self.update(db).await?)
     }
@@ -277,7 +296,7 @@ impl UserActiveModel {
     ///
     /// when has DB query error
     pub async fn verified(mut self, db: &DatabaseConnection) -> ModelResult<UserModel> {
-        self.email_verified_at = ActiveValue::set(Some(Local::now().into()));
+        self.email_verified_at = ActiveValue::set(Some(Utc::now().naive_utc().into()));
         Ok(self.update(db).await?)
     }
 

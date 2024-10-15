@@ -22,7 +22,13 @@ impl MigrationTrait for Migration {
                 Table::create()
                     .table(Notes::Table)
                     .if_not_exists()
-                    .col(pk_auto(Notes::Id))
+                    .col(
+                        ColumnDef::new(Notes::Id)
+                            .big_integer()
+                            .not_null()
+                            .primary_key()
+                            .auto_increment(),
+                    )
                     .col(string_null(Notes::Title))
                     .col(string_null(Notes::Content))
                     .col(

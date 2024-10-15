@@ -3,6 +3,7 @@ use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
 use oic_core::entities::prelude::*;
 use oic_core::models::users::{LoginParams, RegisterParams};
+use serde_json::json;
 
 use crate::{
     mailers::auth::AuthMailer,
@@ -50,9 +51,15 @@ async fn register(
         .set_email_verification_sent(&ctx.db)
         .await?;
 
-    AuthMailer::send_welcome(&ctx, &user).await?;
+    // 不发送邮件
+    // AuthMailer::send_welcome(&ctx, &user).await?;
 
-    format::json(())
+    format::json(json!({
+        "uid": user.uid.to_string(),
+        "uuid": user.uuid.to_string(),
+        "username": user.username,
+        "email": user.email,
+    }))
 }
 
 /// Verify register user. if the user not verified his email, he can't login to

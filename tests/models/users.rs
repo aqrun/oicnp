@@ -102,9 +102,9 @@ async fn can_find_by_pid() {
     testing::seed::<App>(&boot.app_context.db).await.unwrap();
 
     let existing_user =
-    UserModel::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111").await;
+    UserModel::find_by_uuid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111").await;
     let non_existing_user_results =
-    UserModel::find_by_pid(&boot.app_context.db, "23232323-2323-2323-2323-232323232323").await;
+    UserModel::find_by_uuid(&boot.app_context.db, "23232323-2323-2323-2323-232323232323").await;
 
     assert_debug_snapshot!(existing_user);
     assert_debug_snapshot!(non_existing_user_results);
@@ -118,7 +118,7 @@ async fn can_verification_token() {
     let boot = testing::boot_test::<App>().await.unwrap();
     testing::seed::<App>(&boot.app_context.db).await.unwrap();
 
-    let user = UserModel::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
+    let user = UserModel::find_by_uuid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
         .await
         .unwrap();
 
@@ -131,7 +131,7 @@ async fn can_verification_token() {
         .await
         .is_ok());
 
-    let user = UserModel::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
+    let user = UserModel::find_by_uuid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
         .await
         .unwrap();
 
@@ -147,7 +147,7 @@ async fn can_set_forgot_password_sent() {
     let boot = testing::boot_test::<App>().await.unwrap();
     testing::seed::<App>(&boot.app_context.db).await.unwrap();
 
-    let user = UserModel::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
+    let user = UserModel::find_by_uuid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
         .await
         .unwrap();
 
@@ -160,7 +160,7 @@ async fn can_set_forgot_password_sent() {
         .await
         .is_ok());
 
-    let user = UserModel::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
+    let user = UserModel::find_by_uuid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
         .await
         .unwrap();
 
@@ -176,7 +176,7 @@ async fn can_verified() {
     let boot = testing::boot_test::<App>().await.unwrap();
     testing::seed::<App>(&boot.app_context.db).await.unwrap();
 
-    let user = UserModel::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
+    let user = UserModel::find_by_uuid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
         .await
         .unwrap();
 
@@ -188,7 +188,7 @@ async fn can_verified() {
         .await
         .is_ok());
 
-    let user = UserModel::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
+    let user = UserModel::find_by_uuid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
         .await
         .unwrap();
 
@@ -203,7 +203,7 @@ async fn can_reset_password() {
     let boot = testing::boot_test::<App>().await.unwrap();
     testing::seed::<App>(&boot.app_context.db).await.unwrap();
 
-    let user = UserModel::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
+    let user = UserModel::find_by_uuid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
         .await
         .unwrap();
 
@@ -217,7 +217,7 @@ async fn can_reset_password() {
         .is_ok());
 
     assert!(
-        UserModel::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
+        UserModel::find_by_uuid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111")
             .await
             .unwrap()
             .verify_password("new-password")
