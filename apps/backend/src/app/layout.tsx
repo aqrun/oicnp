@@ -4,11 +4,12 @@ import React, { useEffect, useState } from 'react';
 import './globals.css'
 import type { Metadata } from 'next'
 import { RecoilRoot } from 'recoil';
+import { useRouter, usePathname } from 'next/navigation';
 import {
   SyncOutlined,
 } from '@ant-design/icons';
-import UserLogin from '~/containers/UserLogin';
 import { useAuthState } from '~/hooks';
+import { r } from '~/utils';
 import MainLayout from './main-layout';
 
 // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars -- metadata
@@ -24,11 +25,21 @@ function LayoutWidget ({
   children,
 }: React.PropsWithChildren): JSX.Element {
   const [auth] = useAuthState(true);
+  const router = useRouter();
+  const pathname = usePathname();
   const [initLoading, setInitLoading] = useState(true);
 
   useEffect(() => {
     setInitLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (!auth.user) {
+      router.push(r('/login'));
+    } else if (pathname === '/login') {
+      router.push(r('/welcome'));
+    }
+  }, [auth, router, pathname]);
 
   if (initLoading) {
     return (
@@ -40,7 +51,9 @@ function LayoutWidget ({
 
   if (!auth.user) {
     return (
-      <UserLogin />
+      <>
+        {children}
+      </>
     );
   }
 

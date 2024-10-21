@@ -6,7 +6,7 @@ export const Container = styled.div`
   overflow: hidden;
 
   .ant-pro-form-login-page-container {
-    max-width: 50%;
+    // max-width: 50%;
   }
   .oic-auto-login-line-w {
     margin-block-end: 24px;

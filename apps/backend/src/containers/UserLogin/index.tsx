@@ -1,4 +1,7 @@
+'use client';
+
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   LockOutlined,
   MobileOutlined,
@@ -12,12 +15,14 @@ import {
 } from '@ant-design/pro-components';
 import { Button, message, Tabs } from 'antd';
 import { useMemoizedFn } from 'ahooks';
+import { r } from '~/utils';
 import { useAuthState } from '~/hooks';
 import { Container } from './index.styled';
 
 type LoginType = 'phone' | 'account';
 
 export default function UserLogin (): JSX.Element {
+  const router = useRouter();
   const [, setAuthState] = useAuthState();
   const [loginType, setLoginType] = useState<LoginType>('account');
 
@@ -28,6 +33,7 @@ export default function UserLogin (): JSX.Element {
           username: formData.username,
         },
       });
+      router.push(r('/welcome'));
     }
   });
 
