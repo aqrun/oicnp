@@ -21,9 +21,9 @@ import { Container } from './index.styled';
 
 type LoginType = 'phone' | 'account';
 
-export default function UserLogin (): JSX.Element {
+export default function UserLogin (): JSX.Element | null {
   const router = useRouter();
-  const [, setAuthState] = useAuthState();
+  const [auth, setAuthState] = useAuthState();
   const [loginType, setLoginType] = useState<LoginType>('account');
 
   const formSubmitHandle = useMemoizedFn((formData: Record<string, string>) => {
@@ -36,6 +36,10 @@ export default function UserLogin (): JSX.Element {
       router.push(r('/welcome'));
     }
   });
+
+  if (auth.user) {
+    return null;
+  }
 
   return (
     <Container>

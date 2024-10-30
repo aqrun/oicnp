@@ -12,14 +12,10 @@ use loco_rs::{
     Result,
 };
 use migration::Migrator;
-use sea_orm::DatabaseConnection;
 use oic_core::entities::prelude::*;
+use sea_orm::DatabaseConnection;
 
-use crate::{
-    controllers, initializers,
-    tasks,
-    workers::downloader::DownloadWorker,
-};
+use crate::{controllers, initializers, tasks, workers::downloader::DownloadWorker};
 
 pub struct App;
 #[async_trait]
@@ -49,10 +45,13 @@ impl Hooks for App {
     }
 
     fn routes(_ctx: &AppContext) -> AppRoutes {
-        AppRoutes::with_default_routes()
+        let app_routes = AppRoutes::with_default_routes()
+            .add_routes(controllers::admin::routes())
             .add_route(controllers::notes::routes())
             .add_route(controllers::auth::routes())
-            .add_route(controllers::user::routes())
+            .add_route(controllers::user::routes());
+
+        app_routes
     }
 
     fn connect_workers<'a>(p: &'a mut Processor, ctx: &'a AppContext) {

@@ -5,6 +5,7 @@ mod youdao;
 mod auth;
 mod fns;
 mod string;
+mod route;
 
 pub use app_config::*;
 pub use uuid::*;
@@ -13,3 +14,4 @@ pub use youdao::*;
 pub use auth::*;
 pub use fns::*;
 pub use string::*;
+pub use route::*;
