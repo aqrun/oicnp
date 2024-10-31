@@ -42,5 +42,5 @@ sea-orm-migration = { workspace = true }
 async-trait = { workspace = true }
 loco-rs = { workspace = true, features = ["testing"] }
 uuid = { workspace = true }
-validator = { workspace = true }
+validator = { workspace = true, features = ["derive"] }
 

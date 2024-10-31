@@ -6,6 +6,7 @@ mod auth;
 mod fns;
 mod string;
 mod route;
+mod err;
 
 pub use app_config::*;
 pub use uuid::*;
@@ -15,3 +16,4 @@ pub use auth::*;
 pub use fns::*;
 pub use string::*;
 pub use route::*;
+pub use err::*;

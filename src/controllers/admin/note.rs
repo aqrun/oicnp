@@ -1,25 +1,29 @@
 use axum::debug_handler;
 use loco_rs::prelude::*;
-use oic_core::entities::prelude::*;
-use oic_core::utils::get_admin_prefix;
-use serde::{Deserialize, Serialize};
+use oic_core::{
+    entities::prelude::*, 
+    models::notes::CreateNoteParams, 
+    utils::{get_admin_prefix, catch_err},
+    typings::JsonResponse,
+};
 use serde_json::json;
 
 const API_PREFIX: &'static str = "note";
 
-#[derive(Deserialize, Serialize, Debug)]
-pub struct Params {
-    id: Option<String>,
-    name: Option<String>,
-}
-
 #[debug_handler]
-pub async fn get_one(Json(params): Json<Params>) -> Result<Response> {
-    let res: serde_json::Value = json!({
-      "name": "alex",
-      "params": params,
-    });
-    format::json(res)
+pub async fn get_one(
+    State(ctx): State<AppContext>,
+    Json(params): Json<CreateNoteParams>,
+) -> Result<Response> {
+    let res = NoteModel::insert(&ctx.db, &params).await;
+
+    let res_data = match res {
+        Ok(res) => JsonResponse::success(json!(res)),
+        Err(err) => {
+            JsonResponse::error(json!("400"), json!(format!("{}", err)))
+        }
+    };
+    format::json(res_data)
 }
 
 #[debug_handler]
@@ -31,11 +35,24 @@ pub async fn list() -> Result<Response> {
 }
 
 #[debug_handler]
-pub async fn add() -> Result<Response> {
-    let res: serde_json::Value = json!({
-      "name": "alex"
-    });
-    format::json(res)
+pub async fn add(
+    State(ctx): State<AppContext>,
+    Json(params): Json<CreateNoteParams>,
+) -> Result<Response> {
+    if let Err(err) = catch_err(params.validate()) {
+        let msg = err.to_string();
+        return format::json(JsonResponse::error(json!("400"), json!(msg)));
+    }
+
+    let res = NoteModel::insert(&ctx.db, &params).await;
+
+    let res_data = match res {
+        Ok(res) => JsonResponse::success(json!(res)),
+        Err(err) => {
+            JsonResponse::error(json!("400"), json!(format!("{}", err)))
+        }
+    };
+    format::json(res_data)
 }
 
 #[debug_handler]

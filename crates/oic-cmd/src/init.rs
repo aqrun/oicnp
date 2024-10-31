@@ -22,5 +22,9 @@ pub async fn init_cmd() {
       Command::MyTest => {
           cmd::my_test::execute().await;
       },
+
+      Command::SeedData => {
+        cmd::seeds::run().await;
+      }
   }
 }

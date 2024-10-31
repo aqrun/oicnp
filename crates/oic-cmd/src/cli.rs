@@ -23,4 +23,7 @@ pub enum Command {
     MyTest,
     // TruncateTables,
     // InitUser,
+
+    /// 初始化数据
+    SeedData,
 }
