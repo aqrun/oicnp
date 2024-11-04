@@ -25,6 +25,10 @@ pub async fn init_cmd() {
 
       Command::SeedData => {
         cmd::seeds::run().await;
-      }
+      },
+
+      Command::ServeApi => {
+        cmd::serve_api::run().await;
+      },
   }
 }

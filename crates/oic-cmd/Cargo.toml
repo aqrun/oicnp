@@ -29,3 +29,4 @@ lazy_static = { workspace = true }
 dotenv = { workspace = true }
 reqwest = { workspace = true, features = ["json"] }
 loco-rs = { workspace = true, features = ["testing"] }
+axum = { workspace = true, features = ["json"] }

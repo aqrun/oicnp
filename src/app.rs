@@ -8,7 +8,7 @@ use loco_rs::{
     db::{self, truncate_table},
     environment::Environment,
     task::Tasks,
-    worker::{AppWorker, Processor},
+    bgworker::{BackgroundWorker, Queue},
     Result,
 };
 use migration::Migrator;
@@ -54,8 +54,9 @@ impl Hooks for App {
         app_routes
     }
 
-    fn connect_workers<'a>(p: &'a mut Processor, ctx: &'a AppContext) {
-        p.register(DownloadWorker::build(ctx));
+    async fn connect_workers(ctx: &AppContext, queue: &Queue) -> Result<()> {
+        queue.register(DownloadWorker::build(ctx)).await?;
+        Ok(())
     }
 
     fn register_tasks(tasks: &mut Tasks) {

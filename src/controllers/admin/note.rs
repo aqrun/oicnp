@@ -2,9 +2,9 @@ use axum::debug_handler;
 use loco_rs::prelude::*;
 use oic_core::{
     entities::prelude::*, 
-    models::notes::CreateNoteParams, 
+    models::notes::CreateNoteReqParams, 
     utils::{get_admin_prefix, catch_err},
-    typings::JsonResponse,
+    typings::JsonRes,
 };
 use serde_json::json;
 
@@ -13,17 +13,14 @@ const API_PREFIX: &'static str = "note";
 #[debug_handler]
 pub async fn get_one(
     State(ctx): State<AppContext>,
-    Json(params): Json<CreateNoteParams>,
-) -> Result<Response> {
+    Json(params): Json<CreateNoteReqParams>,
+) -> JsonRes<NoteModel> {
     let res = NoteModel::insert(&ctx.db, &params).await;
 
-    let res_data = match res {
-        Ok(res) => JsonResponse::success(json!(res)),
-        Err(err) => {
-            JsonResponse::error(json!("400"), json!(format!("{}", err)))
-        }
-    };
-    format::json(res_data)
+    match res {
+        Ok(res) => JsonRes::ok(res),
+        Err(err) => JsonRes::err(err)
+    }
 }
 
 #[debug_handler]
@@ -37,22 +34,18 @@ pub async fn list() -> Result<Response> {
 #[debug_handler]
 pub async fn add(
     State(ctx): State<AppContext>,
-    Json(params): Json<CreateNoteParams>,
-) -> Result<Response> {
+    Json(params): Json<CreateNoteReqParams>,
+) -> JsonRes<NoteModel> {
     if let Err(err) = catch_err(params.validate()) {
-        let msg = err.to_string();
-        return format::json(JsonResponse::error(json!("400"), json!(msg)));
+        return JsonRes::err(err);
     }
 
     let res = NoteModel::insert(&ctx.db, &params).await;
 
-    let res_data = match res {
-        Ok(res) => JsonResponse::success(json!(res)),
-        Err(err) => {
-            JsonResponse::error(json!("400"), json!(format!("{}", err)))
-        }
-    };
-    format::json(res_data)
+    match res {
+        Ok(res) => JsonRes::ok(res),
+        Err(err) => JsonRes::err(err),
+    }
 }
 
 #[debug_handler]
