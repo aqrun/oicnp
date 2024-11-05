@@ -24,7 +24,9 @@ pub async fn init_cmd() {
       },
 
       Command::SeedData => {
-        cmd::seeds::run().await;
+        if let Err(err) = cmd::seed_data::run().await {
+            println!("SeedDataErr: {}", err);
+        }
       },
 
       Command::ServeApi => {

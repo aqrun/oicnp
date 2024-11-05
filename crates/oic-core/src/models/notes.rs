@@ -27,11 +27,40 @@ impl NoteModel {
         }
 
         if params.content.is_some() {
-            item.title = Set(params.content.clone());
+            item.content = Set(params.content.clone());
         }
     
         let item = item.insert(db).await?;
 
         Ok(item)
+    }
+
+    /// 批量创建 note
+    pub async fn insert_multi(db: &DatabaseConnection, params: &[CreateNoteReqParams]) -> ModelResult<i64> {
+        let txn = db.begin().await?;
+
+        let items = params.iter()
+            .map(|item| {
+                let mut note = NoteActiveModel {
+                    ..Default::default()
+                };
+        
+                if item.title.is_some() {
+                    note.title = Set(item.title.clone());
+                }
+        
+                if item.content.is_some() {
+                    note.content = Set(item.content.clone());
+                }
+
+                note
+            })
+            .collect::<Vec<NoteActiveModel>>();
+        
+        let res = NoteEntity::insert_many(items).exec(&txn).await?;
+
+        txn.commit().await?;
+
+        Ok(res.last_insert_id)
     }
 }

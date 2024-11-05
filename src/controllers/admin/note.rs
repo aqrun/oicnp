@@ -48,6 +48,24 @@ pub async fn add(
     }
 }
 
+/// 批量添加
+#[debug_handler]
+pub async fn add_multi(
+    State(ctx): State<AppContext>,
+    Json(params): Json<Vec<CreateNoteReqParams>>,
+) -> JsonRes<i64> {
+    if let Err(err) = catch_err(params.validate()) {
+        return JsonRes::err(err);
+    }
+
+    let res = NoteModel::insert_multi(&ctx.db, params.as_slice()).await;
+
+    match res {
+        Ok(res) => JsonRes::ok(res),
+        Err(err) => JsonRes::err(err),
+    }
+}
+
 #[debug_handler]
 pub async fn update() -> Result<Response> {
     let res: serde_json::Value = json!({
@@ -70,6 +88,7 @@ pub fn routes() -> Routes {
         .add("/one", post(get_one))
         .add("/list", post(list))
         .add("/add", post(add))
+        .add("/add-multi", post(add_multi))
         .add("/update", post(update))
         .add("/remove", post(remove))
 }

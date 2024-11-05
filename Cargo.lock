@@ -3223,6 +3223,7 @@ dependencies = [
  "gray_matter",
  "lazy_static",
  "loco-rs",
+ "oic_core",
  "rand",
  "regex",
  "reqwest",
@@ -3231,6 +3232,7 @@ dependencies = [
  "sea-orm-migration",
  "serde",
  "serde_json",
+ "serde_yaml",
  "tokio",
 ]
 
@@ -4002,6 +4004,7 @@ version = "0.12.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a77c62af46e79de0a562e1a9849205ffcb7fc1238876e9bd743357570e04046f"
 dependencies = [
+ "async-compression",
  "base64 0.22.1",
  "bytes",
  "encoding_rs",
@@ -4031,6 +4034,7 @@ dependencies = [
  "system-configuration",
  "tokio",
  "tokio-native-tls",
+ "tokio-util",
  "tower-service",
  "url",
  "wasm-bindgen",

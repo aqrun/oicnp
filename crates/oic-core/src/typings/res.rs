@@ -22,7 +22,7 @@ pub struct PageParams {
 }
 
 /// 数据统一返回格式
-#[derive(Debug, Serialize, Default)]
+#[derive(Debug, Serialize, Deserialize, Default, Clone)]
 pub struct JsonRes<T> {
     pub code: Option<String>,
     pub data: Option<T>,

@@ -11,13 +11,14 @@ path = "src/bin/main.rs"
 name = "ic"
 
 [dependencies]
-# oic_core = { workspace = true }
+oic_core = { workspace = true }
 # oicnp_api = { workspace = true }
 # migration = { workspace = true }
 sea-orm = { workspace = true }
 sea-orm-migration = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+serde_yaml = { workspace = true }
 tokio = { workspace = true }
 regex = { workspace = true }
 gray_matter = { workspace = true }
@@ -27,6 +28,6 @@ clap = { workspace = true }
 async-std = { workspace = true }
 lazy_static = { workspace = true }
 dotenv = { workspace = true }
-reqwest = { workspace = true, features = ["json"] }
+reqwest = { workspace = true, features = ["json", "gzip"] }
 loco-rs = { workspace = true, features = ["testing"] }
 axum = { workspace = true, features = ["json"] }
