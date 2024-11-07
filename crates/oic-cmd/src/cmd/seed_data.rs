@@ -34,11 +34,10 @@ async fn seed_notes() -> Result<()> {
 
     let res = post("/note/add-multi", &seed_data).await?;
 
-    if res.code.is_some() && res.clone().code.unwrap().eq("200") {
+    if res.is_success() {
         println!("添加成功: {:?}", res);
     } else {
-        let res = res.clone();
-        println!("添加失败: {}, {}", res.code.unwrap(), res.message.unwrap());
+        println!("添加失败: {}, {}", res.get_code(), res.get_msg());
     }
 
     Ok(())

@@ -102,4 +102,33 @@ impl<T: Serialize> JsonRes<T> {
             message: Some(msg.to_string()),
         }
     }
+    pub fn is_success(&self) -> bool {
+        if self.code.is_none() {
+            return true;
+        }
+
+        if let Some(code) = &self.code {
+            if code.eq("200") {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    pub fn get_code(&self) -> String {
+        if let Some(code) = &self.code {
+            return String::from(code);
+        }
+
+        String::from("")
+    }
+
+    pub fn get_msg(&self) -> String {
+        if let Some(msg) = &self.message {
+            return String::from(msg);
+        }
+
+        String::from("")
+    }
 }
