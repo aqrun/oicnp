@@ -1,5 +1,13 @@
 use validator::{ValidationErrors, ValidationErrorsKind};
 use anyhow::{Result, anyhow};
+use loco_rs::prelude::*;
+
+///
+/// 生成 ModelError
+/// 
+pub fn model_err(err: anyhow::Error) -> ModelError {
+    ModelError::from(DbErr::Custom(err.to_string()))
+}
 
 ///
 /// 获取第1条错误

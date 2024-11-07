@@ -1,6 +1,17 @@
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
+#[derive(Deserialize, Serialize, Debug, Clone, Validate)]
+pub struct QueryNoteReqParams {
+    pub id: i64,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone, Validate)]
+pub struct QueryNoteListReqParams {
+    pub id: Option<i64>,
+    pub title: Option<String>,
+}
+
 /// 创建 note 参数
 #[derive(Deserialize, Serialize, Debug, Clone, Validate)]
 pub struct CreateNoteReqParams {

@@ -1,11 +1,12 @@
 use std::fmt::Debug;
-
 use axum::{
     body::Body,
     http::{header, HeaderValue, StatusCode},
     response::{IntoResponse, Response},
 };
 use serde::{Deserialize, Serialize};
+use loco_rs::prelude::*;
+
 #[derive(Debug, Serialize)]
 /// 查 数据返回
 pub struct ListData<T> {
@@ -130,5 +131,17 @@ impl<T: Serialize> JsonRes<T> {
         }
 
         String::from("")
+    }
+}
+
+impl<T> From<ModelResult<T>> for JsonRes<T>
+where
+    T: Serialize + Send + Sync + Debug,
+{
+    fn from(res: ModelResult<T>) -> Self {
+        match res {
+            Ok(res) => Self::ok(res),
+            Err(err) => Self::err(err),
+        }
     }
 }

@@ -2,7 +2,11 @@ use axum::debug_handler;
 use loco_rs::prelude::*;
 use oic_core::{
     entities::prelude::*, 
-    models::notes::CreateNoteReqParams, 
+    models::notes::{
+        CreateNoteReqParams,
+        QueryNoteReqParams,
+        QueryNoteListReqParams,
+    },
     utils::{get_admin_prefix, catch_err},
     typings::JsonRes,
 };
@@ -13,18 +17,18 @@ const API_PREFIX: &'static str = "note";
 #[debug_handler]
 pub async fn get_one(
     State(ctx): State<AppContext>,
-    Json(params): Json<CreateNoteReqParams>,
+    Json(params): Json<QueryNoteReqParams>,
 ) -> JsonRes<NoteModel> {
-    let res = NoteModel::insert(&ctx.db, &params).await;
+    let res = NoteModel::find_by_id(&ctx.db, params.id).await;
 
-    match res {
-        Ok(res) => JsonRes::ok(res),
-        Err(err) => JsonRes::err(err)
-    }
+    JsonRes::from(res)
 }
 
 #[debug_handler]
-pub async fn list() -> Result<Response> {
+pub async fn list(
+    State(ctx): State<AppContext>,
+    Json(params): Json<QueryNoteListReqParams>,
+) -> Result<Response> {
     let res: serde_json::Value = json!({
       "name": "alex"
     });
@@ -40,12 +44,9 @@ pub async fn add(
         return JsonRes::err(err);
     }
 
-    let res = NoteModel::insert(&ctx.db, &params).await;
+    let res = NoteModel::create(&ctx.db, &params).await;
 
-    match res {
-        Ok(res) => JsonRes::ok(res),
-        Err(err) => JsonRes::err(err),
-    }
+    JsonRes::from(res)
 }
 
 /// 批量添加
@@ -58,12 +59,9 @@ pub async fn add_multi(
         return JsonRes::err(err);
     }
 
-    let res = NoteModel::insert_multi(&ctx.db, params.as_slice()).await;
+    let res = NoteModel::create_multi(&ctx.db, params.as_slice()).await;
 
-    match res {
-        Ok(res) => JsonRes::ok(res),
-        Err(err) => JsonRes::err(err),
-    }
+    JsonRes::from(res)
 }
 
 #[debug_handler]
