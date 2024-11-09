@@ -3,10 +3,10 @@ use crate::{
     utils::{catch_err, utc_now},
     typings::ListData,
 };
-use sea_orm::{prelude::*, QueryOrder, Set, TransactionTrait};
+use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, Set, TransactionTrait};
 use serde_json::json;
 use validator::Validate;
-use super::{CreateNoteReqParams, NoteFilters};
+use super::{CreateNoteReqParams, NoteFilters, UpdateNoteReqParams, DeleteNoteReqParams};
 use anyhow::{anyhow, Result};
 
 #[async_trait::async_trait]
@@ -117,5 +117,41 @@ impl NoteModel {
         txn.commit().await?;
 
         Ok(String::from("批量note添加完成"))
+    }
+
+    /// 更新数据
+    pub async fn update(db: &DatabaseConnection, params: UpdateNoteReqParams) -> Result<i64> {
+        let _ = catch_err(params.validate())?;
+        let id = params.id.unwrap_or(0);
+
+        if id < 0 {
+            return Err(anyhow!("数据不存在,id: {}", id));
+        }
+
+        let mut item = Self::find_by_id(&db, id)
+            .await?
+            .into_active_model();
+
+        item.set_from_json(json!(params))?;
+        item.updated_at = Set(Some(utc_now()));
+    
+        let item = item.update(db).await?;
+
+        Ok(item.id)
+    }
+
+    /// 删除数据
+    pub async fn delete(db: &DatabaseConnection, params: DeleteNoteReqParams) -> Result<i64> {
+        let id = params.id.unwrap_or(0);
+
+        if id < 0 {
+            return Err(anyhow!("数据不存在,id: {}", id));
+        }
+
+        let _res = NoteEntity::delete_by_id(id)
+            .exec(db)
+            .await?;
+
+        Ok(id)
     }
 }

@@ -12,6 +12,7 @@ pub struct NoteFilters {
 /// 创建 note 参数
 #[derive(Deserialize, Serialize, Debug, Validate)]
 pub struct CreateNoteReqParams {
+    pub id: Option<i64>,
     #[validate(required(message = "必须指定 title"), length(min = 2, message = "title 最少2个字符"))]
     pub title: Option<String>,
     #[validate(length(min = 2, message = "content 最少2个字符"))]
@@ -21,9 +22,6 @@ pub struct CreateNoteReqParams {
 ///
 /// 更新 note 参数
 /// 
-#[derive(Deserialize, Serialize, Debug, Validate)]
-pub struct UpdateNoteReqParams {
-    pub id: i64,
-    pub title: Option<String>,
-    pub content: Option<String>,
-}
+pub type UpdateNoteReqParams = CreateNoteReqParams;
+/// 删除数据参数
+pub type DeleteNoteReqParams = CreateNoteReqParams;

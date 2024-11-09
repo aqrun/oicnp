@@ -4,12 +4,13 @@ use oic_core::{
     entities::prelude::*, 
     models::notes::{
         CreateNoteReqParams,
+        UpdateNoteReqParams,
+        DeleteNoteReqParams,
         NoteFilters,
     },
     utils::get_admin_prefix,
     typings::{JsonRes, ListData},
 };
-use serde_json::json;
 
 const API_PREFIX: &'static str = "note";
 
@@ -56,19 +57,23 @@ pub async fn add_multi(
 }
 
 #[debug_handler]
-pub async fn update() -> Result<Response> {
-    let res: serde_json::Value = json!({
-      "name": "alex"
-    });
-    format::json(res)
+pub async fn update(
+    State(ctx): State<AppContext>,
+    Json(params): Json<UpdateNoteReqParams>,
+) -> JsonRes<i64> {
+    let res = NoteModel::update(&ctx.db, params).await;
+
+    JsonRes::from(res)
 }
 
 #[debug_handler]
-pub async fn remove() -> Result<Response> {
-    let res: serde_json::Value = json!({
-      "name": "alex"
-    });
-    format::json(res)
+pub async fn remove(
+    State(ctx): State<AppContext>,
+    Json(params): Json<DeleteNoteReqParams>,
+) -> JsonRes<i64> {
+    let res = NoteModel::delete(&ctx.db, params).await;
+
+    JsonRes::from(res)
 }
 
 pub fn routes() -> Routes {
