@@ -7,6 +7,7 @@ mod fns;
 mod string;
 mod route;
 mod err;
+mod time;
 
 pub use app_config::*;
 pub use uuid::*;
@@ -17,3 +18,4 @@ pub use fns::*;
 pub use string::*;
 pub use route::*;
 pub use err::*;
+pub use time::*;

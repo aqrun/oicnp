@@ -3190,6 +3190,7 @@ dependencies = [
 name = "oic"
 version = "0.0.1"
 dependencies = [
+ "anyhow",
  "async-trait",
  "axum",
  "chrono",
@@ -3199,6 +3200,7 @@ dependencies = [
  "loco-rs",
  "migration",
  "oic_core",
+ "oic_derives",
  "rstest",
  "sea-orm",
  "serde",
@@ -3255,6 +3257,7 @@ dependencies = [
  "loco-rs",
  "log",
  "mime",
+ "oic_derives",
  "once_cell",
  "rand",
  "rbson",

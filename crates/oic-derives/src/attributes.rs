@@ -10,14 +10,14 @@ pub struct Oic {
 }
 
 impl Oic {
-    pub fn from_attributes(attrs: &[syn::Attribute]) -> syn::Result<Self> {
-        let mut oic = Oic::default();
-        for attr in attrs {
-            // println!("{:?}", attr);
-            // if attr.path.is_ident("oic") {
-            //     oic.name = attr.parse_meta()?.lit_str();
-            // }
-        }
+    pub fn from_attributes(_attrs: &[syn::Attribute]) -> syn::Result<Self> {
+        let oic = Oic::default();
+        // for attr in attrs {
+        //     // println!("{:?}", attr);
+        //     // if attr.path.is_ident("oic") {
+        //     //     oic.name = attr.parse_meta()?.lit_str();
+        //     // }
+        // }
         Ok(oic)
     }
 }

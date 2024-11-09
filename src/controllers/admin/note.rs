@@ -4,11 +4,10 @@ use oic_core::{
     entities::prelude::*, 
     models::notes::{
         CreateNoteReqParams,
-        QueryNoteReqParams,
-        QueryNoteListReqParams,
+        NoteFilters,
     },
-    utils::{get_admin_prefix, catch_err},
-    typings::JsonRes,
+    utils::get_admin_prefix,
+    typings::{JsonRes, ListData},
 };
 use serde_json::json;
 
@@ -17,9 +16,10 @@ const API_PREFIX: &'static str = "note";
 #[debug_handler]
 pub async fn get_one(
     State(ctx): State<AppContext>,
-    Json(params): Json<QueryNoteReqParams>,
+    Json(params): Json<NoteFilters>,
 ) -> JsonRes<NoteModel> {
-    let res = NoteModel::find_by_id(&ctx.db, params.id).await;
+    let id = params.id.unwrap_or(0);
+    let res = NoteModel::find_by_id(&ctx.db, id).await;
 
     JsonRes::from(res)
 }
@@ -27,12 +27,11 @@ pub async fn get_one(
 #[debug_handler]
 pub async fn list(
     State(ctx): State<AppContext>,
-    Json(params): Json<QueryNoteListReqParams>,
-) -> Result<Response> {
-    let res: serde_json::Value = json!({
-      "name": "alex"
-    });
-    format::json(res)
+    Json(params): Json<NoteFilters>,
+) -> JsonRes<ListData<NoteModel>> {
+    let res = NoteModel::find_list(&ctx.db, params)
+        .await;
+    JsonRes::from(res)
 }
 
 #[debug_handler]
@@ -40,10 +39,6 @@ pub async fn add(
     State(ctx): State<AppContext>,
     Json(params): Json<CreateNoteReqParams>,
 ) -> JsonRes<NoteModel> {
-    if let Err(err) = catch_err(params.validate()) {
-        return JsonRes::err(err);
-    }
-
     let res = NoteModel::create(&ctx.db, &params).await;
 
     JsonRes::from(res)
@@ -54,11 +49,7 @@ pub async fn add(
 pub async fn add_multi(
     State(ctx): State<AppContext>,
     Json(params): Json<Vec<CreateNoteReqParams>>,
-) -> JsonRes<i64> {
-    if let Err(err) = catch_err(params.validate()) {
-        return JsonRes::err(err);
-    }
-
+) -> JsonRes<String> {
     let res = NoteModel::create_multi(&ctx.db, params.as_slice()).await;
 
     JsonRes::from(res)

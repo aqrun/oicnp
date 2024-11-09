@@ -1,13 +1,5 @@
 use validator::{ValidationErrors, ValidationErrorsKind};
 use anyhow::{Result, anyhow};
-use loco_rs::prelude::*;
-
-///
-/// 生成 ModelError
-/// 
-pub fn model_err(err: anyhow::Error) -> ModelError {
-    ModelError::from(DbErr::Custom(err.to_string()))
-}
 
 ///
 /// 获取第1条错误
@@ -15,18 +7,13 @@ pub fn model_err(err: anyhow::Error) -> ModelError {
 pub fn catch_err(validate_res: Result<(), ValidationErrors>) -> Result<()> {
     if let Err(errs) = validate_res {
         let errs_map = errs.errors();
-    
-        let mut field = String::from("");
+        
         let mut code = String::from("");
         let mut msg = String::from("");
     
-        let mut index = 0;
         for (key, value) in errs_map.iter() {
-            if index > 0 {
-                break;
-            }
-    
-            field = format!("{key}");
+            // 当前处理的字段名
+            let field = format!("{key}");
             
             match value {
                 ValidationErrorsKind::Field(f) => {
@@ -42,13 +29,15 @@ pub fn catch_err(validate_res: Result<(), ValidationErrors>) -> Result<()> {
     
                 },
             };
-    
-            index += 1;
-        }
-    
-        let res_msg = format!("{field} {code} {msg}");
 
-        return Err(anyhow!(res_msg));
+            // 获取任意错误信息错误code就停止
+            // 属性指定的错误信息
+            if !msg.is_empty() {
+                return Err(anyhow!("{}", msg.as_str()));
+            }
+
+            return Err(anyhow!("{} {}", field, code));
+        }
     }
 
     Ok(())

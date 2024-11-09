@@ -1,9 +1,7 @@
-use std::collections::HashMap;
 use serde::{Serialize, Deserialize};
 use chrono::prelude::*;
 use sha2::{Sha256, Digest};
-use anyhow::{anyhow, Result};
-use reqwest::{RequestBuilder};
+use anyhow::Result;
 
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct YoudaoTranslateArgs {

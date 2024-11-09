@@ -5,16 +5,20 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use serde::{Deserialize, Serialize};
-use loco_rs::prelude::*;
+use loco_rs::prelude::ModelResult;
 
 #[derive(Debug, Serialize)]
 /// 查 数据返回
 pub struct ListData<T> {
-    pub list: Vec<T>,
+    pub data: Vec<T>,
+    /// 全部数据条数
     pub total: u64,
-    pub total_pages: u64,
-    pub page_num: u64,
+    /// 当前页码
+    pub page: u64,
+    /// 当前分页大小
+    pub page_size: u64,
 }
+
 /// 分页参数
 #[derive(Deserialize, Clone, Debug, Serialize, Default)]
 pub struct PageParams {
@@ -139,6 +143,18 @@ where
     T: Serialize + Send + Sync + Debug,
 {
     fn from(res: ModelResult<T>) -> Self {
+        match res {
+            Ok(res) => Self::ok(res),
+            Err(err) => Self::err(err),
+        }
+    }
+}
+
+impl<T> From<anyhow::Result<T>> for JsonRes<T>
+where
+    T: Serialize + Send + Sync + Debug,
+{
+    fn from(res: anyhow::Result<T>) -> Self {
         match res {
             Ok(res) => Self::ok(res),
             Err(err) => Self::err(err),
