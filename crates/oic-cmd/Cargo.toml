@@ -12,7 +12,7 @@ name = "ic"
 
 [dependencies]
 oic_core = { workspace = true }
-# oicnp_api = { workspace = true }
+oic_api = { workspace = true }
 # migration = { workspace = true }
 sea-orm = { workspace = true }
 sea-orm-migration = { workspace = true }
@@ -31,3 +31,4 @@ dotenv = { workspace = true }
 reqwest = { workspace = true, features = ["json", "gzip"] }
 loco-rs = { workspace = true, features = ["testing"] }
 axum = { workspace = true, features = ["json"] }
+tower-http = { workspace = true }

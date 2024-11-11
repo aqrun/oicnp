@@ -3215,9 +3215,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "oic_cmd"
+name = "oic_api"
 version = "0.0.1"
 dependencies = [
+ "anyhow",
  "async-std",
  "axum",
  "clap",
@@ -3236,6 +3237,33 @@ dependencies = [
  "serde_json",
  "serde_yaml",
  "tokio",
+ "tower-http",
+]
+
+[[package]]
+name = "oic_cmd"
+version = "0.0.1"
+dependencies = [
+ "async-std",
+ "axum",
+ "clap",
+ "dotenv",
+ "gray_matter",
+ "lazy_static",
+ "loco-rs",
+ "oic_api",
+ "oic_core",
+ "rand",
+ "regex",
+ "reqwest",
+ "scru128",
+ "sea-orm",
+ "sea-orm-migration",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "tokio",
+ "tower-http",
 ]
 
 [[package]]

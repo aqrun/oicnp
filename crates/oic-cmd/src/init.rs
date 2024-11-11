@@ -30,7 +30,7 @@ pub async fn init_cmd() {
       },
 
       Command::ServeApi => {
-        cmd::serve_api::run().await;
+        let _ = oic_api::app::run().await;
       },
   }
 }

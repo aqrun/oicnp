@@ -1,0 +1,27 @@
+[package]
+name = "oic_api"
+version = "0.0.1"
+edition = "2021"
+authors = ["Aqrun <aqrun@sina.com>"]
+
+[dependencies]
+oic_core = { workspace = true }
+sea-orm = { workspace = true }
+sea-orm-migration = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+tokio = { workspace = true }
+regex = { workspace = true }
+gray_matter = { workspace = true }
+rand = { workspace = true }
+scru128 = { workspace = true }
+clap = { workspace = true }
+async-std = { workspace = true }
+lazy_static = { workspace = true }
+dotenv = { workspace = true }
+reqwest = { workspace = true, features = ["json", "gzip"] }
+loco-rs = { workspace = true, features = ["testing", 'with-db'] }
+axum = { workspace = true, features = ["json"] }
+tower-http = { workspace = true }
+anyhow = { workspace = true }
