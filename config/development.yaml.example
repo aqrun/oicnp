@@ -17,10 +17,19 @@ logger:
 # Web server configuration
 server:
   # Port on which the server will listen. the server binding is 0.0.0.0:{PORT}
-  port: 5150
+  port: {{ get_env(name="API_PORT", default=5150) }}
   # The UI hostname or IP address that mailers will point to.
-  host: http://localhost
-
+  host: http://0.0.0.0
+  middlewares:
+    cors:
+      enable: true
+      allow_origins:
+        - 'http://localhost:3001'
+      allow_headers:
+        - '*'
+      allow_methods:
+        - '*'
+      
 # Worker Configuration
 workers:
   # specifies the worker mode. Options:

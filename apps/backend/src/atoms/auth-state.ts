@@ -1,5 +1,5 @@
 import { atom } from 'recoil';
-import { AuthState } from '~/types';
+import type { AuthState } from '~/types';
 
 export const authState = atom<AuthState>({
   key: 'userAuth',

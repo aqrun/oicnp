@@ -8,8 +8,11 @@ import { useRouter, usePathname } from 'next/navigation';
 import {
   SyncOutlined,
 } from '@ant-design/icons';
+import {
+  QueryClientProvider,
+} from '@tanstack/react-query'
 import { useAuthState } from '~/hooks';
-import { r } from '~/utils';
+import { r, queryClient } from '~/utils';
 import MainLayout from './main-layout';
 
 // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars -- metadata
@@ -74,7 +77,11 @@ export default function RootLayout ({
     <html lang="en">
       <body>
         <RecoilRoot>
-          <LayoutWidget>{children}</LayoutWidget>
+          <QueryClientProvider client={queryClient}>
+            <LayoutWidget>
+              {children}
+            </LayoutWidget>
+          </QueryClientProvider>
         </RecoilRoot>
       </body>
     </html>

@@ -71,8 +71,8 @@ export default function MainLayout ({
           paddingBlockStart: 12,
         }}
       >
-        <div>© 2021 Made with love</div>
-        <div>by Ant Design</div>
+        <div>© {(new Date).getFullYear()} Made with love</div>
+        <div>by OICNP</div>
       </div>
     );
   });
@@ -85,6 +85,7 @@ export default function MainLayout ({
         }}
       >
         <ProLayout
+          title="OICNP"
           {...layoutProps}
           actionsRender={(props) => {
             if (props.isMobile) return [];

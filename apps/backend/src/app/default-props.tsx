@@ -32,13 +32,16 @@ const defaultProps = {
             path: '/cms/categories',
             name: '分类',
             icon: <CrownFilled />,
-            component: './Welcome',
           },
           {
             path: '/cms/tags',
             name: '标签',
             icon: <CrownFilled />,
-            component: './Welcome',
+          },
+          {
+            path: '/cms/notes',
+            name: '小记',
+            icon: <CrownFilled />,
           },
         ],
       },

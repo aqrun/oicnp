@@ -17,7 +17,7 @@ export default function TagsPage (): JSX.Element {
         <Button
           key="1"
           onClick={function test() { return 1 }}
-          type="primary"
+          type="default"
         >
           主操作
         </Button>,
@@ -30,12 +30,7 @@ export default function TagsPage (): JSX.Element {
       ]}
       subTitle="简单的描述"
     >
-      <ProCard
-        style={{
-          height: '200vh',
-          minHeight: 800,
-        }}
-      >
+      <ProCard>
         <div>
           page tags
         </div>
