@@ -28,5 +28,5 @@ pub enum Command {
     SeedData,
 
     /// 启动接口服务
-    ServeApi,
+    Serve,
 }

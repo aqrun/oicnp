@@ -45,7 +45,6 @@ impl Related<super::category::Entity> for Entity {
     }
 }
 
-impl ActiveModelBehavior for ActiveModel {}
 
 impl From<&str> for Column {
     fn from(name: &str) -> Self {

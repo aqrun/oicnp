@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}后台管理{% endblock title %}
+
+{% block style %}
+  {% for item in style_files %}
+  <link rel="stylesheet" href="{{ item }}">
+  {% endfor %}
+{% endblock style %}
+
+{% block js %}
+  {% for item in js_files %}
+  <script src="{{ item }}"></script>
+  {% endfor %}
+{% endblock js %}
+
+{% block content %}
+  <div id="root"></div>
+  <div>admin</div>
+{% endblock content %}
+
+
+  

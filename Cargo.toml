@@ -62,7 +62,7 @@ members = ["crates/*", "migration"]
 oic_core = { path = "crates/oic-core" }
 oic_derives = { path = "crates/oic-derives" }
 oic_cmd = { path = "crates/oic-cmd" }
-oic_api = { path = "crates/oic-api" }
+oic_web = { path = "crates/oic-web" }
 migration = { path = "migration" }
 loco-rs = { version = "0.12", features = ["with-db"] }
 clap = { version = "^4", features = ["derive"] }

@@ -29,8 +29,8 @@ pub async fn init_cmd() {
         }
       },
 
-      Command::ServeApi => {
-        let _ = oic_api::app::run().await;
+      Command::Serve => {
+        let _ = oic_web::app::run().await;
       },
   }
 }

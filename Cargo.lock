@@ -3215,32 +3215,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "oic_api"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "async-std",
- "axum",
- "clap",
- "dotenv",
- "gray_matter",
- "lazy_static",
- "loco-rs",
- "oic_core",
- "rand",
- "regex",
- "reqwest",
- "scru128",
- "sea-orm",
- "sea-orm-migration",
- "serde",
- "serde_json",
- "serde_yaml",
- "tokio",
- "tower-http",
-]
-
-[[package]]
 name = "oic_cmd"
 version = "0.0.1"
 dependencies = [
@@ -3251,8 +3225,8 @@ dependencies = [
  "gray_matter",
  "lazy_static",
  "loco-rs",
- "oic_api",
  "oic_core",
+ "oic_web",
  "rand",
  "regex",
  "reqwest",
@@ -3323,6 +3297,32 @@ dependencies = [
  "sea-orm",
  "syn 2.0.85",
  "thiserror",
+]
+
+[[package]]
+name = "oic_web"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "async-std",
+ "axum",
+ "clap",
+ "dotenv",
+ "gray_matter",
+ "lazy_static",
+ "loco-rs",
+ "oic_core",
+ "rand",
+ "regex",
+ "reqwest",
+ "scru128",
+ "sea-orm",
+ "sea-orm-migration",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "tokio",
+ "tower-http",
 ]
 
 [[package]]

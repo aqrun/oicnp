@@ -1,5 +1,5 @@
 [package]
-name = "oic_api"
+name = "oic_web"
 version = "0.0.1"
 edition = "2021"
 authors = ["Aqrun <aqrun@sina.com>"]

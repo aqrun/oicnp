@@ -7,7 +7,7 @@ use crate::views::user::CurrentResponse;
 
 #[debug_handler]
 async fn current(auth: auth::JWT, State(ctx): State<AppContext>) -> Result<Response> {
-    let user = UserModel::find_by_uid(&ctx.db, &auth.claims.pid).await?;
+    let user = UserModel::find_by_uuid(&ctx.db, &auth.claims.pid).await?;
     format::json(CurrentResponse::new(&user))
 }
 

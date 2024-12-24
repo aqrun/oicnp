@@ -2,8 +2,10 @@ use async_trait::async_trait;
 use chrono::offset::Utc;
 use loco_rs::{hash, prelude::*};
 use uuid::Uuid;
-use crate::utils::uuid as getUuid;
-use crate::auth::JWT;
+use crate::utils::{uuid as getUuid, catch_err, utc_now};
+use crate::{auth::JWT,
+    typings::ListData,
+};
 use super::{RegisterParams, Validator};
 pub use crate::entities::prelude::{
   UserActiveModel,
@@ -11,6 +13,15 @@ pub use crate::entities::prelude::{
   UserModel,
   UserColumn,
 };
+use sea_orm::{prelude::*, QueryOrder};
+use anyhow::{Result, anyhow};
+use super::{
+    UserFilters,
+    CreateUserReqParams,
+    UpdateUserReqParams,
+    DeleteUserReqParams,
+};
+use serde_json::json;
 
 impl Validatable for UserActiveModel {
     fn validator(&self) -> Box<dyn Validate> {
@@ -54,11 +65,109 @@ impl Authenticable for UserModel {
     }
 
     async fn find_by_claims_key(db: &DatabaseConnection, claims_key: &str) -> ModelResult<Self> {
-        Self::find_by_uid(db, claims_key).await
+        Self::find_by_uuid(db, claims_key).await
     }
 }
 
 impl UserModel {
+    ////
+    /// 获取user列表
+    /// 
+    pub async fn find_list(db: &DatabaseConnection, params: UserFilters) -> Result<ListData<UserModel>> {
+        let page = params.get_page();
+        let page_size = params.get_page_size();
+        let order = params.get_order();
+        let order_by_str = params.get_order_by();
+
+        let mut q = UserEntity::find();
+
+        if let Some(x) = params.uid {
+            if x > 0 {
+                q = q.filter(UserColumn::Uid.eq(x));
+            }
+        }
+
+        if let Some(x) = params.uuid {
+            if !x.is_empty() {
+                q = q.filter(UserColumn::Uuid.eq(x));
+            }
+        }
+
+        let mut order_by = UserColumn::Uid;
+
+        if order_by_str.eq("created_at") {
+            order_by = UserColumn::CreatedAt;
+        }
+
+        // 获取全部数据条数
+        let total = q.clone().count(db).await?;
+        // 分页获取数据
+        let pager = q.order_by(order_by, order)
+            .paginate(db, page_size);
+        let list = pager.fetch_page(page - 1).await?;
+
+        let res = ListData {
+            data: list,
+            page,
+            page_size,
+            total,
+        };
+
+        Ok(res)
+    }
+
+    /// 创建 user
+    pub async fn create(db: &DatabaseConnection, params: &CreateUserReqParams) -> Result<Self> {
+        let _ = catch_err(params.validate())?;
+
+        let mut item = UserActiveModel {
+            ..Default::default()
+        };
+
+        item.set_from_json(json!(params))?;
+        item.created_at = Set(utc_now());
+    
+        let item = item.insert(db).await?;
+
+        Ok(item)
+    }
+
+    /// 更新数据
+    pub async fn update(db: &DatabaseConnection, params: UpdateUserReqParams) -> Result<i64> {
+        let _ = catch_err(params.validate())?;
+        let uid = params.uid.unwrap_or(0);
+
+        if uid < 0 {
+            return Err(anyhow!("数据不存在,id: {}", uid));
+        }
+
+        let mut item = Self::find_by_uid(&db, uid)
+            .await?
+            .into_active_model();
+
+        item.set_from_json(json!(params))?;
+        item.updated_at = Set(Some(utc_now()));
+    
+        let item = item.update(db).await?;
+
+        Ok(item.uid)
+    }
+
+    /// 删除数据
+    pub async fn delete(db: &DatabaseConnection, params: DeleteUserReqParams) -> Result<i64> {
+        let uid = params.uid.unwrap_or(0);
+
+        if uid < 0 {
+            return Err(anyhow!("数据不存在, uid: {}", uid));
+        }
+
+        let _res = UserEntity::delete_by_id(uid)
+            .exec(db)
+            .await?;
+
+        Ok(uid)
+    }
+
     /// finds a user by the provided email
     ///
     /// # Errors
@@ -118,7 +227,7 @@ impl UserModel {
     /// # Errors
     ///
     /// When could not find user  or DB query error
-    pub async fn find_by_uid(db: &DatabaseConnection, uid: &str) -> ModelResult<Self> {
+    pub async fn find_by_uid(db: &DatabaseConnection, uid: i64) -> ModelResult<Self> {
         // let parse_uuid = Uuid::parse_str(pid).map_err(|e| ModelError::Any(e.into()))?;
         let user = UserEntity::find()
             .filter(
