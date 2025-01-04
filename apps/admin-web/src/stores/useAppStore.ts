@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { BaseState } from './types';
 import { MenuItem } from '~/types';
-import { menus } from './menus';
 
 export interface BaseAppState {
   /**
@@ -21,11 +20,16 @@ export interface BaseAppState {
   /**
    * 选中的侧导航项
    */
-  sideMenuKey?: string;
+  sideMenuKeys?: string[];
   /**
    * 侧导航展开项
    */
-  sideMenuOpenKey?: string;
+  sideMenuOpenKeys?: string[];
+
+  /**
+   * 全局接口加载状态
+   */
+  loading: boolean;
 }
 
 export type AppState = BaseAppState & BaseState<BaseAppState>;
@@ -34,7 +38,8 @@ export type AppState = BaseAppState & BaseState<BaseAppState>;
  * 应用主状态数据
  */
 export const useAppStore = create<AppState>()((set) => ({
-  menus: menus,
+  menus: [],
+  loading: false,
   setState: (payload) => set((state) => {
     return {
       ...state,

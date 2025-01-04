@@ -12,7 +12,7 @@ export default function RouteElement({
   sideMenuOpenKey,
   sideMenuKey,
 }: RouteElementProps): JSX.Element {
-  const { menus } = useAppStore();
+  const menus = useAppStore((state) => state.menus);
 
   // 主菜单项
   const mainMenu = menus?.find((item) => {

@@ -12,6 +12,7 @@ export type MenuItem = MenuPropsItem & MenuItemType & {
   url?: string;
   type?: string;
   children?: MenuItem[];
+  ignore?: boolean;
 }
 
 /**

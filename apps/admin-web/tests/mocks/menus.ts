@@ -32,7 +32,7 @@ const main: MenuItem[] = [
   },
 ];
 
-const cms: MenuItem[] = [
+const cms = [
   {
     key: 'posts',
     label: '文章',
@@ -57,7 +57,7 @@ const cms: MenuItem[] = [
   },
 ];
 
-export const menus: MenuItem[] = [
+export const menus = [
   {
     key: 'main',
     label: '控制台',
@@ -71,5 +71,5 @@ export const menus: MenuItem[] = [
   {
     key: 'settings',
     label: '设置',
-  },
+  }
 ];

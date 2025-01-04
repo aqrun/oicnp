@@ -1,11 +1,8 @@
 import {
-  useAppStore,
-} from '~/stores';
-import {
   MenuItem,
   SubMenuType,
-  RoutePathParams,
 } from '~/types';
+import { useGlobalState } from '~/context';
 import {
   Icon,
 } from '~/components';
@@ -13,36 +10,34 @@ import {
 /**
  * 菜单相关数据
  */
-export default function useMenus({
-  mainMenuKey,
-  sideMenuOpenKey,
-  sideMenuKey,
-}: RoutePathParams) {
-  const { menus } = useAppStore();
+export default function useMenus() {
+  const { urlState, menus } = useGlobalState();
 
   // 主菜单数据是一次菜单数据
   const mainMenus = (menus || [])?.map((item) => {
     // 主菜单移除子项
     const newItem: MenuItem = {
       ...item,
-      icon: (<Icon icon={item?.icon as string} />),
+      icon: item?.icon ? (<Icon icon={item?.icon as string} />) : undefined,
       children: undefined,
     };
 
+
+    delete newItem['ignore'];
+
     return newItem;
   });
-  const activeMainMenu = menus?.find((item) => {
-    return item?.key === mainMenuKey || mainMenus?.[0]?.key;
-  });
-  console.log('activeMainMenu', activeMainMenu)
+  const activeMainMenu = urlState?.mainMenu;
+  // console.log('activeMainMenu', activeMainMenu, 'urlState', urlState)
   // 侧边导航菜单是二级菜单数据
   const sideMenus = (((activeMainMenu as SubMenuType)?.children || []) as MenuItem[])?.map((item) => {
     let subItems: MenuItem[] = [];
 
     if (item?.children) {
       subItems = item?.children?.map((n) => {
-        const subNewItem = {
+        const subNewItem: MenuItem = {
           ...n,
+          key: `${item?.key}@${n?.key}`,
         };
 
         if (n?.icon) {

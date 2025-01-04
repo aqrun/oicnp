@@ -19,6 +19,7 @@ export const Header = styled.header`
   display: flex;
   align-items: center;
   padding: 0 0 0 50px;
+  justify-content: space-between;
 
   .${CLASS_PREFIX}-logo {
     width: 120px;

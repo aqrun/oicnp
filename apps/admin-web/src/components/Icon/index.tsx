@@ -2,10 +2,41 @@ import {} from '@ant-design/icons';
 import { CLASS_PREFIX } from '~/constants';
 import cls from 'clsx';
 import {
-  LaptopOutlined,
+  DashboardOutlined,
   UserOutlined,
+  DesktopOutlined,
+  LaptopOutlined,
+  InboxOutlined,
+  TeamOutlined,
+  BulbOutlined,
+  UsergroupAddOutlined,
+  TagsOutlined,
+  ClusterOutlined,
+  SettingOutlined,
+  DollarOutlined,
+  UnlockOutlined,
 } from '@ant-design/icons';
 import { Container } from './index.styled';
+
+/**
+ * 所有使用的icon可以在这里对应一次
+ * 方便后端只返回icon字符
+ */
+const antIcons: Record<string, JSX.Element> = {
+  DashboardOutlined: <DashboardOutlined />,
+  DesktopOutlined: <DesktopOutlined />,
+  LaptopOutlined: <LaptopOutlined />,
+  InboxOutlined: <InboxOutlined/>,
+  TeamOutlined: <TeamOutlined />,
+  BulbOutlined: <BulbOutlined />,
+  UsergroupAddOutlined: <UsergroupAddOutlined />,
+  TagsOutlined: <TagsOutlined />,
+  ClusterOutlined: <ClusterOutlined />,
+  SettingOutlined: <SettingOutlined />,
+  UserOutlined: <UserOutlined />,
+  DollarOutlined: <DollarOutlined />,
+  UnlockOutlined: <UnlockOutlined />,
+};
 
 export interface IconProps {
   icon: string;
@@ -19,17 +50,10 @@ export interface IconProps {
 export default function Icon({
   icon,
 }: IconProps): JSX.Element {
-  let iconWidget: React.ReactNode = '';
+  let iconWidget: React.ReactNode = <BulbOutlined/>;
 
-  switch (icon) {
-    case 'user-outlined':
-      iconWidget = <UserOutlined />;
-      break;
-    case 'laptop-outlined':
-      iconWidget = <LaptopOutlined />;
-      break;
-    default:
-      iconWidget = <UserOutlined />;
+  if (typeof antIcons?.[icon] !== 'undefined') {
+    iconWidget = antIcons?.[icon];
   }
 
   return (
