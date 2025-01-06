@@ -8,4 +8,7 @@ export const UserActionWrapper = styled.span`
   overflow: hidden;
   margin-left: 30px;
   margin-right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;

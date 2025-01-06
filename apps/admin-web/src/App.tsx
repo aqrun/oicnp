@@ -17,16 +17,14 @@ const queryClient = new QueryClient();
 
 export default function App() {
   return (
-    <>
-      <QueryClientProvider
-        client={queryClient}
-      >
-        <GlobalStyle />
-        <RouterProvider
-          router={createBrowserRouter(allRoutes)}
-        />
-      </QueryClientProvider>
-    </>
+    <QueryClientProvider
+      client={queryClient}
+    >
+      <GlobalStyle />
+      <RouterProvider
+        router={createBrowserRouter(allRoutes)}
+      />
+    </QueryClientProvider>
   )
 }
 

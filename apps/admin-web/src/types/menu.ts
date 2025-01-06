@@ -23,3 +23,12 @@ export interface RoutePathParams {
   sideMenuOpenKey?: string;
   sideMenuKey?: string;
 }
+
+/**
+ * 面包屑数据
+ */
+export interface BreadItem {
+  id: string;
+  label: string;
+  uri: string;
+}

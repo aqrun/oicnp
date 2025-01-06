@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router';
 import { Breadcrumb, Menu, Flex } from 'antd';
-import { asset, r, getRoutePathByKeyPath } from '~/utils';
+import { asset, r, getRoutePathByKeyPath, getPageTitle, getBreadItems } from '~/utils';
 import { CLASS_PREFIX } from '~/constants';
 import { useAppStore } from '~/stores';
 import cls from 'clsx';
@@ -18,6 +18,7 @@ import {
   Content,
   Footer,
 } from './index.styled';
+import { MenuItem } from '~/types';
 
 export default function MainLayout(): JSX.Element {
   const navigate = useNavigate();
@@ -32,6 +33,9 @@ export default function MainLayout(): JSX.Element {
   // 展开的菜单项
   let openKeys = urlState?.sideSelectedOpenKeys;
   let selectedKeys: string[] = urlState?.sideSelectedKeys || [];
+
+  // 面包屑数据
+  const breads = getBreadItems(menus as MenuItem[], urlState);
 
   if (typeof sideMenuOpenKeys !== 'undefined') {
     openKeys = sideMenuOpenKeys;
@@ -94,6 +98,13 @@ export default function MainLayout(): JSX.Element {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authState]);
+  // 更新页面标题
+  useEffect(() => {
+    const pageTitle = getPageTitle(urlState!);
+
+    document.title = pageTitle;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlState?.sideMenu, urlState?.sideOpenMenu, urlState?.mainMenu]);
 
   return (
     <Container className={cls(`${CLASS_PREFIX}-layout-container`)}>
@@ -137,15 +148,19 @@ export default function MainLayout(): JSX.Element {
         )}
         <MainContent className={cls(`${CLASS_PREFIX}-layout-content`)}>
           <Breadcrumb className={cls(`${CLASS_PREFIX}-layout-bread`)}>
-            <Breadcrumb.Item>Home</Breadcrumb.Item>
-            <Breadcrumb.Item>List</Breadcrumb.Item>
-            <Breadcrumb.Item>App</Breadcrumb.Item>
+            {breads?.map((item) => {
+              return (
+                <Breadcrumb.Item key={item?.id}>
+                  {item?.label}
+                </Breadcrumb.Item>
+              );
+            })}
           </Breadcrumb>
           <Content className={cls(`${CLASS_PREFIX}-layout-content`)}>
             <Outlet />
           </Content>
           <Footer className={cls(`${CLASS_PREFIX}-layout-footer`)}>
-            Ant Design ©{new Date().getFullYear()} Created by Ant UED
+            OICNP Admin ©{new Date().getFullYear()} Created by AQRun & ❤️ 
           </Footer>
         </MainContent>
       </Main>

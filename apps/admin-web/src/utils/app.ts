@@ -1,5 +1,6 @@
 import { STATIC_URI, BACK_BASE_URI } from '~/constants';
-import { MenuItem } from '~/types';
+import { MenuItem, BreadItem } from '~/types';
+import { UrlState } from './UrlState';
 
 /**
  * 获取链接前缀
@@ -82,4 +83,80 @@ export function getRoutePathByKeyPath(menus: MenuItem[], keyPath: string[]) {
   }
 
   return '/';
+}
+
+/**
+ * 生成页面标题
+ */
+export function getPageTitle(urlState: UrlState) {
+  const siteName = 'OICNP 管理系统';
+
+  if (!urlState) return siteName;
+
+  const names = [];
+
+  if (urlState?.sideOpenMenu) {
+    names.push(urlState?.sideOpenMenu?.label);
+  }
+
+  if (urlState?.sideMenu) {
+    names.push(urlState?.sideMenu?.label);
+  }
+
+  if (names?.length) {
+    names.push('-');
+  }
+
+  if (urlState?.mainMenu) {
+    names.push(urlState?.mainMenu?.label);
+  }
+
+  return `${names.join('')} - ${siteName}`;
+}
+
+/**
+ * 生成面包屑列表
+ */
+export function getBreadItems(menus: MenuItem[], urlState?: UrlState) {
+  if (!urlState) return [];
+
+  const items: BreadItem[] = [];
+
+  if (!urlState?.mainMenu) return items;
+
+  const uri1 = getRoutePathByKeyPath(menus, [`${urlState?.mainMenu?.key || ''}`]);
+
+  items.push({
+    id: `${urlState?.mainMenu?.key || ''}`,
+    label: `${urlState?.mainMenu?.label || ''}`,
+    uri: uri1,
+  });
+
+  if (!urlState?.sideOpenMenu) return [];
+
+  let uri2 = '';
+
+  // 存在第三项才生成
+  if (urlState?.sideMenu) {
+    uri2 = getRoutePathByKeyPath(menus, [
+      `${urlState?.mainMenu?.key || ''}`,
+      `${urlState?.sideOpenMenu?.key || ''}`,
+    ]);
+  }
+
+  items.push({
+    id: `${urlState?.sideOpenMenu?.key || ''}`,
+    label: `${urlState?.sideOpenMenu?.label || ''}`,
+    uri: uri2,
+  });
+
+  if (!urlState?.sideMenu) return items;
+
+  items.push({
+    id: `${urlState?.sideMenu?.key || ''}`,
+    label: `${urlState?.sideMenu?.label || ''}`,
+    uri: '',
+  });
+
+  return items;
 }

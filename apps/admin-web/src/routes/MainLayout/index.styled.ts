@@ -30,6 +30,10 @@ export const Header = styled.header`
   }
   .${CLASS_PREFIX}-header-main-menu {
     margin-left: 50px;
+
+    .${CLASS_PREFIX}-icon {
+      margin-right: 8px;
+    }
   }
 `;
 
@@ -62,6 +66,10 @@ export const Side = styled.aside`
   .${CLASS_PREFIX}-side-menu {
     height: 100%;
     overflow: auto;
+  }
+
+  .${CLASS_PREFIX}-icon {
+    margin-right: 8px;
   }
 `;
 
