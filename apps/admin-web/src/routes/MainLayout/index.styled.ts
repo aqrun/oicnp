@@ -9,7 +9,7 @@ export const Container = styled.div`
   width: 100%;
   height: 100%;
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: #f0f4fb;
 `;
 
 // Header component
@@ -50,7 +50,8 @@ export const MainContent = styled.div`
   overflow-y: auto;
   flex: 1;
   flex-direction: column;
-  padding: 0 1rem;
+  padding: 0 24px;
+  background: white;
 
   .${CLASS_PREFIX}-layout-bread {
     margin: 16px 0;
@@ -76,9 +77,6 @@ export const Side = styled.aside`
 // Content component
 export const Content = styled.div`
   flex: 1;
-  background: white;
-  border-radius: 8px;
-  padding: 24px;
 `;
 
 // Footer component

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { BaseState } from './types';
-import { MenuItem } from '~/types';
+import { MenuItem, AuthState } from '~/types';
 
 export interface BaseAppState {
   /**
@@ -25,6 +25,11 @@ export interface BaseAppState {
    * 侧导航展开项
    */
   sideMenuOpenKeys?: string[];
+
+  /**
+   * 不记住的临时登录状态
+   */
+  authState?: AuthState;
 
   /**
    * 全局接口加载状态

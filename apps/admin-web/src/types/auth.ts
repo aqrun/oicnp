@@ -6,4 +6,5 @@ export interface AuthState {
   token: string;
   uuid: string;
   expireTime: number;
+  remember?: boolean;
 }

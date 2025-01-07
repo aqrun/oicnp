@@ -55,6 +55,7 @@ export default function Login() {
         token: res?.token || '',
         uuid: res?.uuid || '',
         expireTime,
+        remember: values?.remember,
       });
 
       setAppState({

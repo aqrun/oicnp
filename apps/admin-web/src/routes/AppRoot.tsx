@@ -8,6 +8,7 @@ import {
 import { GlobalContext, GlobalState } from '~/context';
 import NProgress from 'nprogress';
 import { useAppStore } from '~/stores';
+import { useMemoizedFn } from 'ahooks';
 
 export default function AppRoot(): JSX.Element {
   const navigation = useNavigation();
@@ -16,8 +17,18 @@ export default function AppRoot(): JSX.Element {
   const {
     authState,
     setAuthState,
+    resetAuthState,
   } = useAuthState();
   const apiLoading = useAppStore((state) => state.loading);
+
+  const checkAuth = useMemoizedFn(() => {
+    // 使用localstorage存储且到了过期时间重置
+    if (authState?.remember
+      && authState?.expireTime < Date.now()
+    ) {
+      resetAuthState();
+    }
+  });
 
   // 初始化context数据
   const stateValue: GlobalState = {
@@ -43,6 +54,10 @@ export default function AppRoot(): JSX.Element {
       NProgress.done();
     }
   }, [apiLoading]);
+  // 检测登录信息状态
+  useEffect(() => {
+    checkAuth();
+  }, [authState, checkAuth]);
   // 全局数据初始化
   useEffect(() => {
     fetchInitData();

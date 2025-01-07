@@ -15,6 +15,9 @@ import {
   SettingOutlined,
   DollarOutlined,
   UnlockOutlined,
+  CaretUpOutlined,
+  CaretDownOutlined,
+  ReloadOutlined,
 } from '@ant-design/icons';
 import { Container } from './index.styled';
 
@@ -36,10 +39,14 @@ const antIcons: Record<string, JSX.Element> = {
   UserOutlined: <UserOutlined />,
   DollarOutlined: <DollarOutlined />,
   UnlockOutlined: <UnlockOutlined />,
+  CaretUpOutlined: <CaretUpOutlined />,
+  CaretDownOutlined: <CaretDownOutlined />,
+  ReloadOutlined: <ReloadOutlined />,
 };
 
 export interface IconProps {
   icon: string;
+  color?: string;
 }
 
 /**
@@ -49,6 +56,7 @@ export interface IconProps {
  */
 export default function Icon({
   icon,
+  color,
 }: IconProps): JSX.Element {
   let iconWidget: React.ReactNode = <BulbOutlined/>;
 
@@ -57,7 +65,10 @@ export default function Icon({
   }
 
   return (
-    <Container className={cls(`${CLASS_PREFIX}-icon`)}>
+    <Container
+      className={cls(`${CLASS_PREFIX}-icon`)}
+      color={color}
+    >
       {iconWidget}
     </Container>
   );

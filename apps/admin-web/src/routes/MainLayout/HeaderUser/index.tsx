@@ -5,6 +5,7 @@ import { CLASS_PREFIX } from '~/constants';
 import { asset, r } from '~/utils';
 import { useNavigate } from 'react-router';
 import { useAppStore } from '~/stores';
+import { useAuthState } from '~/hooks';
 import {
   UserActionWrapper,
 } from './index.styled';
@@ -13,6 +14,7 @@ import { useMemoizedFn } from 'ahooks';
 export default function HeaderUser() {
   const navigate = useNavigate();
   const setState = useAppStore((state) => state.setState);
+  const { resetAuthState } = useAuthState();
 
   const handleProfileClick = useMemoizedFn(() => {
     setState({
@@ -28,6 +30,7 @@ export default function HeaderUser() {
       sideMenuOpenKeys: undefined,
       sideMenuKeys: undefined,
     });
+    resetAuthState();
     navigate(r('/login'));
   });
   

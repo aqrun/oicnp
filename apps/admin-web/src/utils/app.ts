@@ -29,7 +29,13 @@ export function r(uri: string, isStatic = false) {
   if (!uri?.trim()) return baseUri;
 
   // 移除开头的 / 
-  const validUri = uri?.trim()?.replace(/^\//i, '');
+  const validUri = uri?.trim()
+    ?.replace(/^\//i, '');
+
+  // uri 为空 直接返回
+  if (!validUri) {
+    return baseUri;
+  }
 
   return `${baseUri}/${validUri}`;
 }
@@ -127,9 +133,8 @@ export function getBreadItems(menus: MenuItem[], urlState?: UrlState) {
   const uri1 = getRoutePathByKeyPath(menus, [`${urlState?.mainMenu?.key || ''}`]);
 
   items.push({
-    id: `${urlState?.mainMenu?.key || ''}`,
-    label: `${urlState?.mainMenu?.label || ''}`,
-    uri: uri1,
+    title: `${urlState?.mainMenu?.label || ''}`,
+    href: r(uri1),
   });
 
   if (!urlState?.sideOpenMenu) return [];
@@ -145,17 +150,15 @@ export function getBreadItems(menus: MenuItem[], urlState?: UrlState) {
   }
 
   items.push({
-    id: `${urlState?.sideOpenMenu?.key || ''}`,
-    label: `${urlState?.sideOpenMenu?.label || ''}`,
-    uri: uri2,
+    title: `${urlState?.sideOpenMenu?.label || ''}`,
+    href: r(uri2),
   });
 
   if (!urlState?.sideMenu) return items;
 
   items.push({
-    id: `${urlState?.sideMenu?.key || ''}`,
-    label: `${urlState?.sideMenu?.label || ''}`,
-    uri: '',
+    title: `${urlState?.sideMenu?.label || ''}`,
+    href: '',
   });
 
   return items;

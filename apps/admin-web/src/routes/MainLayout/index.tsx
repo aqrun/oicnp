@@ -9,6 +9,7 @@ import useMenus from '../useMenus';
 import { useMemoizedFn } from 'ahooks';
 import { useGlobalState } from '~/context';
 import HeaderUser from './HeaderUser';
+import NoAuth from './NoAuth';
 import {
   Container,
   Header,
@@ -53,6 +54,10 @@ export default function MainLayout(): JSX.Element {
       return item.key === info?.key;
     });
     const validKey = mainMenu?.ignore ? '' : info?.key;
+    setState({
+      sideMenuOpenKeys: undefined,
+      sideMenuKeys: undefined,
+    });
     navigate(r(validKey));
   });
   
@@ -87,6 +92,13 @@ export default function MainLayout(): JSX.Element {
       sideMenuKeys: info?.selectedKeys || [],
     });
   });
+
+  const noAuth = false;
+  let content = <Outlet />;
+
+  if (noAuth) {
+    content = <NoAuth />
+  }
 
   useEffect(() => {
     if (!authState) {
@@ -147,17 +159,12 @@ export default function MainLayout(): JSX.Element {
           </Side>
         )}
         <MainContent className={cls(`${CLASS_PREFIX}-layout-content`)}>
-          <Breadcrumb className={cls(`${CLASS_PREFIX}-layout-bread`)}>
-            {breads?.map((item) => {
-              return (
-                <Breadcrumb.Item key={item?.id}>
-                  {item?.label}
-                </Breadcrumb.Item>
-              );
-            })}
-          </Breadcrumb>
+          <Breadcrumb
+            className={cls(`${CLASS_PREFIX}-layout-bread`)}
+            items={breads}
+          />
           <Content className={cls(`${CLASS_PREFIX}-layout-content`)}>
-            <Outlet />
+            {content}
           </Content>
           <Footer className={cls(`${CLASS_PREFIX}-layout-footer`)}>
             OICNP Admin ©{new Date().getFullYear()} Created by AQRun & ❤️ 

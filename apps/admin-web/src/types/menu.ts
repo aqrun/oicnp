@@ -1,5 +1,6 @@
 import type { MenuProps } from 'antd';
 import type { MenuItemType } from 'antd/es/menu/interface';
+import type { BreadcrumbProps } from 'antd';
 
 export type { SubMenuType } from 'antd/es/menu/interface';
 
@@ -27,8 +28,4 @@ export interface RoutePathParams {
 /**
  * 面包屑数据
  */
-export interface BreadItem {
-  id: string;
-  label: string;
-  uri: string;
-}
+export type BreadItem = NonNullable<BreadcrumbProps['items']>[number];

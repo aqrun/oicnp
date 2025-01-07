@@ -1,24 +1,45 @@
-import { useLocalStorageState } from 'ahooks';
+import { useLocalStorageState, useMemoizedFn } from 'ahooks';
 import { AuthState } from '~/types';
+import { useAppStore } from '~/stores';
 
+/**
+ * 临时存储使用内存store存储
+ * 记住时长久存储使用 localstorage
+ */
 export const useAuthState = () => {
-  const [authState, setAuthState] = useLocalStorageState<AuthState | undefined>(
+  const storeAuthState = useAppStore((state) => state.authState);
+  const setStoreAuthState = useAppStore((state) => state.setState);
+  const [localStorageAuthState, setLocalStorageAuthState] = useLocalStorageState<AuthState | undefined>(
     'oic-admin-user-auth',
     undefined,
   );
 
-  let resAuthData = authState;
+  /**
+   * 记住时使用 local storage 存储
+   */
+  const setAuthState = useMemoizedFn((authState: AuthState) => {
+    if (authState?.remember) {
+      setLocalStorageAuthState(authState);
+    } else {
+      setStoreAuthState({
+        authState,
+      });
+    }
+  });
 
-  // 是0 不记住
-  if (!authState?.expireTime) {
-    resAuthData = undefined;    
-  } else if (authState?.expireTime < Date.now()) {
-    // 超过过期时间
-    resAuthData = undefined;
-  }
+  /**
+   * 登出或过期时 重置状态
+   */
+  const resetAuthState = useMemoizedFn(() => {
+    setLocalStorageAuthState(undefined);
+    setStoreAuthState({
+      authState: undefined,
+    });
+  });
 
   return {
-    authState: resAuthData,
+    authState: localStorageAuthState || storeAuthState,
     setAuthState,
+    resetAuthState,
   };
 };

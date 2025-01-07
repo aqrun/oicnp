@@ -6,6 +6,7 @@ import { r } from '~/utils';
 
 import LoginPage from '~/pages/Login';
 import Dashboard from '~/pages/Dashboard';
+import NotFound from './MainLayout/NotFound';
 
 const UsersPage = lazy(() => import('~/pages/Users'));
 const RolesPage = lazy(() => import('~/pages/Roles'));
@@ -97,8 +98,12 @@ export const routeList: RouteObject[] = [
         path: r('settings'),
         element: <>settings</>,
       },
+      {
+        path: '*',
+        element: <NotFound />,
+      },
     ],
-  }
+  },
 ];
 
 export const allRoutes: RouteObject[] = [
