@@ -38,8 +38,6 @@ export default function Login() {
       remember: Boolean(values?.remember),
     });
 
-    console.log('login res', res, 'r()', r(''));
-
     if (res) {
       let expireTime = 0;
 

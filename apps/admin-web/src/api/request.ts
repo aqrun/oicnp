@@ -4,6 +4,15 @@ import { message as $message } from 'antd';
 import axios from 'axios';
 import { useAppStore } from '~/stores';
 
+/**
+ * Response 公共数据
+ */
+export interface BaseResponseData<TResponse> {
+  code: string;
+  data: TResponse,
+  message: string;
+}
+
 const axiosInstance = axios.create({
   timeout: 6000,
 });
@@ -72,15 +81,20 @@ export function createService<TRequest, TResponse> (
   const url = `/api${uri}`;
 
   return (data?: TRequest) => {
-    if (method?.toLowerCase() === 'post') {
-      const res = axiosInstance.post<TRequest, TResponse>(url, data, config);
-      return res;
-    } else {
-      const res = axiosInstance.get<TRequest, TResponse>(url, {
-        params: data,
-        ...config,
-      });
-      return res;
-    }
+    return new Promise<TResponse>((resolve) => {
+      if (method?.toLowerCase() === 'post') {
+        axiosInstance.post<TRequest, BaseResponseData<TResponse>>(url, data, config).then((res) => {
+          resolve(res?.data);
+        });
+      } else {
+        axiosInstance.get<TRequest, BaseResponseData<TResponse>>(url, {
+          params: data,
+          ...config,
+        }).then((res) => {
+          resolve(res?.data);
+        });
+      }
+    });
+    
   }
 }

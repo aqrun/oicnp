@@ -4,6 +4,8 @@ import {
   FetchMenusResponseData,
   FetchAuthLoginRequestParams,
   FetchAuthLoginResponseData,
+  FetchUserListRequestParams,
+  FetchUserListResponseData,
 } from './types';
 
 export const fetchMenus = createService<
@@ -15,3 +17,8 @@ export const fetchLogin = createService<
 FetchAuthLoginRequestParams,
 FetchAuthLoginResponseData
 >('/auth/login', 'post');
+
+export const fetchUserList = createService<
+FetchUserListRequestParams,
+FetchUserListResponseData
+>('/user/list', 'post');

@@ -94,10 +94,18 @@ const mocks = [
   {
     pattern: '/api/menus',
     handle: (req, res) => {
+      const resData = {
+        code: "200",
+        data: {
+            menus,
+            total: 0,
+            page: 1,
+            page_size: 10,
+        },
+        message: ""
+      }
       res.setHeader('Content-Type', 'application/json')
-      res.end(JSON.stringify({
-        menus,
-      }))
+      res.end(JSON.stringify(resData))
     },
   },
 ];

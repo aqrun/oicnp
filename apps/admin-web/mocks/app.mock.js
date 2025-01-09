@@ -7,16 +7,6 @@ const mocks = [
     }
   },
   {
-    pattern: '/api/users',
-    handle: (req, res) => {
-      const data = {
-        name: 'alex',
-      }
-      res.setHeader('Content-Type', 'application/json')
-      res.end(JSON.stringify(data))
-    },
-  },
-  {
     pattern: '/api/auth/login',
     handle: (req, res) => {
       const data = {
@@ -24,8 +14,55 @@ const mocks = [
         token: 'testtoken',
         uuid: 'id-abcd',
       }
+      const resData = {
+        code: "200",
+        data: {
+            data,
+            total: 0,
+            page: 1,
+            page_size: 10,
+        },
+        message: ""
+      }
+
       res.setHeader('Content-Type', 'application/json')
-      res.end(JSON.stringify(data))
+      res.end(JSON.stringify(resData))
+    },
+  },
+  {
+    pattern: '/api/user/list',
+    handle: (req, res) => {
+      const data = [
+        {
+          id: '1',
+          username: 'alex',
+          phone: '123',
+        },
+        {
+          id: '2',
+          username: 'alex',
+          phone: '123',
+        },
+        {
+          id: '3',
+          username: 'alex',
+          phone: '123',
+        },
+      ];
+
+      const resData = {
+        code: "200",
+        data: {
+            data,
+            total: 0,
+            page: 1,
+            page_size: 10,
+        },
+        message: ''
+      }
+
+      res.setHeader('Content-Type', 'application/json')
+      res.end(JSON.stringify(resData))
     },
   },
 ];
