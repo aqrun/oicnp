@@ -50,6 +50,11 @@ pub(crate) fn add_filter_methods(input: DeriveInput) -> GeneratorResult<TokenStr
 ///
 /// 添加筛选相关公共参数
 /// 
+/// page: Option<u64>
+/// page_size: Option<u64>
+/// order_by: Option<String>
+/// order: Option<String>
+/// 
 pub(crate) fn add_filter_fields(input: &mut DeriveInput) -> TokenStream {
     let expanded = match input.data {
         syn::Data::Struct(ref mut struct_data) => {

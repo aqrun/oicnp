@@ -1,29 +1,42 @@
 import { MenuItem } from '~/types';
 
-export interface FetchMenusRequestParams {
+export interface BaseFilterParams {
+  page?: number;
+  page_size?: number;
+  order_by?: string;
+  order?: string;
+}
+
+export interface BaseListResponseData {
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface DescribeMenuListRequestParams {
   _name?: string;
 }
 
-export interface FetchMenusResponseData {
+export interface DescribeMenuListResponseData {
   menus?: MenuItem[];
 }
 
-export interface FetchAuthLoginRequestParams {
+export interface DescribeLoginRequestParams {
   username: string;
   password: string;
   remember: boolean;
 }
 
-export interface FetchAuthLoginResponseData {
+export interface DescribeLoginResponseData {
   username?: string;
   token?: string;
   uuid?: string;
 }
 
-export interface FetchUserListRequestParams {
-  username: string;
-  password: string;
-  remember: boolean;
+export interface DescribeUserListRequestParams extends BaseFilterParams{
+  uuid?: string;
+  username?: string;
+  _name?: string;
 }
 
 export interface UserListData {
@@ -32,10 +45,16 @@ export interface UserListData {
   phone: string;
 }
 
-export interface FetchUserListResponseData {
+export interface DescribeUserListResponseData extends BaseListResponseData {
   data: UserListData[];
-  total: number;
-  page: number;
-  page_size: number;
+}
+
+export interface DescribeDeleteUserRequestParams {
+  uid?: number | string;
+  uuid?: string;
+}
+
+export interface DescribeDeleteUserResponseData {
+  res?: string;
 }
 

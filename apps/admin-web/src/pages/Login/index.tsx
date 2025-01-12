@@ -4,7 +4,7 @@ import { CLASS_PREFIX } from '~/constants';
 import { useMutation } from '@tanstack/react-query';
 import cls from 'clsx';
 import { r } from '~/utils';
-import { fetchLogin, FetchAuthLoginRequestParams } from '~/api';
+import { DescribeLogin, DescribeLoginRequestParams } from '~/api';
 import { useMemoizedFn } from 'ahooks';
 import { useGlobalState } from '~/context';
 import { useAppStore } from '~/stores';
@@ -25,8 +25,8 @@ export default function Login() {
   const [form] = Form.useForm<FormValues>();
 
   const login = useMutation({
-    mutationFn: (params: FetchAuthLoginRequestParams) => {
-      return fetchLogin(params);
+    mutationFn: (params: DescribeLoginRequestParams) => {
+      return DescribeLogin(params);
     },
   });
 

@@ -1,24 +1,31 @@
 import { createService } from './request';
 import {
-  FetchMenusRequestParams,
-  FetchMenusResponseData,
-  FetchAuthLoginRequestParams,
-  FetchAuthLoginResponseData,
-  FetchUserListRequestParams,
-  FetchUserListResponseData,
+  DescribeMenuListRequestParams,
+  DescribeMenuListResponseData,
+  DescribeLoginRequestParams,
+  DescribeLoginResponseData,
+  DescribeUserListRequestParams,
+  DescribeUserListResponseData,
+  DescribeDeleteUserRequestParams,
+  DescribeDeleteUserResponseData,
 } from './types';
 
-export const fetchMenus = createService<
-FetchMenusRequestParams,
-FetchMenusResponseData
+export const DescribeMenuList = createService<
+DescribeMenuListRequestParams,
+DescribeMenuListResponseData
 >('/menus', 'get');
 
-export const fetchLogin = createService<
-FetchAuthLoginRequestParams,
-FetchAuthLoginResponseData
+export const DescribeLogin = createService<
+DescribeLoginRequestParams,
+DescribeLoginResponseData
 >('/auth/login', 'post');
 
-export const fetchUserList = createService<
-FetchUserListRequestParams,
-FetchUserListResponseData
+export const DescribeUserList = createService<
+DescribeUserListRequestParams,
+DescribeUserListResponseData
 >('/user/list', 'post');
+
+export const DescribeDeleteUser = createService<
+DescribeDeleteUserRequestParams,
+DescribeDeleteUserResponseData
+>('/user/remove', 'post');

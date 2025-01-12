@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMemoizedFn } from 'ahooks';
-import { fetchMenus } from '~/api';
+import { DescribeMenuList } from '~/api';
 import { useAppStore } from '~/stores';
 
 /**
@@ -13,7 +13,7 @@ export function useAppInit() {
 
   const fetchInitData = useMemoizedFn(async () => {
     setLoading(true);
-    const res = await fetchMenus();
+    const res = await DescribeMenuList();
     
     setState({
       menus: res?.menus || [],

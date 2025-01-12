@@ -83,7 +83,16 @@ export function createService<TRequest, TResponse> (
   return (data?: TRequest) => {
     return new Promise<TResponse>((resolve) => {
       if (method?.toLowerCase() === 'post') {
-        axiosInstance.post<TRequest, BaseResponseData<TResponse>>(url, data, config).then((res) => {
+        const newConfig: AxiosRequestConfig = {
+          ...config,
+          params: {
+            ...(config?.params || {}),
+            // 添加 url 参数 方便控制台调试查看
+            _fetcher: uri?.replace('/', '').replace(/\//i, '-'),
+          },
+        };
+
+        axiosInstance.post<TRequest, BaseResponseData<TResponse>>(url, data, newConfig).then((res) => {
           resolve(res?.data);
         });
       } else {
@@ -95,6 +104,5 @@ export function createService<TRequest, TResponse> (
         });
       }
     });
-    
-  }
+  };
 }

@@ -19,7 +19,12 @@ pub fn derive_enum(input: TokenStream) -> TokenStream {
 }
 
 ///
-/// 为筛选条件增加 page page_size order_by order 等字段
+/// 为筛选条件增加分页/排序等字段
+/// 
+/// * **page**: Option\<u64\>
+/// * **page_size**: Option\<u64\>
+/// * **order_by**: Option\<String\>
+/// * **order**: Option\<String\>
 /// 
 #[proc_macro_attribute]
 pub fn add_filter_fields(_args: TokenStream, input: TokenStream) -> TokenStream {

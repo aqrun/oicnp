@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { BaseState } from './types';
+import { BaseState } from '~/stores/types';
 import { FilterValues } from '~/types';
 
 export type FilterState = BaseState<FilterValues> & {
