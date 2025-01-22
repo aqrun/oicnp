@@ -46,11 +46,8 @@ impl Hooks for App {
 
     fn routes(_ctx: &AppContext) -> AppRoutes {
         let app_routes = AppRoutes::with_default_routes()
-            .add_route(controllers::home::routes())
-            .add_routes(controllers::api::routes());
-            // .add_route(controllers::notes::routes())
-            // .add_route(controllers::auth::routes())
-            // .add_route(controllers::user::routes());
+            .add_routes(controllers::routes())
+            .add_routes(controllers::v1::routes());
 
         app_routes
     }

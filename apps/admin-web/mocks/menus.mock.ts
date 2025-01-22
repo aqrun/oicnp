@@ -67,6 +67,11 @@ const cms = [
     label: '标签',
     icon: 'TagsOutlined',
   },
+  {
+    key: 'notes',
+    label: '笔记',
+    icon: 'TagsOutlined',
+  },
 ];
 
 export const menus: MenuItem[] = [

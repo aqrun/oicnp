@@ -6,7 +6,7 @@
     "@vercel/style-guide": "^5.2.0",
     "eslint-config-turbo": "^2.2.3"
   },
-  "overrides": {
-    "eslint": "^8.48"
+  "dependencies": {
+    "eslint": "^8"
   }
 }

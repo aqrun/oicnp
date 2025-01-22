@@ -1,3 +1,3 @@
 
-/// API 后端前端
-pub static API_ADMIN_PREFIX: &'static str = "api";
+/// API 前缀
+pub static API_PREFIX: &'static str = "";

@@ -1,2 +1,3 @@
+export * from './menu';
 export * from './auth';
-export * from './notes';
+export * from './app';

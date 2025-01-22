@@ -1,2 +1,4 @@
-export * from './MenuCard';
-export * from './SearchInput';
+export * from './Icon';
+export * from './PageTitle';
+// export * from './Filters';
+

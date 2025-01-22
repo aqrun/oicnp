@@ -8,5 +8,6 @@ pub mod auth;
 pub mod constants;
 pub mod typings;
 pub mod app;
+pub mod services;
 
 pub use loco_rs::app::AppContext;

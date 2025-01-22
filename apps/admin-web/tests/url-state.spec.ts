@@ -4,26 +4,35 @@ import { menus } from './mocks/menus';
 
 describe('UrlState 测试', () => {
   test('/ 首页解析', () => {
-    const urlState = new UrlState('/', menus);
+    const urlState = new UrlState('/', '', menus);
     expect(urlState.pathnames).toEqual(['main', 'dashboard']);
     expect(urlState.mainMenuKey).toBe('main');
 
-    const urlState1 = new UrlState('', menus);
+    const urlState1 = new UrlState('', '', menus);
     expect(urlState1.pathnames).toEqual(['main', 'dashboard']);
     expect(urlState1.mainMenuKey).toBe('main');
   });
 
   test('/dashboard 仪表盘解析', () => {
-    const urlState = new UrlState('/dashboard', menus);
+    const urlState = new UrlState('/dashboard', '', menus);
     expect(urlState.pathnames).toEqual(['main', 'dashboard']);
   });
 
   test('/cms 内容管理解析', () => {
-    const urlState = new UrlState('/cms', menus);
+    const urlState = new UrlState('/cms', '', menus);
     expect(urlState.pathnames).toEqual(['cms', 'posts', 'list']);
 
-    const urlState1 = new UrlState('/cms/categories', menus);
+    const urlState1 = new UrlState('/cms/categories', '', menus);
     expect(urlState1.pathnames).toEqual(['cms', 'categories']);
+  });
+
+  test('/cms/#/a/b?name=alex hash解析', () => {
+    const hash = '#/a/b?name=alex';
+    const urlState = new UrlState('/cms', hash, menus);
+    
+    expect(urlState.hashRoute).toBe('a');
+    expect(urlState.hashSubRoute).toBe('b');
+    expect(urlState.params?.name).toBe('alex');
   });
 });
 

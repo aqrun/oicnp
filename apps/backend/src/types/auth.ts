@@ -1,9 +1,10 @@
-
-export interface User {
-  username: string;
-}
-
+/**
+ * 本地存储用户状态
+ */
 export interface AuthState {
-  user?: User;
-  initialized?: boolean;
+  username: string;
+  token: string;
+  uuid: string;
+  expireTime: number;
+  remember?: boolean;
 }

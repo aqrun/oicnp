@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { lazy } from 'react';
 import { RouteObject } from 'react-router';
 import MainLayout from './MainLayout';
@@ -11,6 +12,7 @@ import NotFound from './MainLayout/NotFound';
 const UsersPage = lazy(() => import('~/pages/Users'));
 const RolesPage = lazy(() => import('~/pages/Roles'));
 const PermissionsPage = lazy(() => import('~/pages/Permissions'));
+const NotesPage = lazy(() => import('~/pages/Notes'));
 
 export const routeList: RouteObject[] = [
   {
@@ -39,7 +41,7 @@ export const routeList: RouteObject[] = [
           {
             path: 'list',
             element: <UsersPage />,
-          }
+          },
         ],
       },
       {
@@ -91,6 +93,10 @@ export const routeList: RouteObject[] = [
           {
             path: 'tags',
             element: 'tags',
+          },
+          {
+            path: 'notes',
+            element: <NotesPage />,
           },
         ],
       },

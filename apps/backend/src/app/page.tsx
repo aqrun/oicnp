@@ -1,7 +1,9 @@
-export default function Home (): JSX.Element {
+
+
+export default function Home() {
   return (
     <div>
-      dash board
+      index page
     </div>
-  )
+  );
 }
