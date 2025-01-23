@@ -17,12 +17,13 @@ impl MigrationTrait for Migration {
                     .primary_key()
                     .auto_increment(),
             )
-            .col(ColumnDef::new(Menus::Pid).string_len(32).not_null())
+            .col(ColumnDef::new(Menus::Mid).string_len(255).not_null())
+            .col(ColumnDef::new(Menus::Pid).string_len(255).not_null())
             .col(ColumnDef::new(Menus::Path).string_len(255).not_null().default(""))
             .col(ColumnDef::new(Menus::Name).string_len(100).not_null().default(""))
             .col(ColumnDef::new(Menus::Icon).string_len(50).not_null().default(""))
             .col(ColumnDef::new(Menus::Type).char_len(1).not_null().default(""))
-            .col(ColumnDef::new(Menus::Query).string_len(255).not_null().default(""))
+            .col(ColumnDef::new(Menus::Query).string_len(255).default(""))
             .col(ColumnDef::new(Menus::Weight).integer().not_null().default(0))
             .col(ColumnDef::new(Menus::Api).string_len(255).not_null().default(""))
             .col(ColumnDef::new(Menus::Status).char_len(1).not_null().default("1"))
@@ -34,11 +35,11 @@ impl MigrationTrait for Migration {
             .col(ColumnDef::new(Menus::DataCacheMethod).char_len(1).not_null().default("0"))
             .col(ColumnDef::new(Menus::IsFrame).char_len(1).not_null().default("0"))
             .col(ColumnDef::new(Menus::DataScope).char_len(1).not_null().default("0"))
+            .col(ColumnDef::new(Menus::I18n).string_len(255).default(""))
             .col(ColumnDef::new(Menus::Remark).string_len(255).not_null().default(""))
             .col(
                 ColumnDef::new(Menus::CreatedAt)
                     .date_time()
-                    .not_null()
                     .extra("DEFAULT CURRENT_TIMESTAMP".to_string()),
             )
             .col(

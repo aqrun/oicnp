@@ -226,7 +226,9 @@ pub enum Menus {
     Table,
     #[oic(data_type = "bigInt", comment = "id")]
     Id,
-    #[oic(data_type = "bigInt", default = "", comment = "")]
+    #[oic(data_type = "string", default = "", comment = "")]
+    Mid,
+    #[oic(data_type = "string", default = "", comment = "")]
     Pid,
     #[oic(data_type = "string", len = 255, default = "", comment = "")]
     Path,
@@ -260,6 +262,8 @@ pub enum Menus {
     IsFrame,
     #[oic(data_type = "char", len = 1, default = "0", comment = "")]
     DataScope,
+    #[oic(data_type = "string", len = 255, default = "", comment = "")]
+    I18n,
     #[oic(data_type = "string", len = 255, default = "", comment = "")]
     Remark,
     #[oic(data_type = "datetime", default = "", comment = "创建时间")]

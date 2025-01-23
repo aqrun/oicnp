@@ -22,7 +22,7 @@ impl MenuModel {
         }
 
         let item = MenuEntity::find()
-            .filter(NoteColumn::Id.eq(id))
+            .filter(MenuColumn::Id.eq(id))
             .one(db)
             .await?;
 
@@ -122,13 +122,13 @@ impl MenuModel {
     /// 更新数据
     pub async fn update(db: &DatabaseConnection, params: UpdateMenuReqParams) -> Result<i32> {
         let _ = catch_err(params.validate())?;
-        let nid = params.nid.unwrap_or(0);
+        let id = params.id.unwrap_or(0);
 
-        if nid < 0 {
-            return Err(anyhow!("数据不存在,id: {}", nid));
+        if id < 0 {
+            return Err(anyhow!("数据不存在,id: {}", id));
         }
 
-        let mut item = Self::find_by_id(&db, nid)
+        let mut item = Self::find_by_id(&db, id)
             .await?
             .into_active_model();
 
@@ -142,7 +142,7 @@ impl MenuModel {
 
     /// 删除数据
     pub async fn delete(db: &DatabaseConnection, params: DeleteMenuReqParams) -> Result<i64> {
-        let id = params.nid.unwrap_or(0);
+        let id = params.id.unwrap_or(0);
 
         if id < 0 {
             return Err(anyhow!("数据不存在,id: {}", id));

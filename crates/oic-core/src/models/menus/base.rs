@@ -12,13 +12,28 @@ pub struct MenuFilters {
 /// 创建 note 参数
 #[derive(Deserialize, Serialize, Debug, Validate)]
 pub struct CreateMenuReqParams {
-    pub nid: Option<i64>,
-    #[validate(required(message = "必须指定 vid"), length(min = 2, message = "vid 最少2个字符"))]
-    pub vid: Option<String>,
-    #[validate(required(message = "必须指定 title"), length(min = 2, message = "title 最少2个字符"))]
-    pub title: Option<String>,
-    #[validate(length(min = 2, message = "content 最少2个字符"))]
-    pub content: Option<String>,
+    #[validate(required(message = "必须指定 id"))]
+    pub id: Option<i64>,
+    pub mid: Option<String>,
+    pub pid: Option<String>,
+    pub path: Option<String>,
+    pub name: Option<String>,
+    pub icon: Option<String>,
+    pub r#type: Option<String>,
+    pub query: Option<String>,
+    pub weight: Option<i32>,
+    pub api: Option<String>,
+    pub status: Option<String>,
+    pub method: Option<String>,
+    pub component: Option<String>,
+    pub visible: Option<String>,
+    pub is_cache: Option<String>,
+    pub log_method: Option<String>,
+    pub data_cache_method: Option<String>,
+    pub is_frame: Option<String>,
+    pub data_scope: Option<String>,
+    pub i18n: Option<String>,
+    pub remark: Option<String>,
 }
 
 ///

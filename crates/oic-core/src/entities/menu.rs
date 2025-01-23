@@ -26,6 +26,7 @@ pub struct Model {
     pub data_cache_method: String,
     pub is_frame: String,
     pub data_scope: String,
+    pub i18n: String,
     pub remark: String,
     pub created_at: DateTime,
     pub updated_at: Option<DateTime>,
