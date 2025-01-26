@@ -17,8 +17,8 @@ impl MigrationTrait for Migration {
                     .primary_key()
                     .auto_increment(),
             )
-            .col(ColumnDef::new(Users::Uuid).string_len(64).not_null())
-            .col(ColumnDef::new(Users::Username).string_len(64).not_null().default(""))
+            .col(ColumnDef::new(Users::Uuid).string_len(64).unique_key().not_null())
+            .col(ColumnDef::new(Users::Username).string_len(64).unique_key().not_null().default(""))
             .col(ColumnDef::new(Users::Nickname).string_len(64).not_null().default(""))
             .col(ColumnDef::new(Users::Password).string_len(128).not_null().default(""))
             .col(ColumnDef::new(Users::Salt).string_len(128).not_null().default(""))

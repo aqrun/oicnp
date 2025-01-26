@@ -10,10 +10,12 @@ use loco_rs::{
     task::Tasks,
     bgworker::{BackgroundWorker, Queue},
     Result,
+    config::Config,
 };
 use migration::Migrator;
 use oic_core::entities::prelude::*;
-use sea_orm::DatabaseConnection;
+use axum::Router as AxumRouter;
+use crate::controllers::home::fallback;
 
 use crate::{controllers, initializers, tasks, workers::downloader::DownloadWorker};
 
@@ -34,8 +36,12 @@ impl Hooks for App {
         )
     }
 
-    async fn boot(mode: StartMode, environment: &Environment) -> Result<BootResult> {
-        create_app::<Self, Migrator>(mode, environment).await
+    async fn boot(
+        mode: StartMode,
+        environment: &Environment,
+        config: Config,
+    ) -> Result<BootResult> {
+        create_app::<Self, Migrator>(mode, environment, config).await
     }
 
     async fn initializers(_ctx: &AppContext) -> Result<Vec<Box<dyn Initializer>>> {
@@ -52,6 +58,11 @@ impl Hooks for App {
         app_routes
     }
 
+    async fn after_routes(router: AxumRouter, _ctx: &AppContext) -> Result<AxumRouter> {
+        let router = router.fallback(fallback);
+        Ok(router)
+    }
+
     async fn connect_workers(ctx: &AppContext, queue: &Queue) -> Result<()> {
         queue.register(DownloadWorker::build(ctx)).await?;
         Ok(())
@@ -61,15 +72,15 @@ impl Hooks for App {
         tasks.register(tasks::seed::SeedData);
     }
 
-    async fn truncate(db: &DatabaseConnection) -> Result<()> {
-        truncate_table(db, UserEntity).await?;
-        truncate_table(db, NoteEntity).await?;
+    async fn truncate(ctx: &AppContext) -> Result<()> {
+        truncate_table(&ctx.db, UserEntity).await?;
+        truncate_table(&ctx.db, NoteEntity).await?;
         Ok(())
     }
 
-    async fn seed(db: &DatabaseConnection, base: &Path) -> Result<()> {
-        db::seed::<UserActiveModel>(db, &base.join("users.yaml").display().to_string()).await?;
-        db::seed::<NoteActiveModel>(db, &base.join("notes.yaml").display().to_string()).await?;
+    async fn seed(ctx: &AppContext, base: &Path) -> Result<()> {
+        // db::seed::<UserActiveModel>(db, &base.join("users.yaml").display().to_string()).await?;
+        db::seed::<NoteActiveModel>(&ctx.db, &base.join("notes.yaml").display().to_string()).await?;
         Ok(())
     }
 }

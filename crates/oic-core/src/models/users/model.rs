@@ -125,11 +125,46 @@ impl UserModel {
         };
 
         item.set_from_json(json!(params))?;
-        item.created_at = Set(utc_now());
+        item.created_at = Set(Some(utc_now()));
     
         let item = item.insert(db).await?;
 
         Ok(item)
+    }
+
+    /// 批量创建 note
+    pub async fn create_multi(db: &DatabaseConnection, params: &[CreateUserReqParams]) -> Result<String> {
+        for item in params {
+            let _ = catch_err(item.validate())?;
+        }
+
+        let txn = db.begin().await?;
+        let mut users: Vec<UserActiveModel> = Vec::new();
+
+        for item in params.iter() {
+            match UserActiveModel::from_json(json!(item)) {
+                Ok(mut user) => {
+                    if item.uuid.is_empty() {
+                        user.uuid = Set(getUuid());
+                    }
+
+                    if user.created_at.is_not_set() {
+                        user.created_at = Set(Some(utc_now()));
+                    }
+                    
+                    users.push(user);
+                },
+                Err(err) => {
+                    txn.rollback().await?;
+                    return Err(anyhow!("批量数据有误, UserActiveModel 转换失败 {:?}", err));
+                }
+            };
+        }
+        
+        let _ = UserEntity::insert_many(users).exec(&txn).await?;
+        txn.commit().await?;
+
+        Ok(String::from("批量user添加完成"))
     }
 
     /// 更新数据

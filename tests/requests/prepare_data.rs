@@ -1,7 +1,7 @@
 use axum::http::{HeaderName, HeaderValue};
-use loco_rs::{app::AppContext, TestServer};
-use oic::views::auth::LoginResponse;
+use oic::views::auth::UserSession;
 use oic_core::entities::prelude::*;
+use loco_rs::{app::AppContext, TestServer};
 
 const USER_EMAIL: &str = "test@loco.com";
 const USER_PASSWORD: &str = "1234";
@@ -19,10 +19,7 @@ pub async fn init_user_login(request: &TestServer, ctx: &AppContext) -> LoggedIn
     });
 
     //Creating a new user
-    request
-        .post("/api/auth/register")
-        .json(&register_payload)
-        .await;
+    let _res = request.post("/auth/register").json(&register_payload).await;
     let user = UserModel::find_by_email(&ctx.db, USER_EMAIL)
         .await
         .unwrap();
@@ -31,23 +28,23 @@ pub async fn init_user_login(request: &TestServer, ctx: &AppContext) -> LoggedIn
         "token": user.email_verify_token,
     });
 
-    request.post("/api/auth/verify").json(&verify_payload).await;
+    request.post("/auth/verify").json(&verify_payload).await;
 
     let response = request
-        .post("/api/auth/login")
+        .post("/auth/login")
         .json(&serde_json::json!({
             "email": USER_EMAIL,
             "password": USER_PASSWORD
         }))
         .await;
 
-    let login_response: LoginResponse = serde_json::from_str(&response.text()).unwrap();
+    let session: UserSession = serde_json::from_str(&response.text()).unwrap();
 
     LoggedInUser {
         user: UserModel::find_by_email(&ctx.db, USER_EMAIL)
             .await
             .unwrap(),
-        token: login_response.token,
+        token: session.token,
     }
 }
 

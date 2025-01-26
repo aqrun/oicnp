@@ -11,3 +11,15 @@ pub fn is_valid_matter_content(content: &str) -> bool {
         .expect("Matter reg not valid");
     reg_matter.is_match(content)
 }
+
+pub fn default_string() -> String {
+    String::from("")
+}
+
+pub fn default_option_string() -> Option<String> {
+    Some(String::from(""))
+}
+
+pub fn default_i64() -> i64 {
+    0
+}

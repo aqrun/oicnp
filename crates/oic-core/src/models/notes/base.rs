@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 use oic_derives::{add_filter_fields, FilterParams};
+use crate::utils::default_string;
 
 #[add_filter_fields]
 #[derive(FilterParams, Deserialize, Serialize, Debug)]
@@ -12,6 +13,17 @@ pub struct NoteFilters {
 /// 创建 note 参数
 #[derive(Deserialize, Serialize, Debug, Validate)]
 pub struct CreateNoteReqParams {
+    #[validate(required(message = "必须指定 title"), length(min = 2, message = "title 最少2个字符"))]
+    pub title: Option<String>,
+    #[serde(default = "default_string")]
+    pub content: String,
+}
+
+///
+/// 更新 note 参数
+/// 
+#[derive(Deserialize, Serialize, Debug, Validate)]
+pub struct UpdateNoteReqParams {
     pub id: Option<i64>,
     #[validate(required(message = "必须指定 title"), length(min = 2, message = "title 最少2个字符"))]
     pub title: Option<String>,
@@ -19,9 +31,5 @@ pub struct CreateNoteReqParams {
     pub content: Option<String>,
 }
 
-///
-/// 更新 note 参数
-/// 
-pub type UpdateNoteReqParams = CreateNoteReqParams;
 /// 删除数据参数
-pub type DeleteNoteReqParams = CreateNoteReqParams;
+pub type DeleteNoteReqParams = UpdateNoteReqParams;

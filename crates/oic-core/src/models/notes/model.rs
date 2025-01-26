@@ -95,7 +95,9 @@ impl NoteModel {
 
     /// 批量创建 note
     pub async fn create_multi(db: &DatabaseConnection, params: &[CreateNoteReqParams]) -> Result<String> {
-        let _ = catch_err(params.validate())?;
+        for item in params {
+            let _ = catch_err(item.validate())?;
+        }
         
         let txn = db.begin().await?;
         let mut notes: Vec<NoteActiveModel> = Vec::new();
@@ -103,7 +105,10 @@ impl NoteModel {
         for item in params.iter() {
             match NoteActiveModel::from_json(json!(item)) {
                 Ok(mut note) => {
-                    note.created_at = Set(Some(utc_now()));
+                    if note.created_at.is_not_set() {
+                        note.created_at = Set(Some(utc_now()));
+                    }
+                    
                     notes.push(note);
                 },
                 Err(err) => {

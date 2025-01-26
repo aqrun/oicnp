@@ -1,9 +1,10 @@
-use insta::{assert_debug_snapshot, with_settings};
-use loco_rs::testing;
 use oic::app::App;
-use sea_orm::entity::prelude::*;
-use serial_test::serial;
 use oic_core::entities::prelude::*;
+use insta::{assert_debug_snapshot, with_settings};
+use loco_rs::testing::prelude::*;
+use loco_rs::prelude::*;
+use rstest::rstest;
+use serial_test::serial;
 
 // TODO: see how to dedup / extract this to app-local test utils
 // not to framework, because that would require a runtime dep on insta
@@ -16,25 +17,30 @@ macro_rules! configure_insta {
     };
 }
 
+#[rstest]
+#[case("get_notes", serde_json::json!({}))]
+#[case("get_notes_with_page_size", serde_json::json!({"page_size":"1"}))]
+#[case("get_notes_with_size_and_page", serde_json::json!({"page":"2", "page_size": "5"}))]
+#[case("get_notes_with_filters", serde_json::json!({"page":"1", "page_size": "2", "title": "%note%"}))]
 #[tokio::test]
 #[serial]
-async fn can_get_notes() {
+async fn can_get_notes(#[case] test_name: &str, #[case] params: serde_json::Value) {
     configure_insta!();
 
-    testing::request::<App, _, _>(|request, ctx| async move {
-        testing::seed::<App>(&ctx.db).await.unwrap();
+    request::<App, _, _>(|request, ctx| async move {
+        seed::<App>(&ctx).await.unwrap();
 
-        let notes = request.get("/api/notes").await;
+        let notes = request.get("notes").add_query_params(params).await;
 
         with_settings!({
             filters => {
-                 let mut combined_filters = testing::CLEANUP_DATE.to_vec();
+                 let mut combined_filters = get_cleanup_date().clone();
                     combined_filters.extend(vec![(r#"\"id\\":\d+"#, r#""id\":ID"#)]);
                     combined_filters
             }
         }, {
             assert_debug_snapshot!(
-            (notes.status_code(), notes.text())
+            test_name, (notes.status_code(), notes.text())
         );
         });
     })
@@ -46,17 +52,17 @@ async fn can_get_notes() {
 async fn can_add_note() {
     configure_insta!();
 
-    testing::request::<App, _, _>(|request, _ctx| async move {
+    request::<App, _, _>(|request, _ctx| async move {
         let payload = serde_json::json!({
             "title": "loco",
             "content": "loco note test",
         });
 
-        let add_note_request = request.post("/api/notes").json(&payload).await;
+        let add_note_request = request.post("notes").json(&payload).await;
 
         with_settings!({
             filters => {
-                 let mut combined_filters = testing::CLEANUP_DATE.to_vec();
+                 let mut combined_filters = get_cleanup_date().clone();
                     combined_filters.extend(vec![(r#"\"id\\":\d+"#, r#""id\":ID"#)]);
                     combined_filters
             }
@@ -74,14 +80,14 @@ async fn can_add_note() {
 async fn can_get_note() {
     configure_insta!();
 
-    testing::request::<App, _, _>(|request, ctx| async move {
-        testing::seed::<App>(&ctx.db).await.unwrap();
+    request::<App, _, _>(|request, ctx| async move {
+        seed::<App>(&ctx).await.unwrap();
 
-        let add_note_request = request.get("/api/notes/1").await;
+        let add_note_request = request.get("/notes/1").await;
 
         with_settings!({
             filters => {
-                 let mut combined_filters = testing::CLEANUP_DATE.to_vec();
+                 let mut combined_filters = get_cleanup_date().clone();
                     combined_filters.extend(vec![(r#"\"id\\":\d+"#, r#""id\":ID"#)]);
                     combined_filters
             }
@@ -99,15 +105,15 @@ async fn can_get_note() {
 async fn can_delete_note() {
     configure_insta!();
 
-    testing::request::<App, _, _>(|request, ctx| async move {
-        testing::seed::<App>(&ctx.db).await.unwrap();
+    request::<App, _, _>(|request, ctx| async move {
+        seed::<App>(&ctx).await.unwrap();
 
         let count_before_delete = NoteEntity::find().all(&ctx.db).await.unwrap().len();
-        let delete_note_request = request.delete("/api/notes/1").await;
+        let delete_note_request = request.delete("/notes/1").await;
 
         with_settings!({
             filters => {
-                 let mut combined_filters = testing::CLEANUP_DATE.to_vec();
+                 let mut combined_filters = get_cleanup_date().clone();
                     combined_filters.extend(vec![(r#"\"id\\":\d+"#, r#""id\":ID"#)]);
                     combined_filters
             }

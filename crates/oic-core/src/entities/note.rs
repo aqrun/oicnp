@@ -2,6 +2,7 @@
 
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
+use crate::utils::default_string;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize, Default)]
 #[sea_orm(table_name = "notes")]
@@ -9,8 +10,10 @@ pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
     pub id: i64,
-    pub title: Option<String>,
-    pub content: Option<String>,
+    pub title: String,
+    #[sea_orm(default_value = "")]
+    #[serde(default = "default_string")]
+    pub content: String,
     pub created_at: Option<DateTime>,
     pub updated_at: Option<DateTime>,
 }

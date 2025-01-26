@@ -1,5 +1,7 @@
 use clap::{Parser, Subcommand};
+use loco_rs::app;
 use crate::cmd;
+use oic_core::app::{create_context, get_environment};
 
 #[derive(Parser)]
 #[clap(version, author, about)]
@@ -35,6 +37,9 @@ pub enum Command {
 
 pub async fn init_cmd() {
     dotenv::dotenv().ok();
+    let environment = get_environment();
+    let app_ctx = create_context(&environment).await.expect("Context 创建失败");
+
     let cli = Cli::parse();
 
     match cli.command {
@@ -56,7 +61,7 @@ pub async fn init_cmd() {
         },
 
         Command::SeedData => {
-            if let Err(err) = cmd::seed_data::run().await {
+            if let Err(err) = cmd::seed_data::run(&app_ctx).await {
                 println!("SeedDataErr: {}", err);
             }
         },

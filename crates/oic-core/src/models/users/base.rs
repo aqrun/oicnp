@@ -2,6 +2,7 @@ use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
 use oic_derives::{FilterParams, add_filter_fields};
 use validator::Validate;
+use crate::utils::default_string;
 
 pub use crate::entities::prelude::{
   UserActiveModel,
@@ -41,10 +42,16 @@ pub struct UserFilters {
 /// 创建 User 参数
 #[derive(Deserialize, Serialize, Debug, Validate)]
 pub struct CreateUserReqParams {
+    #[serde(default = "default_string")]
+    pub uuid: String,
     #[validate(required(message = "必须指定 username"), length(min = 2, message = "username 最少2个字符"))]
     pub username: Option<String>,
+    pub nickname: Option<String>,
+    #[validate(required(message = "必须指定 password"), length(min = 2, message = "password 最少6个字符"))]
+    pub password: Option<String>,
     #[validate(email)]
     pub email: Option<String>,
+    pub status: Option<String>,
 }
 
 ///

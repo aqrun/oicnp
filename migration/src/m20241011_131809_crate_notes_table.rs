@@ -29,18 +29,14 @@ impl MigrationTrait for Migration {
                             .primary_key()
                             .auto_increment(),
                     )
-                    .col(string_null(Notes::Title))
-                    .col(string_null(Notes::Content))
+                    .col(string(Notes::Title))
+                    .col(text(Notes::Content).default(""))
                     .col(
-                        ColumnDef::new(Notes::CreatedAt)
-                            .date_time()
-                            .not_null()
+                        date_time(Notes::CreatedAt)
                             .default(Expr::current_timestamp()),
                     )
                     .col(
-                        ColumnDef::new(Notes::UpdatedAt)
-                            .date_time()
-                            .default(Value::Int(None)),
+                        date_time_null(Notes::UpdatedAt)
                     )
                     .to_owned(),
             )

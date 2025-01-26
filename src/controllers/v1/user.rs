@@ -11,7 +11,6 @@ use oic_core::{
         DeleteUserReqParams,
     },
 };
-use serde_json::json;
 
 #[debug_handler]
 pub async fn get_one(
@@ -44,6 +43,17 @@ pub async fn add(
     JsonRes::from(res)
 }
 
+/// 批量添加
+#[debug_handler]
+pub async fn add_multi(
+    State(ctx): State<AppContext>,
+    Json(params): Json<Vec<CreateUserReqParams>>,
+) -> JsonRes<String> {
+    let res = UserModel::create_multi(&ctx.db, params.as_slice()).await;
+
+    JsonRes::from(res)
+}
+
 #[debug_handler]
 pub async fn update(
     State(ctx): State<AppContext>,
@@ -70,6 +80,7 @@ pub fn routes() -> Routes {
         .add("/one", post(get_one))
         .add("/list", post(list))
         .add("/add", post(add))
+        .add("/add-multi", post(add_multi))
         .add("/update", post(update))
         .add("/remove", post(remove))
 }
