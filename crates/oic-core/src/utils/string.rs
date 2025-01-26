@@ -1,5 +1,7 @@
 use regex::Regex;
 use super::slugify_paths_without_date;
+use crate::utils::utc_now;
+use loco_rs::prelude::*;
 
 pub fn generate_slug(file_name: &str) -> (String, String) {
     let (date_time, slug) = slugify_paths_without_date(file_name);
@@ -22,4 +24,12 @@ pub fn default_option_string() -> Option<String> {
 
 pub fn default_i64() -> i64 {
     0
+}
+
+pub fn default_i32() -> i32 {
+    0
+}
+
+pub fn default_date_time() -> DateTime {
+    utc_now()
 }

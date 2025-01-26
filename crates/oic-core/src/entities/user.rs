@@ -2,7 +2,7 @@
 
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
-use crate::utils::{default_string, default_i64};
+use crate::utils::{default_string, default_i64, default_date_time};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize, Default)]
 #[sea_orm(table_name = "users")]
@@ -68,7 +68,9 @@ pub struct Model {
     #[sea_orm(default_value = 0)]
     #[serde(default = "default_i64")]
     pub updated_by: i64,
-    pub created_at: Option<DateTime>,
+    #[sea_orm(default_expr = "Expr::current_timestamp()")]
+    #[serde(default = "default_date_time")]
+    pub created_at: DateTime,
     pub updated_at: Option<DateTime>,
     pub deleted_at: Option<DateTime>,
 }

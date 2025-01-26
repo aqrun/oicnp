@@ -70,7 +70,7 @@ pub async fn update(
 pub async fn remove(
     State(ctx): State<AppContext>,
     Json(params): Json<DeleteMenuReqParams>,
-) -> JsonRes<i64> {
+) -> JsonRes<i32> {
     let res = MenuModel::delete(&ctx.db, params).await;
 
     JsonRes::from(res)
@@ -81,6 +81,7 @@ pub fn routes() -> Routes {
         .prefix(get_api_prefix(super::VERSION, "menu").as_str())
         .add("/one", post(get_one))
         .add("/list", post(list))
+        .add("/add", post(add))
         .add("/add-multi", post(add_multi))
         .add("/update", post(update))
         .add("/remove", post(remove))

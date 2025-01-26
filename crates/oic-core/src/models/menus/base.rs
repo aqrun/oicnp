@@ -1,44 +1,74 @@
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 use oic_derives::{add_filter_fields, FilterParams};
+use crate::utils::{default_string, default_i32};
 
 #[add_filter_fields]
 #[derive(FilterParams, Deserialize, Serialize, Debug)]
 pub struct MenuFilters {
-    pub id: Option<i64>,
+    pub id: Option<i32>,
     pub title: Option<String>,
 }
 
 /// 创建 note 参数
 #[derive(Deserialize, Serialize, Debug, Validate)]
 pub struct CreateMenuReqParams {
-    #[validate(required(message = "必须指定 id"))]
-    pub id: Option<i64>,
-    pub mid: Option<String>,
-    pub pid: Option<String>,
-    pub path: Option<String>,
-    pub name: Option<String>,
-    pub icon: Option<String>,
-    pub r#type: Option<String>,
-    pub query: Option<String>,
-    pub weight: Option<i32>,
-    pub api: Option<String>,
-    pub status: Option<String>,
-    pub method: Option<String>,
-    pub component: Option<String>,
-    pub visible: Option<String>,
-    pub is_cache: Option<String>,
-    pub log_method: Option<String>,
-    pub data_cache_method: Option<String>,
-    pub is_frame: Option<String>,
-    pub data_scope: Option<String>,
-    pub i18n: Option<String>,
-    pub remark: Option<String>,
+    #[serde(default = "default_string")]
+    pub mid: String,
+    #[serde(default = "default_string")]
+    pub pid: String,
+    #[serde(default = "default_string")]
+    pub path: String,
+    #[serde(default = "default_string")]
+    pub name: String,
+    #[serde(default = "default_string")]
+    pub icon: String,
+    #[serde(default = "default_i32")]
+    pub weight: i32,
+    #[serde(default = "default_string")]
+    pub api: String,
+    #[serde(default = "default_string")]
+    pub status: String,
+    #[serde(default = "default_string")]
+    pub visible: String,
+    #[serde(default = "default_string")]
+    pub is_cache: String,
+    #[serde(default = "default_string")]
+    pub is_frame: String,
+    #[serde(default = "default_string")]
+    pub remark: String,
 }
 
 ///
 /// 更新 note 参数
 /// 
-pub type UpdateMenuReqParams = CreateMenuReqParams;
+#[derive(Deserialize, Serialize, Debug, Validate)]
+pub struct UpdateMenuReqParams {
+    pub id: i32,
+    #[serde(default = "default_string")]
+    pub mid: String,
+    #[serde(default = "default_string")]
+    pub pid: String,
+    #[serde(default = "default_string")]
+    pub path: String,
+    #[serde(default = "default_string")]
+    pub name: String,
+    #[serde(default = "default_string")]
+    pub icon: String,
+    #[serde(default = "default_i32")]
+    pub weight: i32,
+    #[serde(default = "default_string")]
+    pub api: String,
+    #[serde(default = "default_string")]
+    pub status: String,
+    #[serde(default = "default_string")]
+    pub visible: String,
+    #[serde(default = "default_string")]
+    pub is_cache: String,
+    #[serde(default = "default_string")]
+    pub is_frame: String,
+    #[serde(default = "default_string")]
+    pub remark: String,
+}
 /// 删除数据参数
-pub type DeleteMenuReqParams = CreateMenuReqParams;
+pub type DeleteMenuReqParams = UpdateMenuReqParams;

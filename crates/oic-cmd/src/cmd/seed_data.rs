@@ -4,6 +4,7 @@ use oic_core::{
     models::{
         notes::CreateNoteReqParams,
         users::CreateUserReqParams,
+        menus::CreateMenuReqParams,
     },
     AppContext,
 };
@@ -74,7 +75,7 @@ async fn seed_menus(ctx: &AppContext) -> Result<()> {
     let seed_file = format!("src/fixtures/{seed_name}s.yaml");
     // 接口API
     let uri = format!("/v1/{seed_name}/add-multi");
-    let seed_data: Vec<CreateUserReqParams> = serde_yaml::from_reader(File::open(seed_file)?)?;
+    let seed_data: Vec<CreateMenuReqParams> = serde_yaml::from_reader(File::open(seed_file)?)?;
     let url = r(ctx, uri.as_str());
     // 请求接口
     let res = post(url.as_str(), &seed_data).await?;

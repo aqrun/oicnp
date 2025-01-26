@@ -125,7 +125,7 @@ impl UserModel {
         };
 
         item.set_from_json(json!(params))?;
-        item.created_at = Set(Some(utc_now()));
+        item.created_at = Set(utc_now());
     
         let item = item.insert(db).await?;
 
@@ -149,7 +149,7 @@ impl UserModel {
                     }
 
                     if user.created_at.is_not_set() {
-                        user.created_at = Set(Some(utc_now()));
+                        user.created_at = Set(utc_now());
                     }
                     
                     users.push(user);

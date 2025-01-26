@@ -236,34 +236,36 @@ pub enum Menus {
     Name,
     #[oic(data_type = "string", len = 50, default = "", comment = "")]
     Icon,
-    #[oic(data_type = "char", len = 1, default = "", comment = "")]
-    Type,
-    #[oic(data_type = "string", len = 255, default = "", comment = "")]
-    Query,
     #[oic(data_type = "int", default = 0, comment = "")]
     Weight,
     #[oic(data_type = "string", len = 255, default = "", comment = "")]
     Api,
     #[oic(data_type = "char", len = 1, default = "1", comment = "")]
     Status,
-    #[oic(data_type = "string", len = 10, default = "", comment = "")]
-    Method,
-    #[oic(data_type = "string", len = 100, default = "", comment = "")]
-    Component,
     #[oic(data_type = "char", len = 1, default = "1", comment = "")]
     Visible,
     #[oic(data_type = "char", len = 1, default = "1", comment = "")]
     IsCache,
     #[oic(data_type = "char", len = 1, default = "0", comment = "")]
-    LogMethod,
-    #[oic(data_type = "char", len = 1, default = "0", comment = "")]
-    DataCacheMethod,
-    #[oic(data_type = "char", len = 1, default = "0", comment = "")]
     IsFrame,
-    #[oic(data_type = "char", len = 1, default = "0", comment = "")]
-    DataScope,
-    #[oic(data_type = "string", len = 255, default = "", comment = "")]
-    I18n,
+    #[oic(data_type = "int", default = 0, comment = "")]
+    Depth,
+    #[oic(data_type = "bigInt", default = 0, comment = "")]
+    P1,
+    #[oic(data_type = "bigInt", default = 0, comment = "")]
+    P2,
+    #[oic(data_type = "bigInt", default = 0, comment = "")]
+    P3,
+    #[oic(data_type = "bigInt", default = 0, comment = "")]
+    P4,
+    #[oic(data_type = "bigInt", default = 0, comment = "")]
+    P5,
+    #[oic(data_type = "bigInt", default = 0, comment = "")]
+    P6,
+    #[oic(data_type = "bigInt", default = 0, comment = "")]
+    P7,
+    #[oic(data_type = "bigInt", default = 0, comment = "")]
+    P8,
     #[oic(data_type = "string", len = 255, default = "", comment = "")]
     Remark,
     #[oic(data_type = "datetime", default = "", comment = "创建时间")]

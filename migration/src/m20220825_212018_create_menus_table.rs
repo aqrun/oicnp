@@ -1,4 +1,4 @@
-use sea_orm_migration::prelude::*;
+use sea_orm_migration::{prelude::*, schema::*};
 use super::types::*;
 
 #[derive(DeriveMigrationName)]
@@ -17,25 +17,26 @@ impl MigrationTrait for Migration {
                     .primary_key()
                     .auto_increment(),
             )
-            .col(ColumnDef::new(Menus::Mid).string_len(255).not_null())
+            .col(ColumnDef::new(Menus::Mid).unique_key().string_len(255).not_null())
             .col(ColumnDef::new(Menus::Pid).string_len(255).not_null())
             .col(ColumnDef::new(Menus::Path).string_len(255).not_null().default(""))
             .col(ColumnDef::new(Menus::Name).string_len(100).not_null().default(""))
+            .col(integer(Menus::Depth).default(0))
+            .col(integer(Menus::P1).default(0))
+            .col(integer(Menus::P2).default(0))
+            .col(integer(Menus::P3).default(0))
+            .col(integer(Menus::P4).default(0))
+            .col(integer(Menus::P5).default(0))
+            .col(integer(Menus::P6).default(0))
+            .col(integer(Menus::P7).default(0))
+            .col(integer(Menus::P8).default(0))
             .col(ColumnDef::new(Menus::Icon).string_len(50).not_null().default(""))
-            .col(ColumnDef::new(Menus::Type).char_len(1).not_null().default(""))
-            .col(ColumnDef::new(Menus::Query).string_len(255).default(""))
             .col(ColumnDef::new(Menus::Weight).integer().not_null().default(0))
             .col(ColumnDef::new(Menus::Api).string_len(255).not_null().default(""))
             .col(ColumnDef::new(Menus::Status).char_len(1).not_null().default("1"))
-            .col(ColumnDef::new(Menus::Method).string_len(10).not_null().default(""))
-            .col(ColumnDef::new(Menus::Component).string_len(100).not_null().default(""))
             .col(ColumnDef::new(Menus::Visible).char_len(1).not_null().default("1"))
             .col(ColumnDef::new(Menus::IsCache).char_len(1).not_null().default("1"))
-            .col(ColumnDef::new(Menus::LogMethod).char_len(1).not_null().default("0"))
-            .col(ColumnDef::new(Menus::DataCacheMethod).char_len(1).not_null().default("0"))
             .col(ColumnDef::new(Menus::IsFrame).char_len(1).not_null().default("0"))
-            .col(ColumnDef::new(Menus::DataScope).char_len(1).not_null().default("0"))
-            .col(ColumnDef::new(Menus::I18n).string_len(255).default(""))
             .col(ColumnDef::new(Menus::Remark).string_len(255).not_null().default(""))
             .col(
                 ColumnDef::new(Menus::CreatedAt)
