@@ -8,7 +8,6 @@ use oic_core::{
         UpdateMenuReqParams,
         DeleteMenuReqParams,
     },
-    services,
 };
 use oic_core::typings::{JsonRes, ListData};
 use oic_core::utils::get_api_prefix;
@@ -29,9 +28,18 @@ pub async fn list(
     State(ctx): State<AppContext>,
     Json(params): Json<MenuFilters>,
 ) -> JsonRes<ListData<MenuModel>> {
-    let res = services::menu::get_menu_tree(&ctx.db).await;
     let res = MenuModel::find_list(&ctx.db, params)
         .await;
+    JsonRes::from(res)
+}
+
+/// 生成树形数据
+#[debug_handler]
+pub async fn get_tree(
+    State(ctx): State<AppContext>,
+    Json(params): Json<MenuFilters>,
+) -> JsonRes<ListData<MenuModel>> {
+    let res = MenuModel::find_tree(&ctx.db, params).await;
     JsonRes::from(res)
 }
 
@@ -81,6 +89,7 @@ pub fn routes() -> Routes {
         .prefix(get_api_prefix(super::VERSION, "menu").as_str())
         .add("/one", post(get_one))
         .add("/list", post(list))
+        .add("/tree", post(get_tree))
         .add("/add", post(add))
         .add("/add-multi", post(add_multi))
         .add("/update", post(update))

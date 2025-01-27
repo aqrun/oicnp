@@ -4,10 +4,13 @@ use oic_derives::{add_filter_fields, FilterParams};
 use crate::utils::{default_string, default_i32};
 
 #[add_filter_fields]
-#[derive(FilterParams, Deserialize, Serialize, Debug)]
+#[derive(FilterParams, Deserialize, Serialize, Debug, Clone)]
 pub struct MenuFilters {
     pub id: Option<i32>,
-    pub title: Option<String>,
+    pub mid: Option<String>,
+    pub pid: Option<String>,
+    pub name: Option<String>,
+    pub depth: Option<String>,
 }
 
 /// 创建 note 参数

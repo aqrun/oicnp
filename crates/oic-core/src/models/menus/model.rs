@@ -63,12 +63,22 @@ impl MenuModel {
         let mut q = MenuEntity::find();
 
         if let Some(x) = params.id {
-            if x > 0 {
-                q = q.filter(MenuColumn::Id.eq(x));
-            }
+            q = q.filter(MenuColumn::Id.eq(x));
         }
 
-        if let Some(x) = params.title {
+        if let Some(x) = params.mid {
+            q = q.filter(MenuColumn::Mid.eq(x));
+        }
+
+        if let Some(x) = params.pid {
+            q = q.filter(MenuColumn::Pid.eq(x));
+        }
+
+        if let Some(x) = params.depth {
+            q = q.filter(MenuColumn::Depth.eq(x));
+        }
+
+        if let Some(x) = params.name {
             if !x.is_empty() {
                 q = q.filter(MenuColumn::Name.contains(&x));
             }
@@ -76,8 +86,10 @@ impl MenuModel {
 
         let mut order_by = MenuColumn::Id;
 
-        if order_by_str.eq("title") {
+        if order_by_str.eq("name") {
             order_by = MenuColumn::Name;
+        } else if order_by_str.eq("weight") {
+            order_by = MenuColumn::Weight
         }
 
         // 获取全部数据条数
@@ -92,6 +104,66 @@ impl MenuModel {
             page,
             page_size,
             total,
+        };
+
+        Ok(res)
+    }
+
+    ////
+    /// 获取node列表
+    /// 
+    pub async fn find_tree(db: &DatabaseConnection, params: MenuFilters) -> Result<ListData<Self>> {
+        let order = params.get_order();
+        let order_by_str = params.get_order_by();
+        let mid = params.mid.unwrap_or(String::from(""));
+        
+        // 先获取父级数据
+        let menu = Self::find_by_mid(db, mid.as_str()).await?;
+
+        // 根据父级查找所有子级元素
+        let mut q = MenuEntity::find();
+
+        if menu.depth == 1 {
+            q = q.filter(MenuColumn::P1.eq(menu.id));
+        }
+        if menu.depth == 2 {
+            q = q.filter(MenuColumn::P2.eq(menu.id));
+        }
+        if menu.depth == 3 {
+            q = q.filter(MenuColumn::P3.eq(menu.id));
+        }
+        if menu.depth == 4 {
+            q = q.filter(MenuColumn::P4.eq(menu.id));
+        }
+        if menu.depth == 5 {
+            q = q.filter(MenuColumn::P5.eq(menu.id));
+        }
+        if menu.depth == 6 {
+            q = q.filter(MenuColumn::P6.eq(menu.id));
+        }
+        if menu.depth == 7 {
+            q = q.filter(MenuColumn::P7.eq(menu.id));
+        }
+        if menu.depth == 8 {
+            q = q.filter(MenuColumn::P8.eq(menu.id));
+        }
+
+        let mut order_by = MenuColumn::Id;
+
+        if order_by_str.eq("name") {
+            order_by = MenuColumn::Name;
+        } else if order_by_str.eq("weight") {
+            order_by = MenuColumn::Weight
+        }
+
+        let list = q.order_by(order_by, order).all(db).await?;
+
+        // let tree = build_menu_tree(list);
+        let res = ListData {
+            data: list,
+            page: 0,
+            page_size: 0,
+            total: 0,
         };
 
         Ok(res)
@@ -123,6 +195,7 @@ impl MenuModel {
         // 缓存已存在的菜单数据
         let mut exist_menus: HashMap<String, Self> = HashMap::new();
 
+        // 遍历参数列表
         for item in params.iter() {
             // 先使用缓存父菜单数据
             let mut parent_menu: Option<Self> = None;
@@ -164,35 +237,40 @@ impl MenuModel {
                         menu.p6 = Set(parent_menu.p6);
                         menu.p7 = Set(parent_menu.p7);
                         menu.p8 = Set(parent_menu.p8);
-
-                        if depth == 2 {
-                            menu.p1 = Set(parent_menu.id);
-                        }
-                        if depth == 3 {
-                            menu.p2 = Set(parent_menu.id);
-                        }
-                        if depth == 4 {
-                            menu.p3 = Set(parent_menu.id);
-                        }
-                        if depth == 5 {
-                            menu.p4 = Set(parent_menu.id);
-                        }
-                        if depth == 6 {
-                            menu.p5 = Set(parent_menu.id);
-                        }
-                        if depth == 7 {
-                            menu.p6 = Set(parent_menu.id);
-                        }
-                        if depth == 8 {
-                            menu.p7 = Set(parent_menu.id);
-                        }
-                        if depth == 9 {
-                            menu.p8 = Set(parent_menu.id);
-                        }
                     }
 
-                    let res = menu.insert(db).await?;
-                    exist_menus.insert(String::from(res.mid.as_str()), res);
+                    let menu_model = menu.insert(db).await?;
+                    let mut menu = menu_model.clone().into_active_model();
+
+                    // 深度对应的 p值指定为自身ID
+                    if menu_model.depth == 1 {
+                        menu.p1 = Set(menu_model.id);
+                    }
+                    if menu_model.depth == 2 {
+                        menu.p2 = Set(menu_model.id);
+                    }
+                    if menu_model.depth == 3 {
+                        menu.p3 = Set(menu_model.id);
+                    }
+                    if menu_model.depth == 4 {
+                        menu.p4 = Set(menu_model.id);
+                    }
+                    if menu_model.depth == 5 {
+                        menu.p5 = Set(menu_model.id);
+                    }
+                    if menu_model.depth == 6 {
+                        menu.p6 = Set(menu_model.id);
+                    }
+                    if menu_model.depth == 7 {
+                        menu.p7 = Set(menu_model.id);
+                    }
+                    if menu_model.depth == 8 {
+                        menu.p8 = Set(menu_model.id);
+                    }
+                    // 更新到数据表
+                    let menu_model = menu.update(db).await?;
+                    // 添加缓存数据
+                    exist_menus.insert(String::from(menu_model.mid.as_str()), menu_model);
                 },
                 Err(err) => {
                     return Err(anyhow!("批量数据有误, {}", err));
