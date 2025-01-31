@@ -3,6 +3,8 @@ use crate::{
     entities::prelude::*,
     utils::{catch_err, utc_now},
     typings::ListData,
+    services::menu::build_menu_tree,
+    models::menus::MenuTreeItem,
 };
 use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, Set};
 use serde_json::json;
@@ -110,9 +112,9 @@ impl MenuModel {
     }
 
     ////
-    /// 获取node列表
+    /// 获取node列表树型数据
     /// 
-    pub async fn find_tree(db: &DatabaseConnection, params: MenuFilters) -> Result<ListData<Self>> {
+    pub async fn find_tree(db: &DatabaseConnection, params: MenuFilters) -> Result<MenuTreeItem> {
         let order = params.get_order();
         let order_by_str = params.get_order_by();
         let mid = params.mid.unwrap_or(String::from(""));
@@ -158,15 +160,10 @@ impl MenuModel {
 
         let list = q.order_by(order_by, order).all(db).await?;
 
-        // let tree = build_menu_tree(list);
-        let res = ListData {
-            data: list,
-            page: 0,
-            page_size: 0,
-            total: 0,
-        };
+        // 列表转为树结构
+        let root = build_menu_tree(list);
 
-        Ok(res)
+        Ok(root)
     }
 
     /// 创建 node

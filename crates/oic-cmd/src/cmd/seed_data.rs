@@ -10,9 +10,11 @@ use oic_core::{
 };
 use crate::utils::{post, r};
 
+///
+/// cargo ic seed-data
 pub async fn run(ctx: &AppContext) -> Result<()> {
-    // seed_notes(ctx).await?;
-    // seed_users(ctx).await?;
+    seed_notes(ctx).await?;
+    seed_users(ctx).await?;
     seed_menus(ctx).await?;
     Ok(())
 }

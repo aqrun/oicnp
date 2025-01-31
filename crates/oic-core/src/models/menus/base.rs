@@ -75,3 +75,18 @@ pub struct UpdateMenuReqParams {
 }
 /// 删除数据参数
 pub type DeleteMenuReqParams = UpdateMenuReqParams;
+
+/**
+ * 树结构返回的菜单数据
+ */
+#[derive(Clone, Debug, Deserialize, Serialize, Default)]
+pub struct MenuTreeItem {
+    pub id: i32,
+    pub mid: String,
+    pub pid: String,
+    pub path: String,
+    pub name: String,
+    pub weight: i32,
+    pub icon: String,
+    pub children: Vec<MenuTreeItem>,
+}

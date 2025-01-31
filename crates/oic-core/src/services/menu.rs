@@ -1,54 +1,60 @@
 use std::collections::HashMap;
 use crate::entities::prelude::*;
-use serde::{Deserialize, Serialize};
+use crate::models::menus::MenuTreeItem;
 
-#[derive(Clone, Debug, Deserialize, Serialize, Default)]
-pub struct MenuTreeItem {
-    pub id: i32,
-    pub mid: String,
-    pub pid: String,
-    pub path: String,
-    pub name: String,
-    pub weight: i32,
-    pub icon: String,
-    pub children: Vec<MenuTreeItem>,
-}
-
+///
+/// 参考示例
+/// https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=7da973c6d740c895e57dd424ebcf0a35
+/// 
 pub fn build_menu_tree(menus: Vec<MenuModel>) -> MenuTreeItem {
-    let menus: Vec<MenuTreeItem> = menus.into_iter().map(|item| {
-        let data = MenuTreeItem {
-            id: item.id,
-            mid: item.mid,
-            pid: item.pid,
-            path: item.path,
-            name: item.name,
-            weight: item.weight,
-            icon: item.icon,
-            children: Vec::new(),
-        };
-        return data;
-    }).collect::<Vec<MenuTreeItem>>();
+    // let mut roots = Vec::new();
+    // 只有一个根节点
+    let mut root = MenuModel::default();
+    let mut child_map: HashMap<String, Vec<MenuModel>> = HashMap::new();
 
-    println!("menus----{:?}", menus.clone());
-
-    let mut menu_map: HashMap<String, MenuTreeItem> = HashMap::new();
-    
-    // Populate the map
-    for mut item in menus {
-        item.children = Vec::new(); // Initialize children
-        menu_map.insert(item.mid.clone(), item);
+    for node in menus {
+        if !node.pid.as_str().is_empty() {
+            if let Some(child_nodes) = child_map.get_mut(node.pid.as_str()) {
+                child_nodes.push(node);
+            } else {
+                child_map.insert(String::from(node.pid.as_str()), vec![node]);
+            }
+        } else {
+            // roots.push(node);
+            root = node;
+        }
     }
 
-    // for item in menu_map.values() {
-    //     if !item.pid.is_empty() {
-    //         if let Some(parent) = menu_map.get_mut(item.pid.as_str()) {
-    //             parent.children.push(item.clone());
-    //         } 
-    //     }
-    // }
+    /*
+    let mut tree_roots = Vec::new();
+    for node in roots {
+        tree_roots.push(into_tree_node(node, &mut child_map));
+    }
+    */
 
-    let d = MenuTreeItem::default();
-    // let a = roots.get(0).unwrap_or(&d);
-    // a.clone()
-    d
+    into_tree_node(root, &mut child_map)
+}
+
+fn into_tree_node (
+    menu: MenuModel,
+    mut child_map: &mut HashMap<String, Vec<MenuModel>>,
+) -> MenuTreeItem {
+    let mut children = Vec::new();
+
+    if let Some((_id, child_nodes)) = child_map.remove_entry(menu.mid.as_str()) {
+        for child_node in child_nodes {
+            children.push(into_tree_node(child_node, &mut child_map));
+        }
+    }
+
+    MenuTreeItem {
+        id: menu.id,
+        mid: menu.mid,
+        pid: menu.pid,
+        path: menu.path,
+        name: menu.name,
+        weight: menu.weight,
+        icon: menu.icon,
+        children,
+    }
 }

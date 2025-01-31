@@ -4,16 +4,16 @@
   path: ''
   name: Backend
   icon: ''
+- mid: dashboard
+  pid: backend
+  path: '/dashboard'
+  name: 仪表盘
+  icon: 'DashboardOutlined'
 - mid: system
   pid: backend
   path: '/system'
   name: 系统管理
   icon: 'LaptopOutlined'
-- mid: dashboard
-  pid: system
-  path: '/system/dashboard'
-  name: 仪表盘
-  icon: 'DashboardOutlined'
 - mid: users
   pid: system
   path: '/system/users'

@@ -7,7 +7,9 @@ use oic_core::{
         CreateMenuReqParams,
         UpdateMenuReqParams,
         DeleteMenuReqParams,
+        MenuTreeItem,
     },
+
 };
 use oic_core::typings::{JsonRes, ListData};
 use oic_core::utils::get_api_prefix;
@@ -38,7 +40,7 @@ pub async fn list(
 pub async fn get_tree(
     State(ctx): State<AppContext>,
     Json(params): Json<MenuFilters>,
-) -> JsonRes<ListData<MenuModel>> {
+) -> JsonRes<MenuTreeItem> {
     let res = MenuModel::find_tree(&ctx.db, params).await;
     JsonRes::from(res)
 }
