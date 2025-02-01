@@ -12,6 +12,8 @@ export const LAYOUT_HEADER_HEIGHT = 64;
  */
 export const STATIC_URI = 'http://static.oicnp.my/';
 
+export const API_URI = 'http://localhost:5150';
+
 /**
  * 后端URL路径前缀
  */

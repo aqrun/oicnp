@@ -1,8 +1,11 @@
+'use client';
+
 import type { AxiosRequestConfig, Method } from 'axios';
 
-import { message as $message } from 'antd';
+// import { message as $message } from 'antd';
 import axios from 'axios';
-// import { useAppStore } from '~/stores';
+import { useAppStore } from '@/stores';
+import { API_URI } from '@/constants';
 
 /**
  * Response 公共数据
@@ -19,36 +22,36 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   config => {
-    // useAppStore.setState({
-    //   loading: true,
-    // });
+    useAppStore.setState({
+      loading: true,
+    });
 
     return config;
   },
   error => {
-    // useAppStore.setState({
-    //   loading: false,
-    // });
+    useAppStore.setState({
+      loading: false,
+    });
     Promise.reject(error);
   },
 );
 
 axiosInstance.interceptors.response.use(
   config => {
-    // useAppStore.setState({
-    //   loading: false,
-    // });
+    useAppStore.setState({
+      loading: false,
+    });
 
-    if (config?.data?.message) {
-      $message.success(config.data.message)
-    }
+    // if (config?.data?.message) {
+    //   $message.success(config.data.message)
+    // }
 
     return config?.data;
   },
   error => {
-    // useAppStore.setState({
-    //   loading: false,
-    // });
+    useAppStore.setState({
+      loading: false,
+    });
     // if needs to navigate to login page when request exception
     // history.replace('/login');
     let errorMessage = '系统异常';
@@ -74,11 +77,11 @@ axiosInstance.interceptors.response.use(
  * 创建服务
  */
 export function createService<TRequest, TResponse> (
-  uri: string,
+  action: string,
   method: Method,
   config: AxiosRequestConfig = {}
 ): (data?: TRequest) => Promise<TResponse> {
-  const url = `/api${uri}`;
+  const url = `${API_URI}/v1${action}`;
 
   return (data?: TRequest) => {
     return new Promise<TResponse>((resolve) => {
@@ -88,7 +91,7 @@ export function createService<TRequest, TResponse> (
           params: {
             ...(config?.params || {}),
             // 添加 url 参数 方便控制台调试查看
-            _fetcher: uri?.replace('/', '').replace(/\//i, '-'),
+            _fetcher: action?.replace('/', '').replace(/\//i, '-'),
           },
         };
 
@@ -105,24 +108,4 @@ export function createService<TRequest, TResponse> (
       }
     });
   };
-}
-
-
-export function createFetcher<TRequest, TResponse> (action: string, method?: string) {
-  const url = `/api${action}`;
-  return (data?: TRequest) => {
-    return new Promise<TResponse>((resolve) => {
-      fetch(url, {
-        method: method || 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data),
-      }).then((res) => res.json()).then((res) => {
-        resolve(res?.data);
-      }).catch(err => {
-        resolve(null as any);
-      });
-    });
-  }
 }

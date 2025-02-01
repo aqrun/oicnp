@@ -9,5 +9,7 @@ export const Container = styled.div`
     margin: 0;
     line-height: 32px;
     color: #111;
+    font-size: 24px;
+    font-weight: 500;
   }
 `;

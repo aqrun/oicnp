@@ -83,9 +83,10 @@ pub type DeleteMenuReqParams = UpdateMenuReqParams;
 pub struct MenuTreeItem {
     pub id: i32,
     pub mid: String,
+    pub key: String,
     pub pid: String,
     pub path: String,
-    pub name: String,
+    pub label: String,
     pub weight: i32,
     pub icon: String,
     pub children: Vec<MenuTreeItem>,

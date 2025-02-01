@@ -1,6 +1,6 @@
 import qs from 'qs';
 import { getBaseUri } from './app';
-import { MenuItem } from '~/types';
+import { MenuItem } from '@/types';
 
 /**
  * 根据当前 location path 解析对应的菜单数据

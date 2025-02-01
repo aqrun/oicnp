@@ -14,12 +14,27 @@ export interface BaseListResponseData {
 }
 
 export interface DescribeMenuListRequestParams {
+  mid?: string;
   _name?: string;
 }
 
 export interface DescribeMenuListResponseData {
   menus?: MenuItem[];
 }
+
+export interface MenuTreeItem {
+  id: number;
+  mid: string;
+  pid: string;
+  path: string;
+  label: string;
+  weight: number;
+  icon: string;
+  isActive?: boolean;
+  children: MenuTreeItem[];
+}
+
+export type DescribeMenuTreeResponseData = MenuTreeItem;
 
 export interface DescribeLoginRequestParams {
   username: string;

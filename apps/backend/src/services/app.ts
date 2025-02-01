@@ -1,3 +1,5 @@
+'use client';
+
 import { createService } from './request';
 import {
   DescribeMenuListRequestParams,

@@ -12,16 +12,20 @@ export const Container = styled.div`
   height: 100%;
   min-height: 100vh;
   background-color: #f0f4fb;
+  display: flex;
+  flex-direction: row;
 `;
 
 // Header component
 export const Header = styled.header`
   height: ${LAYOUT_HEADER_HEIGHT}px;
-  background: #001529;
+  border-right: 1px solid hsl(var(--border));
+  border-bottom: 1px solid hsl(var(--border));
+  background: white;
   display: flex;
   align-items: center;
-  padding: 0 0 0 50px;
-  justify-content: space-between;
+  padding: 0 0 0 24px;
+  justify-content: center;
 
   .${CLASS_PREFIX}-logo {
     width: 120px;
@@ -42,7 +46,8 @@ export const Header = styled.header`
 // Main component
 export const Main = styled.main`
   display: flex;
-  height: calc(100vh - ${LAYOUT_HEADER_HEIGHT}px);
+  height: 100vh;
+  flex: 1;
 `;
 
 // MainContent component
@@ -63,16 +68,29 @@ export const MainContent = styled.div`
 // Side component
 export const Side = styled.aside`
   background-color: #001529;
-  width: 240px;
-  height: 100%;
+  width: 256px;
+  height: 100vh;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
 
   .${CLASS_PREFIX}-side-menu {
-    height: 100%;
+    height: calc(100% - 64px - 64px);
     overflow: auto;
   }
 
   .${CLASS_PREFIX}-icon {
     margin-right: 8px;
+  }
+
+  .${CLASS_PREFIX}-layout-side-footer {
+    height: 64px;
+    display: flex;
+    // align-items: center;
+    // justify-content: center;
+    background: white;
+    // border-top: 1px solid hsl(var(--border));
+    border-right: 1px solid hsl(var(--border));
   }
 `;
 

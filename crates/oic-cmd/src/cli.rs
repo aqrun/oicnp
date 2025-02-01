@@ -1,5 +1,4 @@
 use clap::{Parser, Subcommand};
-use loco_rs::app;
 use crate::cmd;
 use oic_core::app::{create_context, get_environment};
 

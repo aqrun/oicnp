@@ -1,6 +1,7 @@
 import { STATIC_URI, BACK_BASE_URI } from '@/constants';
 import { MenuItem, BreadItem } from '@/types';
 import { UrlState } from './UrlState';
+import dayjs from 'dayjs';
 
 /**
  * 获取链接前缀
@@ -162,4 +163,13 @@ export function getBreadItems(menus: MenuItem[], urlState?: UrlState) {
   });
 
   return items;
+}
+
+/**
+ * 日期格式化显示
+ */
+export function formatDate(strDate: string): string {
+  if (!strDate) return strDate;
+  const res = dayjs(strDate).add(8, 'h').format('YYYY年MM月DD日 HH:mm:ss');
+  return res;
 }
