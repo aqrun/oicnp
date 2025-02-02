@@ -52,6 +52,7 @@ export function Filters({
         {Boolean(onCreate) && (
           <CreateButton
             label={createLabel}
+            onCreate={onCreate}
           />
         )}
         {Boolean(onSearch) && (

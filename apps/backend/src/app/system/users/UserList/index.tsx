@@ -13,6 +13,7 @@ import useColumns from './useColumns';
 import { UserListData } from '@/services';
 import { useUserStore } from './useUserStore';
 import { nextTick } from '@/utils';
+import { setHashState } from '@/utils/app.client';
 import { useQueryUserList } from './useQueryUserList';
 
 /**
@@ -31,8 +32,13 @@ export default function UserList(): JSX.Element {
   };
   const dataSource = getDataSource();
 
+  /**
+   * 创建操作
+   */
   const handleCreate = useMemoizedFn(() => {
-
+    setHashState({
+      route: 'create',
+    });
   });
 
   const handleRefresh = useMemoizedFn(() => {

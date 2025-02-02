@@ -1,12 +1,11 @@
 import { createContext, useContext } from 'react';
-// import { UrlState } from '@/utils';
-import { MenuItem, AuthState } from '@/types';
+import { HashState } from '@/types';
 
 export interface GlobalState {
-  menus?: MenuItem[];
-  // urlState?: UrlState;
-  authState?: AuthState;
-  setAuthState?: (authState: AuthState) => void;
+  /**
+   * 解析后的哈析参数
+   */
+  hashState?: HashState;
 }
 
 const initialGlobalData: GlobalState = {

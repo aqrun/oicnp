@@ -1,3 +1,5 @@
+'use client';
+
 import Overview from './Overview';
 import SalePercent from './SalePercent';
 import TimeLine from './TimeLine';
