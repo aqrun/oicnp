@@ -10,6 +10,8 @@ import {
   DescribeUserListResponseData,
   DescribeDeleteUserRequestParams,
   DescribeDeleteUserResponseData,
+  DescribeCreateUserRequestParams,
+  DescribeCreateUserResponseData,
 } from './types';
 
 export const DescribeMenuList = createService<
@@ -25,9 +27,14 @@ DescribeLoginResponseData
 export const DescribeUserList = createService<
 DescribeUserListRequestParams,
 DescribeUserListResponseData
->('/user/list', 'post');
+>('/user/list', 'post', { ignoreError: true, });
 
 export const DescribeDeleteUser = createService<
 DescribeDeleteUserRequestParams,
 DescribeDeleteUserResponseData
 >('/user/remove', 'post');
+
+export const DescribeCreateUser = createService<
+DescribeCreateUserRequestParams,
+DescribeCreateUserResponseData
+>('/user/add', 'post');

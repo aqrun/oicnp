@@ -76,7 +76,7 @@ export function MainLayout({
   const pathnameArr = pathname?.split('/')?.filter(i => i);
   const getDefaultSelectedKeys = () => {
     if (pathnameArr?.length) {
-      return [`/${pathnameArr.join('/')}`];
+      return [`/${pathnameArr?.slice(0, 2).join('/')}`];
     }
     return ['/dashboard'];
   }
@@ -111,7 +111,7 @@ export function MainLayout({
 
       if (menu?.children?.length && pathnameArr?.length > 1) {
         subMenu = menu?.children?.find((item) => {
-          return item?.path === `/${pathnameArr.join('/')}`;
+          return item?.path === `/${pathnameArr?.slice(0, 2).join('/')}`;
         });
 
         if (subMenu) {

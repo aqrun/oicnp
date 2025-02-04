@@ -55,7 +55,8 @@ export interface DescribeUserListRequestParams extends BaseFilterParams{
 }
 
 export interface UserListData {
-  id: string;
+  uid: string;
+  uuid: string;
   username: string;
   phone: string;
 }
@@ -71,5 +72,19 @@ export interface DescribeDeleteUserRequestParams {
 
 export interface DescribeDeleteUserResponseData {
   res?: string;
+}
+
+export interface DescribeCreateUserRequestParams {
+  username?: string;
+  email?: string;
+  nickname?: string;
+  password?: string;
+  status?: string;
+}
+export interface DescribeCreateUserResponseData {
+  uid?: number;
+  uuid?: string;
+  username?: string;
+  nickname?: string;
 }
 

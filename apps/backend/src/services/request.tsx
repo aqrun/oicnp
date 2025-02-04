@@ -1,11 +1,13 @@
 'use client';
 
 import type { AxiosRequestConfig, Method } from 'axios';
-
-// import { message as $message } from 'antd';
 import axios from 'axios';
 import { useAppStore } from '@/stores';
 import { API_URI } from '@/constants';
+
+export type RequestConfig = AxiosRequestConfig & {
+  ignoreError?: boolean;
+};
 
 /**
  * Response 公共数据
@@ -37,14 +39,25 @@ axiosInstance.interceptors.request.use(
 );
 
 axiosInstance.interceptors.response.use(
-  config => {
+  (config) => {
     useAppStore.setState({
       loading: false,
     });
 
-    // if (config?.data?.message) {
-    //   $message.success(config.data.message)
-    // }
+    const ignoreError = (config?.config as RequestConfig)?.ignoreError ?? false;
+    const code = config?.data?.code ?? '200';
+    const message = config?.data?.message;
+
+    if (!ignoreError && code !== '200' && message) {
+      console.error(message);
+      useAppStore.setState({
+        loading: false,
+        errors: [{
+          code,
+          message,
+        }]
+      });
+    }
 
     return config?.data;
   },
@@ -63,7 +76,15 @@ axiosInstance.interceptors.response.use(
     }
 
     console.dir(error);
-    // error.message && $message.error(errorMessage);
+    if (error.message) {
+      useAppStore.setState({
+        loading: false,
+        errors: [{
+          code: '500',
+          message: errorMessage,
+        }]
+      });
+    }
 
     return {
       status: false,
@@ -79,14 +100,14 @@ axiosInstance.interceptors.response.use(
 export function createService<TRequest, TResponse> (
   action: string,
   method: Method,
-  config: AxiosRequestConfig = {}
+  config: RequestConfig = {}
 ): (data?: TRequest) => Promise<TResponse> {
   const url = `${API_URI}/v1${action}`;
 
   return (data?: TRequest) => {
     return new Promise<TResponse>((resolve) => {
       if (method?.toLowerCase() === 'post') {
-        const newConfig: AxiosRequestConfig = {
+        const newConfig: RequestConfig = {
           ...config,
           params: {
             ...(config?.params || {}),

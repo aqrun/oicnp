@@ -120,16 +120,28 @@ impl UserModel {
     pub async fn create(db: &DatabaseConnection, params: &CreateUserReqParams) -> Result<Self> {
         let _ = catch_err(params.validate())?;
 
-        let mut item = UserActiveModel {
-            ..Default::default()
+        let user = match UserActiveModel::from_json(json!(params)) {
+            Ok(mut user) => {
+                if params.uuid.is_empty() {
+                    user.uuid = Set(getUuid());
+                }
+
+                if user.created_at.is_not_set() {
+                    user.created_at = Set(utc_now());
+                }
+
+                user
+            },
+            Err(err) => {
+                println!("errrrrrrrrrr---{:?}", params);
+                return Err(anyhow!("params 转为 UserActiveModel 失败 {:?}", err));
+            }
         };
 
-        item.set_from_json(json!(params))?;
-        item.created_at = Set(utc_now());
-    
-        let item = item.insert(db).await?;
+        println!("test---{:?}", user.clone());
+        let user = user.insert(db).await?;
 
-        Ok(item)
+        Ok(user)
     }
 
     /// 批量创建 note

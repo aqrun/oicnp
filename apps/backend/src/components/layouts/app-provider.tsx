@@ -5,7 +5,8 @@ import {
   QueryClient,
 } from '@tanstack/react-query';
 import { GlobalContext, GlobalState } from '@/context';
-import { parseHashState } from '@/utils/app.client';
+import { App } from 'antd';
+import { ErrorHandler } from '../ErrorHandler';
 
 export interface AppProviderProps extends React.PropsWithChildren {
 
@@ -21,18 +22,21 @@ export function AppProvider({
 }: AppProviderProps) {
   // 全局状态参数
   const globalState: GlobalState = {
-    hashState: parseHashState(),
+    
   };
 
   return (
-    <GlobalContext.Provider
-      value={globalState}
-    >
-      <QueryClientProvider
-        client={queryClient}
+    <App>
+      <GlobalContext.Provider
+        value={globalState}
       >
-        {children}
-      </QueryClientProvider>
-    </GlobalContext.Provider>
+        <QueryClientProvider
+          client={queryClient}
+        >
+          {children}
+          <ErrorHandler />
+        </QueryClientProvider>
+      </GlobalContext.Provider>
+    </App>
   );
 }

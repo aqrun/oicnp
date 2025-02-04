@@ -1,3 +1,5 @@
+'use client';
+
 import qs from 'qs';
 
 export interface AddParamOptions {

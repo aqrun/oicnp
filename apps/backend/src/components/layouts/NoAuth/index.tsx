@@ -1,3 +1,5 @@
+'use client';
+
 import { Result, Button } from 'antd';
 import { r } from '@/utils';
 import { Container } from './index.styled';

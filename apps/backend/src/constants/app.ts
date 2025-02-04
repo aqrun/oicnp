@@ -17,7 +17,7 @@ export const API_URI = 'http://localhost:5150';
 /**
  * 后端URL路径前缀
  */
-export const BACK_BASE_URI = '/admin';
+export const BACK_BASE_URI = '/';
 
 /**
  * cookie auth key

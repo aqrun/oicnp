@@ -17,3 +17,11 @@ export type HashState = {
   route?: string;
   subRoute?: string;
 } & Record<string, string | number>;
+
+/**
+ * 错误信息
+ */
+export interface FailModel {
+  code?: string;
+  message?: string;
+}

@@ -1,3 +1,5 @@
+'use client';
+
 import qs from 'qs';
 import { getBaseUri } from './app';
 import { MenuItem } from '@/types';

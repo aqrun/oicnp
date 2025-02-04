@@ -1,3 +1,5 @@
+'use client';
+
 import { STATIC_URI, BACK_BASE_URI } from '@/constants';
 import { MenuItem, BreadItem } from '@/types';
 import { UrlState } from './UrlState';

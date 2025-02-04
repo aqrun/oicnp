@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { Table } from 'antd';
+import { useRouter } from 'next/navigation';
 import {
   PageTitle,
   Filters,
@@ -12,14 +13,14 @@ import { FilterValues, EnumFilterTrigger } from '@/types';
 import useColumns from './useColumns';
 import { UserListData } from '@/services';
 import { useUserStore } from './useUserStore';
-import { nextTick } from '@/utils';
-import { setHashState } from '@/utils/app.client';
+import { nextTick, r } from '@/utils';
 import { useQueryUserList } from './useQueryUserList';
 
 /**
  * 仪表盘
  */
 export default function UserList(): JSX.Element {
+  const router = useRouter();
   const pager = useUserStore((state) => state.pager);
   const setState = useUserStore((state) => state.setState);
   const refreshToken = useUserStore((state) => state.refreshToken);
@@ -36,9 +37,7 @@ export default function UserList(): JSX.Element {
    * 创建操作
    */
   const handleCreate = useMemoizedFn(() => {
-    setHashState({
-      route: 'create',
-    });
+    router.push(r('/system/users/create'));
   });
 
   const handleRefresh = useMemoizedFn(() => {

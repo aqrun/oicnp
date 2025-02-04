@@ -1,3 +1,5 @@
+'use client';
+
 import { Dropdown } from 'antd';
 import cls from 'clsx';
 import { Icon } from '@/components';

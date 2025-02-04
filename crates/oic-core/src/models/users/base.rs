@@ -49,9 +49,10 @@ pub struct CreateUserReqParams {
     pub nickname: Option<String>,
     #[validate(required(message = "必须指定 password"), length(min = 2, message = "password 最少6个字符"))]
     pub password: Option<String>,
-    #[validate(email)]
+    #[validate(email(message = "邮箱地址不合法"))]
     pub email: Option<String>,
-    pub status: Option<String>,
+    #[serde(default = "default_string")]
+    pub status: String,
 }
 
 ///

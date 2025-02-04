@@ -9,6 +9,8 @@ import {
 } from '@/services';
 import { useUserStore } from './useUserStore';
 import { useMutation } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+import { r } from '@/utils';
 import { TableActionContainer } from '@/styles/app.styled';
 
 export interface TableActionsProps {
@@ -18,6 +20,7 @@ export interface TableActionsProps {
 export default function TableActions({
   record,
 }: TableActionsProps): JSX.Element {
+  const router = useRouter();
   const setState = useUserStore((state) => state.setState);
 
   const m = useMutation({
@@ -41,7 +44,7 @@ export default function TableActions({
       },
       onOk: async () => {
         const params: DescribeDeleteUserRequestParams = {
-          uid: record?.id,
+          uid: record?.uid,
         };
         // 删除用户
         await deleteUser(params);
@@ -51,6 +54,10 @@ export default function TableActions({
         });
       }
     });
+  });
+
+  const handleView = useMemoizedFn(() => {
+    router.push(r(`/system/users/detail?uid=${record?.uid}`));
   });
 
   return (
@@ -63,6 +70,7 @@ export default function TableActions({
         size="small"
         color="primary"
         variant="link"
+        onClick={handleView}
       >
         查看
       </Button>
