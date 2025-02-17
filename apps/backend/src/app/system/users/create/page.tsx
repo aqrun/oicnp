@@ -1,7 +1,7 @@
 'use client';
 
 import type { FormProps } from 'antd';
-import { Button, Form, Input } from 'antd';
+import { Button, Form, Input, Checkbox } from 'antd';
 import {
   PageTitle,
 } from '@/components';
@@ -19,6 +19,8 @@ type FieldType = {
   nickname?: string;
   password?: string;
   email?: string;
+  status?: string;
+  isAdmin?: string;
 };
 
 export default function UserCreatePage() {
@@ -32,6 +34,9 @@ export default function UserCreatePage() {
     console.log('Success:', values);
     const params: DescribeCreateUserRequestParams = {
       ...values,
+      // boolean 转 字符串
+      status: values?.status ? '1' : '0',
+      isAdmin: values?.isAdmin ? '1' : '0',
     };
     const res = await DescribeCreateUser(params);
 
@@ -87,6 +92,18 @@ export default function UserCreatePage() {
           rules={[{ required: true, message: '请输入密码' }]}
         >
           <Input.Password />
+        </Form.Item>
+        <Form.Item<FieldType>
+          name="status"
+          valuePropName="checked"
+        >
+          <Checkbox>账号启用</Checkbox>
+        </Form.Item>
+        <Form.Item<FieldType>
+          name="isAdmin"
+          valuePropName="checked"
+        >
+          <Checkbox>超级管理员</Checkbox>
         </Form.Item>
 
         {/* <Form.Item<FieldType> name="remember" valuePropName="checked" label={null}>

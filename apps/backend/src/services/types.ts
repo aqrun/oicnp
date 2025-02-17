@@ -80,6 +80,7 @@ export interface DescribeCreateUserRequestParams {
   nickname?: string;
   password?: string;
   status?: string;
+  isAdmin?: string;
 }
 export interface DescribeCreateUserResponseData {
   uid?: number;

@@ -3,8 +3,10 @@ use chrono::offset::Utc;
 use loco_rs::{hash, prelude::*};
 use uuid::Uuid;
 use crate::utils::{uuid as getUuid, catch_err, utc_now};
-use crate::{auth::JWT,
+use crate::{
+    auth::JWT,
     typings::ListData,
+    utils::{encrypt_password, generate_salt},
 };
 use super::{RegisterParams, Validator};
 pub use crate::entities::prelude::{
@@ -125,6 +127,12 @@ impl UserModel {
                 if params.uuid.is_empty() {
                     user.uuid = Set(getUuid());
                 }
+
+                let salt = generate_salt();
+                let password = params.clone().password.unwrap_or(String::from("123456"));
+
+                user.password = Set(encrypt_password(salt.as_str(), password.as_str()));
+                user.salt = Set(salt);
 
                 if user.created_at.is_not_set() {
                     user.created_at = Set(utc_now());

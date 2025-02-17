@@ -1,3 +1,5 @@
+'use client';
+
 import { Form, Input, Button, Checkbox } from 'antd';
 import { CLASS_PREFIX } from '@/constants';
 import { useMutation } from '@tanstack/react-query';

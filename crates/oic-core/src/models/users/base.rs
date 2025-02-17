@@ -40,7 +40,7 @@ pub struct UserFilters {
 }
 
 /// 创建 User 参数
-#[derive(Deserialize, Serialize, Debug, Validate)]
+#[derive(Deserialize, Serialize, Debug, Validate, Clone)]
 pub struct CreateUserReqParams {
     #[serde(default = "default_string")]
     pub uuid: String,
@@ -53,6 +53,9 @@ pub struct CreateUserReqParams {
     pub email: Option<String>,
     #[serde(default = "default_string")]
     pub status: String,
+    #[serde(default = "default_string")]
+    #[serde(rename(deserialize = "isAdmin"))]
+    pub is_admin: String,
 }
 
 ///

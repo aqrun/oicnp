@@ -1,4 +1,6 @@
-import { AppSidebar } from "./app-sidebar"
+'use client';
+
+import { AppSidebar } from "./app-sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,

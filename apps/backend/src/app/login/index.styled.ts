@@ -1,3 +1,5 @@
+'use client';
+
 import styled from 'styled-components';
 import { CLASS_PREFIX } from '@/constants';
 
