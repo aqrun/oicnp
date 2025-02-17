@@ -11,7 +11,6 @@ import { redirect } from 'next/navigation';
  */
 export async function loginAction(params: DescribeLoginRequestParams) {
   const res = await DescribeAuthLogin(params)
-  console.log('loginAction res----', res, 'params', params);
   const code = res?.code || '200';
 
   // 登陆成功设置 cookie

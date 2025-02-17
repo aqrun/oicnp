@@ -154,14 +154,6 @@ export function MainLayout({
     await logoutAction();
   });
 
-  if (pathname === '/login') {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        {children}
-      </div>
-    );
-  }
-
   /**
    * 初始化信息获取
    */
@@ -176,6 +168,14 @@ export function MainLayout({
   useEffect(() => {
     fetchInitialData();
   }, []);
+
+  if (pathname === '/login') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        {children}
+      </div>
+    );
+  }
 
   return (
     <SidebarProvider>

@@ -34,18 +34,6 @@ export default function Login() {
     if (code !== '200') {
       setErrorInfo('用户名或密码不正确');
     }
-    console.log('res---2-2-2-2-2----', res);
-
-    // if (code ) {
-    //   let expireTime = 0;
-
-    //   if (values?.remember) {
-    //     // 7 天过期时间
-    //     expireTime = Date.now() + (7 * 24 * 60 * 60 * 1000);
-    //     // 30 秒测试
-    //     // expireTime = Date.now() + (30 * 1000);
-    //   }
-    // }
   });
   
   return (
