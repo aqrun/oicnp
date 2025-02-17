@@ -11,7 +11,7 @@ export default function useColumns() {
       key: 'uid',
       title: 'UID',
       dataIndex: 'uid',
-      width: 100,
+      width: 80,
     },
     {
       key: 'username',
@@ -50,6 +50,14 @@ export default function useColumns() {
       width: 200,
       render: (value: string) => {
         return formatDate(value);
+      }
+    },
+    {
+      key: 'empty',
+      title: null,
+      dataIndex: 'uid',
+      render: (value: string) => {
+        return <></>;
       }
     },
     {

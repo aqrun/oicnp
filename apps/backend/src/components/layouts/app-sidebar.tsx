@@ -158,6 +158,7 @@ const data = {
 
 export interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   navMenus?: MenuTreeItem[];
+  onLogout?: () => void;
 }
 
 export function AppSidebar({ ...props }: AppSidebarProps) {
@@ -170,7 +171,10 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
         <NavMain items={props.navMenus || []} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser
+          user={data.user}
+          onLogout={props?.onLogout}
+        />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

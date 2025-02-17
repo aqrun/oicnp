@@ -19,8 +19,6 @@ export const API_URI = 'http://localhost:5150';
  */
 export const BACK_BASE_URI = '/';
 
-/**
- * cookie auth key
- */
-export const AUTH_KEY = 'token';
+
+export const SESSION_ID = 'session_abc';
 

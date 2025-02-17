@@ -1,12 +1,15 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Breadcrumb, Menu } from 'antd';
 import { SelectInfo } from 'rc-menu/lib/interface';
 import { CLASS_PREFIX } from '@/constants';
 import cls from 'clsx';
 import { Icon } from '@/components';
+import { logoutAction } from '@/actions/logout';
+import { getUser } from '@/actions/getUser';
+import { useAppStore } from '@/stores/useAppStore';
 import {
   Container,
   Header,
@@ -24,6 +27,7 @@ import {
   SidebarProvider,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
+import { useMemoizedFn } from 'ahooks';
 
 export interface MainLayoutProps extends React.PropsWithChildren {
   navMenus: MenuTreeItem[];
@@ -36,6 +40,9 @@ export function MainLayout({
   const router = useRouter();
   const pathname = usePathname();
   const showSideNav = true;
+
+  const user = useAppStore(state => state.user);
+  const setAppState = useAppStore(state => state.setState);
 
   const [selectedKeys, setSelectedKeys] = useState<Array<string> | undefined>(undefined);
   const [openKeys, setOpenKeys] = useState<Array<string> | undefined>(undefined);
@@ -143,6 +150,33 @@ export function MainLayout({
     router.push(info.key);
   });
 
+  const handleLogout = useMemoizedFn(async () => {
+    await logoutAction();
+  });
+
+  if (pathname === '/login') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        {children}
+      </div>
+    );
+  }
+
+  /**
+   * 初始化信息获取
+   */
+  const fetchInitialData = async () => {
+    const userRes = await getUser();
+
+    setAppState({
+      user: userRes,
+    });
+  };
+
+  useEffect(() => {
+    fetchInitialData();
+  }, []);
+
   return (
     <SidebarProvider>
       <Container className={cls(`${CLASS_PREFIX}-layout-container`)}>
@@ -179,11 +213,14 @@ export function MainLayout({
               <SidebarFooter
                 className="w-full"
               >
-                <NavUser user={{
-                  name: "shadcn",
-                  email: "m@example.com",
-                  avatar: "/avatars/shadcn.jpg",
-                }} />
+                <NavUser
+                  user={{
+                    name: user?.username || '',
+                    email: user?.email || '',
+                    avatar: user?.avatar || '',
+                  }}
+                  onLogout={handleLogout}
+                />
               </SidebarFooter>
             </div>
           </Side>

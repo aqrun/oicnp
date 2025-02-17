@@ -1,65 +1,51 @@
 'use client';
 
+import { useState } from 'react';
 import { Form, Input, Button, Checkbox } from 'antd';
 import { CLASS_PREFIX } from '@/constants';
-import { useMutation } from '@tanstack/react-query';
 import cls from 'clsx';
-import { r } from '@/utils';
-import { DescribeLogin, DescribeLoginRequestParams } from '@/services';
+import { loginAction } from './loginAction';
 import { useMemoizedFn } from 'ahooks';
-import { useGlobalState } from '@/context';
 import { Container } from './index.styled';
 
 export interface FormValues {
-  username: string;
+  email: string;
   password: string;
   remember?: boolean;
 }
 
 export default function Login() {
-  const {
-    setAuthState,
-  } = useGlobalState();
   const [form] = Form.useForm<FormValues>();
 
-  const login = useMutation({
-    mutationFn: (params: DescribeLoginRequestParams) => {
-      return DescribeLogin(params);
-    },
-  });
+  const [errorInfo, setErrorInfo] = useState('');
 
   const handleSubmit = useMemoizedFn(async () => {
+    setErrorInfo('');
     const values = form.getFieldsValue();
-    const res = await login.mutateAsync({
-      username: values?.username,
+
+    const res = await loginAction({
+      email: values?.email,
       password: values?.password,
       remember: Boolean(values?.remember),
     });
+    
+    const code = res?.code || '200';
 
-    if (res) {
-      let expireTime = 0;
-
-      if (values?.remember) {
-        // 7 天过期时间
-        expireTime = Date.now() + (7 * 24 * 60 * 60 * 1000);
-        // 30 秒测试
-        // expireTime = Date.now() + (30 * 1000);
-      }
-
-      setAuthState!({
-        username: res?.username || '',
-        token: res?.token || '',
-        uuid: res?.uuid || '',
-        expireTime,
-        remember: values?.remember,
-      });
-
-      // setAppState({
-      //   sideMenuOpenKeys: undefined,
-      //   sideMenuKeys: undefined,
-      // });
-      // navigate(r(''));
+    if (code !== '200') {
+      setErrorInfo('用户名或密码不正确');
     }
+    console.log('res---2-2-2-2-2----', res);
+
+    // if (code ) {
+    //   let expireTime = 0;
+
+    //   if (values?.remember) {
+    //     // 7 天过期时间
+    //     expireTime = Date.now() + (7 * 24 * 60 * 60 * 1000);
+    //     // 30 秒测试
+    //     // expireTime = Date.now() + (30 * 1000);
+    //   }
+    // }
   });
   
   return (
@@ -68,23 +54,28 @@ export default function Login() {
         form={form}
         className={cls(`${CLASS_PREFIX}-login-form`)}
         initialValues={{
-          username: 'guest',
+          email: 'guest@ab.com',
           password: '123456',
         }}
         onFinish={handleSubmit}
       >
-        <h2>OICNP ADMIN</h2>
+        <h2 className="text-2xl mb-4 text-slate-800">OICNP ADMIN</h2>
+        {Boolean(errorInfo) && (
+          <div className="text-red-700 my-2">
+            {errorInfo}
+          </div>
+        )}
         <Form.Item
-          name="username"
+          name="email"
           rules={[
             {
               required: true,
-              message: '请输入正确的用户名',
+              message: '请输入正确的邮箱',
             },
           ]}        
         >
           <Input
-            placeholder="用户名"
+            placeholder="邮箱"
           />
         </Form.Item>
         <Form.Item
@@ -111,7 +102,7 @@ export default function Login() {
             htmlType="submit"
             type="primary"
             className={cls(`${CLASS_PREFIX}-btn-login`)}
-            loading={login?.isPending}
+            // loading={login?.isPending}
           >
             登录
           </Button>

@@ -11,7 +11,7 @@ pub use crate::entities::prelude::{
   UserColumn,
 };
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct LoginParams {
     pub email: String,
     pub password: String,

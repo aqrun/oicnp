@@ -36,13 +36,37 @@ export interface MenuTreeItem {
 
 export type DescribeMenuTreeResponseData = MenuTreeItem;
 
-export interface DescribeLoginRequestParams {
+export interface DescribeUserRequestParams {
+  uuid: string;
+}
+
+export interface DescribeUserResponseData {
+  uid: number;
+  uuid: string;
   username: string;
+  nickname: string;
+  api_key: string;
+  status: string;
+  is_admin: string;
+  remark: string;
+  avatar: string;
+  gender: string;
+  email: string;
+  phone: string;
+  last_login_ip: string,
+  last_login_at: string,
+}
+
+export interface DescribeLoginRequestParams {
+  username?: string;
+  email: string;
   password: string;
   remember: boolean;
 }
 
 export interface DescribeLoginResponseData {
+  code?: string;
+  message?: string;
   username?: string;
   token?: string;
   uuid?: string;

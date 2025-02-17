@@ -9,6 +9,8 @@ export const Container = styled.div`
   align-items: center;
   height: 100%;
   background: #f1f1f1;
+  flex: 1;
+  min-height: 100vh;
 
   h2 {
     text-align: center;

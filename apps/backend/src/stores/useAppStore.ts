@@ -2,7 +2,12 @@
 
 import { create } from 'zustand';
 import { BaseState } from './types';
-import { FailModel } from '@/types';
+import {
+  FailModel,
+} from '@/types';
+import {
+  DescribeUserResponseData,
+} from '@/services/types';
 
 export interface BaseAppState {
   /**
@@ -11,6 +16,10 @@ export interface BaseAppState {
   loading: boolean;
   errors: Array<FailModel>;
   addError: (failModel: FailModel) => void,
+  /**
+   * 当前登陆用户信息
+   */
+  user?: DescribeUserResponseData;
 }
 
 export type AppState = BaseAppState & BaseState<BaseAppState>;
@@ -19,6 +28,7 @@ export type AppState = BaseAppState & BaseState<BaseAppState>;
  * 应用主状态数据
  */
 export const useAppStore = create<AppState>()((set) => ({
+  user: undefined,
   loading: false,
   errors: [],
   setState: (payload) => set((state) => {

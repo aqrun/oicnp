@@ -5,6 +5,7 @@ use crate::entities::prelude::*;
 use crate::models::users::{LoginParams, RegisterParams};
 use serde_json::{json, Value};
 use anyhow::{Result, anyhow};
+use crate::utils::verify_password;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct VerifyParams {
@@ -146,9 +147,14 @@ pub async fn login(
     params: LoginParams,
 ) -> Result<LoginResponse> {
     let user = UserModel::find_by_email(db, params.email.as_str()).await?;
-
-    let valid = user.verify_password(&params.password);
-
+    println!("11111 {:?}", user.clone());
+    // let valid = user.verify_password(&params.password);
+    let valid = verify_password(
+        params.password.as_str(), 
+        user.password.as_str(),
+        user.salt.as_str()
+    )?;
+    println!("valid: {:?}, ----, {:?}", valid, params.clone());
     if !valid {
         return Err(anyhow!("invalid password"));
     }

@@ -18,9 +18,17 @@ pub async fn get_one(
     Json(params): Json<UserFilters>,
 ) -> JsonRes<UserModel> {
     let uid = params.uid.unwrap_or(0);
-    let res = UserModel::find_by_uid(&ctx.db, uid).await;
+    let uuid = params.uuid.unwrap_or(String::from(""));
 
-    JsonRes::from(res)
+    if uid > 0 {
+        let res = UserModel::find_by_uid(&ctx.db, uid).await;
+    
+        return JsonRes::from(res);
+    }
+
+    let res = UserModel::find_by_uuid(&ctx.db, uuid.as_str()).await;
+
+    return JsonRes::from(res);
 }
 
 #[debug_handler]

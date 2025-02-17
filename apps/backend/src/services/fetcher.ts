@@ -11,7 +11,11 @@ export function createFetcher<TRequest, TResponse> (action: string, method?: str
         },
         body: JSON.stringify(data),
       }).then((res) => res.json()).then((res) => {
-        resolve(res?.data);
+        if (res?.code === '200') {
+          resolve(res?.data);
+        } else {
+          resolve(res);
+        }
       }).catch(err => {
         resolve(null as any);
       });

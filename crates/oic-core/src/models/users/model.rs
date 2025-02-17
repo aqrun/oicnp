@@ -228,7 +228,8 @@ impl UserModel {
     /// # Errors
     ///
     /// When could not find user by the given token or DB query error
-    pub async fn find_by_email(db: &DatabaseConnection, email: &str) -> ModelResult<Self> {
+    pub async fn find_by_email(db: &DatabaseConnection, email: &str) -> Result<Self> {
+        println!("abc-11111");
         let user = UserEntity::find()
             .filter(
                 model::query::condition()
@@ -237,7 +238,8 @@ impl UserModel {
             )
             .one(db)
             .await?;
-        user.ok_or_else(|| ModelError::EntityNotFound)
+        println!("abc-22222, {:?}", user.clone());
+        user.ok_or_else(|| anyhow!("User not found"))
     }
 
     /// finds a user by the provided verification token
@@ -260,7 +262,7 @@ impl UserModel {
         user.ok_or_else(|| ModelError::EntityNotFound)
     }
 
-    /// /// finds a user by the provided reset token
+    /// finds a user by the provided reset token
     ///
     /// # Errors
     ///
