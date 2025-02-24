@@ -113,3 +113,40 @@ export interface DescribeCreateUserResponseData {
   nickname?: string;
 }
 
+export interface DescribeUserDetailRequestParams extends BaseFilterParams{
+  uid?: number;
+  uuid?: string;
+  username?: string;
+  _name?: string;
+}
+
+export interface DescribeUserDetailResponseData {
+  uid?: number;
+  uuid?: string;
+  username?: string;
+  nickname?: string;
+  email?: string;
+  status?: string;
+  isAdmin?: string;
+}
+
+export interface DescribeUpdateUserRequestParams {
+  uid?: number;
+  username?: string;
+  email?: string;
+  nickname?: string;
+  password?: string;
+  status?: string;
+  isAdmin?: string;
+}
+
+export interface DescribeUpdateUserResponseData {
+  uid?: number;
+  uuid?: string;
+  username?: string;
+  nickname?: string;
+  email?: string;
+  status?: string;
+  isAdmin?: string;
+}
+

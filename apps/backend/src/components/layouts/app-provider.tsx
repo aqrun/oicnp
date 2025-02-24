@@ -5,7 +5,7 @@ import {
   QueryClient,
 } from '@tanstack/react-query';
 import { GlobalContext, GlobalState } from '@/context';
-import { App } from 'antd';
+import { App, Modal } from 'antd';
 import { ErrorHandler } from '../ErrorHandler';
 
 export interface AppProviderProps extends React.PropsWithChildren {
@@ -20,9 +20,11 @@ const queryClient = new QueryClient();
 export function AppProvider({
   children,
 }: AppProviderProps) {
+  const [modal, contextHolder] = Modal.useModal();
+
   // 全局状态参数
   const globalState: GlobalState = {
-    
+    modal,
   };
 
   return (
@@ -36,6 +38,7 @@ export function AppProvider({
           {children}
           <ErrorHandler />
         </QueryClientProvider>
+        {contextHolder}
       </GlobalContext.Provider>
     </App>
   );

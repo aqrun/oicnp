@@ -200,7 +200,20 @@ impl UserModel {
             .await?
             .into_active_model();
 
-        item.set_from_json(json!(params))?;
+        if let Some(s) = params.username {
+            item.username = Set(s);
+        }
+
+        if let Some(s) = params.nickname {
+            item.nickname = Set(s);
+        }
+
+        if let Some(s) = params.email {
+            item.email = Set(s);
+        }
+        
+        item.status = Set(String::from(params.status.as_str()));
+        item.is_admin = Set(String::from(params.is_admin.as_str()));
         item.updated_at = Set(Some(utc_now()));
     
         let item = item.update(db).await?;

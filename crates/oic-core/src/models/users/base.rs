@@ -66,8 +66,15 @@ pub struct UpdateUserReqParams {
     pub uid: Option<i64>,
     #[validate(required(message = "必须指定 username"), length(min = 2, message = "username 最少2个字符"))]
     pub username: Option<String>,
+    #[validate(length(min = 2, message = "nickname 最少2个字符"))]
+    pub nickname: Option<String>,
     #[validate(email)]
     pub email: Option<String>,
+    #[serde(default = "default_string")]
+    pub status: String,
+    #[serde(default = "default_string")]
+    #[serde(rename(deserialize = "isAdmin"))]
+    pub is_admin: String,
 }
 
 /// 删除数据参数

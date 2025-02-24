@@ -60,6 +60,10 @@ export default function TableActions({
     router.push(r(`/system/users/detail?uid=${record?.uid}`));
   });
 
+  const handleEdit = useMemoizedFn(() => {
+    router.push(r(`/system/users/edit?uid=${record?.uid}`));
+  });
+
   return (
     <TableActionContainer
       split={<Divider type="vertical" />}
@@ -79,6 +83,7 @@ export default function TableActions({
         size="small"
         color="primary"
         variant="link"
+        onClick={handleEdit}
       >
         编辑
       </Button>

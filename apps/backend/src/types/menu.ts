@@ -1,3 +1,5 @@
+'use client';
+
 import type { MenuProps } from 'antd';
 import type { MenuItemType } from 'antd/es/menu/interface';
 import type { BreadcrumbProps } from 'antd';
