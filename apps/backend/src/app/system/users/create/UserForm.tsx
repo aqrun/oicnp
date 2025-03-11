@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Button, Form, Input, Checkbox } from 'antd';
 import type { FormProps } from 'antd';

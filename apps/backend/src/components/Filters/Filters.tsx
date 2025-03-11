@@ -1,51 +1,34 @@
 'use client';
 
+import { useState } from 'react';
 import { CLASS_PREFIX } from '@/constants';
 import cls from 'clsx';
 import { CreateButton } from './CreateButton';
 import { RefreshButton } from './RefreshButton';
 import { SearchBox } from './SearchBox';
-import { EnumFilterTrigger, FilterValues } from '@/types';
+import { FilterValues } from '@/types';
+import {
+  FilterContext,
+  FilterScopeState,
+  useFilterState,
+} from './context';
+import {
+  FiltersProps,
+} from './types';
 import { Container } from './index.styled';
-
-export interface FiltersProps {
-  /**
-   * 创建按钮显示
-   */
-  createLabel?: string;
-  /**
-   * 搜索内容提示
-   */
-  placeholder?: string;
-  /**
-   * 搜索事件
-   */
-  onSearch?: (values: FilterValues) => void;
-  /**
-   * 筛选值变化事件
-   */
-  onChange?: (values: FilterValues, trigger?: EnumFilterTrigger) => void;
-  /**
-   * 点击创建
-   */
-  onCreate?: () => void;
-  /**
-   * 点击刷新
-   */
-  onRefresh?: () => void;
-}
+import { useMemoizedFn } from 'ahooks';
 
 /**
  * 筛选组件
  */
-export function Filters({
-  createLabel,
-  placeholder,
-  onSearch,
-  onChange,
-  onCreate,
-  onRefresh,
-}: FiltersProps): JSX.Element {
+export function FiltersWidget(): JSX.Element {
+  const {
+    createLabel,
+    onSearch,
+    onCreate,
+    onRefresh,
+  } = useFilterState();
+
   return (
     <Container>
       <div className={cls(`${CLASS_PREFIX}-filter-left`)}>
@@ -56,11 +39,7 @@ export function Filters({
           />
         )}
         {Boolean(onSearch) && (
-          <SearchBox
-            placeholder={placeholder}
-            onSearch={onSearch}
-            onChange={onChange}
-          />
+          <SearchBox />
         )}
       </div>
       <div className={cls(`${CLASS_PREFIX}-filter-right`)}>
@@ -71,5 +50,33 @@ export function Filters({
         )}
       </div>
     </Container>
+  );
+}
+
+export function Filters(props: FiltersProps) {
+  const [values, setValues] = useState<FilterValues>({});
+
+  const updateValues = useMemoizedFn((payload: FilterValues = {}) => {
+    const newState: FilterValues = {
+      ...values,
+      ...payload,
+    };
+    setValues(newState);
+    return newState;
+  });
+  
+  // context 数据
+  const scopeData: FilterScopeState = {
+    ...(props || {}),
+    values,
+    setValues: updateValues,
+  };
+
+  return (
+    <FilterContext.Provider
+      value={scopeData}
+    >
+      <FiltersWidget />
+    </FilterContext.Provider>
   );
 }

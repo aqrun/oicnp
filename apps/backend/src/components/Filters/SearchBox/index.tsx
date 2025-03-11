@@ -4,29 +4,23 @@ import { useState } from 'react';
 import { useMemoizedFn } from 'ahooks';
 import { Input } from 'antd';
 import { CLASS_PREFIX } from '@/constants';
-import { useFilterStore } from '../useFilterStore';
 import { useDebounceFn } from 'ahooks';
 import { FilterValues, EnumFilterTrigger } from '@/types';
 import { ChangeEvent } from 'react';
+import { useFilterState } from '../context';
 
 const { Search } = Input;
-
-export interface SearchBoxProps {
-  placeholder?: string;
-  onSearch?: (value: FilterValues) => void;
-  onChange?: (values: FilterValues, trigger?: EnumFilterTrigger) => void;
-}
 
 /**
  * 关键词搜索框
  */
-export function SearchBox({
-  placeholder,
-  onSearch,
-  onChange,
-}: SearchBoxProps): JSX.Element {
-  const values = useFilterStore((state) => state.values);
-  const setFilterValues = useFilterStore((state) => state.setValues);
+export function SearchBox(): JSX.Element {
+  const {
+    setValues,
+    placeholder,
+    onSearch,
+    onChange,
+  } = useFilterState();
   const [value, setValue] = useState<string | undefined>(undefined);
 
   /**
@@ -35,7 +29,7 @@ export function SearchBox({
   const {
     run: updateStore,
   } = useDebounceFn((newValues: FilterValues) => {
-    setFilterValues(newValues);
+    setValues(newValues);
 
     if (typeof onChange === 'function') {
       onChange(newValues, EnumFilterTrigger.keyword);

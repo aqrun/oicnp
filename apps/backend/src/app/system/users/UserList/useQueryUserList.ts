@@ -14,7 +14,7 @@ export function useQueryUserList() {
   const setState = useUserStore((state) => state.setState);
 
   const { isFetching, data, refetch } = useQuery({
-    queryKey: ['userList', pager],
+    queryKey: ['userList'],
     queryFn: async () => {
       const params: DescribeUserListRequestParams = {
         page: pager?.page,
@@ -35,8 +35,8 @@ export function useQueryUserList() {
       });
       console.log('res---', res);
       return res;
-    }
-  });
+    },
+  },);
 
   const refresh = useMemoizedFn(() => {
     refetch();

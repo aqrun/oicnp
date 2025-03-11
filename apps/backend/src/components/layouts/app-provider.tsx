@@ -12,7 +12,13 @@ export interface AppProviderProps extends React.PropsWithChildren {
 
 }
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: true,
+    },
+  },
+});
 
 /**
  * 全局provider注册

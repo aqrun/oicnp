@@ -7,7 +7,6 @@ import {
   PageTitle,
   Filters,
 } from '@/components';
-import { Container } from './index.styled';
 import { useMemoizedFn } from 'ahooks';
 import { FilterValues, EnumFilterTrigger } from '@/types';
 import useColumns from './useColumns';
@@ -15,6 +14,7 @@ import { UserListData } from '@/services';
 import { useUserStore } from './useUserStore';
 import { nextTick, r } from '@/utils';
 import { useQueryUserList } from './useQueryUserList';
+import { Container } from './index.styled';
 
 /**
  * 仪表盘
@@ -83,6 +83,7 @@ export default function UserList(): JSX.Element {
   });
 
   useEffect(() => {
+    console.log('pagemount0-----userlist')
     if (refreshToken) {
       refresh();
     }
