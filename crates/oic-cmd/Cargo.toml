@@ -1,7 +1,7 @@
 [package]
 name = "oic_cmd"
 version = "0.0.1"
-edition = "2021"
+edition = { workspace = true }
 authors = ["Aqrun <aqrun@sina.com>"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -13,6 +13,7 @@ name = "ic"
 [dependencies]
 oic_core = { workspace = true }
 oic_web = { workspace = true }
+oic_api = { workspace = true }
 # migration = { workspace = true }
 sea-orm = { workspace = true }
 sea-orm-migration = { workspace = true }

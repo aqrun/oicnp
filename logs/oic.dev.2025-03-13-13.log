@@ -1,0 +1,9 @@
+  [2m2025-03-13T21:53:04.994849+08:00[0m [33m WARN[0m [1;33mzino_core::application::secret_key[0m[33m: [33mauto-generated `secret` is used for deriving a secret key[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-e3de039b2554c837/zino-core-0.33.0/src/application/secret_key.rs:16
+
+  [2m2025-03-13T21:53:05.002881+08:00[0m [31mERROR[0m [1;31mzino_core::error[0m[31m: [31mNo such file or directory (os error 2)[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-e3de039b2554c837/zino-core-0.33.0/src/error/mod.rs:163
+
+  [2m2025-03-13T21:53:05.002851+08:00[0m [31mERROR[0m [1;31mzino_core::state[0m[31m: [31mfail to read the config file `config.dev.toml`: No such file or directory (os error 2)[0m
+    [2;3mat[0m /Users/aqrun/workspace/apps/rust/cargo/registry/src/rsproxy.cn-e3de039b2554c837/zino-core-0.33.0/src/state/mod.rs:137
+

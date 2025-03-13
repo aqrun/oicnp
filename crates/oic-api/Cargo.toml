@@ -1,0 +1,25 @@
+[package]
+name = "oic_api"
+description = "An example for axum integration."
+version = "0.0.1"
+edition = { workspace = true }
+
+[dependencies]
+axum = { workspace = true }
+serde = { workspace = true }
+tracing = { workspace = true }
+zino-core = { workspace = true, features = ["env-filter", "validator-email"] }
+zino-derive = { workspace = true }
+zino-model = { workspace = true }
+zino-orm = { workspace = true, features = ["orm-mysql"] }
+
+[dependencies.zino]
+workspace = true
+features = [
+    "axum",
+    "cookie",
+    "i18n",
+    "jwt",
+    "orm",
+    "view",
+]

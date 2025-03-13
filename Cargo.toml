@@ -2,7 +2,7 @@
 name = "oic"
 version = "0.0.1"
 authors = ["AQrun <aqrun@sina.com>"]
-edition = "2021"
+edition = { workspace = true }
 license = "MIT"
 readme = "README.md"
 description = "A fast content management system"
@@ -15,10 +15,10 @@ default-run = "oic"
 
 [dependencies]
 # oic_cmd = { workspace = true }
-oic_derives = { workspace = true }
-oic_core = { workspace = true }
-loco-rs = { workspace = true }
-migration = { workspace = true }
+# oic_derives = { workspace = true }
+# oic_core = { workspace = true }
+# loco-rs = { workspace = true }
+# migration = { workspace = true }
 tokio = { workspace = true }
 axum = { workspace = true }
 include_dir = { workspace = true }
@@ -30,13 +30,28 @@ async-trait = { workspace = true }
 tracing = { workspace = true }
 chrono = { workspace = true }
 validator = { workspace = true }
-sea-orm = { workspace = true }
+# sea-orm = { workspace = true }
 anyhow = { workspace = true }
 
 # view engine i18n
 fluent-templates = { workspace = true }
 unic-langid = { workspace = true }
 # /view engine
+zino-core = { workspace = true, features = ["env-filter", "validator-email"] }
+zino-derive = { workspace = true }
+zino-model = { workspace = true }
+zino-orm = { workspace = true, features = ["orm-postgres"] }
+
+[dependencies.zino]
+workspace = true
+features = [
+    "axum",
+    "cookie",
+    "i18n",
+    "jwt",
+    "orm",
+    "view",
+]
 
 [dev-dependencies]
 serial_test = { workspace = true }
@@ -44,25 +59,29 @@ rstest = { workspace = true }
 loco-rs = { workspace = true, features = ["testing"] }
 insta = { workspace = true }
 
-[[bin]]
-name = "oic"
-path = "src/bin/main.rs"
-required-features = []
+# [[bin]]
+# name = "oic"
+# path = "src/bin/main.rs"
+# required-features = []
 
-[[bin]]
-name = "tool"
-path = "src/bin/tool.rs"
-required-features = []
+# [[bin]]
+# name = "tool"
+# path = "src/bin/tool.rs"
+# required-features = []
 
 [workspace]
 resolver = "2"
 members = ["crates/*", "migration"]
+
+[workspace.package]
+edition = "2024"
 
 [workspace.dependencies]
 oic_core = { path = "crates/oic-core" }
 oic_derives = { path = "crates/oic-derives" }
 oic_cmd = { path = "crates/oic-cmd" }
 oic_web = { path = "crates/oic-web" }
+oic_api = { path = "crates/oic-api" }
 migration = { path = "migration" }
 loco-rs = { version = "0.14", features = ["with-db"] }
 clap = { version = "^4", features = ["derive"] }
@@ -104,6 +123,21 @@ validator = { version = "0.19" }
 reqwest = { version = "0.12.9" }
 mime = "0.3.16"
 tower-http = { version = "^0.6" }
+zino-core = { version = "^0.33", features = ["env-filter", "validator-email"] }
+zino-derive = { version = "^0.31" }
+zino-model = { version = "^0.31" }
+zino-orm = { version = "^0.5.1", features = ["orm-postgres"] }
+
+[workspace.dependencies.zino]
+version = "0.33"
+features = [
+    "axum",
+    "cookie",
+    "i18n",
+    "jwt",
+    "orm",
+    "view",
+]
 
 [workspace.dependencies.sea-orm]
 version = "^1"
