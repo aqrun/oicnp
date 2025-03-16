@@ -43,6 +43,18 @@ pub async fn add(
     JsonRes::from(res)
 }
 
+#[debug_handler]
+pub async fn add1(
+    State(ctx): State<AppContext>,
+    Json(params): Json<NoteModel>,
+) -> JsonRes<String> {
+    println!("not-add-params: {:?}", params);
+    // let res = NoteModel::create(&ctx.db, &params).await;
+
+    // JsonRes::from(res)
+    JsonRes::ok("test".into())
+}
+
 /// 批量添加
 #[debug_handler]
 pub async fn add_multi(
@@ -79,6 +91,7 @@ pub fn routes() -> Routes {
         .prefix(get_api_prefix(super::VERSION, "note").as_str())
         .add("/one", post(get_one))
         .add("/list", post(list))
+        .add("/add1", post(add1))
         .add("/add", post(add))
         .add("/add-multi", post(add_multi))
         .add("/update", post(update))
