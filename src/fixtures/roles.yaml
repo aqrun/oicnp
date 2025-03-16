@@ -1,0 +1,17 @@
+---
+- vid: admin
+  name: 管理员
+  weight: 0
+  status: 1
+- vid: author
+  name: 作者
+  weight: 0
+  status: 1
+- vid: member
+  name: 成员
+  weight: 0
+  status: 1
+- vid: guest
+  name: 游客
+  weight: 0
+  status: 1

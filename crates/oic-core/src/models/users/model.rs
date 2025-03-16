@@ -168,6 +168,12 @@ impl UserModel {
                         user.uuid = Set(getUuid());
                     }
 
+                    let salt = generate_salt();
+                    let password = item.clone().password.unwrap_or(String::from("123456"));
+
+                    user.password = Set(encrypt_password(salt.as_str(), password.as_str()));
+                    user.salt = Set(salt);
+
                     if user.created_at.is_not_set() {
                         user.created_at = Set(utc_now());
                     }

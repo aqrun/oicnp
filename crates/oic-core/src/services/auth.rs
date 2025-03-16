@@ -5,7 +5,7 @@ use crate::entities::prelude::*;
 use crate::models::users::{LoginParams, RegisterParams};
 use serde_json::{json, Value};
 use anyhow::{Result, anyhow};
-use crate::utils::verify_password;
+use crate::utils::{verify_password, catch_err};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct VerifyParams {
@@ -114,7 +114,7 @@ pub async fn forgot(
         return Err(anyhow!("email user not found"));
     };
 
-    let user = user
+    let _user = user
         .into_active_model()
         .set_forgot_password_sent(db)
         .await?;
@@ -146,6 +146,8 @@ pub async fn login(
     config: &Config,
     params: LoginParams,
 ) -> Result<LoginResponse> {
+    let _ = catch_err(params.validate())?;
+
     let user = UserModel::find_by_email(db, params.email.as_str()).await?;
     println!("11111 {:?}", user.clone());
     // let valid = user.verify_password(&params.password);

@@ -2,24 +2,27 @@
 
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
+use validator::Validate;
 
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Deserialize, Serialize, Default)]
+#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Deserialize, Serialize, Default, Validate)]
 #[sea_orm(table_name = "roles")]
+#[serde(default)]
 pub struct Model {
     #[sea_orm(primary_key)]
-    #[serde(skip_deserializing)]
+    // #[serde(skip_deserializing)]
     pub role_id: i64,
-    pub vid: String,
-    pub name: String,
-    pub weight: i32,
-    pub scope: String,
-    pub status: String,
-    pub remark: String,
-    pub created_at: DateTime,
+    #[validate(required(message = "必须指定 vid"), length(min = 2, message = "vid 最少2个字符"))]
+    pub vid: Option<String>,
+    #[validate(required(message = "必须指定 name"), length(min = 2, message = "name 最少2个字符"))]
+    pub name: Option<String>,
+    pub weight: Option<i32>,
+    pub scope: Option<String>,
+    #[validate(required(message = "必须指定 status"))]
+    pub status: Option<String>,
+    pub remark: Option<String>,
+    pub created_at: Option<DateTime>,
     pub updated_at: Option<DateTime>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {}
-
-impl ActiveModelBehavior for ActiveModel {}

@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 oic_derives = { workspace = true }
 async-graphql = { workspace = true }
-serde = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
 axum = { workspace = true }
 axum-extra = { workspace = true }
 serde_json = { workspace = true }

@@ -2,7 +2,6 @@ use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
 use oic_derives::{FilterParams, add_filter_fields};
 use validator::Validate;
-use crate::utils::default_string;
 
 pub use crate::entities::prelude::{
   UserActiveModel,
@@ -11,9 +10,12 @@ pub use crate::entities::prelude::{
   UserColumn,
 };
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, Validate, Default)]
+#[serde(default)]
 pub struct LoginParams {
+    #[validate(length(min = 1, message = "必须指定 email 或 password"))]
     pub email: String,
+    #[validate(length(min = 1, message = "必须指定 email 或 password"))]
     pub password: String,
 }
 
@@ -40,9 +42,9 @@ pub struct UserFilters {
 }
 
 /// 创建 User 参数
-#[derive(Deserialize, Serialize, Debug, Validate, Clone)]
+#[derive(Deserialize, Serialize, Debug, Validate, Clone, Default)]
+#[serde(default)]
 pub struct CreateUserReqParams {
-    #[serde(default = "default_string")]
     pub uuid: String,
     #[validate(required(message = "必须指定 username"), length(min = 2, message = "username 最少2个字符"))]
     pub username: Option<String>,
@@ -51,9 +53,7 @@ pub struct CreateUserReqParams {
     pub password: Option<String>,
     #[validate(email(message = "邮箱地址不合法"))]
     pub email: Option<String>,
-    #[serde(default = "default_string")]
     pub status: String,
-    #[serde(default = "default_string")]
     #[serde(rename(deserialize = "isAdmin"))]
     pub is_admin: String,
 }
@@ -61,7 +61,8 @@ pub struct CreateUserReqParams {
 ///
 /// 更新 note 参数
 /// 
-#[derive(Deserialize, Serialize, Debug, Validate)]
+#[derive(Deserialize, Serialize, Debug, Validate, Default)]
+#[serde(default)]
 pub struct UpdateUserReqParams {
     pub uid: Option<i64>,
     #[validate(required(message = "必须指定 username"), length(min = 2, message = "username 最少2个字符"))]
@@ -70,9 +71,7 @@ pub struct UpdateUserReqParams {
     pub nickname: Option<String>,
     #[validate(email)]
     pub email: Option<String>,
-    #[serde(default = "default_string")]
     pub status: String,
-    #[serde(default = "default_string")]
     #[serde(rename(deserialize = "isAdmin"))]
     pub is_admin: String,
 }

@@ -32,3 +32,4 @@ reqwest = { workspace = true, features = ["json", "gzip"] }
 loco-rs = { workspace = true, features = ["testing"] }
 axum = { workspace = true, features = ["json"] }
 tower-http = { workspace = true }
+anyhow = { workspace = true }

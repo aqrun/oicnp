@@ -17,6 +17,12 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Command {
+    /// 密码加密
+    Hash {
+        /// 指定明文密码
+        #[clap(short = 'p', long, default_value = "")]
+        password: String,
+    },
     // FindAllBlogs {
     //     #[clap(default_value = "json")]
     //     format: String,
@@ -25,6 +31,9 @@ pub enum Command {
     MyTest,
     // TruncateTables,
     // InitUser,
+    
+    /// 数据表创建初始数据
+    InitSeed,
 
     /// 初始化数据
     SeedData,
@@ -59,6 +68,17 @@ pub async fn init_cmd() {
             cmd::my_test::execute().await;
         },
 
+        Command::Hash { password } => {
+            if let Err(err) = cmd::hash_pass::hash(password.as_str()).await {
+                println!("HashPassErr: {:?}", err);
+            }
+        },
+
+        Command::InitSeed => {
+            if let Err(err) = cmd::init_seed::run(&app_ctx).await {
+                println!("InitSeedErr: {}", err);
+            }
+        },
         Command::SeedData => {
             if let Err(err) = cmd::seed_data::run(&app_ctx).await {
                 println!("SeedDataErr: {}", err);
