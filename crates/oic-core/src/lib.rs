@@ -11,3 +11,4 @@ pub mod app;
 pub mod services;
 
 pub use loco_rs::app::AppContext;
+pub use models::RequestParamsUpdater;

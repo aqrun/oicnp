@@ -1,16 +1,16 @@
 use std::collections::HashMap;
 use crate::{
     entities::prelude::*,
-    utils::{catch_err, utc_now},
-    typings::ListData,
-    services::menu::build_menu_tree,
     models::menus::MenuTreeItem,
+    services::menu::build_menu_tree,
+    typings::ListData,
+    utils::{catch_err, utc_now},
+    RequestParamsUpdater,
 };
+use loco_rs::prelude::*;
 use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, Set};
-use serde_json::json;
 use validator::Validate;
 use super::{CreateMenuReqParams, MenuFilters, UpdateMenuReqParams, DeleteMenuReqParams};
-use anyhow::{anyhow, Result};
 
 #[async_trait::async_trait]
 impl ActiveModelBehavior for MenuActiveModel {}
@@ -19,9 +19,9 @@ impl MenuModel {
     ///
     /// 根据ID查找一个
     /// 
-    pub async fn find_by_id(db: &DatabaseConnection, id: i32) -> Result<Self> {
+    pub async fn find_by_id(db: &DatabaseConnection, id: i32) -> ModelResult<Self> {
         if id < 0 {
-            return Err(anyhow!("数据不存在,id: {}", id));
+            return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
         }
 
         let item = MenuEntity::find()
@@ -30,16 +30,16 @@ impl MenuModel {
             .await?;
 
         item.ok_or_else(|| {
-            anyhow!("数据不存在,id: {}", id)
+            ModelError::Any(format!("数据不存在,id: {}", id).into())
         })
     }
 
     ///
     /// 根据MID查找一个
     /// 
-    pub async fn find_by_mid(db: &DatabaseConnection, mid: &str) -> Result<Self> {
+    pub async fn find_by_mid(db: &DatabaseConnection, mid: &str) -> ModelResult<Self> {
         if mid.is_empty() {
-            return Err(anyhow!("mid为空: {}", mid));
+            return Err(ModelError::Any(format!("mid为空: {}", mid).into()));
         }
 
         let item = MenuEntity::find()
@@ -48,7 +48,7 @@ impl MenuModel {
             .await?;
 
         item.ok_or_else(|| {
-            anyhow!("数据不存在, mid: {}", mid)
+            ModelError::Any(format!("数据不存在, mid: {}", mid).into())
         })
     }
 
@@ -56,7 +56,7 @@ impl MenuModel {
     ////
     /// 获取node列表
     /// 
-    pub async fn find_list(db: &DatabaseConnection, params: MenuFilters) -> Result<ListData<Self>> {
+    pub async fn find_list(db: &DatabaseConnection, params: MenuFilters) -> ModelResult<ListData<Self>> {
         let page = params.get_page();
         let page_size = params.get_page_size();
         let order = params.get_order();
@@ -114,7 +114,7 @@ impl MenuModel {
     ////
     /// 获取node列表树型数据
     /// 
-    pub async fn find_tree(db: &DatabaseConnection, params: MenuFilters) -> Result<MenuTreeItem> {
+    pub async fn find_tree(db: &DatabaseConnection, params: MenuFilters) -> ModelResult<MenuTreeItem> {
         let order = params.get_order();
         let order_by_str = params.get_order_by();
         let mid = params.mid.unwrap_or(String::from(""));
@@ -167,15 +167,15 @@ impl MenuModel {
     }
 
     /// 创建 node
-    pub async fn create(db: &DatabaseConnection, params: &CreateMenuReqParams) -> Result<Self> {
+    pub async fn create(db: &DatabaseConnection, params: &CreateMenuReqParams) -> ModelResult<Self> {
         let _ = catch_err(params.validate())?;
 
         let mut item = MenuActiveModel {
             ..Default::default()
         };
 
-        item.set_from_json(json!(params))?;
-        item.created_at = Set(utc_now());
+        params.update(&mut item);
+        params.update_by_create(&mut item);
     
         let item = item.insert(db).await?;
 
@@ -184,7 +184,7 @@ impl MenuModel {
 
     /// 批量创建 node
     /// 菜单需要每次添加更新对应的 depth 数据 所以不使用 事务操作
-    pub async fn create_multi(db: &DatabaseConnection, params: &[CreateMenuReqParams]) -> Result<String> {
+    pub async fn create_multi(db: &DatabaseConnection, params: &[CreateMenuReqParams]) -> ModelResult<String> {
         for item in params {
             let _ = catch_err(item.validate())?;
         }
@@ -196,15 +196,20 @@ impl MenuModel {
         for item in params.iter() {
             // 先使用缓存父菜单数据
             let mut parent_menu: Option<Self> = None;
+            let mut pid = String::from("");
+
+            if let Some(x) = &item.pid {
+                pid = String::from(x);
+            }
             
-            if !item.pid.as_str().is_empty() {
-                let res = exist_menus.get(item.pid.as_str());
+            if !pid.as_str().is_empty() {
+                let res = exist_menus.get(pid.as_str());
 
                 if let Some(res) = res {
                     parent_menu = Some(res.clone());
                 } else {
                     // 不存在从数据库读取
-                    match Self::find_by_mid(db, item.pid.as_str()).await {
+                    match Self::find_by_mid(db, pid.as_str()).await {
                         Ok(res) => {
                             exist_menus.insert(String::from(res.mid.as_str()), res.clone());
                             parent_menu = Some(res);
@@ -214,84 +219,82 @@ impl MenuModel {
                 }
             }
 
-            match MenuActiveModel::from_json(json!(item)) {
-                Ok(mut menu) => {
-                    menu.created_at = Set(utc_now());
-
-                    // 不存在父菜单 depth = 1
-                    if item.pid.as_str().is_empty() {
-                        menu.depth = Set(1);
-                    }
-
-                    if let Some(parent_menu) = parent_menu {
-                        let depth = parent_menu.depth + 1;
-                        menu.depth = Set(depth);
-                        menu.p1 = Set(parent_menu.p1);
-                        menu.p2 = Set(parent_menu.p2);
-                        menu.p3 = Set(parent_menu.p3);
-                        menu.p4 = Set(parent_menu.p4);
-                        menu.p5 = Set(parent_menu.p5);
-                        menu.p6 = Set(parent_menu.p6);
-                        menu.p7 = Set(parent_menu.p7);
-                        menu.p8 = Set(parent_menu.p8);
-                    }
-
-                    let menu_model = menu.insert(db).await?;
-                    let mut menu = menu_model.clone().into_active_model();
-
-                    // 深度对应的 p值指定为自身ID
-                    if menu_model.depth == 1 {
-                        menu.p1 = Set(menu_model.id);
-                    }
-                    if menu_model.depth == 2 {
-                        menu.p2 = Set(menu_model.id);
-                    }
-                    if menu_model.depth == 3 {
-                        menu.p3 = Set(menu_model.id);
-                    }
-                    if menu_model.depth == 4 {
-                        menu.p4 = Set(menu_model.id);
-                    }
-                    if menu_model.depth == 5 {
-                        menu.p5 = Set(menu_model.id);
-                    }
-                    if menu_model.depth == 6 {
-                        menu.p6 = Set(menu_model.id);
-                    }
-                    if menu_model.depth == 7 {
-                        menu.p7 = Set(menu_model.id);
-                    }
-                    if menu_model.depth == 8 {
-                        menu.p8 = Set(menu_model.id);
-                    }
-                    // 更新到数据表
-                    let menu_model = menu.update(db).await?;
-                    // 添加缓存数据
-                    exist_menus.insert(String::from(menu_model.mid.as_str()), menu_model);
-                },
-                Err(err) => {
-                    return Err(anyhow!("批量数据有误, {}", err));
-                }
+            let mut menu = MenuActiveModel {
+                ..Default::default()
             };
+    
+            item.update(&mut menu);
+            item.update_by_create(&mut menu);
+
+            // 不存在父菜单 depth = 1
+            if pid.as_str().is_empty() {
+                menu.depth = Set(1);
+            }
+
+            if let Some(parent_menu) = parent_menu {
+                let depth = parent_menu.depth + 1;
+                menu.depth = Set(depth);
+                menu.p1 = Set(parent_menu.p1);
+                menu.p2 = Set(parent_menu.p2);
+                menu.p3 = Set(parent_menu.p3);
+                menu.p4 = Set(parent_menu.p4);
+                menu.p5 = Set(parent_menu.p5);
+                menu.p6 = Set(parent_menu.p6);
+                menu.p7 = Set(parent_menu.p7);
+                menu.p8 = Set(parent_menu.p8);
+            }
+
+            let menu_model = menu.insert(db).await?;
+            let mut menu = menu_model.clone().into_active_model();
+
+            // 深度对应的 p值指定为自身ID
+            if menu_model.depth == 1 {
+                menu.p1 = Set(menu_model.id);
+            }
+            if menu_model.depth == 2 {
+                menu.p2 = Set(menu_model.id);
+            }
+            if menu_model.depth == 3 {
+                menu.p3 = Set(menu_model.id);
+            }
+            if menu_model.depth == 4 {
+                menu.p4 = Set(menu_model.id);
+            }
+            if menu_model.depth == 5 {
+                menu.p5 = Set(menu_model.id);
+            }
+            if menu_model.depth == 6 {
+                menu.p6 = Set(menu_model.id);
+            }
+            if menu_model.depth == 7 {
+                menu.p7 = Set(menu_model.id);
+            }
+            if menu_model.depth == 8 {
+                menu.p8 = Set(menu_model.id);
+            }
+            // 更新到数据表
+            let menu_model = menu.update(db).await?;
+            // 添加缓存数据
+            exist_menus.insert(String::from(menu_model.mid.as_str()), menu_model);
         }
 
         Ok(String::from("批量菜单添加完成"))
     }
 
     /// 更新数据
-    pub async fn update(db: &DatabaseConnection, params: UpdateMenuReqParams) -> Result<i32> {
+    pub async fn update(db: &DatabaseConnection, params: UpdateMenuReqParams) -> ModelResult<i32> {
         let _ = catch_err(params.validate())?;
-        let id = params.id;
+        let id = params.id.unwrap_or(0);
 
-        if id < 0 {
-            return Err(anyhow!("数据不存在,id: {}", id));
+        if id <= 0 {
+            return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
         }
 
         let mut item = Self::find_by_id(&db, id)
             .await?
             .into_active_model();
 
-        item.set_from_json(json!(params))?;
+        params.update(&mut item);
         item.updated_at = Set(Some(utc_now()));
     
         let item = item.update(db).await?;
@@ -300,11 +303,11 @@ impl MenuModel {
     }
 
     /// 删除数据
-    pub async fn delete(db: &DatabaseConnection, params: DeleteMenuReqParams) -> Result<i32> {
-        let id = params.id;
+    pub async fn delete(db: &DatabaseConnection, params: DeleteMenuReqParams) -> ModelResult<i32> {
+        let id = params.id.unwrap_or(0);
 
-        if id < 0 {
-            return Err(anyhow!("数据不存在,id: {}", id));
+        if id <= 0 {
+            return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
         }
 
         let _res = NodeEntity::delete_by_id(id)

@@ -3,11 +3,11 @@ use crate::{
     utils::{catch_err, utc_now},
     typings::ListData,
 };
+use loco_rs::model::{ModelError, ModelResult};
 use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, Set, TransactionTrait};
 use serde_json::json;
 use validator::Validate;
 use super::{CreateNoteReqParams, NoteFilters, UpdateNoteReqParams, DeleteNoteReqParams};
-use anyhow::{anyhow, Result};
 
 #[async_trait::async_trait]
 impl ActiveModelBehavior for NoteActiveModel {}
@@ -16,9 +16,9 @@ impl NoteModel {
     ///
     /// 根据ID查找一个
     /// 
-    pub async fn find_by_id(db: &DatabaseConnection, id: i64) -> Result<Self> {
+    pub async fn find_by_id(db: &DatabaseConnection, id: i64) -> ModelResult<Self> {
         if id < 0 {
-            return Err(anyhow!("数据不存在,id: {}", id));
+            return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
         }
 
         let item = NoteEntity::find()
@@ -27,14 +27,14 @@ impl NoteModel {
             .await?;
 
         item.ok_or_else(|| {
-            anyhow!("数据不存在,id: {}", id)
+            ModelError::Any(format!("数据不存在,id: {}", id).into())
         })
     }
 
     ////
     /// 获取note列表
     /// 
-    pub async fn find_list(db: &DatabaseConnection, params: NoteFilters) -> Result<ListData<NoteModel>> {
+    pub async fn find_list(db: &DatabaseConnection, params: NoteFilters) -> ModelResult<ListData<NoteModel>> {
         let page = params.get_page();
         let page_size = params.get_page_size();
         let order = params.get_order();
@@ -78,7 +78,7 @@ impl NoteModel {
     }
 
     /// 创建 note
-    pub async fn create(db: &DatabaseConnection, params: &CreateNoteReqParams) -> Result<Self> {
+    pub async fn create(db: &DatabaseConnection, params: &CreateNoteReqParams) -> ModelResult<Self> {
         let _ = catch_err(params.validate())?;
 
         let mut item = NoteActiveModel {
@@ -94,7 +94,7 @@ impl NoteModel {
     }
 
     /// 批量创建 note
-    pub async fn create_multi(db: &DatabaseConnection, params: &[CreateNoteReqParams]) -> Result<String> {
+    pub async fn create_multi(db: &DatabaseConnection, params: &[CreateNoteReqParams]) -> ModelResult<String> {
         for item in params {
             let _ = catch_err(item.validate())?;
         }
@@ -113,7 +113,7 @@ impl NoteModel {
                 },
                 Err(err) => {
                     txn.rollback().await?;
-                    return Err(anyhow!("批量数据有误, {}", err));
+                    return Err(ModelError::Any(format!("批量数据有误, {}", err).into()));
                 }
             };
         }
@@ -125,12 +125,12 @@ impl NoteModel {
     }
 
     /// 更新数据
-    pub async fn update(db: &DatabaseConnection, params: UpdateNoteReqParams) -> Result<i64> {
+    pub async fn update(db: &DatabaseConnection, params: UpdateNoteReqParams) -> ModelResult<i64> {
         let _ = catch_err(params.validate())?;
         let id = params.id.unwrap_or(0);
 
         if id < 0 {
-            return Err(anyhow!("数据不存在,id: {}", id));
+            return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
         }
 
         let mut item = Self::find_by_id(&db, id)
@@ -146,11 +146,11 @@ impl NoteModel {
     }
 
     /// 删除数据
-    pub async fn delete(db: &DatabaseConnection, params: DeleteNoteReqParams) -> Result<i64> {
+    pub async fn delete(db: &DatabaseConnection, params: DeleteNoteReqParams) -> ModelResult<i64> {
         let id = params.id.unwrap_or(0);
 
         if id < 0 {
-            return Err(anyhow!("数据不存在,id: {}", id));
+            return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
         }
 
         let _res = NoteEntity::delete_by_id(id)

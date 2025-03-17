@@ -2,6 +2,13 @@ use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
 use oic_derives::{FilterParams, add_filter_fields};
 use validator::Validate;
+use crate::utils::{
+    utc_now,
+    encrypt_password,
+    generate_salt,
+    uuid as getUuid,
+};
+use crate::RequestParamsUpdater;
 
 pub use crate::entities::prelude::{
   UserActiveModel,
@@ -44,40 +51,158 @@ pub struct UserFilters {
 /// 创建 User 参数
 #[derive(Deserialize, Serialize, Debug, Validate, Clone, Default)]
 #[serde(default)]
-pub struct CreateUserReqParams {
-    pub uuid: String,
+pub struct UserReqParams {
+    pub uid: Option<i64>,
+    pub uuid: Option<String>,
     #[validate(required(message = "必须指定 username"), length(min = 2, message = "username 最少2个字符"))]
     pub username: Option<String>,
     pub nickname: Option<String>,
-    #[validate(required(message = "必须指定 password"), length(min = 2, message = "password 最少6个字符"))]
     pub password: Option<String>,
+    pub salt: Option<String>,
+    pub api_key: Option<String>,
+    pub reset_token: Option<String>,
+    pub reset_sent_at: Option<DateTime>,
+    pub status: Option<String>,
     #[validate(email(message = "邮箱地址不合法"))]
     pub email: Option<String>,
-    pub status: String,
+    pub gender: Option<String>,
+    pub avatar: Option<String>,
+    #[serde(rename(deserialize = "roleId"))]
+    pub role_id: Option<i64>,
+    pub dpt_id: Option<i64>,
+    pub remark: Option<String>,
     #[serde(rename(deserialize = "isAdmin"))]
-    pub is_admin: String,
+    pub is_admin: Option<String>,
+    pub phone: Option<String>,
+    pub created_by: Option<i64>,
+    pub updated_by: Option<i64>,
+    pub created_at: Option<DateTime>,
+    pub updated_at: Option<DateTime>,
+    pub deleted_at: Option<DateTime>,
 }
+
+impl RequestParamsUpdater for UserReqParams {
+    type ActiveModel = UserActiveModel;
+
+    /// 根据非空正常数据更新
+    fn update(&self, user: &mut Self::ActiveModel) {
+        if let Some(x) = &self.uuid {
+            user.uuid = Set(String::from(x));
+        }
+
+        if let Some(x) = &self.username {
+            user.username = Set(String::from(x));
+        }
+
+        if let Some(x) = &self.nickname {
+            user.nickname = Set(String::from(x));
+        }
+
+        if let Some(x) = &self.salt {
+            user.salt = Set(String::from(x));
+        }
+
+        if let Some(x) = &self.api_key {
+            user.api_key = Set(String::from(x));
+        }
+
+        if let Some(x) = &self.reset_token {
+            user.reset_token = Set(String::from(x));
+        }
+
+        if let Some(x) = &self.reset_sent_at {
+            // user.reset_sent_at = Set(Some(x.into()));
+        }
+
+        if let Some(x) = &self.status {
+            user.status = Set(String::from(x));
+        }
+
+        if let Some(x) = &self.email {
+            user.email = Set(String::from(x));
+        }
+
+        if let Some(x) = &self.gender {
+            user.gender = Set(String::from(x));
+        }
+
+        if let Some(x) = &self.avatar {
+            user.avatar = Set(String::from(x));
+        }
+
+        if let Some(x) = &self.role_id {
+            user.role_id = Set(*x);
+        }
+
+        if let Some(x) = &self.dpt_id {
+            user.dpt_id = Set(*x);
+        }
+
+        if let Some(x) = &self.remark {
+            user.remark = Set(String::from(x));
+        }
+
+        if let Some(x) = &self.is_admin {
+            user.is_admin = Set(String::from(x));
+        }
+
+        if let Some(x) = &self.phone {
+            user.phone = Set(String::from(x));
+        }
+
+        if let Some(x) = &self.created_by {
+            user.created_by = Set(*x);
+        }
+
+        if let Some(x) = &self.updated_by {
+            user.updated_by = Set(*x);
+        }
+
+        if let Some(x) = &self.created_at {
+            // user.created_at = Set(*x);
+        }
+
+        if let Some(x) = &self.updated_at {
+            // user.updated_at = Set(*x);
+        }
+
+        if let Some(x) = &self.deleted_at {
+            // user.deleted_at = Set(*x);
+        }
+    }
+
+    ///
+    /// 是创建操作需要再设置一些默认参数 如密码 uuid等
+    /// 
+    fn update_by_create(&self, user: &mut Self::ActiveModel) {
+        if self.uuid.is_none() {
+            user.uuid = Set(getUuid());
+        }
+        
+        let salt = generate_salt();
+        let mut password = String::from("123456");
+
+        if let Some(x) = &self.password {
+            password = String::from(x);
+        }
+        
+        user.password = Set(encrypt_password(salt.as_str(), password.as_str()));
+        user.salt = Set(salt);
+        
+        if self.created_at.is_none() {
+            user.created_at = Set(utc_now());
+        }
+    }
+}
+
+pub type CreateUserReqParams = UserReqParams;
 
 ///
 /// 更新 note 参数
 /// 
-#[derive(Deserialize, Serialize, Debug, Validate, Default)]
-#[serde(default)]
-pub struct UpdateUserReqParams {
-    pub uid: Option<i64>,
-    #[validate(required(message = "必须指定 username"), length(min = 2, message = "username 最少2个字符"))]
-    pub username: Option<String>,
-    #[validate(length(min = 2, message = "nickname 最少2个字符"))]
-    pub nickname: Option<String>,
-    #[validate(email)]
-    pub email: Option<String>,
-    pub status: String,
-    #[serde(rename(deserialize = "isAdmin"))]
-    pub is_admin: String,
-}
-
+pub type UpdateUserReqParams = UserReqParams;
+///
 /// 删除数据参数
-#[derive(Deserialize, Serialize, Debug, Validate)]
-pub struct DeleteUserReqParams {
-    pub uid: Option<i64>,
-}
+/// 
+pub type DeleteUserReqParams = UserReqParams;
+

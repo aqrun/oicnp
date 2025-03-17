@@ -2,11 +2,10 @@ use async_trait::async_trait;
 use chrono::offset::Utc;
 use loco_rs::{hash, prelude::*};
 use uuid::Uuid;
-use crate::utils::{uuid as getUuid, catch_err, utc_now};
+use crate::utils::catch_err;
 use crate::{
     auth::JWT,
     typings::ListData,
-    utils::{encrypt_password, generate_salt},
 };
 use super::{RegisterParams, Validator};
 pub use crate::entities::prelude::{
@@ -15,15 +14,15 @@ pub use crate::entities::prelude::{
   UserModel,
   UserColumn,
 };
+use crate::utils::uuid as getUuid;
+use crate::RequestParamsUpdater;
 use sea_orm::{prelude::*, QueryOrder};
-use anyhow::{Result, anyhow};
 use super::{
     UserFilters,
     CreateUserReqParams,
     UpdateUserReqParams,
     DeleteUserReqParams,
 };
-use serde_json::json;
 
 impl Validatable for UserActiveModel {
     fn validator(&self) -> Box<dyn Validate> {
@@ -36,19 +35,30 @@ impl Validatable for UserActiveModel {
 
 #[async_trait::async_trait]
 impl ActiveModelBehavior for UserActiveModel {
+    /// 
+    /// before save
+    ///  
     async fn before_save<C>(self, _db: &C, insert: bool) -> Result<Self, DbErr>
     where
         C: ConnectionTrait,
     {
         self.validate()?;
+
         if insert {
             let mut this = self;
-            this.uuid = ActiveValue::Set(getUuid());
-            this.api_key = ActiveValue::Set(format!("api-{}", Uuid::new_v4()));
-            Ok(this)
-        } else {
-            Ok(self)
+
+            if this.uuid.is_not_set() {
+                this.uuid = ActiveValue::Set(getUuid());
+            }
+
+            if this.api_key.is_not_set() {
+                this.api_key = ActiveValue::Set(format!("api-{}", Uuid::new_v4()));
+            }
+
+            return Ok(this);
         }
+
+        Ok(self)
     }
 }
 
@@ -75,7 +85,7 @@ impl UserModel {
     ////
     /// 获取user列表
     /// 
-    pub async fn find_list(db: &DatabaseConnection, params: UserFilters) -> Result<ListData<UserModel>> {
+    pub async fn find_list(db: &DatabaseConnection, params: UserFilters) -> ModelResult<ListData<UserModel>> {
         let page = params.get_page();
         let page_size = params.get_page_size();
         let order = params.get_order();
@@ -119,32 +129,12 @@ impl UserModel {
     }
 
     /// 创建 user
-    pub async fn create(db: &DatabaseConnection, params: &CreateUserReqParams) -> Result<Self> {
+    pub async fn create(db: &DatabaseConnection, params: &CreateUserReqParams) -> ModelResult<Self> {
         let _ = catch_err(params.validate())?;
 
-        let user = match UserActiveModel::from_json(json!(params)) {
-            Ok(mut user) => {
-                if params.uuid.is_empty() {
-                    user.uuid = Set(getUuid());
-                }
-
-                let salt = generate_salt();
-                let password = params.clone().password.unwrap_or(String::from("123456"));
-
-                user.password = Set(encrypt_password(salt.as_str(), password.as_str()));
-                user.salt = Set(salt);
-
-                if user.created_at.is_not_set() {
-                    user.created_at = Set(utc_now());
-                }
-
-                user
-            },
-            Err(err) => {
-                println!("errrrrrrrrrr---{:?}", params);
-                return Err(anyhow!("params 转为 UserActiveModel 失败 {:?}", err));
-            }
-        };
+        let mut user = UserActiveModel::new();
+        params.update(&mut user);
+        params.update_by_create(&mut user);
 
         println!("test---{:?}", user.clone());
         let user = user.insert(db).await?;
@@ -153,7 +143,7 @@ impl UserModel {
     }
 
     /// 批量创建 note
-    pub async fn create_multi(db: &DatabaseConnection, params: &[CreateUserReqParams]) -> Result<String> {
+    pub async fn create_multi(db: &DatabaseConnection, params: &[CreateUserReqParams]) -> ModelResult<String> {
         for item in params {
             let _ = catch_err(item.validate())?;
         }
@@ -162,29 +152,11 @@ impl UserModel {
         let mut users: Vec<UserActiveModel> = Vec::new();
 
         for item in params.iter() {
-            match UserActiveModel::from_json(json!(item)) {
-                Ok(mut user) => {
-                    if item.uuid.is_empty() {
-                        user.uuid = Set(getUuid());
-                    }
+            let mut user = UserActiveModel::new();
+            item.update(&mut user);
+            item.update_by_create(&mut user);
 
-                    let salt = generate_salt();
-                    let password = item.clone().password.unwrap_or(String::from("123456"));
-
-                    user.password = Set(encrypt_password(salt.as_str(), password.as_str()));
-                    user.salt = Set(salt);
-
-                    if user.created_at.is_not_set() {
-                        user.created_at = Set(utc_now());
-                    }
-                    
-                    users.push(user);
-                },
-                Err(err) => {
-                    txn.rollback().await?;
-                    return Err(anyhow!("批量数据有误, UserActiveModel 转换失败 {:?}", err));
-                }
-            };
+            users.push(user);
         }
         
         let _ = UserEntity::insert_many(users).exec(&txn).await?;
@@ -194,45 +166,29 @@ impl UserModel {
     }
 
     /// 更新数据
-    pub async fn update(db: &DatabaseConnection, params: UpdateUserReqParams) -> Result<i64> {
+    pub async fn update(db: &DatabaseConnection, params: UpdateUserReqParams) -> ModelResult<i64> {
         let _ = catch_err(params.validate())?;
         let uid = params.uid.unwrap_or(0);
 
         if uid < 0 {
-            return Err(anyhow!("数据不存在,id: {}", uid));
+            return Err(ModelError::Message(format!("数据不存在,id: {}", uid)));
         }
 
-        let mut item = Self::find_by_uid(&db, uid)
+        let mut user = Self::find_by_uid(&db, uid)
             .await?
-            .into_active_model();
-
-        if let Some(s) = params.username {
-            item.username = Set(s);
-        }
-
-        if let Some(s) = params.nickname {
-            item.nickname = Set(s);
-        }
-
-        if let Some(s) = params.email {
-            item.email = Set(s);
-        }
-        
-        item.status = Set(String::from(params.status.as_str()));
-        item.is_admin = Set(String::from(params.is_admin.as_str()));
-        item.updated_at = Set(Some(utc_now()));
+            .into_active_model();    
+        params.update(&mut user);
     
-        let item = item.update(db).await?;
-
+        let item = user.update(db).await?;
         Ok(item.uid)
     }
 
     /// 删除数据
-    pub async fn delete(db: &DatabaseConnection, params: DeleteUserReqParams) -> Result<i64> {
+    pub async fn delete(db: &DatabaseConnection, params: DeleteUserReqParams) -> ModelResult<i64> {
         let uid = params.uid.unwrap_or(0);
 
-        if uid < 0 {
-            return Err(anyhow!("数据不存在, uid: {}", uid));
+        if uid <= 0 {
+            return Err(ModelError::Message(format!("数据不存在, uid: {}", uid)));
         }
 
         let _res = UserEntity::delete_by_id(uid)
@@ -247,7 +203,7 @@ impl UserModel {
     /// # Errors
     ///
     /// When could not find user by the given token or DB query error
-    pub async fn find_by_email(db: &DatabaseConnection, email: &str) -> Result<Self> {
+    pub async fn find_by_email(db: &DatabaseConnection, email: &str) -> ModelResult<Self> {
         println!("abc-11111");
         let user = UserEntity::find()
             .filter(
@@ -258,7 +214,7 @@ impl UserModel {
             .one(db)
             .await?;
         println!("abc-22222, {:?}", user.clone());
-        user.ok_or_else(|| anyhow!("User not found"))
+        user.ok_or_else(|| ModelError::Message(format!("User not found")))
     }
 
     /// finds a user by the provided verification token
