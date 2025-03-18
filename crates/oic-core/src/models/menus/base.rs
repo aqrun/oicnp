@@ -31,7 +31,9 @@ pub struct MenuReqParams {
     pub api: Option<String>,
     pub status: Option<String>,
     pub visible: Option<String>,
+    #[serde(rename(deserialize = "isCache"))]
     pub is_cache: Option<String>,
+    #[serde(rename(deserialize = "isFrame"))]
     pub is_frame: Option<String>,
     pub remark: Option<String>,
 }

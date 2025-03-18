@@ -59,6 +59,7 @@ pub struct UserReqParams {
     pub nickname: Option<String>,
     pub password: Option<String>,
     pub salt: Option<String>,
+    #[serde(rename(deserialize = "apiKey"))]
     pub api_key: Option<String>,
     pub reset_token: Option<String>,
     pub reset_sent_at: Option<DateTime>,
@@ -69,15 +70,21 @@ pub struct UserReqParams {
     pub avatar: Option<String>,
     #[serde(rename(deserialize = "roleId"))]
     pub role_id: Option<i64>,
+    #[serde(rename(deserialize = "dptId"))]
     pub dpt_id: Option<i64>,
     pub remark: Option<String>,
     #[serde(rename(deserialize = "isAdmin"))]
     pub is_admin: Option<String>,
     pub phone: Option<String>,
+    #[serde(rename(deserialize = "createdBy"))]
     pub created_by: Option<i64>,
+    #[serde(rename(deserialize = "updatedBy"))]
     pub updated_by: Option<i64>,
+    #[serde(rename(deserialize = "createdAt"))]
     pub created_at: Option<DateTime>,
+    #[serde(rename(deserialize = "updatedAt"))]
     pub updated_at: Option<DateTime>,
+    #[serde(rename(deserialize = "deletedAt"))]
     pub deleted_at: Option<DateTime>,
 }
 
