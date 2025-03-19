@@ -1,6 +1,5 @@
 ---
-- uuid: user1
-  username: user1
+- username: user1
   nickname: user1
   email: user1@example.com
   password: "123456"

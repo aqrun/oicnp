@@ -1,13 +1,11 @@
 use crate::{
-    entities::prelude::*,
-    utils::{catch_err, utc_now},
-    typings::ListData,
+    entities::prelude::*, typings::ListData, utils::catch_err, RequestParamsUpdater
 };
 use loco_rs::model::{ModelError, ModelResult};
-use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, Set, TransactionTrait};
-use serde_json::json;
+use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, TransactionTrait};
 use validator::Validate;
 use super::{CreateNoteReqParams, NoteFilters, UpdateNoteReqParams, DeleteNoteReqParams};
+
 
 #[async_trait::async_trait]
 impl ActiveModelBehavior for NoteActiveModel {}
@@ -85,8 +83,8 @@ impl NoteModel {
             ..Default::default()
         };
 
-        item.set_from_json(json!(params))?;
-        item.created_at = Set(Some(utc_now()));
+        params.update(&mut item);
+        params.update_by_create(&mut item);
     
         let item = item.insert(db).await?;
 
@@ -103,19 +101,13 @@ impl NoteModel {
         let mut notes: Vec<NoteActiveModel> = Vec::new();
 
         for item in params.iter() {
-            match NoteActiveModel::from_json(json!(item)) {
-                Ok(mut note) => {
-                    if note.created_at.is_not_set() {
-                        note.created_at = Set(Some(utc_now()));
-                    }
-                    
-                    notes.push(note);
-                },
-                Err(err) => {
-                    txn.rollback().await?;
-                    return Err(ModelError::Any(format!("批量数据有误, {}", err).into()));
-                }
+            let mut note = NoteActiveModel {
+                ..Default::default()
             };
+    
+            item.update(&mut note);
+            item.update_by_create(&mut note);
+            notes.push(note);
         }
         
         let _ = NoteEntity::insert_many(notes).exec(&txn).await?;
@@ -129,7 +121,7 @@ impl NoteModel {
         let _ = catch_err(params.validate())?;
         let id = params.id.unwrap_or(0);
 
-        if id < 0 {
+        if id <= 0 {
             return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
         }
 
@@ -137,8 +129,7 @@ impl NoteModel {
             .await?
             .into_active_model();
 
-        item.set_from_json(json!(params))?;
-        item.updated_at = Set(Some(utc_now()));
+        params.update(&mut item);
     
         let item = item.update(db).await?;
 
@@ -149,7 +140,7 @@ impl NoteModel {
     pub async fn delete(db: &DatabaseConnection, params: DeleteNoteReqParams) -> ModelResult<i64> {
         let id = params.id.unwrap_or(0);
 
-        if id < 0 {
+        if id <= 0 {
             return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
         }
 

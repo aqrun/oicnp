@@ -1,13 +1,11 @@
 use crate::{
-    entities::prelude::*,
-    utils::{catch_err, utc_now},
-    typings::ListData,
+    entities::prelude::*, typings::ListData, utils::{catch_err, utc_now}, RequestParamsUpdater
 };
+use loco_rs::prelude::*;
 use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, Set, TransactionTrait};
 use serde_json::json;
 use validator::Validate;
 use super::{CreateNodeReqParams, NodeFilters, UpdateNodeReqParams, DeleteNodeReqParams};
-use anyhow::{anyhow, Result};
 
 #[async_trait::async_trait]
 impl ActiveModelBehavior for NodeActiveModel {}
@@ -16,9 +14,9 @@ impl NodeModel {
     ///
     /// 根据ID查找一个
     /// 
-    pub async fn find_by_id(db: &DatabaseConnection, id: i64) -> Result<Self> {
-        if id < 0 {
-            return Err(anyhow!("数据不存在,id: {}", id));
+    pub async fn find_by_id(db: &DatabaseConnection, id: i64) -> ModelResult<Self> {
+        if id <= 0 {
+            return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
         }
 
         let item = NodeEntity::find()
@@ -27,14 +25,14 @@ impl NodeModel {
             .await?;
 
         item.ok_or_else(|| {
-            anyhow!("数据不存在,id: {}", id)
+            ModelError::Any(format!("数据不存在,id: {}", id).into())
         })
     }
 
     ////
     /// 获取node列表
     /// 
-    pub async fn find_list(db: &DatabaseConnection, params: NodeFilters) -> Result<ListData<Self>> {
+    pub async fn find_list(db: &DatabaseConnection, params: NodeFilters) -> ModelResult<ListData<Self>> {
         let page = params.get_page();
         let page_size = params.get_page_size();
         let order = params.get_order();
@@ -78,15 +76,15 @@ impl NodeModel {
     }
 
     /// 创建 node
-    pub async fn create(db: &DatabaseConnection, params: &CreateNodeReqParams) -> Result<Self> {
+    pub async fn create(db: &DatabaseConnection, params: &CreateNodeReqParams) -> ModelResult<Self> {
         let _ = catch_err(params.validate())?;
 
         let mut item = NodeActiveModel {
             ..Default::default()
         };
 
-        item.set_from_json(json!(params))?;
-        item.created_at = Set(utc_now());
+        params.update(&mut item);
+        params.update_by_create(&mut item);
     
         let item = item.insert(db).await?;
 
@@ -94,23 +92,21 @@ impl NodeModel {
     }
 
     /// 批量创建 node
-    pub async fn create_multi(db: &DatabaseConnection, params: &[CreateNodeReqParams]) -> Result<String> {
+    pub async fn create_multi(db: &DatabaseConnection, params: &[CreateNodeReqParams]) -> ModelResult<String> {
         let _ = catch_err(params.validate())?;
         
         let txn = db.begin().await?;
         let mut notes: Vec<NodeActiveModel> = Vec::new();
 
         for item in params.iter() {
-            match NodeActiveModel::from_json(json!(item)) {
-                Ok(mut note) => {
-                    note.created_at = Set(utc_now());
-                    notes.push(note);
-                },
-                Err(err) => {
-                    txn.rollback().await?;
-                    return Err(anyhow!("批量数据有误, {}", err));
-                }
+            let mut note = NodeActiveModel {
+                ..Default::default()
             };
+    
+            item.update(&mut note);
+            item.update_by_create(&mut note);
+
+            notes.push(note);
         }
         
         let _ = NodeEntity::insert_many(notes).exec(&txn).await?;
@@ -120,20 +116,19 @@ impl NodeModel {
     }
 
     /// 更新数据
-    pub async fn update(db: &DatabaseConnection, params: UpdateNodeReqParams) -> Result<i64> {
+    pub async fn update(db: &DatabaseConnection, params: UpdateNodeReqParams) -> ModelResult<i64> {
         let _ = catch_err(params.validate())?;
         let nid = params.nid.unwrap_or(0);
 
-        if nid < 0 {
-            return Err(anyhow!("数据不存在,id: {}", nid));
+        if nid <= 0 {
+            return Err(ModelError::Any(format!("数据不存在,id: {}", nid).into()));
         }
 
         let mut item = Self::find_by_id(&db, nid)
             .await?
             .into_active_model();
 
-        item.set_from_json(json!(params))?;
-        item.updated_at = Set(Some(utc_now()));
+        params.update(&mut item);
     
         let item = item.update(db).await?;
 
@@ -141,11 +136,11 @@ impl NodeModel {
     }
 
     /// 删除数据
-    pub async fn delete(db: &DatabaseConnection, params: DeleteNodeReqParams) -> Result<i64> {
+    pub async fn delete(db: &DatabaseConnection, params: DeleteNodeReqParams) -> ModelResult<i64> {
         let nid = params.nid.unwrap_or(0);
 
-        if nid < 0 {
-            return Err(anyhow!("数据不存在,id: {}", nid));
+        if nid <= 0 {
+            return Err(ModelError::Any(format!("数据不存在,id: {}", nid).into()));
         }
 
         let _res = NodeEntity::delete_by_id(nid)

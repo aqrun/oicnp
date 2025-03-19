@@ -2,9 +2,11 @@ use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
 use oic_derives::{FilterParams, add_filter_fields};
 use validator::Validate;
-use crate::utils::utc_now;
-use crate::RequestParamsUpdater;
-use crate::entities::prelude::*;
+use crate::{
+    models::RequestParamsUpdater,
+    utils::utc_now,
+    entities::prelude::*,
+};
 
 #[add_filter_fields]
 #[derive(FilterParams, Deserialize, Serialize, Debug, Default)]

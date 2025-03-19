@@ -12,7 +12,7 @@ pub struct Model {
     pub id: i64,
     pub title: String,
     pub content: String,
-    pub created_at: Option<DateTime>,
+    pub created_at: DateTime,
     pub updated_at: Option<DateTime>,
 }
 
