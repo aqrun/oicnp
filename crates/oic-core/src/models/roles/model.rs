@@ -13,6 +13,15 @@ use super::{CreateRoleReqParams, DeleteRoleReqParams, RoleFilters, UpdateRoleReq
 impl ActiveModelBehavior for RoleActiveModel {}
 
 impl RoleModel {
+    pub async fn find_by_user(db: &DatabaseConnection, user: &UserModel) -> ModelResult<Self> {
+        let role = RoleEntity::find()
+            .inner_join(UserRoleMapEntity)
+            .filter(UserRoleMapColumn::Uid.eq(user.uid))
+            .one(db)
+            .await?;
+        role.ok_or_else(|| ModelError::EntityNotFound)
+    }
+
     ///
     /// 根据ID查找一个
     /// 

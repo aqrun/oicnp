@@ -45,4 +45,6 @@ loco-rs = { workspace = true, features = ["testing"] }
 uuid = { workspace = true }
 validator = { workspace = true, features = ["derive"] }
 mime = { workspace = true }
+tower = { workspace = true }
+futures-util = { workspace = true }
 

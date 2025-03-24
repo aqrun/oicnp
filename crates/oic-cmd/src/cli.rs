@@ -65,7 +65,9 @@ pub async fn init_cmd() {
         //   init_user_run().await;
         // },
         Command::MyTest => {
-            cmd::my_test::execute().await;
+            if let Err(err) = cmd::my_test::run(&app_ctx).await {
+                println!("MyTest: {:?}", err);
+            }
         },
 
         Command::Hash { password } => {

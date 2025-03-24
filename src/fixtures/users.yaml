@@ -1,11 +1,19 @@
 ---
-- username: user1
-  nickname: user1
-  email: user1@example.com
-  password: "123456"
-  status: "1"
+- username: aqrun
+  nickname: aqrun
+  email: aqrun@sina.com
+  password: e59454b49de59e71fc6b7d5ee5b74c3ad84a43a5968fa6c81eed8cd9a69fd8af
+  salt: 28a31c2b1c01b8d70fd4e0dab2e25f1518694ebb6ad5d4d1226c8b25d4572c58
+  status: 1
+  isAdmin: 1
+  roles:
+    - admin
+    - author
 - username: user2
   nickname: user2
   email: user2@example.com
-  password: "123456"
-  status: "1"
+  salt: 2d51a4414562ed5a302fc377bc894f3631a8fe6d0728c2bb4bb9e06b762ed046
+  hash: ba4a62dfc677cabb143659b8f6485c82ec607445989716f5bcaba1e156c1714b
+  status: 1
+  roles:
+    - member

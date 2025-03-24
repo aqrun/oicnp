@@ -70,6 +70,7 @@ pub struct UserReqParams {
     pub avatar: Option<String>,
     #[serde(rename(deserialize = "roleId"))]
     pub role_id: Option<i64>,
+    pub roles: Option<Vec<String>>,
     #[serde(rename(deserialize = "dptId"))]
     pub dpt_id: Option<i64>,
     pub remark: Option<String>,
@@ -118,7 +119,7 @@ impl RequestParamsUpdater for UserReqParams {
         }
 
         if let Some(x) = &self.reset_sent_at {
-            // user.reset_sent_at = Set(Some(x.into()));
+            user.reset_sent_at = Set(Some(*x));
         }
 
         if let Some(x) = &self.status {
@@ -166,15 +167,17 @@ impl RequestParamsUpdater for UserReqParams {
         }
 
         if let Some(x) = &self.created_at {
-            // user.created_at = Set(*x);
+            user.created_at = Set(*x);
         }
 
         if let Some(x) = &self.updated_at {
-            // user.updated_at = Set(*x);
+            user.updated_at = Set(Some(*x));
+        } else {
+            user.updated_at = Set(Some(utc_now()));
         }
 
         if let Some(x) = &self.deleted_at {
-            // user.deleted_at = Set(*x);
+            user.deleted_at = Set(Some(*x));
         }
     }
 
@@ -186,15 +189,21 @@ impl RequestParamsUpdater for UserReqParams {
             user.uuid = Set(getUuid());
         }
         
-        let salt = generate_salt();
         let mut password = String::from("123456");
 
         if let Some(x) = &self.password {
             password = String::from(x);
         }
-        
-        user.password = Set(encrypt_password(salt.as_str(), password.as_str()));
-        user.salt = Set(salt);
+
+        // 存在盐值直接使用已生成的密码
+        if let Some(x) = &self.salt {
+            user.salt = Set(String::from(x));
+        } else {
+            // 不存在盐址新生成加密字符串
+            let salt = generate_salt();
+            user.password = Set(encrypt_password(salt.as_str(), password.as_str()));
+            user.salt = Set(salt);
+        }
         
         if self.created_at.is_none() {
             user.created_at = Set(utc_now());

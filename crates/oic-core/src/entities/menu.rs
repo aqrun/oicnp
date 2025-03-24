@@ -2,79 +2,35 @@
 
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
-use crate::utils::{default_string, default_i32, default_date_time};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Deserialize, Serialize, Default)]
 #[sea_orm(table_name = "menus")]
+#[serde(default)]
 pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
     pub id: i32,
-    #[sea_orm(default_value = "")]
-    #[serde(default = "default_string")]
     pub mid: String,
-    #[sea_orm(default_value = "")]
-    #[serde(default = "default_string")]
     pub pid: String,
-    #[sea_orm(default_value = "")]
-    #[serde(default = "default_string")]
     pub path: String,
-    #[sea_orm(default_value = "")]
-    #[serde(default = "default_string")]
     pub name: String,
-    #[sea_orm(default_value = "")]
-    #[serde(default = "default_i32")]
     pub depth: i32,
-    #[sea_orm(default_value = "")]
-    #[serde(default = "default_i32")]
     pub p1: i32,
-    #[sea_orm(default_value = "")]
-    #[serde(default = "default_i32")]
     pub p2: i32,
-    #[sea_orm(default_value = "")]
-    #[serde(default = "default_i32")]
     pub p3: i32,
-    #[sea_orm(default_value = "")]
-    #[serde(default = "default_i32")]
     pub p4: i32,
-    #[sea_orm(default_value = "")]
-    #[serde(default = "default_i32")]
     pub p5: i32,
-    #[sea_orm(default_value = "")]
-    #[serde(default = "default_i32")]
     pub p6: i32,
-    #[sea_orm(default_value = "")]
-    #[serde(default = "default_i32")]
     pub p7: i32,
-    #[sea_orm(default_value = "")]
-    #[serde(default = "default_i32")]
     pub p8: i32,
-    #[sea_orm(default_value = "")]
-    #[serde(default = "default_string")]
     pub icon: String,
-    #[sea_orm(default_value = "")]
-    #[serde(default = "default_i32")]
     pub weight: i32,
-    #[sea_orm(default_value = "")]
-    #[serde(default = "default_string")]
     pub api: String,
-    #[sea_orm(default_value = "")]
-    #[serde(default = "default_string")]
     pub status: String,
-    #[sea_orm(default_value = "")]
-    #[serde(default = "default_string")]
     pub visible: String,
-    #[sea_orm(default_value = "")]
-    #[serde(default = "default_string")]
     pub is_cache: String,
-    #[sea_orm(default_value = "")]
-    #[serde(default = "default_string")]
     pub is_frame: String,
-    #[sea_orm(default_value = "")]
-    #[serde(default = "default_string")]
     pub remark: String,
-    #[sea_orm(default_expr = "Expr::current_timestamp()")]
-    #[serde(default = "default_date_time")]
     pub created_at: DateTime,
     pub updated_at: Option<DateTime>,
     pub deleted_at: Option<DateTime>,

@@ -13,6 +13,9 @@ pub use crate::entities::prelude::{
   UserEntity,
   UserModel,
   UserColumn,
+  RoleModel,
+  UserRoleMapActiveModel,
+  UserRoleMapEntity,
 };
 use crate::utils::uuid as getUuid;
 use crate::RequestParamsUpdater;
@@ -160,9 +163,66 @@ impl UserModel {
         }
         
         let _ = UserEntity::insert_many(users).exec(&txn).await?;
+
         txn.commit().await?;
 
+        // 需要批量创建的 user role 关联关系
+        let mut user_role_list: Vec<UserRoleMapActiveModel> = Vec::new();
+
+        for item in params.iter() {
+            let mut email = String::from("");
+            let mut item_roles: Vec<String> = Vec::new();
+
+            if let Some(x) = &item.email {
+                email = String::from(x);
+            } else {
+                continue;
+            }
+
+            if let Some(x) = &item.roles {
+                item_roles = x.clone();
+            }
+
+            let user = Self::find_by_email(db, email.as_str()).await?;
+
+            for role_item in item_roles {
+                let role = RoleModel::find_by_vid(db, role_item.as_str()).await?;
+                let user_role_map = UserRoleMapActiveModel {
+                    uid: Set(user.uid),
+                    role_id: Set(role.role_id),
+                    ..Default::default()
+                };
+                user_role_list.push(user_role_map);
+            }
+        }
+
+        let _ = UserRoleMapEntity::insert_many(user_role_list).exec(db).await?;
+        
         Ok(String::from("批量user添加完成"))
+    }
+
+    /// 给用户指定角色
+    pub async fn assign_roles(
+        db: &DatabaseConnection,
+        uid: i64,
+        role_vids: &[String],
+    ) -> ModelResult<i64> {
+        // 需要批量创建的 user role 关联关系
+        let mut user_roles: Vec<UserRoleMapActiveModel> = Vec::new();
+
+        for vid in role_vids {
+            let role = RoleModel::find_by_vid(db, vid.as_str()).await?;
+            let user_role_map = UserRoleMapActiveModel {
+                uid: Set(uid),
+                role_id: Set(role.role_id),
+                ..Default::default()
+            };
+            user_roles.push(user_role_map);
+        }
+
+        let _ = UserRoleMapEntity::insert_many(user_roles).exec(db).await?;
+
+        Ok(0)
     }
 
     /// 更新数据
@@ -204,7 +264,6 @@ impl UserModel {
     ///
     /// When could not find user by the given token or DB query error
     pub async fn find_by_email(db: &DatabaseConnection, email: &str) -> ModelResult<Self> {
-        println!("abc-11111");
         let user = UserEntity::find()
             .filter(
                 model::query::condition()
@@ -213,7 +272,7 @@ impl UserModel {
             )
             .one(db)
             .await?;
-        println!("abc-22222, {:?}", user.clone());
+
         user.ok_or_else(|| ModelError::Message(format!("User not found")))
     }
 

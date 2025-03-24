@@ -104,6 +104,8 @@ validator = { version = "0.19" }
 reqwest = { version = "0.12.9" }
 mime = "0.3.16"
 tower-http = { version = "^0.6" }
+tower = "0.4.13"
+futures-util = "0.3.30"
 
 [workspace.dependencies.sea-orm]
 version = "^1"
