@@ -6,6 +6,7 @@
   salt: 28a31c2b1c01b8d70fd4e0dab2e25f1518694ebb6ad5d4d1226c8b25d4572c58
   status: 1
   isAdmin: 1
+  gender: 1
   roles:
     - admin
     - author
@@ -15,5 +16,7 @@
   salt: 2d51a4414562ed5a302fc377bc894f3631a8fe6d0728c2bb4bb9e06b762ed046
   hash: ba4a62dfc677cabb143659b8f6485c82ec607445989716f5bcaba1e156c1714b
   status: 1
+  isAdmin: 0
+  gender: 1
   roles:
     - member

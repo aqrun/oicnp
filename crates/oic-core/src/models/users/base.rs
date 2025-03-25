@@ -198,6 +198,7 @@ impl RequestParamsUpdater for UserReqParams {
         // 存在盐值直接使用已生成的密码
         if let Some(x) = &self.salt {
             user.salt = Set(String::from(x));
+            user.password = Set(password);
         } else {
             // 不存在盐址新生成加密字符串
             let salt = generate_salt();

@@ -13,7 +13,7 @@ use std::fs::File;
 /// 数据表最初数据填入
 /// 直接操作数据表
 pub async fn run(ctx: &AppContext) -> Result<()> {
-    seed_roles(ctx).await?;
+    // seed_roles(ctx).await?;
     seed_users(ctx).await?;
     Ok(())
 }
@@ -43,7 +43,7 @@ async fn seed_users(ctx: &AppContext) -> Result<()> {
     // 种子文件
     let seed_file = format!("src/fixtures/{seed_name}s.yaml");
     let seed_data: Vec<CreateUserReqParams> = serde_yaml::from_reader(File::open(seed_file)?)?;
-    println!("------{:?}", seed_data);
+
     let _ = UserModel::create_multi(&ctx.db, seed_data.as_slice()).await?;
     println!("用户数据初始化完成");
     Ok(())

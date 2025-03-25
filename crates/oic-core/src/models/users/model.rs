@@ -161,7 +161,7 @@ impl UserModel {
 
             users.push(user);
         }
-        
+
         let _ = UserEntity::insert_many(users).exec(&txn).await?;
 
         txn.commit().await?;

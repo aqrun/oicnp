@@ -17,7 +17,7 @@ impl MigrationTrait for Migration {
                     .primary_key()
                     .auto_increment(),
             )
-            .col(ColumnDef::new(Roles::Vid).string_len(64).not_null().default(""))
+            .col(ColumnDef::new(Roles::Vid).string_len(64).unique_key().not_null())
             .col(ColumnDef::new(Roles::Name).string_len(64).not_null().default(""))
             .col(ColumnDef::new(Roles::Weight).integer().not_null().default(0))
             .col(ColumnDef::new(Roles::Scope).char_len(1).not_null().default("0"))
