@@ -8,21 +8,20 @@ pub struct Migration;
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let table = Table::create()
-            .table(RoleApiMap::Table)
+            .table(MenuPermissionsMap::Table)
             .if_not_exists()
             .col(
-                ColumnDef::new(RoleApiMap::Id)
+                ColumnDef::new(MenuPermissionsMap::Id)
                     .big_integer()
                     .not_null()
                     .primary_key()
                     .auto_increment(),
             )
-            .col(ColumnDef::new(RoleApiMap::RoleId).big_integer().not_null().default(0))
-            .col(ColumnDef::new(RoleApiMap::Api).string_len(255).not_null().default(""))
-            .col(ColumnDef::new(RoleApiMap::Method).string_len(10).not_null().default(0))
-            .col(ColumnDef::new(RoleApiMap::CreatedBy).big_integer().not_null().default(0))
+            .col(ColumnDef::new(MenuPermissionsMap::MenuId).big_integer().not_null().default(0))
+            .col(ColumnDef::new(MenuPermissionsMap::PermissionId).string_len(255).not_null().default(""))
+            .col(ColumnDef::new(MenuPermissionsMap::CreatedBy).big_integer().not_null().default(0))
             .col(
-                ColumnDef::new(RoleApiMap::CreatedAt)
+                ColumnDef::new(MenuPermissionsMap::CreatedAt)
                     .date_time()
                     .not_null()
                     .extra("DEFAULT CURRENT_TIMESTAMP".to_string()),
@@ -34,7 +33,7 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager.drop_table(
-            Table::drop().table(RoleApiMap::Table).to_owned()
+            Table::drop().table(MenuPermissionsMap::Table).to_owned()
         ).await
     }
 }

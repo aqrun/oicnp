@@ -12,10 +12,12 @@ mod m20220825_211935_create_crons_table;
 mod m20220825_211957_create_crons_logs_table;
 mod m20220825_212010_create_login_logs_table;
 mod m20220825_212018_create_menus_table;
+mod m20220825_212020_create_menu_permissions_map_table;
 mod m20220825_212030_create_operation_logs_table;
 mod m20220825_212131_create_positions_table;
 mod m20220825_212141_create_roles_table;
-mod m20220825_212152_create_role_api_map_table;
+mod m20220825_212142_create_permissions_table;
+mod m20220825_212152_create_role_permissions_map_table;
 mod m20220825_212215_create_role_department_map_table;
 mod m20220825_212228_create_update_logs_table;
 mod m20220825_212238_create_users_table;
@@ -53,10 +55,12 @@ impl MigratorTrait for Migrator {
             Box::new(m20220825_211957_create_crons_logs_table::Migration),
             Box::new(m20220825_212010_create_login_logs_table::Migration),
             Box::new(m20220825_212018_create_menus_table::Migration),
+            Box::new(m20220825_212020_create_menu_permissions_map_table::Migration),
             Box::new(m20220825_212030_create_operation_logs_table::Migration),
             Box::new(m20220825_212131_create_positions_table::Migration),
             Box::new(m20220825_212141_create_roles_table::Migration),
-            Box::new(m20220825_212152_create_role_api_map_table::Migration),
+            Box::new(m20220825_212142_create_permissions_table::Migration),
+            Box::new(m20220825_212152_create_role_permissions_map_table::Migration),
             Box::new(m20220825_212215_create_role_department_map_table::Migration),
             Box::new(m20220825_212228_create_update_logs_table::Migration),
             Box::new(m20220825_212238_create_users_table::Migration),

@@ -5,42 +5,49 @@ pub use super::comment_body::{
     Model as CommentBodyModel,
     Column as ColumnBodyColumn,
     ActiveModel as ColumnBodyActiveModel,
+    Relation as ColumnBodyRelation,
 };
 pub use super::comment::{
     Entity as CommentEntity,
     Model as CommentModel,
     Column as CommentColumn,
     ActiveModel as CommentActiveModel,
+    Relation as CommentRelation,
 };
 pub use super::config::{
     Entity as ConfigEntity,
     Model as ConfigModel,
     Column as ConfigColumn,
     ActiveModel as ConfigActiveModel,
+    Relation as ConfigRelation,
 };
 pub use super::file::{
     Entity as FileEntity,
     Model as FileModel,
     Column as FileColumn,
     ActiveModel as FileActiveModel,
+    Relation as FileRelation,
 };
 pub use super::node_body::{
     Entity as NodeBodyEntity,
     Model as NodeBodyModel,
     Column as NodeBodyColumn,
     ActiveModel as NodeBodyActiveModel,
+    Relation as NodeBodyRelation,
 };
 pub use super::node_comments_map::{
     Entity as NodeCommentsMapEntity,
     Model as NodeCommentsMapModel,
     Column as NodeCommentsMapColumn,
     ActiveModel as NodeCommentsMapActiveModel,
+    Relation as NodeCommentsMapRelation,
 };
 pub use super::node_files_map::{
     Entity as NodeFilesMapEntity,
     Model as NodeFilesMapModel,
     Column as NodeFilesMapColumn,
     ActiveModel as NodeFilesMapActiveModel,
+    Relation as NodeFilesMapRelation,
 };
 pub use super::node_tags_map::{
     Entity as NodeTagsMapEntity,
@@ -53,154 +60,194 @@ pub use super::node_categories_map::{
     Model as NodeCategoriesMapModel,
     Column as NodeCategoriesMapColumn,
     ActiveModel as NodeCategoriesMapActiveModel,
+    Relation as NodeCategoriesMapRelation,
 };
 pub use super::node::{
     Entity as NodeEntity,
     Model as NodeModel,
     Column as NodeColumn,
     ActiveModel as NodeActiveModel,
+    Relation as NodeRelation,
 };
 pub use super::tag::{
     Entity as TagEntity,
     Model as TagModel,
     Column as TagColumn,
     ActiveModel as TagActiveModel,
+    Relation as TagRelation, 
 };
 pub use super::category::{
     Entity as CategoryEntity,
     Model as CategoryModel,
     Column as CategoryColumn,
     ActiveModel as CategoryActiveModel,
+    Relation as CategoryRelation,
 };
 pub use super::user_files_map::{
     Entity as UserFileEntity,
     Model as UserFileModel,
     Column as UserFileColumn,
     ActiveModel as UserFileActiveModel,
+    Relation as UserFileRelation,
 };
 pub use super::short_link::{
     Entity as ShortLinkEntity,
     Model as ShortLinkModel,
     Column as ShortLinkColumn,
     ActiveModel as ShortLinkActiveModel,
+    Relation as ShortLinkRelation,
 };
 pub use super::api_db::{
     Entity as ApiDbEntity,
     Model as ApiDbModel,
     Column as ApiDbColumn,
     ActiveModel as ApiDbActiveModel,
+    Relation as ApiDbRelation,
 };
 pub use super::attribute_value::{
     Entity as AttributeValueEntity,
     Model as AttributeValueModel,
     Column as AttributeValueColumn,
     ActiveModel as AttributeValueActiveModel,
+    Relation as AttributeValueRelation,
 };
 pub use super::attribute::{
     Entity as AttributeEntity,
     Model as AttributeModel,
     Column as AttributeColumn,
     ActiveModel as AttributeActiveModel,
+    Relation as AttributeRelation,
 };
 pub use super::cron_log::{
     Entity as CronLogEntity,
     Model as CronLogModel,
     Column as CronLogColumn,
     ActiveModel as CronLogActiveModel,
+    Relation as CronLogRelation,
 };
 pub use super::cron::{
     Entity as CronEntity,
     Model as CronModel,
     Column as CronColumn,
     ActiveModel as CronActiveModel,
+    Relation as CronRelation,
 };
 pub use super::department::{
     Entity as DepartmentEntity,
     Model as DepartmentModel,
     Column as DepartmentColumn,
     ActiveModel as DepartmentActiveModel,
+    Relation as DepartmentRelation,
 };
 pub use super::login_log::{
     Entity as LoginLogEntity,
     Model as LoginLogModel,
     Column as LoginLogColumn,
     ActiveModel as LoginLogActiveModel,
+    Relation as LoginLogRelation,
 };
 pub use super::menu::{
     Entity as MenuEntity,
     Model as MenuModel,
     Column as MenuColumn,
     ActiveModel as MenuActiveModel,
+    Relation as MenuRelation,
+};
+pub use super::menu_permissions_map::{
+    Entity as MenuPermissionsEntity,
+    Model as MenuPermissionsModel,
+    Column as MenuPermissionsColumn,
+    ActiveModel as MenuPermissionsActiveModel,
+    Relation as MenuPermissionsRelation,
 };
 pub use super::operation_logs::{
     Entity as OperationLogEntity,
     Model as OperationLogModel,
     Column as OperationLogColumn,
     ActiveModel as OperationLogActiveModel,
+    Relation as OperationLogRelation,
 };
 pub use super::position::{
     Entity as PositionEntity,
     Model as PositionModel,
     Column as PositionColumn,
     ActiveModel as PositionActiveModel,
+    Relation as PositionRelation,
 };
-pub use super::role_api_map::{
-    Entity as RoleApiMapEntity,
-    Model as RoleApiMapModel,
-    Column as RoleApiMapColumn,
-    ActiveModel as RoleApiMapActiveModel,
+pub use super::role_permissions_map::{
+    Entity as RolePermissionsMapEntity,
+    Model as RolePermissionsMapModel,
+    Column as RolePermissionsMapColumn,
+    ActiveModel as RolePermissionsMapActiveModel,
+    Relation as RolePermissionMapRelation,
 };
 pub use super::role_department_map::{
     Entity as RoleDepartmentMapEntity,
     Model as RoleDepartmentMapModel,
     Column as RoleDepartmentMapColumn,
     ActiveModel as RoleDepartmentMapActiveModel,
+    Relation as RoleDepartmentMapRelation,
 };
 pub use super::role::{
     Entity as RoleEntity,
     Model as RoleModel,
     Column as RoleColumn,
     ActiveModel as RoleActiveModel,
+    Relation as RoleRelation,
+};
+pub use super::permission::{
+    Entity as PermissionEntity,
+    Model as PermissionModel,
+    Column as PermissionColumn,
+    ActiveModel as PermissionActiveModel,
+    Relation as PermissionRelation,
 };
 pub use super::update_log::{
     Entity as UpdateLogEntity,
     Model as UpdateLogModel,
     Column as UpdateLogColumn,
     ActiveModel as UpdateLogActiveModel,
+    Relation as UpdateLogRelation,
 };
 pub use super::user_department_map::{
     Entity as UserDepartmentMapEntity,
     Model as UserDepartmentMapModel,
     Column as UserDepartmentMapColumn,
     ActiveModel as UserDepartmentMapActiveModel,
+    Relation as UserDepartmentMapRelation,
 };
 pub use super::user_online::{
     Entity as UserOnlineEntity,
     Model as UserOnlineModel,
     Column as UserOnlineColumn,
     ActiveModel as UserOnlineActiveModel,
+    Relation as UserOnlineRelation,
 };
 pub use super::user_position_map::{
     Entity as UserPositionMapEntity,
     Model as UserPositionMapModel,
     Column as UserPositionMapColumn,
     ActiveModel as UserPositionMapActiveModel,
+    Relation as UserPositionRelation,
 };
 pub use super::user_role_map::{
     Entity as UserRoleMapEntity,
     Model as UserRoleMapModel,
     Column as UserRoleMapColumn,
     ActiveModel as UserRoleMapActiveModel,
+    Relation as UserRoleMapRelation,
 };
 pub use super::user::{
     Entity as UserEntity,
     Model as UserModel,
     Column as UserColumn,
     ActiveModel as UserActiveModel,
+    Relation as UserRelation,
 };
 pub use super::note::{
     Entity as NoteEntity,
     Model as NoteModel,
     Column as NoteColumn,
     ActiveModel as NoteActiveModel,
+    Relation as NoteRelation,
 };

@@ -13,7 +13,7 @@ impl MigrationTrait for Migration {
             .table(Departments::Table)
             .if_not_exists()
             .col(
-                ColumnDef::new(Departments::DptId)
+                ColumnDef::new(Departments::Id)
                     .big_integer()
                     .not_null()
                     .primary_key()

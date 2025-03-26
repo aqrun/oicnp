@@ -15,7 +15,7 @@ pub enum ApiDb {
 pub enum Departments {
     Table,
     #[oic(data_type = "bigInt", comment = "部门ID")]
-    DptId,
+    Id,
     #[oic(data_type = "bigInt", default = 0, comment = "父部门id")]
     Pid,
     #[oic(data_type = "string", len = 32, default = "", comment = "部门名称")]
@@ -276,6 +276,21 @@ pub enum Menus {
     DeletedAt,
 }
 
+#[derive(Iden, OicColumn)]
+pub enum MenuPermissionsMap {
+    Table,
+    #[oic(data_type = "bigInt", comment = "")]
+    Id,
+    #[oic(data_type = "bigInt", comment = "")]
+    MenuId,
+    #[oic(data_type = "string", len = 255, comment = "")]
+    PermissionId,
+    #[oic(data_type = "bigInt", len = 20, default = 0, comment = "")]
+    CreatedBy,
+    #[oic(data_type = "datetime", comment = "")]
+    CreatedAt,
+}
+
 
 // sys_oper_log
 #[derive(Iden, OicColumn)]
@@ -373,16 +388,41 @@ pub enum Roles {
     UpdatedAt,
 }
 
+#[derive(Iden, OicColumn)]
+pub enum Permissions {
+    Table,
+    #[oic(data_type = "bigInt", comment = "")]
+    PermissionId,
+    #[oic(data_type = "string", len = 64, default = "", comment = "")]
+    Vid,
+    #[oic(data_type = "string", len = 64, default = "", comment = "")]
+    Name,
+    #[oic(data_type = "string", len = 255, default = "", comment = "")]
+    Api,
+    #[oic(data_type = "int", default = 0, comment = "")]
+    Weight,
+    #[oic(data_type = "char", len = 1, default = "0", comment = "")]
+    Scope,
+    #[oic(data_type = "char", len = 1, default = "1", comment = "")]
+    Status,
+    #[oic(data_type = "string", len = 255, default = "", comment = "")]
+    Remark,
+    #[oic(data_type = "datetime", comment = "")]
+    CreatedAt,
+    #[oic(data_type = "datetime", comment = "")]
+    UpdatedAt,
+}
+
 // sys_role_api
 #[derive(Iden, OicColumn)]
-pub enum RoleApiMap {
+pub enum RolePermissionsMap {
     Table,
     #[oic(data_type = "bigInt", comment = "")]
     Id,
     #[oic(data_type = "bigInt", comment = "")]
     RoleId,
     #[oic(data_type = "string", len = 255, comment = "")]
-    Api,
+    PermissionId,
     #[oic(data_type = "char", len = 10, default = "", comment = "")]
     Method,
     #[oic(data_type = "bigInt", len = 20, default = 0, comment = "")]
