@@ -84,7 +84,7 @@ impl RequestParamsUpdater for RoleReqParams {
     /// 是创建操作需要再设置一些默认参数 如密码 uuid等
     /// 
     fn update_by_create(&self, role: &mut Self::ActiveModel) {
-        role.role_id = ActiveValue::NotSet;
+        // role.role_id = ActiveValue::NotSet;
 
 
         if self.created_at.is_none() {

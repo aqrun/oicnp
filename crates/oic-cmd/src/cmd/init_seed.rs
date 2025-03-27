@@ -13,7 +13,7 @@ use std::fs::File;
 /// 数据表最初数据填入
 /// 直接操作数据表
 pub async fn run(ctx: &AppContext) -> Result<()> {
-    // seed_roles(ctx).await?;
+    seed_roles(ctx).await?;
     seed_users(ctx).await?;
     Ok(())
 }

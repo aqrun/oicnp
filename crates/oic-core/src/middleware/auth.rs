@@ -72,10 +72,7 @@ where
           _ => {
             let empty_res = Self {
               claims: UserClaims {
-                uid: "".to_string(),
-                uuid: "".to_string(),
-                exp: 0,
-                claims: None,
+                ..Default::default()
               },
               user: T::default(),
             };
@@ -88,7 +85,7 @@ where
 
         match AuthJWT::new(&jwt_secret.secret).validate(&token) {
             Ok(claims) => {
-                let user = T::find_by_claims_key(&ctx.db, &claims.claims.uid)
+                let user = T::find_by_claims_key(&ctx.db, claims.claims.uuid.as_str())
                     .await
                     .map_err(|_| Error::Unauthorized("token is not valid".to_string()))?;
                 Ok(Self {

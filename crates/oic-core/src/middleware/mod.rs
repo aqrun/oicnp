@@ -1,2 +1,5 @@
-pub mod auth;
-pub mod role;
+mod auth;
+mod role;
+
+pub use auth::*;
+pub use role::*;

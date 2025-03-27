@@ -11,6 +11,7 @@ pub struct Model {
     #[serde(rename(deserialize = "permissionId", serialize = "permissionId"))]
     pub permission_id: i64,
     pub vid: String,
+    pub pid: i64,
     pub name: String,
     pub api: String,
     pub weight: i32,

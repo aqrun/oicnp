@@ -8,9 +8,9 @@ use jsonwebtoken::{
 /// Represents the default JWT algorithm used by the [`JWT`] struct.
 const JWT_ALGORITHM: Algorithm = Algorithm::HS512;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UserClaims {
-    pub uid: String,
+    pub uid: i64,
     pub uuid: String,
     pub exp: usize,
     pub claims: Option<Value>,
@@ -62,14 +62,19 @@ impl JWT {
   pub fn generate_token(
       &self,
       expiration: &u64,
-      uid: String,
-      uuid: String,
+      uid: i64,
+      uuid: &str,
       claims: Option<Value>,
   ) -> JWTResult<String> {
       #[allow(clippy::cast_possible_truncation)]
       let exp = (get_current_timestamp() + expiration) as usize;
 
-      let claims = UserClaims { uid, uuid, exp, claims };
+      let claims = UserClaims {
+        uid,
+        uuid: String::from(uuid),
+        exp,
+        claims,
+      };
 
       let token = encode(
           &Header::new(self.algorithm),

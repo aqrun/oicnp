@@ -94,6 +94,10 @@ impl RequestParamsUpdater for UserReqParams {
 
     /// 根据非空正常数据更新
     fn update(&self, user: &mut Self::ActiveModel) {
+        if let Some(x) = &self.uid {
+            user.uid = Set(*x);
+        }
+
         if let Some(x) = &self.uuid {
             user.uuid = Set(String::from(x));
         }

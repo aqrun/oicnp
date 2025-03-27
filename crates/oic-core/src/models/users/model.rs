@@ -423,7 +423,7 @@ impl UserModel {
     ///
     /// when could not convert user claims to jwt token
     pub fn generate_jwt(&self, secret: &str, expiration: &u64) -> ModelResult<String> {
-        Ok(JWT::new(secret).generate_token(expiration, self.uid.to_string(), self.uuid.to_string(), None)?)
+        Ok(JWT::new(secret).generate_token(expiration, self.uid, self.uuid.as_str(), None)?)
     }
 }
 

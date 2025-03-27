@@ -13,8 +13,7 @@ use loco_rs::prelude::*;
 use super::auth::JWTWithUser;
 use tower::{Layer, Service};
 use crate::entities::prelude::*;
-
-use crate::models::{roles, users};
+use crate::typings::JsonRes;
 
 #[derive(Clone)]
 pub struct RoleRouteLayer {
@@ -68,34 +67,47 @@ where
         Box::pin(async move {
             // Example of extracting JWT and checking roles
             let (mut parts, body) = req.into_parts();
-            let auth = JWTWithUser::<UserModel>::from_request_parts(&mut parts, &state).await;
+            // 当前 URL /v1/info
+            let uri = String::from(parts.uri.path());
 
-            match auth {
-                Ok(auth) => {
-                    // Check user roles here
-                    // If the user has the required role, proceed with the inner service
-                    let _role = match RoleModel::find_by_user(&state.db, &auth.user).await {
-                        Ok(role) => role,
-                        Err(_) => {
-                            return Ok(Response::builder()
-                                .status(401)
-                                .body(Body::empty())
-                                .unwrap()
-                                .into_response())
-                        }
-                    };
-                    let req = Request::from_parts(parts, body);
-                    inner.call(req).await
-                }
+            let mut has_permission = false;
+
+            let not_auth_uris = vec![
+                "/v1/info",
+            ];
+
+            let auth = match JWTWithUser::<UserModel>::from_request_parts(&mut parts, &state).await {
+                Ok(auth) => auth,
                 Err(_) => {
-                    // Handle error, e.g., return an unauthorized response
-                    Ok(Response::builder()
-                        .status(401)
-                        .body(Body::empty())
-                        .unwrap()
-                        .into_response())
-                }
+                    return Ok(no_auth("请先登录"));
+                },
+            };
+            // 检测登录状态
+            if auth.claims.uuid.is_empty() {
+                return Ok(no_auth("请先登录"));
+            }
+
+            if not_auth_uris.contains(&uri.as_str()) {
+                // 不需要权限检测
+                has_permission = true;
+            }
+
+            if has_permission {
+                let req = Request::from_parts(parts, body);
+                inner.call(req).await
+            } else {
+                Ok(no_auth(""))
             }
         })
     }
+}
+
+fn no_auth(msg: &str) -> Response {
+    let mut valid_msg = String::from("无权限访问");
+
+    if !msg.is_empty() {
+        valid_msg = String::from(msg);
+    }
+
+    JsonRes::<String>::code("401", valid_msg.as_str()).into_response()
 }

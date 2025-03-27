@@ -26,20 +26,22 @@ pub struct ResetParams {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct LoginResponse {
     pub token: String,
-    pub uid: String,
+    pub uid: i64,
     pub uuid: String,
     pub username: String,
+    pub email: String,
     pub is_verified: bool,
 }
 
 impl LoginResponse {
     #[must_use]
-    pub fn new(user: &UserModel, token: &String) -> Self {
+    pub fn new(user: &UserModel, token: &str) -> Self {
         Self {
-            token: token.to_string(),
-            uid: user.uid.to_string(),
-            uuid: user.uuid.to_string(),
-            username: user.username.clone(),
+            token: String::from(token),
+            uid: user.uid,
+            uuid: String::from(user.uuid.as_str()),
+            username: String::from(user.username.as_str()),
+            email: String::from(user.email.as_str()),
             is_verified: user.email_verified_at.is_some(),
         }
     }
@@ -149,14 +151,14 @@ pub async fn login(
     let _ = catch_err(params.validate())?;
 
     let user = UserModel::find_by_email(db, params.email.as_str()).await?;
-    println!("11111 {:?}", user.clone());
+
     // let valid = user.verify_password(&params.password);
     let valid = verify_password(
         params.password.as_str(), 
         user.password.as_str(),
         user.salt.as_str()
     )?;
-    println!("valid: {:?}, ----, {:?}", valid, params.clone());
+
     if !valid {
         return Err(anyhow!("invalid password"));
     }
@@ -167,5 +169,5 @@ pub async fn login(
         .generate_jwt(&jwt_secret.secret, &jwt_secret.expiration)
         .or_else(|_| unauthorized("unauthorized!"))?;
 
-    Ok(LoginResponse::new(&user, &token))
+    Ok(LoginResponse::new(&user, token.as_str()))
 }
