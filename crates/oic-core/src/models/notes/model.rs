@@ -1,5 +1,9 @@
 use crate::{
-    entities::prelude::*, typings::ListData, utils::catch_err, RequestParamsUpdater
+    entities::prelude::*,
+    typings::ListData,
+    utils::catch_err,
+    RequestParamsUpdater,
+    ModelCrudHandler,
 };
 use loco_rs::model::{ModelError, ModelResult};
 use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, TransactionTrait};
@@ -9,6 +13,39 @@ use super::{CreateNoteReqParams, NoteFilters, UpdateNoteReqParams, DeleteNoteReq
 
 #[async_trait::async_trait]
 impl ActiveModelBehavior for NoteActiveModel {}
+
+#[async_trait::async_trait]
+impl ModelCrudHandler for NoteModel {
+    type CreateReqParams = CreateNoteReqParams;
+
+    /// 批量创建
+    async fn create_multi(
+        db: &DatabaseConnection,
+        params: &[Self::CreateReqParams],
+    ) -> ModelResult<String> {
+        for item in params {
+            let _ = catch_err(item.validate())?;
+        }
+        
+        let txn = db.begin().await?;
+        let mut notes: Vec<NoteActiveModel> = Vec::new();
+
+        for item in params.iter() {
+            let mut note = NoteActiveModel {
+                ..Default::default()
+            };
+    
+            item.update(&mut note);
+            item.update_by_create(&mut note);
+            notes.push(note);
+        }
+        
+        let _ = NoteEntity::insert_many(notes).exec(&txn).await?;
+        txn.commit().await?;
+
+        Ok(String::from("批量note添加完成"))
+    }
+}
 
 impl NoteModel {
     ///
@@ -89,31 +126,6 @@ impl NoteModel {
         let item = item.insert(db).await?;
 
         Ok(item)
-    }
-
-    /// 批量创建 note
-    pub async fn create_multi(db: &DatabaseConnection, params: &[CreateNoteReqParams]) -> ModelResult<String> {
-        for item in params {
-            let _ = catch_err(item.validate())?;
-        }
-        
-        let txn = db.begin().await?;
-        let mut notes: Vec<NoteActiveModel> = Vec::new();
-
-        for item in params.iter() {
-            let mut note = NoteActiveModel {
-                ..Default::default()
-            };
-    
-            item.update(&mut note);
-            item.update_by_create(&mut note);
-            notes.push(note);
-        }
-        
-        let _ = NoteEntity::insert_many(notes).exec(&txn).await?;
-        txn.commit().await?;
-
-        Ok(String::from("批量note添加完成"))
     }
 
     /// 更新数据

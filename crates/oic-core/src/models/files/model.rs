@@ -1,5 +1,9 @@
 use crate::{
-    entities::prelude::*, typings::ListData, utils::catch_err, RequestParamsUpdater
+    entities::prelude::*,
+    typings::ListData,
+    utils::catch_err,
+    RequestParamsUpdater,
+    ModelCrudHandler,
 };
 use loco_rs::prelude::*;
 use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, TransactionTrait};
@@ -8,6 +12,38 @@ use super::{CreateFileReqParams, FileFilters, UpdateFileReqParams, DeleteFileReq
 
 #[async_trait::async_trait]
 impl ActiveModelBehavior for FileActiveModel {}
+
+#[async_trait::async_trait]
+impl ModelCrudHandler for FileModel {
+    type CreateReqParams = CreateFileReqParams;
+
+    /// 批量创建
+    async fn create_multi(
+        db: &DatabaseConnection,
+        params: &[Self::CreateReqParams],
+    ) -> ModelResult<String> {
+        let _ = catch_err(params.validate())?;
+        
+        let txn = db.begin().await?;
+        let mut list: Vec<FileActiveModel> = Vec::new();
+
+        for item in params.iter() {
+            let mut file = FileActiveModel {
+                ..Default::default()
+            };
+    
+            item.update(&mut file);
+            item.update_by_create(&mut file);
+
+            list.push(file);
+        }
+        
+        let _ = FileEntity::insert_many(list).exec(&txn).await?;
+        txn.commit().await?;
+
+        Ok(String::from("批量file添加完成"))
+    }
+}
 
 impl FileModel {
     ///
@@ -88,30 +124,6 @@ impl FileModel {
         let item = item.insert(db).await?;
 
         Ok(item)
-    }
-
-    /// 批量创建 node
-    pub async fn create_multi(db: &DatabaseConnection, params: &[CreateFileReqParams]) -> ModelResult<String> {
-        let _ = catch_err(params.validate())?;
-        
-        let txn = db.begin().await?;
-        let mut list: Vec<FileActiveModel> = Vec::new();
-
-        for item in params.iter() {
-            let mut file = FileActiveModel {
-                ..Default::default()
-            };
-    
-            item.update(&mut file);
-            item.update_by_create(&mut file);
-
-            list.push(file);
-        }
-        
-        let _ = FileEntity::insert_many(list).exec(&txn).await?;
-        txn.commit().await?;
-
-        Ok(String::from("批量node添加完成"))
     }
 
     /// 更新数据

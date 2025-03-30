@@ -6,11 +6,45 @@ use crate::{
 use loco_rs::prelude::*;
 use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, TransactionTrait};
 use validator::Validate;
-use crate::RequestParamsUpdater;
+use crate::{RequestParamsUpdater, ModelCrudHandler};
 use super::{CreatePermissionReqParams, DeletePermissionReqParams, PermissionFilters, UpdatePermissionReqParams};
 
 #[async_trait::async_trait]
 impl ActiveModelBehavior for PermissionActiveModel {}
+
+#[async_trait::async_trait]
+impl ModelCrudHandler for PermissionModel {
+    type CreateReqParams = CreatePermissionReqParams;
+
+    /// 批量创建
+    async fn create_multi(
+        db: &DatabaseConnection,
+        params: &[Self::CreateReqParams],
+    ) -> ModelResult<String> {
+        for item in params {
+            let _ = catch_err(item.validate())?;
+        }
+        
+        let txn = db.begin().await?;
+        let mut list: Vec<PermissionActiveModel> = Vec::new();
+
+        for item in params.iter() {
+            let mut permission = PermissionActiveModel {
+                ..Default::default()
+            };
+
+            item.update(&mut permission);
+            item.update_by_create(&mut permission);
+
+            list.push(permission);
+        }
+
+        let _ = PermissionEntity::insert_many(list).exec(&txn).await?;
+        txn.commit().await?;
+
+        Ok(String::from("批量角色添加完成"))
+    }
+}
 
 impl PermissionModel {
 
@@ -106,32 +140,6 @@ impl PermissionModel {
         let item = item.insert(db).await?;
 
         Ok(item)
-    }
-
-    /// 批量创建
-    pub async fn create_multi(db: &DatabaseConnection, params: &[CreatePermissionReqParams]) -> ModelResult<String> {
-        for item in params {
-            let _ = catch_err(item.validate())?;
-        }
-        
-        let txn = db.begin().await?;
-        let mut list: Vec<PermissionActiveModel> = Vec::new();
-
-        for item in params.iter() {
-            let mut permission = PermissionActiveModel {
-                ..Default::default()
-            };
-
-            item.update(&mut permission);
-            item.update_by_create(&mut permission);
-
-            list.push(permission);
-        }
-
-        let _ = PermissionEntity::insert_many(list).exec(&txn).await?;
-        txn.commit().await?;
-
-        Ok(String::from("批量角色添加完成"))
     }
 
     /// 更新数据

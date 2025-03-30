@@ -20,7 +20,7 @@ pub struct NoteFilters {
 }
 
 /// 创建 note 参数
-#[derive(Deserialize, Serialize, Debug, Validate, Default)]
+#[derive(Deserialize, Serialize, Debug, Validate, Default, Clone)]
 #[serde(default)]
 pub struct NoteReqParams {
     pub id: Option<i64>,

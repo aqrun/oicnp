@@ -1,14 +1,49 @@
 use crate::{
-    entities::prelude::*, typings::ListData, utils::{catch_err, utc_now}, RequestParamsUpdater
+    entities::prelude::*,
+    typings::ListData,
+    utils::catch_err,
+    RequestParamsUpdater,
+    ModelCrudHandler,
 };
 use loco_rs::prelude::*;
-use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, Set, TransactionTrait};
-use serde_json::json;
+use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, TransactionTrait};
 use validator::Validate;
 use super::{CreateNodeReqParams, NodeFilters, UpdateNodeReqParams, DeleteNodeReqParams};
 
 #[async_trait::async_trait]
 impl ActiveModelBehavior for NodeActiveModel {}
+
+#[async_trait::async_trait]
+impl ModelCrudHandler for NodeModel {
+    type CreateReqParams = CreateNodeReqParams;
+
+    /// 批量创建
+    async fn create_multi(
+        db: &DatabaseConnection,
+        params: &[Self::CreateReqParams],
+    ) -> ModelResult<String> {
+        let _ = catch_err(params.validate())?;
+        
+        let txn = db.begin().await?;
+        let mut notes: Vec<NodeActiveModel> = Vec::new();
+
+        for item in params.iter() {
+            let mut note = NodeActiveModel {
+                ..Default::default()
+            };
+    
+            item.update(&mut note);
+            item.update_by_create(&mut note);
+
+            notes.push(note);
+        }
+        
+        let _ = NodeEntity::insert_many(notes).exec(&txn).await?;
+        txn.commit().await?;
+
+        Ok(String::from("批量node添加完成"))
+    }
+}
 
 impl NodeModel {
     ///
@@ -89,30 +124,6 @@ impl NodeModel {
         let item = item.insert(db).await?;
 
         Ok(item)
-    }
-
-    /// 批量创建 node
-    pub async fn create_multi(db: &DatabaseConnection, params: &[CreateNodeReqParams]) -> ModelResult<String> {
-        let _ = catch_err(params.validate())?;
-        
-        let txn = db.begin().await?;
-        let mut notes: Vec<NodeActiveModel> = Vec::new();
-
-        for item in params.iter() {
-            let mut note = NodeActiveModel {
-                ..Default::default()
-            };
-    
-            item.update(&mut note);
-            item.update_by_create(&mut note);
-
-            notes.push(note);
-        }
-        
-        let _ = NodeEntity::insert_many(notes).exec(&txn).await?;
-        txn.commit().await?;
-
-        Ok(String::from("批量node添加完成"))
     }
 
     /// 更新数据

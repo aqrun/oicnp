@@ -3,7 +3,7 @@ use validator::Validate;
 use oic_derives::{add_filter_fields, FilterParams};
 use loco_rs::prelude::*;
 use crate::{
-    models::RequestParamsUpdater,
+    RequestParamsUpdater,
     utils::utc_now,
     entities::prelude::*,
 };
@@ -27,7 +27,7 @@ pub struct FileFilters {
 }
 
 /// 创建 file 参数
-#[derive(Deserialize, Serialize, Debug, Validate, Default)]
+#[derive(Deserialize, Serialize, Debug, Validate, Default, Clone)]
 #[serde(default)]
 pub struct FileReqParams {
     pub file_id: Option<i64>,

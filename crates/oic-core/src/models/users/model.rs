@@ -18,7 +18,7 @@ pub use crate::entities::prelude::{
   UserRoleMapEntity,
 };
 use crate::utils::uuid as getUuid;
-use crate::RequestParamsUpdater;
+use crate::{RequestParamsUpdater, ModelCrudHandler};
 use sea_orm::{prelude::*, QueryOrder};
 use super::{
     UserFilters,
@@ -84,6 +84,69 @@ impl Authenticable for UserModel {
     }
 }
 
+#[async_trait]
+impl ModelCrudHandler for UserModel {
+    type CreateReqParams = CreateUserReqParams;
+
+    async fn create_multi(
+        db: &DatabaseConnection,
+        params: &[Self::CreateReqParams],
+    ) -> ModelResult<String> {
+        for item in params {
+            let _ = catch_err(item.validate())?;
+        }
+
+        let txn = db.begin().await?;
+        let mut users: Vec<UserActiveModel> = Vec::new();
+
+        for item in params.iter() {
+            let mut user = UserActiveModel::new();
+            item.update(&mut user);
+            item.update_by_create(&mut user);
+
+            users.push(user);
+        }
+
+        let _ = UserEntity::insert_many(users).exec(&txn).await?;
+
+        txn.commit().await?;
+
+        // 需要批量创建的 user role 关联关系
+        let mut user_role_list: Vec<UserRoleMapActiveModel> = Vec::new();
+
+        for item in params.iter() {
+            let mut email = String::from("");
+            let mut item_roles: Vec<String> = Vec::new();
+
+            if let Some(x) = &item.email {
+                email = String::from(x);
+            } else {
+                continue;
+            }
+
+            if let Some(x) = &item.roles {
+                item_roles = x.clone();
+            }
+
+            let user = Self::find_by_email(db, email.as_str()).await?;
+
+            for role_item in item_roles {
+                let role = RoleModel::find_by_vid(db, role_item.as_str()).await?;
+                let user_role_map = UserRoleMapActiveModel {
+                    uid: Set(user.uid),
+                    role_id: Set(role.role_id),
+                    ..Default::default()
+                };
+                user_role_list.push(user_role_map);
+            }
+        }
+
+        let _ = UserRoleMapEntity::insert_many(user_role_list).exec(db).await?;
+        
+        Ok(String::from("批量user添加完成"))
+    }
+}
+
 impl UserModel {
     ////
     /// 获取user列表
@@ -143,62 +206,6 @@ impl UserModel {
         let user = user.insert(db).await?;
 
         Ok(user)
-    }
-
-    /// 批量创建 note
-    pub async fn create_multi(db: &DatabaseConnection, params: &[CreateUserReqParams]) -> ModelResult<String> {
-        for item in params {
-            let _ = catch_err(item.validate())?;
-        }
-
-        let txn = db.begin().await?;
-        let mut users: Vec<UserActiveModel> = Vec::new();
-
-        for item in params.iter() {
-            let mut user = UserActiveModel::new();
-            item.update(&mut user);
-            item.update_by_create(&mut user);
-
-            users.push(user);
-        }
-
-        let _ = UserEntity::insert_many(users).exec(&txn).await?;
-
-        txn.commit().await?;
-
-        // 需要批量创建的 user role 关联关系
-        let mut user_role_list: Vec<UserRoleMapActiveModel> = Vec::new();
-
-        for item in params.iter() {
-            let mut email = String::from("");
-            let mut item_roles: Vec<String> = Vec::new();
-
-            if let Some(x) = &item.email {
-                email = String::from(x);
-            } else {
-                continue;
-            }
-
-            if let Some(x) = &item.roles {
-                item_roles = x.clone();
-            }
-
-            let user = Self::find_by_email(db, email.as_str()).await?;
-
-            for role_item in item_roles {
-                let role = RoleModel::find_by_vid(db, role_item.as_str()).await?;
-                let user_role_map = UserRoleMapActiveModel {
-                    uid: Set(user.uid),
-                    role_id: Set(role.role_id),
-                    ..Default::default()
-                };
-                user_role_list.push(user_role_map);
-            }
-        }
-
-        let _ = UserRoleMapEntity::insert_many(user_role_list).exec(db).await?;
-        
-        Ok(String::from("批量user添加完成"))
     }
 
     /// 给用户指定角色

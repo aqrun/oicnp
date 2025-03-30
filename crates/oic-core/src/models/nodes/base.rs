@@ -28,7 +28,7 @@ pub struct NodeFilters {
 }
 
 /// 创建 note 参数
-#[derive(Deserialize, Serialize, Debug, Validate, Default)]
+#[derive(Deserialize, Serialize, Debug, Validate, Default, Clone)]
 #[serde(default)]
 pub struct NodeReqParams {
     pub nid: Option<i64>,

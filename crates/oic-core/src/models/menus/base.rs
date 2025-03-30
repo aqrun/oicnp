@@ -18,7 +18,7 @@ pub struct MenuFilters {
 }
 
 /// 创建 note 参数
-#[derive(Deserialize, Serialize, Debug, Validate, Default)]
+#[derive(Deserialize, Serialize, Debug, Validate, Default, Clone)]
 #[serde(default)]
 pub struct MenuReqParams {
     pub id: Option<i32>,

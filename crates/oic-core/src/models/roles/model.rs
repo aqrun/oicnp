@@ -6,11 +6,45 @@ use crate::{
 use loco_rs::prelude::*;
 use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, TransactionTrait};
 use validator::Validate;
-use crate::RequestParamsUpdater;
+use crate::{RequestParamsUpdater, ModelCrudHandler};
 use super::{CreateRoleReqParams, DeleteRoleReqParams, RoleFilters, UpdateRoleReqParams};
 
 #[async_trait::async_trait]
 impl ActiveModelBehavior for RoleActiveModel {}
+
+#[async_trait::async_trait]
+impl ModelCrudHandler for RoleModel {
+    type CreateReqParams = CreateRoleReqParams;
+
+    /// 批量创建
+    async fn create_multi(
+        db: &DatabaseConnection,
+        params: &[Self::CreateReqParams],
+    ) -> ModelResult<String> {
+        for item in params {
+            let _ = catch_err(item.validate())?;
+        }
+        
+        let txn = db.begin().await?;
+        let mut list: Vec<RoleActiveModel> = Vec::new();
+
+        for item in params.iter() {
+            let mut role = RoleActiveModel {
+                ..Default::default()
+            };
+
+            item.update(&mut role);
+            item.update_by_create(&mut role);
+
+            list.push(role);
+        }
+
+        let _ = RoleEntity::insert_many(list).exec(&txn).await?;
+        txn.commit().await?;
+
+        Ok(String::from("批量角色添加完成"))
+    }
+}
 
 impl RoleModel {
     pub async fn find_by_user(db: &DatabaseConnection, user: &UserModel) -> ModelResult<Self> {
@@ -114,32 +148,6 @@ impl RoleModel {
         let item = item.insert(db).await?;
 
         Ok(item)
-    }
-
-    /// 批量创建
-    pub async fn create_multi(db: &DatabaseConnection, params: &[CreateRoleReqParams]) -> ModelResult<String> {
-        for item in params {
-            let _ = catch_err(item.validate())?;
-        }
-        
-        let txn = db.begin().await?;
-        let mut list: Vec<RoleActiveModel> = Vec::new();
-
-        for item in params.iter() {
-            let mut role = RoleActiveModel {
-                ..Default::default()
-            };
-
-            item.update(&mut role);
-            item.update_by_create(&mut role);
-
-            list.push(role);
-        }
-
-        let _ = RoleEntity::insert_many(list).exec(&txn).await?;
-        txn.commit().await?;
-
-        Ok(String::from("批量角色添加完成"))
     }
 
     /// 更新数据
