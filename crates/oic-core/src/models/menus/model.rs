@@ -18,9 +18,95 @@ impl ActiveModelBehavior for MenuActiveModel {}
 
 #[async_trait::async_trait]
 impl ModelCrudHandler for MenuModel {
+    type DataModel = Self;
+    type FilterParams = MenuFilters;
     type CreateReqParams = CreateMenuReqParams;
     type UpdateReqParams = UpdateMenuReqParams;
     type DeleteReqParams = DeleteMenuReqParams;
+
+    ///
+    /// 根据ID查找一个
+    /// 
+    async fn find_by_id(db: &DatabaseConnection, id: i64) -> ModelResult<Self> {
+        if id < 0 {
+            return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
+        }
+
+        let item = MenuEntity::find()
+            .filter(MenuColumn::Id.eq(id))
+            .one(db)
+            .await?;
+
+        item.ok_or_else(|| {
+            ModelError::Any(format!("数据不存在,id: {}", id).into())
+        })
+    }
+
+    ///
+    /// 根据ID查找一个
+    /// 
+    async fn find_by_vid(db: &DatabaseConnection, vid: &str) -> ModelResult<Self> {
+        Ok(Self::default())
+    }
+
+
+    ////
+    /// 获取node列表
+    /// 
+    async fn find_list(db: &DatabaseConnection, params: &Self::FilterParams) -> ModelResult<ListData<Self>> {
+        let page = params.get_page();
+        let page_size = params.get_page_size();
+        let order = params.get_order();
+        let order_by_str = params.get_order_by();
+
+        let mut q = MenuEntity::find();
+
+        if let Some(x) = params.id {
+            q = q.filter(MenuColumn::Id.eq(x));
+        }
+
+        if let Some(x) = &params.mid {
+            q = q.filter(MenuColumn::Mid.eq(x));
+        }
+
+        if let Some(x) = &params.pid {
+            q = q.filter(MenuColumn::Pid.eq(x));
+        }
+
+        if let Some(x) = &params.depth {
+            q = q.filter(MenuColumn::Depth.eq(x));
+        }
+
+        if let Some(x) = &params.name {
+            if !x.is_empty() {
+                q = q.filter(MenuColumn::Name.contains(x));
+            }
+        }
+
+        let mut order_by = MenuColumn::Id;
+
+        if order_by_str.eq("name") {
+            order_by = MenuColumn::Name;
+        } else if order_by_str.eq("weight") {
+            order_by = MenuColumn::Weight
+        }
+
+        // 获取全部数据条数
+        let total = q.clone().count(db).await?;
+        // 分页获取数据
+        let pager = q.order_by(order_by, order)
+            .paginate(db, page_size);
+        let list = pager.fetch_page(page - 1).await?;
+
+        let res = ListData {
+            data: list,
+            page,
+            page_size,
+            total,
+        };
+
+        Ok(res)
+    }
 
     /// 批量创建 menu
     /// 菜单需要每次添加更新对应的 depth 数据 所以不使用 事务操作
@@ -146,7 +232,7 @@ impl ModelCrudHandler for MenuModel {
             return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
         }
 
-        let mut item = Self::find_by_id(db, id)
+        let mut item = Self::find_by_id(db, id as i64)
             .await?
             .into_active_model();
 
@@ -176,24 +262,6 @@ impl ModelCrudHandler for MenuModel {
 
 impl MenuModel {
     ///
-    /// 根据ID查找一个
-    /// 
-    pub async fn find_by_id(db: &DatabaseConnection, id: i32) -> ModelResult<Self> {
-        if id < 0 {
-            return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
-        }
-
-        let item = MenuEntity::find()
-            .filter(MenuColumn::Id.eq(id))
-            .one(db)
-            .await?;
-
-        item.ok_or_else(|| {
-            ModelError::Any(format!("数据不存在,id: {}", id).into())
-        })
-    }
-
-    ///
     /// 根据MID查找一个
     /// 
     pub async fn find_by_mid(db: &DatabaseConnection, mid: &str) -> ModelResult<Self> {
@@ -209,65 +277,6 @@ impl MenuModel {
         item.ok_or_else(|| {
             ModelError::Any(format!("数据不存在, mid: {}", mid).into())
         })
-    }
-
-
-    ////
-    /// 获取node列表
-    /// 
-    pub async fn find_list(db: &DatabaseConnection, params: MenuFilters) -> ModelResult<ListData<Self>> {
-        let page = params.get_page();
-        let page_size = params.get_page_size();
-        let order = params.get_order();
-        let order_by_str = params.get_order_by();
-
-        let mut q = MenuEntity::find();
-
-        if let Some(x) = params.id {
-            q = q.filter(MenuColumn::Id.eq(x));
-        }
-
-        if let Some(x) = params.mid {
-            q = q.filter(MenuColumn::Mid.eq(x));
-        }
-
-        if let Some(x) = params.pid {
-            q = q.filter(MenuColumn::Pid.eq(x));
-        }
-
-        if let Some(x) = params.depth {
-            q = q.filter(MenuColumn::Depth.eq(x));
-        }
-
-        if let Some(x) = params.name {
-            if !x.is_empty() {
-                q = q.filter(MenuColumn::Name.contains(&x));
-            }
-        }
-
-        let mut order_by = MenuColumn::Id;
-
-        if order_by_str.eq("name") {
-            order_by = MenuColumn::Name;
-        } else if order_by_str.eq("weight") {
-            order_by = MenuColumn::Weight
-        }
-
-        // 获取全部数据条数
-        let total = q.clone().count(db).await?;
-        // 分页获取数据
-        let pager = q.order_by(order_by, order)
-            .paginate(db, page_size);
-        let list = pager.fetch_page(page - 1).await?;
-
-        let res = ListData {
-            data: list,
-            page,
-            page_size,
-            total,
-        };
-
-        Ok(res)
     }
 
     ////

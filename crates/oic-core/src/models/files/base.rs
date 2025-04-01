@@ -9,7 +9,7 @@ use crate::{
 };
 
 #[add_filter_fields]
-#[derive(FilterParams, Deserialize, Serialize, Debug, Default)]
+#[derive(FilterParams, Deserialize, Serialize, Debug, Default, Clone)]
 #[serde(default)]
 pub struct FileFilters {
     pub file_id: Option<i64>,

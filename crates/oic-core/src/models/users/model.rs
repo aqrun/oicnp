@@ -86,9 +86,85 @@ impl Authenticable for UserModel {
 
 #[async_trait]
 impl ModelCrudHandler for UserModel {
+    type DataModel = Self;
+    type FilterParams = UserFilters;
     type CreateReqParams = CreateUserReqParams;
     type UpdateReqParams = UpdateUserReqParams;
     type DeleteReqParams = DeleteUserReqParams;
+
+    /// 根据ID查找一个
+    async fn find_by_id(db: &DatabaseConnection, id: i64) -> ModelResult<Self::DataModel> {
+        // let parse_uuid = Uuid::parse_str(pid).map_err(|e| ModelError::Any(e.into()))?;
+        let user = UserEntity::find()
+            .filter(
+                model::query::condition()
+                    .eq(UserColumn::Uid, id)
+                    .build(),
+            )
+            .one(db)
+            .await?;
+        user.ok_or_else(|| ModelError::EntityNotFound)
+    }
+
+    /// 根据vid查找一个
+    async fn find_by_vid(db: &DatabaseConnection, vid: &str) -> ModelResult<Self::DataModel> {
+        // let parse_uuid = Uuid::parse_str(pid).map_err(|e| ModelError::Any(e.into()))?;
+        let user = UserEntity::find()
+            .filter(
+                model::query::condition()
+                    .eq(UserColumn::Uuid, vid)
+                    .build(),
+            )
+            .one(db)
+            .await?;
+        user.ok_or_else(|| ModelError::EntityNotFound)
+    }
+
+    ////
+    /// 获取user列表
+    /// 
+    async fn find_list(db: &DatabaseConnection, params: &Self::FilterParams) -> ModelResult<ListData<Self>> {
+        let page = params.get_page();
+        let page_size = params.get_page_size();
+        let order = params.get_order();
+        let order_by_str = params.get_order_by();
+
+        let mut q = UserEntity::find();
+
+        if let Some(x) = &params.uid {
+            if *x > 0 {
+                q = q.filter(UserColumn::Uid.eq(*x));
+            }
+        }
+
+        if let Some(x) = &params.uuid {
+            if !x.is_empty() {
+                q = q.filter(UserColumn::Uuid.eq(x));
+            }
+        }
+
+        let mut order_by = UserColumn::Uid;
+
+        if order_by_str.eq("created_at") {
+            order_by = UserColumn::CreatedAt;
+        }
+
+        // 获取全部数据条数
+        let total = q.clone().count(db).await?;
+        // 分页获取数据
+        let pager = q.order_by(order_by, order)
+            .paginate(db, page_size);
+        let list = pager.fetch_page(page - 1).await?;
+
+        let res = ListData {
+            data: list,
+            page,
+            page_size,
+            total,
+        };
+
+        Ok(res)
+    }
 
     async fn create_multi(
         db: &DatabaseConnection,
@@ -197,52 +273,6 @@ impl ModelCrudHandler for UserModel {
 }
 
 impl UserModel {
-    ////
-    /// 获取user列表
-    /// 
-    pub async fn find_list(db: &DatabaseConnection, params: UserFilters) -> ModelResult<ListData<UserModel>> {
-        let page = params.get_page();
-        let page_size = params.get_page_size();
-        let order = params.get_order();
-        let order_by_str = params.get_order_by();
-
-        let mut q = UserEntity::find();
-
-        if let Some(x) = params.uid {
-            if x > 0 {
-                q = q.filter(UserColumn::Uid.eq(x));
-            }
-        }
-
-        if let Some(x) = params.uuid {
-            if !x.is_empty() {
-                q = q.filter(UserColumn::Uuid.eq(x));
-            }
-        }
-
-        let mut order_by = UserColumn::Uid;
-
-        if order_by_str.eq("created_at") {
-            order_by = UserColumn::CreatedAt;
-        }
-
-        // 获取全部数据条数
-        let total = q.clone().count(db).await?;
-        // 分页获取数据
-        let pager = q.order_by(order_by, order)
-            .paginate(db, page_size);
-        let list = pager.fetch_page(page - 1).await?;
-
-        let res = ListData {
-            data: list,
-            page,
-            page_size,
-            total,
-        };
-
-        Ok(res)
-    }
-
     /// 给用户指定角色
     pub async fn assign_roles(
         db: &DatabaseConnection,

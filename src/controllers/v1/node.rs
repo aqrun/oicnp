@@ -29,7 +29,7 @@ pub async fn list(
     State(ctx): State<AppContext>,
     Json(params): Json<NodeFilters>,
 ) -> JsonRes<ListData<NodeModel>> {
-    let res = NodeModel::find_list(&ctx.db, params)
+    let res = NodeModel::find_list(&ctx.db, &params)
         .await;
     JsonRes::from(res)
 }

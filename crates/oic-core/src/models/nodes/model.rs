@@ -15,9 +15,82 @@ impl ActiveModelBehavior for NodeActiveModel {}
 
 #[async_trait::async_trait]
 impl ModelCrudHandler for NodeModel {
+    type DataModel = Self;
+    type FilterParams = NodeFilters;
     type CreateReqParams = CreateNodeReqParams;
     type UpdateReqParams = UpdateNodeReqParams;
     type DeleteReqParams = DeleteNodeReqParams;
+
+    ///
+    /// 根据ID查找一个
+    /// 
+    async fn find_by_id(db: &DatabaseConnection, id: i64) -> ModelResult<Self> {
+        if id <= 0 {
+            return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
+        }
+
+        let item = NodeEntity::find()
+            .filter(NoteColumn::Id.eq(id))
+            .one(db)
+            .await?;
+
+        item.ok_or_else(|| {
+            ModelError::Any(format!("数据不存在,id: {}", id).into())
+        })
+    }
+
+    ///
+    /// 根据ID查找一个
+    /// 
+    async fn find_by_vid(_db: &DatabaseConnection, _vid: &str) -> ModelResult<Self> {
+        Ok(Self::default())
+    }
+
+    ////
+    /// 获取node列表
+    /// 
+    async fn find_list(db: &DatabaseConnection, params: &Self::FilterParams) -> ModelResult<ListData<Self>> {
+        let page = params.get_page();
+        let page_size = params.get_page_size();
+        let order = params.get_order();
+        let order_by_str = params.get_order_by();
+
+        let mut q = NodeEntity::find();
+
+        if let Some(x) = params.nid {
+            if x > 0 {
+                q = q.filter(NodeColumn::Nid.eq(x));
+            }
+        }
+
+        if let Some(x) = &params.title {
+            if !x.is_empty() {
+                q = q.filter(NodeColumn::Title.contains(x));
+            }
+        }
+
+        let mut order_by = NodeColumn::Nid;
+
+        if order_by_str.eq("title") {
+            order_by = NodeColumn::Title;
+        }
+
+        // 获取全部数据条数
+        let total = q.clone().count(db).await?;
+        // 分页获取数据
+        let pager = q.order_by(order_by, order)
+            .paginate(db, page_size);
+        let list = pager.fetch_page(page - 1).await?;
+
+        let res = ListData {
+            data: list,
+            page,
+            page_size,
+            total,
+        };
+
+        Ok(res)
+    }
 
     /// 批量创建
     async fn create_multi(
@@ -99,67 +172,5 @@ impl ModelCrudHandler for NodeModel {
 }
 
 impl NodeModel {
-    ///
-    /// 根据ID查找一个
-    /// 
-    pub async fn find_by_id(db: &DatabaseConnection, id: i64) -> ModelResult<Self> {
-        if id <= 0 {
-            return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
-        }
-
-        let item = NodeEntity::find()
-            .filter(NoteColumn::Id.eq(id))
-            .one(db)
-            .await?;
-
-        item.ok_or_else(|| {
-            ModelError::Any(format!("数据不存在,id: {}", id).into())
-        })
-    }
-
-    ////
-    /// 获取node列表
-    /// 
-    pub async fn find_list(db: &DatabaseConnection, params: NodeFilters) -> ModelResult<ListData<Self>> {
-        let page = params.get_page();
-        let page_size = params.get_page_size();
-        let order = params.get_order();
-        let order_by_str = params.get_order_by();
-
-        let mut q = NodeEntity::find();
-
-        if let Some(x) = params.nid {
-            if x > 0 {
-                q = q.filter(NodeColumn::Nid.eq(x));
-            }
-        }
-
-        if let Some(x) = params.title {
-            if !x.is_empty() {
-                q = q.filter(NodeColumn::Title.contains(&x));
-            }
-        }
-
-        let mut order_by = NodeColumn::Nid;
-
-        if order_by_str.eq("title") {
-            order_by = NodeColumn::Title;
-        }
-
-        // 获取全部数据条数
-        let total = q.clone().count(db).await?;
-        // 分页获取数据
-        let pager = q.order_by(order_by, order)
-            .paginate(db, page_size);
-        let list = pager.fetch_page(page - 1).await?;
-
-        let res = ListData {
-            data: list,
-            page,
-            page_size,
-            total,
-        };
-
-        Ok(res)
-    }
+    
 }

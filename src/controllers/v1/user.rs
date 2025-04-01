@@ -37,7 +37,7 @@ pub async fn list(
     State(ctx): State<AppContext>,
     Json(params): Json<UserFilters>,
 ) -> JsonRes<ListData<UserModel>> {
-    let res = UserModel::find_list(&ctx.db, params)
+    let res = UserModel::find_list(&ctx.db, &params)
         .await;
     JsonRes::from(res)
 }

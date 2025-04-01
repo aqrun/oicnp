@@ -20,7 +20,7 @@ pub async fn get_one(
     Json(params): Json<MenuFilters>,
 ) -> JsonRes<MenuModel> {
     let id = params.id.unwrap_or(0);
-    let res = MenuModel::find_by_id(&ctx.db, id).await;
+    let res = MenuModel::find_by_id(&ctx.db, id as i64).await;
 
     JsonRes::from(res)
 }
@@ -30,7 +30,7 @@ pub async fn list(
     State(ctx): State<AppContext>,
     Json(params): Json<MenuFilters>,
 ) -> JsonRes<ListData<MenuModel>> {
-    let res = MenuModel::find_list(&ctx.db, params)
+    let res = MenuModel::find_list(&ctx.db, &params)
         .await;
     JsonRes::from(res)
 }

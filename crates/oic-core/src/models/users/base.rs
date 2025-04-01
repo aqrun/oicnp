@@ -41,7 +41,8 @@ pub struct Validator {
 }
 
 #[add_filter_fields]
-#[derive(FilterParams, Deserialize, Serialize, Debug)]
+#[derive(FilterParams, Deserialize, Serialize, Debug, Clone, Default)]
+#[serde(default)]
 pub struct UserFilters {
     pub uid: Option<i64>,
     pub uuid: Option<String>,
