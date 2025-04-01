@@ -22,7 +22,7 @@ impl ModelCrudHandler for FileModel {
         db: &DatabaseConnection,
         params: &[Self::CreateReqParams],
     ) -> ModelResult<String> {
-        let _ = catch_err(params.validate())?;
+        catch_err(params.validate())?;
         
         let txn = db.begin().await?;
         let mut list: Vec<FileActiveModel> = Vec::new();
@@ -112,7 +112,7 @@ impl FileModel {
 
     /// 创建 node
     pub async fn create(db: &DatabaseConnection, params: &CreateFileReqParams) -> ModelResult<Self> {
-        let _ = catch_err(params.validate())?;
+        catch_err(params.validate())?;
 
         let mut item = FileActiveModel {
             ..Default::default()
@@ -128,14 +128,14 @@ impl FileModel {
 
     /// 更新数据
     pub async fn update(db: &DatabaseConnection, params: UpdateFileReqParams) -> ModelResult<i64> {
-        let _ = catch_err(params.validate())?;
+        catch_err(params.validate())?;
         let id = params.file_id.unwrap_or(0);
 
         if id <= 0 {
             return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
         }
 
-        let mut item = Self::find_by_id(&db, id)
+        let mut item = Self::find_by_id(db, id)
             .await?
             .into_active_model();
 

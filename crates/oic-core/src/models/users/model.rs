@@ -6,6 +6,7 @@ use crate::utils::catch_err;
 use crate::{
     auth::JWT,
     typings::ListData,
+    uuid,
 };
 use super::{RegisterParams, Validator};
 pub use crate::entities::prelude::{
@@ -17,7 +18,6 @@ pub use crate::entities::prelude::{
   UserRoleMapActiveModel,
   UserRoleMapEntity,
 };
-use crate::utils::uuid as getUuid;
 use crate::{RequestParamsUpdater, ModelCrudHandler};
 use sea_orm::{prelude::*, QueryOrder};
 use super::{
@@ -51,7 +51,7 @@ impl ActiveModelBehavior for UserActiveModel {
             let mut this = self;
 
             if this.uuid.is_not_set() {
-                this.uuid = ActiveValue::Set(getUuid());
+                this.uuid = ActiveValue::Set(uuid!());
             }
 
             if this.api_key.is_not_set() {
@@ -93,7 +93,7 @@ impl ModelCrudHandler for UserModel {
         params: &[Self::CreateReqParams],
     ) -> ModelResult<String> {
         for item in params {
-            let _ = catch_err(item.validate())?;
+            catch_err(item.validate())?;
         }
 
         let txn = db.begin().await?;
@@ -196,7 +196,7 @@ impl UserModel {
 
     /// 创建 user
     pub async fn create(db: &DatabaseConnection, params: &CreateUserReqParams) -> ModelResult<Self> {
-        let _ = catch_err(params.validate())?;
+        catch_err(params.validate())?;
 
         let mut user = UserActiveModel::new();
         params.update(&mut user);
@@ -234,14 +234,14 @@ impl UserModel {
 
     /// 更新数据
     pub async fn update(db: &DatabaseConnection, params: UpdateUserReqParams) -> ModelResult<i64> {
-        let _ = catch_err(params.validate())?;
+        catch_err(params.validate())?;
         let uid = params.uid.unwrap_or(0);
 
         if uid < 0 {
             return Err(ModelError::Message(format!("数据不存在,id: {}", uid)));
         }
 
-        let mut user = Self::find_by_uid(&db, uid)
+        let mut user = Self::find_by_uid(db, uid)
             .await?
             .into_active_model();    
         params.update(&mut user);
@@ -448,7 +448,7 @@ impl UserActiveModel {
         mut self,
         db: &DatabaseConnection,
     ) -> ModelResult<UserModel> {
-        self.email_verify_sent_at = ActiveValue::set(Some(Utc::now().naive_utc().into()));
+        self.email_verify_sent_at = ActiveValue::set(Some(Utc::now().naive_utc()));
         self.email_verify_token = ActiveValue::Set(Uuid::new_v4().to_string());
         Ok(self.update(db).await?)
     }
@@ -466,7 +466,7 @@ impl UserActiveModel {
     ///
     /// when has DB query error
     pub async fn set_forgot_password_sent(mut self, db: &DatabaseConnection) -> ModelResult<UserModel> {
-        self.reset_sent_at = ActiveValue::set(Some(Utc::now().naive_utc().into()));
+        self.reset_sent_at = ActiveValue::set(Some(Utc::now().naive_utc()));
         self.reset_token = ActiveValue::Set(Uuid::new_v4().to_string());
         Ok(self.update(db).await?)
     }
@@ -481,7 +481,7 @@ impl UserActiveModel {
     ///
     /// when has DB query error
     pub async fn verified(mut self, db: &DatabaseConnection) -> ModelResult<UserModel> {
-        self.email_verified_at = ActiveValue::set(Some(Utc::now().naive_utc().into()));
+        self.email_verified_at = ActiveValue::set(Some(Utc::now().naive_utc()));
         Ok(self.update(db).await?)
     }
 

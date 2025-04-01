@@ -27,7 +27,7 @@ impl ModelCrudHandler for MenuModel {
         params: &[Self::CreateReqParams],
     ) -> ModelResult<String> {
         for item in params {
-            let _ = catch_err(item.validate())?;
+            catch_err(item.validate())?;
         }
 
         // 缓存已存在的菜单数据
@@ -43,20 +43,17 @@ impl ModelCrudHandler for MenuModel {
                 pid = String::from(x);
             }
             
-            if !pid.as_str().is_empty() {
+            if !pid.is_empty() {
                 let res = exist_menus.get(pid.as_str());
 
                 if let Some(res) = res {
                     parent_menu = Some(res.clone());
                 } else {
                     // 不存在从数据库读取
-                    match Self::find_by_mid(db, pid.as_str()).await {
-                        Ok(res) => {
-                            exist_menus.insert(String::from(res.mid.as_str()), res.clone());
-                            parent_menu = Some(res);
-                        },
-                        _ => {},
-                    };
+                    if let Ok(res) = Self::find_by_mid(db, pid.as_str()).await {
+                        exist_menus.insert(String::from(res.mid.as_str()), res.clone());
+                        parent_menu = Some(res);
+                    }
                 }
             }
 
@@ -68,7 +65,7 @@ impl ModelCrudHandler for MenuModel {
             item.update_by_create(&mut menu);
 
             // 不存在父菜单 depth = 1
-            if pid.as_str().is_empty() {
+            if pid.is_empty() {
                 menu.depth = Set(1);
             }
 
@@ -276,7 +273,7 @@ impl MenuModel {
 
     /// 创建 node
     pub async fn create(db: &DatabaseConnection, params: &CreateMenuReqParams) -> ModelResult<Self> {
-        let _ = catch_err(params.validate())?;
+        catch_err(params.validate())?;
 
         let mut item = MenuActiveModel {
             ..Default::default()
@@ -292,14 +289,14 @@ impl MenuModel {
 
     /// 更新数据
     pub async fn update(db: &DatabaseConnection, params: UpdateMenuReqParams) -> ModelResult<i32> {
-        let _ = catch_err(params.validate())?;
+        catch_err(params.validate())?;
         let id = params.id.unwrap_or(0);
 
         if id <= 0 {
             return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
         }
 
-        let mut item = Self::find_by_id(&db, id)
+        let mut item = Self::find_by_id(db, id)
             .await?
             .into_active_model();
 

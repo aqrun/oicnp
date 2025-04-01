@@ -6,9 +6,8 @@ use crate::utils::{
     utc_now,
     encrypt_password,
     generate_salt,
-    uuid as getUuid,
 };
-use crate::RequestParamsUpdater;
+use crate::{RequestParamsUpdater, uuid};
 
 pub use crate::entities::prelude::{
   UserActiveModel,
@@ -190,7 +189,7 @@ impl RequestParamsUpdater for UserReqParams {
     /// 
     fn update_by_create(&self, user: &mut Self::ActiveModel) {
         if self.uuid.is_none() {
-            user.uuid = Set(getUuid());
+            user.uuid = Set(uuid!());
         }
         
         let mut password = String::from("123456");

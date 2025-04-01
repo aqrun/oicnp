@@ -10,6 +10,7 @@ use oic_core::{
     },
     utils::get_api_prefix,
     typings::{JsonRes, ListData},
+    ModelCrudHandler,
 };
 
 #[debug_handler]

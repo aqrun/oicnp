@@ -8,7 +8,7 @@ mod node;
 mod auth;
 mod menu;
 
-pub const VERSION: &'static str = "v1";
+pub const VERSION: &str = "v1";
 
 pub fn routes(ctx: &AppContext) -> Vec<Routes> {
     let mut routes = Vec::new();

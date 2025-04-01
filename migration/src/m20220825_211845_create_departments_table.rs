@@ -1,7 +1,7 @@
 use sea_orm_migration::prelude::*;
 use super::types::*;
 
-const INDEX_PARENT_ID: &'static str = "idx-departments-parentId";
+const INDEX_PARENT_ID: &str = "idx-departments-parentId";
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;

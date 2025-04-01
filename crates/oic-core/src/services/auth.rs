@@ -148,7 +148,7 @@ pub async fn login(
     config: &Config,
     params: LoginParams,
 ) -> Result<LoginResponse> {
-    let _ = catch_err(params.validate())?;
+    catch_err(params.validate())?;
 
     let user = UserModel::find_by_email(db, params.email.as_str()).await?;
 

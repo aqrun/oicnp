@@ -24,9 +24,7 @@ pub fn generate_salt() -> String {
     // 填充随机数
     rand::thread_rng().fill(&mut salt[..]);
     // 转为16进制字符串
-    let str_salt = HEXLOWER.encode(&salt);
-
-    str_salt
+    HEXLOWER.encode(&salt)
 }
 
 ///
@@ -43,9 +41,7 @@ pub fn encrypt_password(salt: &str, password: &str) -> String {
         &mut to_store
     );
     // 将类型[u8; CREDENTIAL_LEN] 转为 字符串
-    let str_result = HEXLOWER.encode(&to_store);
-
-    str_result
+    HEXLOWER.encode(&to_store)
 }
 
 ///

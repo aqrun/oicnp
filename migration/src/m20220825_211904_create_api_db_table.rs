@@ -1,7 +1,7 @@
 use sea_orm_migration::prelude::*;
 use super::types::*;
 
-const INDEX_DB: &'static str = "idx-apiDb-db";
+const INDEX_DB: &str = "idx-apiDb-db";
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;

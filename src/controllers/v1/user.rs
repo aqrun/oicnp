@@ -10,6 +10,7 @@ use oic_core::{
         UpdateUserReqParams,
         DeleteUserReqParams,
     },
+    ModelCrudHandler,
 };
 
 #[debug_handler]
@@ -28,7 +29,7 @@ pub async fn get_one(
 
     let res = UserModel::find_by_uuid(&ctx.db, uuid.as_str()).await;
 
-    return JsonRes::from(res);
+    JsonRes::from(res)
 }
 
 #[debug_handler]
@@ -91,5 +92,4 @@ pub fn routes() -> Routes {
         .add("/add-multi", post(add_multi))
         .add("/update", post(update))
         .add("/remove", post(remove))
-        // .layer()
 }

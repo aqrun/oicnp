@@ -13,7 +13,7 @@ pub fn build_menu_tree(menus: Vec<MenuModel>) -> MenuTreeItem {
     let mut child_map: HashMap<String, Vec<MenuModel>> = HashMap::new();
 
     for node in menus {
-        if !node.pid.as_str().is_empty() {
+        if !node.pid.is_empty() {
             if let Some(child_nodes) = child_map.get_mut(node.pid.as_str()) {
                 child_nodes.push(node);
             } else {

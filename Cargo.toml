@@ -106,6 +106,7 @@ mime = "0.3.16"
 tower-http = { version = "^0.6" }
 tower = "0.4.13"
 futures-util = "0.3.30"
+nanoid = "0.4.0"
 
 [workspace.dependencies.sea-orm]
 version = "^1"

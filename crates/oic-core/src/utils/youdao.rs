@@ -8,17 +8,20 @@ pub struct YoudaoTranslateArgs {
     pub q: String,
     pub from: String,
     pub to: String,
-    pub appKey: String,
+    #[serde(rename(deserialize = "appKey", serialize = "appKey"))]
+    pub app_key: String,
     pub salt: String,
     pub sign: String,
-    pub signType: String,
+    #[serde(rename(deserialize = "signType", serialize = "signType"))]
+    pub sign_type: String,
     pub curtime: String,
     pub ext: Option<String>,
     pub voice: Option<String>,
     pub strict: Option<String>,
     pub vocabld: Option<String>,
     pub domain: Option<String>,
-    pub rejectFallback: Option<String>,
+    #[serde(rename(deserialize = "rejectFallback", serialize = "rejectFallback"))]
+    pub reject_fallback: Option<String>,
 }
 
 
@@ -38,21 +41,21 @@ pub async fn youdao_translate(q: &str) -> Result<String> {
     hasher.update(sign_source);
     let sign = format!("{:X}", hasher.finalize());
 
-    let mut args = YoudaoTranslateArgs {
+    let args = YoudaoTranslateArgs {
         q: String::from(q),
         from: String::from("zh-CHS"),
         to: String::from("en"),
-        appKey: String::from(app_key),
+        app_key: String::from(app_key),
         salt: format!("{}", salt),
         sign: String::from(sign.as_str()),
-        signType: String::from("v3"),
+        sign_type: String::from("v3"),
         curtime: format!("{}", curtime),
         ext: None,
         voice: None,
         strict: None,
         vocabld: None,
         domain: None,
-        rejectFallback: None,
+        reject_fallback: None,
     };
 
     let client = reqwest::Client::new();

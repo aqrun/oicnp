@@ -100,7 +100,7 @@ pub async fn check_user_has_role(db: &DatabaseConnection, uid: i64, role_vid: &s
 
 ///
 /// 检测用户是否具体指定权限
-/// 
-pub async fn can(db: &DatabaseConnection, uid: i64, permission_vid: &str) -> Result<bool> {
+///
+pub async fn can(_db: &DatabaseConnection, _uid: i64, _permission_vid: &str) -> Result<bool> {
     Ok(true)
 }

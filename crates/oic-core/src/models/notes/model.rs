@@ -24,7 +24,7 @@ impl ModelCrudHandler for NoteModel {
         params: &[Self::CreateReqParams],
     ) -> ModelResult<String> {
         for item in params {
-            let _ = catch_err(item.validate())?;
+            catch_err(item.validate())?;
         }
         
         let txn = db.begin().await?;
@@ -114,7 +114,7 @@ impl NoteModel {
 
     /// 创建 note
     pub async fn create(db: &DatabaseConnection, params: &CreateNoteReqParams) -> ModelResult<Self> {
-        let _ = catch_err(params.validate())?;
+        catch_err(params.validate())?;
 
         let mut item = NoteActiveModel {
             ..Default::default()
@@ -130,14 +130,14 @@ impl NoteModel {
 
     /// 更新数据
     pub async fn update(db: &DatabaseConnection, params: UpdateNoteReqParams) -> ModelResult<i64> {
-        let _ = catch_err(params.validate())?;
+        catch_err(params.validate())?;
         let id = params.id.unwrap_or(0);
 
         if id <= 0 {
             return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
         }
 
-        let mut item = Self::find_by_id(&db, id)
+        let mut item = Self::find_by_id(db, id)
             .await?
             .into_active_model();
 

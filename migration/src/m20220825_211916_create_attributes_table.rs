@@ -1,7 +1,7 @@
 use sea_orm_migration::prelude::*;
 use super::types::*;
 
-const INDEX_VID: &'static str = "idx-attributes-vid";
+const INDEX_VID: &str = "idx-attributes-vid";
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;

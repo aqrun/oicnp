@@ -118,7 +118,7 @@ impl<T: Serialize> JsonRes<T> {
             }
         }
 
-        return false;
+        false
     }
 
     pub fn get_code(&self) -> String {

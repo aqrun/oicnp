@@ -33,10 +33,8 @@ pub fn catch_err(validate_res: Result<(), ValidationErrors>) -> ModelResult<()> 
             // 获取任意错误信息错误code就停止
             // 属性指定的错误信息
             if !msg.is_empty() {
-                return Err(ModelError::Message(msg));
+                return Err(ModelError::Message(format!("{} {}", field, code)));
             }
-
-            return Err(ModelError::Message(format!("{} {}", field, code)));
         }
     }
 

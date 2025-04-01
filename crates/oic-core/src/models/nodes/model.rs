@@ -22,7 +22,7 @@ impl ModelCrudHandler for NodeModel {
         db: &DatabaseConnection,
         params: &[Self::CreateReqParams],
     ) -> ModelResult<String> {
-        let _ = catch_err(params.validate())?;
+        catch_err(params.validate())?;
         
         let txn = db.begin().await?;
         let mut notes: Vec<NodeActiveModel> = Vec::new();
@@ -112,7 +112,7 @@ impl NodeModel {
 
     /// 创建 node
     pub async fn create(db: &DatabaseConnection, params: &CreateNodeReqParams) -> ModelResult<Self> {
-        let _ = catch_err(params.validate())?;
+        catch_err(params.validate())?;
 
         let mut item = NodeActiveModel {
             ..Default::default()
@@ -128,14 +128,14 @@ impl NodeModel {
 
     /// 更新数据
     pub async fn update(db: &DatabaseConnection, params: UpdateNodeReqParams) -> ModelResult<i64> {
-        let _ = catch_err(params.validate())?;
+        catch_err(params.validate())?;
         let nid = params.nid.unwrap_or(0);
 
         if nid <= 0 {
             return Err(ModelError::Any(format!("数据不存在,id: {}", nid).into()));
         }
 
-        let mut item = Self::find_by_id(&db, nid)
+        let mut item = Self::find_by_id(db, nid)
             .await?
             .into_active_model();
 
