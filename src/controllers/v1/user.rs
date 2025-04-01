@@ -46,7 +46,7 @@ pub async fn list(
 pub async fn add(
     State(ctx): State<AppContext>,
     Json(params): Json<CreateUserReqParams>,
-) -> JsonRes<UserModel> {
+) -> JsonRes<i64> {
     let res = UserModel::create(&ctx.db, &params).await;
 
     JsonRes::from(res)
@@ -68,7 +68,7 @@ pub async fn update(
     State(ctx): State<AppContext>,
     Json(params): Json<UpdateUserReqParams>,
 ) -> JsonRes<i64> {
-    let res = UserModel::update(&ctx.db, params).await;
+    let res = UserModel::update(&ctx.db, &params).await;
 
     JsonRes::from(res)
 }
@@ -78,7 +78,7 @@ pub async fn remove(
     State(ctx): State<AppContext>,
     Json(params): Json<DeleteUserReqParams>,
 ) -> JsonRes<i64> {
-    let res = UserModel::delete(&ctx.db, params).await;
+    let res = UserModel::delete_one(&ctx.db, &params).await;
 
     JsonRes::from(res)
 }

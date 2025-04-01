@@ -16,6 +16,8 @@ impl ActiveModelBehavior for FileActiveModel {}
 #[async_trait::async_trait]
 impl ModelCrudHandler for FileModel {
     type CreateReqParams = CreateFileReqParams;
+    type UpdateReqParams = UpdateFileReqParams;
+    type DeleteReqParams = DeleteFileReqParams;
 
     /// 批量创建
     async fn create_multi(
@@ -42,6 +44,57 @@ impl ModelCrudHandler for FileModel {
         txn.commit().await?;
 
         Ok(String::from("批量file添加完成"))
+    }
+
+    /// 创建 node
+    async fn create(db: &DatabaseConnection, params: &Self::CreateReqParams) -> ModelResult<i64> {
+        catch_err(params.validate())?;
+
+        let mut item = FileActiveModel {
+            ..Default::default()
+        };
+
+        params.update(&mut item);
+        params.update_by_create(&mut item);
+    
+        let item = item.insert(db).await?;
+
+        Ok(item.file_id)
+    }
+
+    /// 更新数据
+    async fn update(db: &DatabaseConnection, params: &Self::UpdateReqParams) -> ModelResult<i64> {
+        catch_err(params.validate())?;
+        let id = params.file_id.unwrap_or(0);
+
+        if id <= 0 {
+            return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
+        }
+
+        let mut item = Self::find_by_id(db, id)
+            .await?
+            .into_active_model();
+
+        params.update(&mut item);
+    
+        let item = item.update(db).await?;
+
+        Ok(item.file_id)
+    }
+
+    /// 删除数据
+    async fn delete_one(db: &DatabaseConnection, params: &Self::DeleteReqParams) -> ModelResult<i64> {
+        let nid = params.file_id.unwrap_or(0);
+
+        if nid <= 0 {
+            return Err(ModelError::Any(format!("数据不存在,id: {}", nid).into()));
+        }
+
+        let _res = FileEntity::delete_by_id(nid)
+            .exec(db)
+            .await?;
+
+        Ok(nid)
     }
 }
 
@@ -108,56 +161,5 @@ impl FileModel {
         };
 
         Ok(res)
-    }
-
-    /// 创建 node
-    pub async fn create(db: &DatabaseConnection, params: &CreateFileReqParams) -> ModelResult<Self> {
-        catch_err(params.validate())?;
-
-        let mut item = FileActiveModel {
-            ..Default::default()
-        };
-
-        params.update(&mut item);
-        params.update_by_create(&mut item);
-    
-        let item = item.insert(db).await?;
-
-        Ok(item)
-    }
-
-    /// 更新数据
-    pub async fn update(db: &DatabaseConnection, params: UpdateFileReqParams) -> ModelResult<i64> {
-        catch_err(params.validate())?;
-        let id = params.file_id.unwrap_or(0);
-
-        if id <= 0 {
-            return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
-        }
-
-        let mut item = Self::find_by_id(db, id)
-            .await?
-            .into_active_model();
-
-        params.update(&mut item);
-    
-        let item = item.update(db).await?;
-
-        Ok(item.file_id)
-    }
-
-    /// 删除数据
-    pub async fn delete(db: &DatabaseConnection, params: DeleteFileReqParams) -> ModelResult<i64> {
-        let nid = params.file_id.unwrap_or(0);
-
-        if nid <= 0 {
-            return Err(ModelError::Any(format!("数据不存在,id: {}", nid).into()));
-        }
-
-        let _res = FileEntity::delete_by_id(nid)
-            .exec(db)
-            .await?;
-
-        Ok(nid)
     }
 }

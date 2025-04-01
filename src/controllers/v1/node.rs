@@ -38,7 +38,7 @@ pub async fn list(
 pub async fn add(
     State(ctx): State<AppContext>,
     Json(params): Json<CreateNodeReqParams>,
-) -> JsonRes<NodeModel> {
+) -> JsonRes<i64> {
     let res = NodeModel::create(&ctx.db, &params).await;
 
     JsonRes::from(res)
@@ -60,7 +60,7 @@ pub async fn update(
     State(ctx): State<AppContext>,
     Json(params): Json<UpdateNodeReqParams>,
 ) -> JsonRes<i64> {
-    let res = NodeModel::update(&ctx.db, params).await;
+    let res = NodeModel::update(&ctx.db, &params).await;
 
     JsonRes::from(res)
 }
@@ -70,7 +70,7 @@ pub async fn remove(
     State(ctx): State<AppContext>,
     Json(params): Json<DeleteNodeReqParams>,
 ) -> JsonRes<i64> {
-    let res = NodeModel::delete(&ctx.db, params).await;
+    let res = NodeModel::delete_one(&ctx.db, &params).await;
 
     JsonRes::from(res)
 }

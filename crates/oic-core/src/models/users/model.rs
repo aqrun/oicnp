@@ -87,6 +87,8 @@ impl Authenticable for UserModel {
 #[async_trait]
 impl ModelCrudHandler for UserModel {
     type CreateReqParams = CreateUserReqParams;
+    type UpdateReqParams = UpdateUserReqParams;
+    type DeleteReqParams = DeleteUserReqParams;
 
     async fn create_multi(
         db: &DatabaseConnection,
@@ -145,6 +147,53 @@ impl ModelCrudHandler for UserModel {
         
         Ok(String::from("批量user添加完成"))
     }
+
+    /// 创建 user
+    async fn create(db: &DatabaseConnection, params: &Self::CreateReqParams) -> ModelResult<i64> {
+        catch_err(params.validate())?;
+
+        let mut user = UserActiveModel::new();
+        params.update(&mut user);
+        params.update_by_create(&mut user);
+
+        // println!("test---{:?}", user.clone());
+        let user = user.insert(db).await?;
+
+        Ok(user.uid)
+    }
+
+    /// 更新数据
+    async fn update(db: &DatabaseConnection, params: &Self::UpdateReqParams) -> ModelResult<i64> {
+        catch_err(params.validate())?;
+        let uid = params.uid.unwrap_or(0);
+
+        if uid < 0 {
+            return Err(ModelError::Message(format!("数据不存在,id: {}", uid)));
+        }
+
+        let mut user = Self::find_by_uid(db, uid)
+            .await?
+            .into_active_model();    
+        params.update(&mut user);
+    
+        let item = user.update(db).await?;
+        Ok(item.uid)
+    }
+
+    /// 删除数据
+    async fn delete_one(db: &DatabaseConnection, params: &Self::DeleteReqParams) -> ModelResult<i64> {
+        let uid = params.uid.unwrap_or(0);
+
+        if uid <= 0 {
+            return Err(ModelError::Message(format!("数据不存在, uid: {}", uid)));
+        }
+
+        let _res = UserEntity::delete_by_id(uid)
+            .exec(db)
+            .await?;
+
+        Ok(uid)
+    }
 }
 
 impl UserModel {
@@ -194,20 +243,6 @@ impl UserModel {
         Ok(res)
     }
 
-    /// 创建 user
-    pub async fn create(db: &DatabaseConnection, params: &CreateUserReqParams) -> ModelResult<Self> {
-        catch_err(params.validate())?;
-
-        let mut user = UserActiveModel::new();
-        params.update(&mut user);
-        params.update_by_create(&mut user);
-
-        println!("test---{:?}", user.clone());
-        let user = user.insert(db).await?;
-
-        Ok(user)
-    }
-
     /// 给用户指定角色
     pub async fn assign_roles(
         db: &DatabaseConnection,
@@ -230,39 +265,6 @@ impl UserModel {
         let _ = UserRoleMapEntity::insert_many(user_roles).exec(db).await?;
 
         Ok(0)
-    }
-
-    /// 更新数据
-    pub async fn update(db: &DatabaseConnection, params: UpdateUserReqParams) -> ModelResult<i64> {
-        catch_err(params.validate())?;
-        let uid = params.uid.unwrap_or(0);
-
-        if uid < 0 {
-            return Err(ModelError::Message(format!("数据不存在,id: {}", uid)));
-        }
-
-        let mut user = Self::find_by_uid(db, uid)
-            .await?
-            .into_active_model();    
-        params.update(&mut user);
-    
-        let item = user.update(db).await?;
-        Ok(item.uid)
-    }
-
-    /// 删除数据
-    pub async fn delete(db: &DatabaseConnection, params: DeleteUserReqParams) -> ModelResult<i64> {
-        let uid = params.uid.unwrap_or(0);
-
-        if uid <= 0 {
-            return Err(ModelError::Message(format!("数据不存在, uid: {}", uid)));
-        }
-
-        let _res = UserEntity::delete_by_id(uid)
-            .exec(db)
-            .await?;
-
-        Ok(uid)
     }
 
     /// finds a user by the provided email

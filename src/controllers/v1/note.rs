@@ -38,22 +38,10 @@ pub async fn list(
 pub async fn add(
     State(ctx): State<AppContext>,
     Json(params): Json<CreateNoteReqParams>,
-) -> JsonRes<NoteModel> {
+) -> JsonRes<i64> {
     let res = NoteModel::create(&ctx.db, &params).await;
 
     JsonRes::from(res)
-}
-
-#[debug_handler]
-pub async fn add1(
-    State(ctx): State<AppContext>,
-    Json(params): Json<NoteModel>,
-) -> JsonRes<String> {
-    println!("not-add-params: {:?}", params);
-    // let res = NoteModel::create(&ctx.db, &params).await;
-
-    // JsonRes::from(res)
-    JsonRes::ok("test".into())
 }
 
 /// 批量添加
@@ -72,7 +60,7 @@ pub async fn update(
     State(ctx): State<AppContext>,
     Json(params): Json<UpdateNoteReqParams>,
 ) -> JsonRes<i64> {
-    let res = NoteModel::update(&ctx.db, params).await;
+    let res = NoteModel::update(&ctx.db, &params).await;
 
     JsonRes::from(res)
 }
@@ -82,7 +70,7 @@ pub async fn remove(
     State(ctx): State<AppContext>,
     Json(params): Json<DeleteNoteReqParams>,
 ) -> JsonRes<i64> {
-    let res = NoteModel::delete(&ctx.db, params).await;
+    let res = NoteModel::delete_one(&ctx.db, &params).await;
 
     JsonRes::from(res)
 }
@@ -92,7 +80,6 @@ pub fn routes() -> Routes {
         .prefix(get_api_prefix(super::VERSION, "note").as_str())
         .add("/one", post(get_one))
         .add("/list", post(list))
-        .add("/add1", post(add1))
         .add("/add", post(add))
         .add("/add-multi", post(add_multi))
         .add("/update", post(update))

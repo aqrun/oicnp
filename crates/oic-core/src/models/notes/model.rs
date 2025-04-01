@@ -17,6 +17,8 @@ impl ActiveModelBehavior for NoteActiveModel {}
 #[async_trait::async_trait]
 impl ModelCrudHandler for NoteModel {
     type CreateReqParams = CreateNoteReqParams;
+    type UpdateReqParams = UpdateNoteReqParams;
+    type DeleteReqParams = DeleteNoteReqParams;
 
     /// 批量创建
     async fn create_multi(
@@ -44,6 +46,57 @@ impl ModelCrudHandler for NoteModel {
         txn.commit().await?;
 
         Ok(String::from("批量note添加完成"))
+    }
+
+    /// 创建 note
+    async fn create(db: &DatabaseConnection, params: &Self::CreateReqParams) -> ModelResult<i64> {
+        catch_err(params.validate())?;
+
+        let mut item = NoteActiveModel {
+            ..Default::default()
+        };
+
+        params.update(&mut item);
+        params.update_by_create(&mut item);
+    
+        let item = item.insert(db).await?;
+
+        Ok(item.id)
+    }
+
+    /// 更新数据
+    async fn update(db: &DatabaseConnection, params: &Self::UpdateReqParams) -> ModelResult<i64> {
+        catch_err(params.validate())?;
+        let id = params.id.unwrap_or(0);
+
+        if id <= 0 {
+            return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
+        }
+
+        let mut item = Self::find_by_id(db, id)
+            .await?
+            .into_active_model();
+
+        params.update(&mut item);
+    
+        let item = item.update(db).await?;
+
+        Ok(item.id)
+    }
+
+    /// 删除数据
+    async fn delete_one(db: &DatabaseConnection, params: &Self::DeleteReqParams) -> ModelResult<i64> {
+        let id = params.id.unwrap_or(0);
+
+        if id <= 0 {
+            return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
+        }
+
+        let _res = NoteEntity::delete_by_id(id)
+            .exec(db)
+            .await?;
+
+        Ok(id)
     }
 }
 
@@ -110,56 +163,5 @@ impl NoteModel {
         };
 
         Ok(res)
-    }
-
-    /// 创建 note
-    pub async fn create(db: &DatabaseConnection, params: &CreateNoteReqParams) -> ModelResult<Self> {
-        catch_err(params.validate())?;
-
-        let mut item = NoteActiveModel {
-            ..Default::default()
-        };
-
-        params.update(&mut item);
-        params.update_by_create(&mut item);
-    
-        let item = item.insert(db).await?;
-
-        Ok(item)
-    }
-
-    /// 更新数据
-    pub async fn update(db: &DatabaseConnection, params: UpdateNoteReqParams) -> ModelResult<i64> {
-        catch_err(params.validate())?;
-        let id = params.id.unwrap_or(0);
-
-        if id <= 0 {
-            return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
-        }
-
-        let mut item = Self::find_by_id(db, id)
-            .await?
-            .into_active_model();
-
-        params.update(&mut item);
-    
-        let item = item.update(db).await?;
-
-        Ok(item.id)
-    }
-
-    /// 删除数据
-    pub async fn delete(db: &DatabaseConnection, params: DeleteNoteReqParams) -> ModelResult<i64> {
-        let id = params.id.unwrap_or(0);
-
-        if id <= 0 {
-            return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
-        }
-
-        let _res = NoteEntity::delete_by_id(id)
-            .exec(db)
-            .await?;
-
-        Ok(id)
     }
 }

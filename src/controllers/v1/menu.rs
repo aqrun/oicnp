@@ -49,7 +49,7 @@ pub async fn get_tree(
 pub async fn add(
     State(ctx): State<AppContext>,
     Json(params): Json<CreateMenuReqParams>,
-) -> JsonRes<MenuModel> {
+) -> JsonRes<i64> {
     let res = MenuModel::create(&ctx.db, &params).await;
 
     JsonRes::from(res)
@@ -70,8 +70,8 @@ pub async fn add_multi(
 pub async fn update(
     State(ctx): State<AppContext>,
     Json(params): Json<UpdateMenuReqParams>,
-) -> JsonRes<i32> {
-    let res = MenuModel::update(&ctx.db, params).await;
+) -> JsonRes<i64> {
+    let res = MenuModel::update(&ctx.db, &params).await;
 
     JsonRes::from(res)
 }
@@ -80,8 +80,8 @@ pub async fn update(
 pub async fn remove(
     State(ctx): State<AppContext>,
     Json(params): Json<DeleteMenuReqParams>,
-) -> JsonRes<i32> {
-    let res = MenuModel::delete(&ctx.db, params).await;
+) -> JsonRes<i64> {
+    let res = MenuModel::delete_one(&ctx.db, &params).await;
 
     JsonRes::from(res)
 }
