@@ -41,7 +41,7 @@ fn into_tree_node (
 ) -> MenuTreeItem {
     let mut children = Vec::new();
 
-    if let Some((_id, child_nodes)) = child_map.remove_entry(menu.mid.as_str()) {
+    if let Some((_id, child_nodes)) = child_map.remove_entry(menu.vid.as_str()) {
         for child_node in child_nodes {
             children.push(into_tree_node(child_node, &mut child_map));
         }
@@ -49,7 +49,7 @@ fn into_tree_node (
 
     MenuTreeItem {
         id: menu.id,
-        mid: menu.mid,
+        vid: menu.vid,
         pid: menu.pid,
         path: String::from(menu.path.as_str()),
         key: String::from(menu.path.as_str()),
