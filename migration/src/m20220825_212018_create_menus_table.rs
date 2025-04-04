@@ -17,7 +17,7 @@ impl MigrationTrait for Migration {
                     .primary_key()
                     .auto_increment(),
             )
-            .col(ColumnDef::new(Menus::Mid).unique_key().string_len(255).not_null())
+            .col(ColumnDef::new(Menus::Vid).unique_key().string_len(255).not_null())
             .col(ColumnDef::new(Menus::Pid).string_len(255).not_null())
             .col(ColumnDef::new(Menus::Path).string_len(255).not_null().default(""))
             .col(ColumnDef::new(Menus::Name).string_len(100).not_null().default(""))

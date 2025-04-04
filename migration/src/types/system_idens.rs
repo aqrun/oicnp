@@ -227,7 +227,7 @@ pub enum Menus {
     #[oic(data_type = "bigInt", comment = "id")]
     Id,
     #[oic(data_type = "string", default = "", comment = "")]
-    Mid,
+    Vid,
     #[oic(data_type = "string", default = "", comment = "")]
     Pid,
     #[oic(data_type = "string", len = 255, default = "", comment = "")]

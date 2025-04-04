@@ -43,12 +43,22 @@ impl ModelCrudHandler for MenuModel {
     }
 
     ///
-    /// 根据ID查找一个
+    /// 根据VID查找一个
     /// 
     async fn find_by_vid(db: &DatabaseConnection, vid: &str) -> ModelResult<Self> {
-        Ok(Self::default())
-    }
+        if vid.is_empty() {
+            return Err(ModelError::Any(format!("vid为空: {}", vid).into()));
+        }
 
+        let item = MenuEntity::find()
+            .filter(MenuColumn::Vid.eq(vid))
+            .one(db)
+            .await?;
+
+        item.ok_or_else(|| {
+            ModelError::Any(format!("数据不存在, vid: {}", vid).into())
+        })
+    }
 
     ////
     /// 获取node列表
@@ -65,8 +75,8 @@ impl ModelCrudHandler for MenuModel {
             q = q.filter(MenuColumn::Id.eq(x));
         }
 
-        if let Some(x) = &params.mid {
-            q = q.filter(MenuColumn::Mid.eq(x));
+        if let Some(x) = &params.vid {
+            q = q.filter(MenuColumn::Vid.eq(x));
         }
 
         if let Some(x) = &params.pid {
@@ -138,8 +148,8 @@ impl ModelCrudHandler for MenuModel {
                     parent_menu = Some(res.clone());
                 } else {
                     // 不存在从数据库读取
-                    if let Ok(res) = Self::find_by_mid(db, pid.as_str()).await {
-                        exist_menus.insert(String::from(res.mid.as_str()), res.clone());
+                    if let Ok(res) = Self::find_by_vid(db, pid.as_str()).await {
+                        exist_menus.insert(String::from(res.vid.as_str()), res.clone());
                         parent_menu = Some(res);
                     }
                 }
@@ -201,7 +211,7 @@ impl ModelCrudHandler for MenuModel {
             // 更新到数据表
             let menu_model = menu.update(db).await?;
             // 添加缓存数据
-            exist_menus.insert(String::from(menu_model.mid.as_str()), menu_model);
+            exist_menus.insert(String::from(menu_model.vid.as_str()), menu_model);
         }
 
         Ok(String::from("批量菜单添加完成"))
@@ -261,34 +271,16 @@ impl ModelCrudHandler for MenuModel {
 }
 
 impl MenuModel {
-    ///
-    /// 根据MID查找一个
-    /// 
-    pub async fn find_by_mid(db: &DatabaseConnection, mid: &str) -> ModelResult<Self> {
-        if mid.is_empty() {
-            return Err(ModelError::Any(format!("mid为空: {}", mid).into()));
-        }
-
-        let item = MenuEntity::find()
-            .filter(MenuColumn::Mid.eq(mid))
-            .one(db)
-            .await?;
-
-        item.ok_or_else(|| {
-            ModelError::Any(format!("数据不存在, mid: {}", mid).into())
-        })
-    }
-
     ////
     /// 获取node列表树型数据
     /// 
     pub async fn find_tree(db: &DatabaseConnection, params: MenuFilters) -> ModelResult<MenuTreeItem> {
         let order = params.get_order();
         let order_by_str = params.get_order_by();
-        let mid = params.mid.unwrap_or(String::from(""));
+        let vid = params.vid.unwrap_or(String::from(""));
         
         // 先获取父级数据
-        let menu = Self::find_by_mid(db, mid.as_str()).await?;
+        let menu = Self::find_by_vid(db, vid.as_str()).await?;
 
         // 根据父级查找所有子级元素
         let mut q = MenuEntity::find();

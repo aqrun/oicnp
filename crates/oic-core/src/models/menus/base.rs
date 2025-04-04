@@ -11,7 +11,7 @@ use loco_rs::prelude::Set;
 #[serde(default)]
 pub struct MenuFilters {
     pub id: Option<i32>,
-    pub mid: Option<String>,
+    pub vid: Option<String>,
     pub pid: Option<String>,
     pub name: Option<String>,
     pub depth: Option<String>,
@@ -22,7 +22,7 @@ pub struct MenuFilters {
 #[serde(default)]
 pub struct MenuReqParams {
     pub id: Option<i32>,
-    pub mid: Option<String>,
+    pub vid: Option<String>,
     pub pid: Option<String>,
     pub path: Option<String>,
     pub name: Option<String>,
@@ -42,8 +42,8 @@ impl RequestParamsUpdater for MenuReqParams {
     type ActiveModel = MenuActiveModel;
 
     fn update(&self, item: &mut Self::ActiveModel) {
-        if let Some(x) = &self.mid {
-            item.mid = Set(String::from(x));
+        if let Some(x) = &self.vid {
+            item.vid = Set(String::from(x));
         }
 
         if let Some(x) = &self.pid {
@@ -108,7 +108,7 @@ pub type DeleteMenuReqParams = MenuReqParams;
 #[derive(Clone, Debug, Deserialize, Serialize, Default)]
 pub struct MenuTreeItem {
     pub id: i32,
-    pub mid: String,
+    pub vid: String,
     pub key: String,
     pub pid: String,
     pub path: String,
