@@ -1,7 +1,5 @@
 use crate::{
-    entities::prelude::*,
-    utils::catch_err,
-    typings::ListData,
+    entities::prelude::*, models::permissions::CreatePermissionReqParams, typings::ListData, utils::catch_err
 };
 use loco_rs::prelude::*;
 use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, TransactionTrait};
@@ -124,6 +122,9 @@ impl ModelCrudHandler for RoleModel {
         let _ = RoleEntity::insert_many(list).exec(&txn).await?;
         txn.commit().await?;
 
+        // 为角色指定权限
+        Self::assign_multi_role_permissions(db, params).await?;
+
         Ok(String::from("批量角色添加完成"))
     }
 
@@ -187,5 +188,67 @@ impl RoleModel {
             .one(db)
             .await?;
         role.ok_or_else(|| ModelError::EntityNotFound)
+    }
+
+    ///
+    /// 根据 permission_vids 给角色指定权限
+    /// 
+    pub async fn assign_multi_role_permissions(
+        db: &DatabaseConnection,
+        params: &[CreateRoleReqParams],
+    ) -> ModelResult<()> {
+        // 需要批量创建的 user role 关联关系
+        let mut role_permission_list: Vec<RolePermissionsMapActiveModel> = Vec::new();
+
+        let all_permissions = PermissionEntity::find()
+            .all(db)
+            .await?;
+        let all_roles = RoleEntity::find()
+            .all(db)
+            .await?;
+
+        for item in params.iter() {
+            let mut role_vid = String::from("");
+            let mut permission_vids: Vec<String> = Vec::new();
+
+            if let Some(x) = &item.vid {
+                role_vid = String::from(x);
+            } else {
+                continue;
+            }
+
+            if let Some(x) = &item.permission_vids {
+                permission_vids = x.clone();
+            }
+
+            let role = match all_roles.iter().find(|item| {
+                item.vid.eq(role_vid.as_str())
+            }) {
+                Some(x) => x,
+                _ => {
+                    continue;
+                }
+            };
+
+            for permission_vid in permission_vids {
+                let permission = match all_permissions.iter().find(|item| {
+                    item.vid.eq(permission_vid.as_str())
+                }) {
+                    Some(x) => x,
+                    _ => continue,
+                };
+
+                let role_permission_map = RolePermissionsMapActiveModel {
+                    role_id: Set(role.role_id),
+                    permission_id: Set(permission.permission_id),
+                    ..Default::default()
+                };
+                role_permission_list.push(role_permission_map);
+            }
+        }
+
+        let _ = RolePermissionsMapEntity::insert_many(role_permission_list).exec(db).await?;
+
+        Ok(())
     }
 }

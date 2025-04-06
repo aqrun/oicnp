@@ -4,18 +4,33 @@
   name: 管理员
   weight: 0
   status: 1
+  permissionVids: []
 - roleId: 2,
   vid: author
   name: 作者
   weight: 0
   status: 1
+  permissionVids:
+    - system
+    - user
+    - user-list
+    - cms
+    - note
+    - note-list
+    - note-add
+    - note-update
 - roleId: 3, 
   vid: member
   name: 成员
   weight: 0
   status: 1
+  permissionVids:
+    - cms
+    - note
+    - note-list
 - roleId: 4,
   vid: guest
   name: 游客
   weight: 0
   status: 1
+  permissionVids: []

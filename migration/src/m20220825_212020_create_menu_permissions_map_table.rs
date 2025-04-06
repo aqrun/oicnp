@@ -18,7 +18,7 @@ impl MigrationTrait for Migration {
                     .auto_increment(),
             )
             .col(ColumnDef::new(MenuPermissionsMap::MenuId).big_integer().not_null().default(0))
-            .col(ColumnDef::new(MenuPermissionsMap::PermissionId).string_len(255).not_null().default(""))
+            .col(ColumnDef::new(MenuPermissionsMap::PermissionId).big_integer().not_null().default(0))
             .col(ColumnDef::new(MenuPermissionsMap::CreatedBy).big_integer().not_null().default(0))
             .col(
                 ColumnDef::new(MenuPermissionsMap::CreatedAt)

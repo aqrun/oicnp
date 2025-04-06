@@ -70,12 +70,14 @@ where
             // 当前 URL /v1/info
             let uri = String::from(parts.uri.path());
 
+            // 是否拥有访问权限检测标识
             let mut has_permission = false;
 
             let not_auth_uris = vec![
                 "/v1/info",
             ];
 
+            // 解析当前登录用户信息
             let auth = match JWTWithUser::<UserModel>::from_request_parts(&mut parts, &state).await {
                 Ok(auth) => auth,
                 Err(_) => {
@@ -87,7 +89,10 @@ where
                 return Ok(no_auth("请先登录"));
             }
 
-            if not_auth_uris.contains(&uri.as_str()) {
+            if auth.user.is_admin.eq("1") {
+                // 管理员账号拥有所有权限
+                has_permission = true;
+            } else if not_auth_uris.contains(&uri.as_str()) {
                 // 不需要权限检测
                 has_permission = true;
             }

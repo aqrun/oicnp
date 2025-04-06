@@ -154,11 +154,11 @@ pub use super::menu::{
     Relation as MenuRelation,
 };
 pub use super::menu_permissions_map::{
-    Entity as MenuPermissionsEntity,
-    Model as MenuPermissionsModel,
-    Column as MenuPermissionsColumn,
-    ActiveModel as MenuPermissionsActiveModel,
-    Relation as MenuPermissionsRelation,
+    Entity as MenuPermissionsMapEntity,
+    Model as MenuPermissionsMapModel,
+    Column as MenuPermissionsMapColumn,
+    ActiveModel as MenuPermissionsMapActiveModel,
+    Relation as MenuPermissionsMapRelation,
 };
 pub use super::operation_logs::{
     Entity as OperationLogEntity,

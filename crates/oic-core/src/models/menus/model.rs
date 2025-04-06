@@ -215,6 +215,8 @@ impl ModelCrudHandler for MenuModel {
             exist_menus.insert(String::from(menu_model.vid.as_str()), menu_model);
         }
 
+        Self::assign_multi_menu_permissions(db, params).await?;
+
         Ok(String::from("批量菜单添加完成"))
     }
 
@@ -325,5 +327,67 @@ impl MenuModel {
         let root = build_menu_tree(list);
 
         Ok(root)
+    }
+
+    ///
+    /// 根据 permission_vids 给菜单指定权限
+    /// 
+    pub async fn assign_multi_menu_permissions(
+        db: &DatabaseConnection,
+        params: &[CreateMenuReqParams],
+    ) -> ModelResult<()> {
+        // 需要批量创建的 menu permission 关联关系
+        let mut menu_permissions_list: Vec<MenuPermissionsMapActiveModel> = Vec::new();
+
+        let all_permissions = PermissionEntity::find()
+            .all(db)
+            .await?;
+        let all_menus = MenuEntity::find()
+            .all(db)
+            .await?;
+
+        for item in params.iter() {
+            let mut menu_vid = String::from("");
+            let mut permission_vids: Vec<String> = Vec::new();
+
+            if let Some(x) = &item.vid {
+                menu_vid = String::from(x);
+            } else {
+                continue;
+            }
+
+            if let Some(x) = &item.permission_vids {
+                permission_vids = x.clone();
+            }
+
+            let menu = match all_menus.iter().find(|item| {
+                item.vid.eq(menu_vid.as_str())
+            }) {
+                Some(x) => x,
+                _ => {
+                    continue;
+                }
+            };
+
+            for permission_vid in permission_vids {
+                let permission = match all_permissions.iter().find(|item| {
+                    item.vid.eq(permission_vid.as_str())
+                }) {
+                    Some(x) => x,
+                    _ => continue,
+                };
+
+                let menu_permission_map = MenuPermissionsMapActiveModel {
+                    menu_id: Set(menu.id),
+                    permission_id: Set(permission.permission_id),
+                    ..Default::default()
+                };
+                menu_permissions_list.push(menu_permission_map);
+            }
+        }
+
+        let _ = MenuPermissionsMapEntity::insert_many(menu_permissions_list).exec(db).await?;
+
+        Ok(())
     }
 }

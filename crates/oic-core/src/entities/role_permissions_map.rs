@@ -10,7 +10,7 @@ pub struct Model {
     #[serde(skip_deserializing)]
     pub id: i64,
     pub role_id: i64,
-    pub permission_id: String,
+    pub permission_id: i64,
     pub created_by: i64,
     pub created_at: DateTime,
 }

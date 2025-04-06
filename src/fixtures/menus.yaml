@@ -22,7 +22,8 @@
   path: '/system/users'
   name: 用户
   icon: 'TeamOutlined'
-  permissionVids: []
+  permissionVids:
+    - user
 - vid: roles
   parentVid: system
   path: '/system/roles'
@@ -46,29 +47,33 @@
   path: '/cms'
   name: 内容管理
   icon: 'InboxOutlined'
-  permissionVids: []
+  permissionVids: 
+    - cms
 - vid: posts
   parentVid: cms
   path: '/cms/posts'
   name: 文章
   icon: 'DollarOutlined'
-  permissionVids: []
+  permissionVids:
+    - post
 - vid: categories
   parentVid: cms
   path: '/cms/categories'
   name: 分类
   icon: 'ClusterOutlined'
-  permissionVids: []
+  permissionVids:
+    - category
 - vid: tags
   parentVid: cms
   path: '/cms/tags'
   name: 标签
   icon: 'TagsOutlined'
-  permissionVids: []
+  permissionVids:
+    - tag
 - vid: notes
   parentVid: cms
   path: '/cms/notes'
   name: 笔记
   icon: ''
   permissionVids: 
-    - notes
+    - note
