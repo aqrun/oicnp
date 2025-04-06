@@ -228,7 +228,7 @@ pub enum Menus {
     Id,
     #[oic(data_type = "string", default = "", comment = "")]
     Vid,
-    #[oic(data_type = "string", default = "", comment = "")]
+    #[oic(data_type = "bigInt", default = "0", comment = "")]
     Pid,
     #[oic(data_type = "string", len = 255, default = "", comment = "")]
     Path,
@@ -395,6 +395,8 @@ pub enum Permissions {
     PermissionId,
     #[oic(data_type = "string", len = 64, default = "", comment = "")]
     Vid,
+    #[oic(data_type = "bigInt", default = 0, comment = "")]
+    Pid,
     #[oic(data_type = "string", len = 64, default = "", comment = "")]
     Name,
     #[oic(data_type = "string", len = 255, default = "", comment = "")]

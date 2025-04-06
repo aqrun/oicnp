@@ -18,6 +18,7 @@ impl MigrationTrait for Migration {
                     .auto_increment(),
             )
             .col(ColumnDef::new(Permissions::Vid).string_len(64).unique_key().not_null())
+            .col(ColumnDef::new(Permissions::Pid).big_integer().not_null().default(0))
             .col(ColumnDef::new(Permissions::Name).string_len(64).not_null().default(""))
             .col(ColumnDef::new(Permissions::Api).string_len(255).not_null().default(""))
             .col(ColumnDef::new(Permissions::Weight).integer().not_null().default(0))

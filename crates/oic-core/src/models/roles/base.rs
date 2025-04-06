@@ -34,6 +34,9 @@ pub struct RoleReqParams {
     pub created_at: Option<DateTime>,
     #[serde(rename(deserialize = "updatedAt"))]
     pub updated_at: Option<DateTime>,
+    /// 指定权限
+    #[serde(rename(deserialize = "permissionVids"))]
+    pub permission_vids: Option<Vec<String>>,
 }
 
 impl RequestParamsUpdater for RoleReqParams {

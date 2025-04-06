@@ -1,6 +1,7 @@
 use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
 use crate::typings::ListData;
+use std::fmt::Debug;
 
 ///
 /// 请求参数更新操作
@@ -24,10 +25,10 @@ pub trait RequestParamsUpdater {
 pub trait ModelCrudHandler {
     /// 关联的请求参数类型
     type DataModel: Serialize;
-    type FilterParams: Deserialize<'static> + Default + Clone + Send;
-    type CreateReqParams: RequestParamsUpdater + Deserialize<'static> + Default + Clone + Send;
-    type UpdateReqParams: RequestParamsUpdater + Deserialize<'static> + Default + Clone + Send;
-    type DeleteReqParams: RequestParamsUpdater + Deserialize<'static> + Default + Clone + Send;
+    type FilterParams: Deserialize<'static> + Default + Clone + Send + Debug;
+    type CreateReqParams: RequestParamsUpdater + Deserialize<'static> + Default + Clone + Send + Debug;
+    type UpdateReqParams: RequestParamsUpdater + Deserialize<'static> + Default + Clone + Send + Debug;
+    type DeleteReqParams: RequestParamsUpdater + Deserialize<'static> + Default + Clone + Send + Debug;
 
     /// 根据ID查找一个
     async fn find_by_id(db: &DatabaseConnection, id: i64) -> ModelResult<Self::DataModel>;

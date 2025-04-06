@@ -11,8 +11,11 @@ use std::fs::File;
 /// 数据表最初数据填入
 /// 直接操作数据表
 pub async fn run(ctx: &AppContext) -> Result<()> {
-    handle_seed::<RoleModel>(ctx, "role").await?;
-    handle_seed::<UserModel>(ctx, "user").await?;
+    handle_seed::<PermissionModel>(ctx, "permission").await?;
+    //handle_seed::<RoleModel>(ctx, "role").await?;
+    //handle_seed::<UserModel>(ctx, "user").await?;
+    //handle_seed::<MenuModel>(ctx, "menu").await?;
+    //handle_seed::<NoteModel>(ctx, "note").await?;
     Ok(())
 }
 
@@ -35,7 +38,7 @@ where
     let seed_file = format!("src/fixtures/{seed_name}s.yaml");
     // 读取 yaml 文件并解析为指定的类型
     let seed_data: Vec<TModel::CreateReqParams> = serde_yaml::from_reader(File::open(seed_file)?)?;
-
+    
     // 批量插入数据
     let _ = TModel::create_multi(&ctx.db, seed_data.as_slice()).await?;
     println!("{}数据初始化完成", seed_name);

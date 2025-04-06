@@ -7,17 +7,9 @@ use crate::{
     auth::JWT,
     typings::ListData,
     uuid,
+    entities::prelude::*,
 };
 use super::{RegisterParams, Validator};
-pub use crate::entities::prelude::{
-  UserActiveModel,
-  UserEntity,
-  UserModel,
-  UserColumn,
-  RoleModel,
-  UserRoleMapActiveModel,
-  UserRoleMapEntity,
-};
 use crate::{RequestParamsUpdater, ModelCrudHandler};
 use sea_orm::{prelude::*, QueryOrder};
 use super::{
@@ -189,37 +181,7 @@ impl ModelCrudHandler for UserModel {
 
         txn.commit().await?;
 
-        // 需要批量创建的 user role 关联关系
-        let mut user_role_list: Vec<UserRoleMapActiveModel> = Vec::new();
-
-        for item in params.iter() {
-            let mut email = String::from("");
-            let mut item_roles: Vec<String> = Vec::new();
-
-            if let Some(x) = &item.email {
-                email = String::from(x);
-            } else {
-                continue;
-            }
-
-            if let Some(x) = &item.roles {
-                item_roles = x.clone();
-            }
-
-            let user = Self::find_by_email(db, email.as_str()).await?;
-
-            for role_item in item_roles {
-                let role = RoleModel::find_by_vid(db, role_item.as_str()).await?;
-                let user_role_map = UserRoleMapActiveModel {
-                    uid: Set(user.uid),
-                    role_id: Set(role.role_id),
-                    ..Default::default()
-                };
-                user_role_list.push(user_role_map);
-            }
-        }
-
-        let _ = UserRoleMapEntity::insert_many(user_role_list).exec(db).await?;
+        Self::assign_multi_user_roles(db, params).await?;
         
         Ok(String::from("批量user添加完成"))
     }
@@ -295,6 +257,65 @@ impl UserModel {
         let _ = UserRoleMapEntity::insert_many(user_roles).exec(db).await?;
 
         Ok(0)
+    }
+
+    pub async fn assign_multi_user_roles(
+        db: &DatabaseConnection,
+        params: &[CreateUserReqParams],
+    ) -> ModelResult<()> {
+        // 需要批量创建的 user role 关联关系
+        let mut user_role_list: Vec<UserRoleMapActiveModel> = Vec::new();
+
+        let all_users = UserEntity::find()
+            .all(db)
+            .await?;
+        let all_roles = RoleEntity::find()
+            .all(db)
+            .await?;
+
+        for item in params.iter() {
+            let mut email = String::from("");
+            let mut item_roles: Vec<String> = Vec::new();
+
+            if let Some(x) = &item.email {
+                email = String::from(x);
+            } else {
+                continue;
+            }
+
+            if let Some(x) = &item.roles {
+                item_roles = x.clone();
+            }
+
+            let user = match all_users.iter().find(|item| {
+                item.email.eq(email.as_str())
+            }) {
+                Some(x) => x,
+                _ => {
+                    continue;
+                }
+            };
+
+            for role_item in item_roles {
+                let role = match all_roles.iter().find(|item| {
+                    item.vid.eq(role_item.as_str())
+                }) {
+                    Some(x) => x,
+                    _ => continue,
+                };
+
+                let user_role_map = UserRoleMapActiveModel {
+                    uid: Set(user.uid),
+                    role_id: Set(role.role_id),
+                    ..Default::default()
+                };
+                user_role_list.push(user_role_map);
+            }
+        }
+
+        let _ = UserRoleMapEntity::insert_many(user_role_list).exec(db).await?;
+
+        Ok(())
     }
 
     /// finds a user by the provided email

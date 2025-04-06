@@ -80,7 +80,7 @@ impl ModelCrudHandler for MenuModel {
         }
 
         if let Some(x) = &params.pid {
-            q = q.filter(MenuColumn::Pid.eq(x));
+            q = q.filter(MenuColumn::Pid.eq(*x));
         }
 
         if let Some(x) = &params.depth {
@@ -135,20 +135,20 @@ impl ModelCrudHandler for MenuModel {
         for item in params.iter() {
             // 先使用缓存父菜单数据
             let mut parent_menu: Option<Self> = None;
-            let mut pid = String::from("");
+            let mut parent_vid = String::from("");
 
-            if let Some(x) = &item.pid {
-                pid = String::from(x);
+            if let Some(x) = &item.parent_vid {
+                parent_vid = String::from(x);
             }
             
-            if !pid.is_empty() {
-                let res = exist_menus.get(pid.as_str());
+            if !parent_vid.is_empty() {
+                let res = exist_menus.get(parent_vid.as_str());
 
                 if let Some(res) = res {
                     parent_menu = Some(res.clone());
                 } else {
                     // 不存在从数据库读取
-                    if let Ok(res) = Self::find_by_vid(db, pid.as_str()).await {
+                    if let Ok(res) = Self::find_by_vid(db, parent_vid.as_str()).await {
                         exist_menus.insert(String::from(res.vid.as_str()), res.clone());
                         parent_menu = Some(res);
                     }
@@ -163,12 +163,13 @@ impl ModelCrudHandler for MenuModel {
             item.update_by_create(&mut menu);
 
             // 不存在父菜单 depth = 1
-            if pid.is_empty() {
+            if parent_vid.is_empty() {
                 menu.depth = Set(1);
             }
 
             if let Some(parent_menu) = parent_menu {
                 let depth = parent_menu.depth + 1;
+                menu.pid = Set(parent_menu.id);
                 menu.depth = Set(depth);
                 menu.p1 = Set(parent_menu.p1);
                 menu.p2 = Set(parent_menu.p2);
@@ -230,7 +231,7 @@ impl ModelCrudHandler for MenuModel {
     
         let item = item.insert(db).await?;
 
-        Ok(item.id as i64)
+        Ok(item.id)
     }
 
     /// 更新数据
@@ -242,7 +243,7 @@ impl ModelCrudHandler for MenuModel {
             return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
         }
 
-        let mut item = Self::find_by_id(db, id as i64)
+        let mut item = Self::find_by_id(db, id)
             .await?
             .into_active_model();
 
@@ -251,7 +252,7 @@ impl ModelCrudHandler for MenuModel {
     
         let item = item.update(db).await?;
 
-        Ok(item.id as i64)
+        Ok(item.id)
     }
 
     /// 删除数据
@@ -266,7 +267,7 @@ impl ModelCrudHandler for MenuModel {
             .exec(db)
             .await?;
 
-        Ok(id as i64)
+        Ok(id)
     }
 }
 

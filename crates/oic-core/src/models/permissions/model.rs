@@ -1,10 +1,11 @@
+use std::collections::HashMap;
 use crate::{
     entities::prelude::*,
     utils::catch_err,
     typings::ListData,
 };
 use loco_rs::prelude::*;
-use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, TransactionTrait};
+use sea_orm::{prelude::*, IntoActiveModel, QueryOrder};
 use validator::Validate;
 use crate::{RequestParamsUpdater, ModelCrudHandler};
 use super::{CreatePermissionReqParams, DeletePermissionReqParams, PermissionFilters, UpdatePermissionReqParams};
@@ -107,24 +108,54 @@ impl ModelCrudHandler for PermissionModel {
             catch_err(item.validate())?;
         }
         
-        let txn = db.begin().await?;
-        let mut list: Vec<PermissionActiveModel> = Vec::new();
+        // 缓存已存在的权限数据
+        let mut exist_permissions: HashMap<String, Self> = HashMap::new();
 
+        // 遍历参数列表
         for item in params.iter() {
+            // 先使用缓存父菜单数据
+            let mut parent_permission: Option<Self> = None;
+            let mut parent_vid = String::from("");
+
+            if let Some(x) = &item.parent_vid {
+                parent_vid = String::from(x);
+            }
+            
+            if !parent_vid.is_empty() {
+                let res = exist_permissions.get(parent_vid.as_str());
+
+                if let Some(res) = res {
+                    parent_permission = Some(res.clone());
+                } else {
+                    // 不存在从数据库读取
+                    if let Ok(res) = Self::find_by_vid(db, parent_vid.as_str()).await {
+                        exist_permissions.insert(String::from(res.vid.as_str()), res.clone());
+                        parent_permission = Some(res);
+                    }
+                }
+            }
+
             let mut permission = PermissionActiveModel {
                 ..Default::default()
             };
-
+    
             item.update(&mut permission);
             item.update_by_create(&mut permission);
 
-            list.push(permission);
+            if let Some(parent_permission) = parent_permission {
+                permission.pid = Set(parent_permission.permission_id);
+            }
+
+            let permission_model = permission.insert(db).await?;
+            // let permission = permission_model.clone().into_active_model();
+
+            // // 更新到数据表
+            // let permission_model = permission.update(db).await?;
+            // 添加缓存数据
+            exist_permissions.insert(String::from(permission_model.vid.as_str()), permission_model);
         }
 
-        let _ = PermissionEntity::insert_many(list).exec(&txn).await?;
-        txn.commit().await?;
-
-        Ok(String::from("批量角色添加完成"))
+        Ok(String::from("批量权限添加完成"))
     }
 
     /// 创建

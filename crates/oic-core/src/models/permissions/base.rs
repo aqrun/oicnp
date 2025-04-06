@@ -24,6 +24,9 @@ pub struct PermissionReqParams {
     pub permission_id: Option<i64>,
     #[validate(required(message = "必须指定 vid"), length(min = 2, message = "vid 最少2个字符"))]
     pub vid: Option<String>,
+    #[serde(rename(deserialize = "parentVid"))]
+    pub parent_vid: Option<String>,
+    pub pid: Option<i64>,
     #[validate(required(message = "必须指定 name"), length(min = 2, message = "name 最少2个字符"))]
     pub name: Option<String>,
     pub weight: Option<i32>,

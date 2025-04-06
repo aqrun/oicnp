@@ -1,61 +1,74 @@
 ---
-- mid: backend
-  pid: ''
+- vid: backend
+  parentVid: ''
   path: ''
   name: Backend
   icon: ''
-- mid: dashboard
-  pid: backend
+- vid: dashboard
+  parentVid: backend
   path: '/dashboard'
   name: 仪表盘
   icon: 'DashboardOutlined'
-- mid: system
-  pid: backend
+  permissionVids: []
+- vid: system
+  parentVid: backend
   path: '/system'
   name: 系统管理
   icon: 'LaptopOutlined'
-- mid: users
-  pid: system
+  permissionVids:
+    - system
+- vid: users
+  parentVid: system
   path: '/system/users'
   name: 用户
   icon: 'TeamOutlined'
-- mid: roles
-  pid: system
+  permissionVids: []
+- vid: roles
+  parentVid: system
   path: '/system/roles'
   name: 角色
   icon: 'UsergroupAddOutlined'
-- mid: permissions
-  pid: system
+  permissionVids: []
+- vid: permissions
+  parentVid: system
   path: '/system/permissions'
   name: 权限
   icon: 'UnlockOutlined'
-- mid: settings
-  pid: system
+  permissionVids: []
+- vid: settings
+  parentVid: system
   path: '/system/settings'
   name: 设置
   icon: 'SettingOutlined'
-- mid: cms
-  pid: backend
+  permissionVids: []
+- vid: cms
+  parentVid: backend
   path: '/cms'
   name: 内容管理
   icon: 'InboxOutlined'
-- mid: posts
-  pid: cms
+  permissionVids: []
+- vid: posts
+  parentVid: cms
   path: '/cms/posts'
   name: 文章
   icon: 'DollarOutlined'
-- mid: categories
-  pid: cms
+  permissionVids: []
+- vid: categories
+  parentVid: cms
   path: '/cms/categories'
   name: 分类
   icon: 'ClusterOutlined'
-- mid: tags
-  pid: cms
+  permissionVids: []
+- vid: tags
+  parentVid: cms
   path: '/cms/tags'
   name: 标签
   icon: 'TagsOutlined'
-- mid: notes
-  pid: cms
+  permissionVids: []
+- vid: notes
+  parentVid: cms
   path: '/cms/notes'
   name: 笔记
   icon: ''
+  permissionVids: 
+    - notes

@@ -10,14 +10,14 @@ pub fn build_menu_tree(menus: Vec<MenuModel>) -> MenuTreeItem {
     // let mut roots = Vec::new();
     // 只有一个根节点
     let mut root = MenuModel::default();
-    let mut child_map: HashMap<String, Vec<MenuModel>> = HashMap::new();
+    let mut child_map: HashMap<i64, Vec<MenuModel>> = HashMap::new();
 
     for node in menus {
-        if !node.pid.is_empty() {
-            if let Some(child_nodes) = child_map.get_mut(node.pid.as_str()) {
+        if node.pid <= 0 {
+            if let Some(child_nodes) = child_map.get_mut(&node.pid) {
                 child_nodes.push(node);
             } else {
-                child_map.insert(String::from(node.pid.as_str()), vec![node]);
+                child_map.insert(node.pid, vec![node]);
             }
         } else {
             // roots.push(node);
@@ -37,11 +37,11 @@ pub fn build_menu_tree(menus: Vec<MenuModel>) -> MenuTreeItem {
 
 fn into_tree_node (
     menu: MenuModel,
-    mut child_map: &mut HashMap<String, Vec<MenuModel>>,
+    mut child_map: &mut HashMap<i64, Vec<MenuModel>>,
 ) -> MenuTreeItem {
     let mut children = Vec::new();
 
-    if let Some((_id, child_nodes)) = child_map.remove_entry(menu.vid.as_str()) {
+    if let Some((_id, child_nodes)) = child_map.remove_entry(&menu.id) {
         for child_node in child_nodes {
             children.push(into_tree_node(child_node, &mut child_map));
         }

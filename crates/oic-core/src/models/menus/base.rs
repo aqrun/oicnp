@@ -10,9 +10,11 @@ use loco_rs::prelude::Set;
 #[derive(FilterParams, Deserialize, Serialize, Debug, Clone, Default)]
 #[serde(default)]
 pub struct MenuFilters {
-    pub id: Option<i32>,
+    pub id: Option<i64>,
     pub vid: Option<String>,
-    pub pid: Option<String>,
+    #[serde(rename(deserialize = "parentVid"))]
+    pub parent_vid: Option<String>,
+    pub pid: Option<i64>,
     pub name: Option<String>,
     pub depth: Option<String>,
 }
@@ -21,9 +23,11 @@ pub struct MenuFilters {
 #[derive(Deserialize, Serialize, Debug, Validate, Default, Clone)]
 #[serde(default)]
 pub struct MenuReqParams {
-    pub id: Option<i32>,
+    pub id: Option<i64>,
     pub vid: Option<String>,
-    pub pid: Option<String>,
+    pub pid: Option<i64>,
+    #[serde(rename(deserialize = "parentVid"))]
+    pub parent_vid: Option<String>,
     pub path: Option<String>,
     pub name: Option<String>,
     pub icon: Option<String>,
@@ -36,6 +40,9 @@ pub struct MenuReqParams {
     #[serde(rename(deserialize = "isFrame"))]
     pub is_frame: Option<String>,
     pub remark: Option<String>,
+    /// 指定权限
+    #[serde(rename(deserialize = "permissionVids"))]
+    pub permission_vids: Option<Vec<String>>,
 }
 
 impl RequestParamsUpdater for MenuReqParams {
@@ -47,7 +54,7 @@ impl RequestParamsUpdater for MenuReqParams {
         }
 
         if let Some(x) = &self.pid {
-            item.pid = Set(String::from(x));
+            item.pid = Set(*x);
         }
 
         if let Some(x) = &self.path {
@@ -107,10 +114,10 @@ pub type DeleteMenuReqParams = MenuReqParams;
  */
 #[derive(Clone, Debug, Deserialize, Serialize, Default)]
 pub struct MenuTreeItem {
-    pub id: i32,
+    pub id: i64,
     pub vid: String,
     pub key: String,
-    pub pid: String,
+    pub pid: i64,
     pub path: String,
     pub label: String,
     pub weight: i32,
