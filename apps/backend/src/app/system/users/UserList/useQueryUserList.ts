@@ -33,7 +33,7 @@ export function useQueryUserList() {
           total: res?.total || 0,
         }
       });
-      console.log('res---', res);
+
       return res;
     },
   },);

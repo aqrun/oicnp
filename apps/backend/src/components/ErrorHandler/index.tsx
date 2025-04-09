@@ -20,7 +20,17 @@ export function ErrorHandler(): JSX.Element {
       content: (
         <>
           错误码: {error?.code}<br/>
-          错误信息：{error?.message}
+          错误信息：{error?.message}<br/>
+          {Boolean(error?.action) && (
+            <span>
+              操作：{error?.action}<br/>
+            </span>
+          )}
+          {Boolean(error?.requestId) && (
+            <span>
+              RequestId：{error?.requestId}<br/>
+            </span>
+          )}
         </>
       ),
     });

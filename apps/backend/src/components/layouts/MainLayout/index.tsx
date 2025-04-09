@@ -179,7 +179,9 @@ export function MainLayout({
 
   return (
     <SidebarProvider>
-      <Container className={cls(`${CLASS_PREFIX}-layout-container`)}>
+      <Container
+        className={cls(`${CLASS_PREFIX}-layout-container`)}
+      >
         {showSideNav && (
           <Side className={cls(`${CLASS_PREFIX}-layout-side`)}>
             <Header className={cls(`${CLASS_PREFIX}-layout-header`)}>

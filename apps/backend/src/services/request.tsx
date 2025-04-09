@@ -3,7 +3,8 @@
 import type { AxiosRequestConfig, Method } from 'axios';
 import axios from 'axios';
 import { useAppStore } from '@/stores';
-import { API_URI } from '@/constants';
+import { API_URI, SESSION_ID } from '@/constants';
+import cookies from 'js-cookie';
 
 export type RequestConfig = AxiosRequestConfig & {
   ignoreError?: boolean;
@@ -47,6 +48,21 @@ axiosInstance.interceptors.response.use(
     const ignoreError = (config?.config as RequestConfig)?.ignoreError ?? false;
     const code = config?.data?.code ?? '200';
     const message = config?.data?.message;
+    const action = config?.config?.params?._fetcher || config?.config?.url;
+
+    // 未登陆状态需要先登录
+    if (code === '401') {
+      useAppStore.setState({
+        loading: false,
+        errors: [{
+          code,
+          message,
+          action,
+          requestId: config?.data?.requestId,
+        }],
+      });
+      return config?.data;
+    }
 
     if (!ignoreError && code !== '200' && message) {
       console.error(message);
@@ -107,8 +123,14 @@ export function createService<TRequest, TResponse> (
   return (data?: TRequest) => {
     return new Promise<TResponse>((resolve) => {
       if (method?.toLowerCase() === 'post') {
+        // 当前登陆信息
+        const token = cookies.get(SESSION_ID);
         const newConfig: RequestConfig = {
           ...config,
+          headers: {
+            ...(config?.headers || {}),
+            'Authorization': `Bearer ${token}`,
+          },
           params: {
             ...(config?.params || {}),
             // 添加 url 参数 方便控制台调试查看

@@ -14,7 +14,7 @@ export interface BaseListResponseData {
 }
 
 export interface DescribeMenuListRequestParams {
-  mid?: string;
+  vid?: string;
   _name?: string;
 }
 

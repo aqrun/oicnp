@@ -24,4 +24,6 @@ export type HashState = {
 export interface FailModel {
   code?: string;
   message?: string;
+  action?: string;
+  requestId?: string;
 }

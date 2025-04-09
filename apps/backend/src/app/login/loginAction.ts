@@ -20,8 +20,8 @@ export async function loginAction(params: DescribeLoginRequestParams) {
 
     const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     cookieStore.set(SESSION_ID, session, {
-      httpOnly: true,
-      secure: true,
+      httpOnly: false,
+      secure: false,
       expires: expires,
       sameSite: 'lax',
       path: '/',

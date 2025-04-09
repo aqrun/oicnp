@@ -4,7 +4,7 @@ import { SESSION_ID } from '@/constants';
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
-  
+
   if (request.nextUrl.pathname.startsWith('/_next')
     || request.nextUrl.pathname.startsWith('/favicon')
   ) {

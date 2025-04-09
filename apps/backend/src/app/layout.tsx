@@ -15,7 +15,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const menuRes = await DescribeMenuTree({ mid: 'backend' });
+  const menuRes = await DescribeMenuTree({ vid: 'backend' });
 
   return (
     <html lang="en">
