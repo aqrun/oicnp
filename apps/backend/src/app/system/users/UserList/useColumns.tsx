@@ -9,9 +9,15 @@ export default function useColumns() {
   const columns: TableProps<UserListData>['columns'] = [
     {
       key: 'uid',
-      title: 'UID',
+      title: 'ID',
       dataIndex: 'uid',
       width: 80,
+    },
+    {
+      key: 'uuid',
+      title: 'UUID',
+      dataIndex: 'uuid',
+      width: 200,
     },
     {
       key: 'username',

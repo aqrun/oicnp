@@ -80,7 +80,6 @@ where
           },
         };
 
-        println!("token: {}", token);
         let jwt_secret = ctx.config.get_jwt_config()?;
 
         match AuthJWT::new(&jwt_secret.secret).validate(&token) {

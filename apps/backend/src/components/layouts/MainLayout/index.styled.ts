@@ -84,7 +84,7 @@ export const Side = styled.aside`
   }
 
   .${CLASS_PREFIX}-layout-side-footer {
-    height: 64px;
+    height: 80px;
     display: flex;
     // align-items: center;
     // justify-content: center;
