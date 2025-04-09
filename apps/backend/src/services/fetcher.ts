@@ -2,6 +2,9 @@ import { API_URI } from '@/constants';
 import { cookies } from 'next/headers';
 import { SESSION_ID } from '@/constants';
 
+/**
+ * server端接口创建
+ */
 export function createFetcher<TRequest, TResponse> (action: string, method?: string) {
   const url = `${API_URI}/v1${action}`;
 
