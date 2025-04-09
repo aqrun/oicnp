@@ -36,6 +36,12 @@
   name: 权限
   icon: 'UnlockOutlined'
   permissionVids: []
+- vid: menus
+  parentVid: system
+  path: '/system/menus'
+  name: 菜单
+  icon: 'MenuOutlined'
+  permissionVids: []
 - vid: settings
   parentVid: system
   path: '/system/settings'

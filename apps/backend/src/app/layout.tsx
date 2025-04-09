@@ -6,7 +6,7 @@ import "@/styles/globals.css";
 
 
 export const metadata: Metadata = {
-  title: "OICNP 后台管理",
+  title: "OICNP 管理系统",
   description: "千里江陵一日还",
 };
 

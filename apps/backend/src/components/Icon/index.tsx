@@ -20,6 +20,7 @@ import {
   CaretDownOutlined,
   ReloadOutlined,
   ArrowLeftOutlined,
+  MenuOutlined,
 } from '@ant-design/icons';
 import { Container } from './index.styled';
 
@@ -45,6 +46,7 @@ const antIcons: Record<string, JSX.Element> = {
   CaretDownOutlined: <CaretDownOutlined />,
   ReloadOutlined: <ReloadOutlined />,
   ArrowLeftOutlined: <ArrowLeftOutlined />,
+  MenuOutlined: <MenuOutlined />,
 };
 
 export interface IconProps {
