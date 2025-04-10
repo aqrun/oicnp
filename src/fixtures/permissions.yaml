@@ -5,31 +5,31 @@
   api: /v1/system
   weight: 0
   status: 1
-- vid: user
+- vid: system:user
   parentVid: system
   name: 用户管理
   api: /v1/user
   weight: 0
   status: 1
-- vid: user-list
+- vid: system:user:list
   parentVid: user
   name: 查看用户列表
   api: /v1/user/list
   weight: 0
   status: 1
-- vid: user-add
+- vid: system:user:add
   parentVid: user
   name: 创建用户
   api: /v1/user/add
   weight: 0
   status: 1
-- vid: user-update
+- vid: system:user:update
   parentVid: user
   name: 更新用户
   api: /v1/user/update
   weight: 0
   status: 1
-- vid: user-remove
+- vid: system:user:remove
   parentVid: user
   name: 删除用户
   api: /v1/user/remove
@@ -41,31 +41,31 @@
   api: /v1/cms
   weight: 0
   status: 1
-- vid: note
+- vid: cms:note
   parentVid: cms
   name: 管理笔记
   api: /v1/note
   weight: 0
   status: 1
-- vid: note-list
+- vid: cms:note:list
   parentVid: note
   name: 查看笔记列表
   api: /v1/note/list
   weight: 0
   status: 1
-- vid: note-add
+- vid: cms:note:add
   parentVid: note
   name: 创建笔记
   api: /v1/note/add
   weight: 0
   status: 1
-- vid: note-update
+- vid: cms:note:update
   parentVid: note
   name: 更新笔记
   api: /v1/note/update
   weight: 0
   status: 1
-- vid: note-remove
+- vid: cms:note:remove
   parentVid: note
   name: 删除笔记
   api: /v1/note/remove

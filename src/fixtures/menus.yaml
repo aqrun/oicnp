@@ -23,31 +23,35 @@
   name: 用户
   icon: 'TeamOutlined'
   permissionVids:
-    - user
+    - system:user
 - vid: roles
   parentVid: system
   path: '/system/roles'
   name: 角色
   icon: 'UsergroupAddOutlined'
-  permissionVids: []
+  permissionVids:
+    - system:role
 - vid: permissions
   parentVid: system
   path: '/system/permissions'
   name: 权限
   icon: 'UnlockOutlined'
-  permissionVids: []
+  permissionVids:
+    - system:permission
 - vid: menus
   parentVid: system
   path: '/system/menus'
   name: 菜单
   icon: 'MenuOutlined'
-  permissionVids: []
+  permissionVids:
+    - system:menu
 - vid: settings
   parentVid: system
   path: '/system/settings'
   name: 设置
   icon: 'SettingOutlined'
-  permissionVids: []
+  permissionVids:
+    - system:settings
 - vid: cms
   parentVid: backend
   path: '/cms'
@@ -61,25 +65,25 @@
   name: 文章
   icon: 'DollarOutlined'
   permissionVids:
-    - post
+    - cms:post
 - vid: categories
   parentVid: cms
   path: '/cms/categories'
   name: 分类
   icon: 'ClusterOutlined'
   permissionVids:
-    - category
+    - cms:category
 - vid: tags
   parentVid: cms
   path: '/cms/tags'
   name: 标签
   icon: 'TagsOutlined'
   permissionVids:
-    - tag
+    - cms:tag
 - vid: notes
   parentVid: cms
   path: '/cms/notes'
   name: 笔记
   icon: ''
   permissionVids: 
-    - note
+    - cms:note
