@@ -3,10 +3,10 @@
 import { cookies } from 'next/headers';
 import { SESSION_ID } from '@/constants';
 import { jwtDecode } from 'jwt-decode';
-import { DescribeUser } from '@/services/actions';
+import { DescribeUserDetail } from '@/services/apis/user/action';
 
 /**
- * 登出操作服务端请求
+ * 获取用户信息
  */
 export async function getUser() {
   const cookieStore = await cookies()
@@ -19,7 +19,7 @@ export async function getUser() {
     uuid: string;
   }>(token);
 
-  const res = await DescribeUser({
+  const res = await DescribeUserDetail({
     uuid: decoded.uuid,
   });
 

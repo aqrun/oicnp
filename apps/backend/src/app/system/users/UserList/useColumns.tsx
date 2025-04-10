@@ -2,11 +2,11 @@
 
 import type { TableProps} from 'antd';
 import TableActions from './TableActions';
-import { UserListData } from '@/services/types';
+import { UserModel } from '@/services';
 import { formatDate } from '@/utils';
 
 export default function useColumns() {
-  const columns: TableProps<UserListData>['columns'] = [
+  const columns: TableProps<UserModel>['columns'] = [
     {
       key: 'uid',
       title: 'ID',
@@ -72,7 +72,7 @@ export default function useColumns() {
       fixed: 'right',
       width: 200,
       dataIndex: 'id',
-      render: (value: string, record: UserListData) => {
+      render: (value: string, record: UserModel) => {
         return (
           <TableActions
             record={record}

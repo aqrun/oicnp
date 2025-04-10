@@ -3,25 +3,25 @@
 import { useMemoizedFn } from 'ahooks';
 import { Button, Divider, Modal } from 'antd';
 import {
-  UserModel,
+  RoleModel,
   DescribeDeleteUser,
   DescribeDeleteUserRequestParams,
 } from '@/services';
-import { useUserStore } from './useUserStore';
+import { useRoleStore } from './useRoleStore';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { r } from '@/utils';
 import { TableActionContainer } from '@/styles/app.styled';
 
 export interface TableActionsProps {
-  record: UserModel;
+  record: RoleModel;
 }
 
 export default function TableActions({
   record,
 }: TableActionsProps): JSX.Element {
   const router = useRouter();
-  const setState = useUserStore((state) => state.setState);
+  const setState = useRoleStore((state) => state.setState);
 
   const m = useMutation({
     mutationFn: (params: DescribeDeleteUserRequestParams) => {
@@ -34,8 +34,8 @@ export default function TableActions({
 
   const handleDelete = useMemoizedFn(() => {
     Modal.confirm({
-      title: '删除用户',
-      content: `确定删除用户: ${record?.username}?`,
+      title: '删除角色',
+      content: `确定删除角色: ${record?.name}?`,
       okText: '删除',
       okType: 'danger',
       type: 'warning',
@@ -44,7 +44,7 @@ export default function TableActions({
       },
       onOk: async () => {
         const params: DescribeDeleteUserRequestParams = {
-          uid: record?.uid,
+          uid: record?.roleId,
         };
         // 删除用户
         await deleteUser(params);
@@ -57,11 +57,11 @@ export default function TableActions({
   });
 
   const handleView = useMemoizedFn(() => {
-    router.push(r(`/system/users/detail?uid=${record?.uid}`));
+    router.push(r(`/system/roles/detail?uid=${record?.roleId}`));
   });
 
   const handleEdit = useMemoizedFn(() => {
-    router.push(r(`/system/users/edit?uid=${record?.uid}`));
+    router.push(r(`/system/roles/edit?uid=${record?.roleId}`));
   });
 
   return (

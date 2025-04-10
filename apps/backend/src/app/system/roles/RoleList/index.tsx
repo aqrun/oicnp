@@ -10,23 +10,23 @@ import {
 import { useMemoizedFn } from 'ahooks';
 import { FilterValues, EnumFilterTrigger } from '@/types';
 import useColumns from './useColumns';
-import { UserModel } from '@/services';
-import { useUserStore } from './useUserStore';
+import { UserModel } from '@/services/apis/user/types';
+import { useRoleStore } from './useRoleStore';
 import { nextTick, r } from '@/utils';
-import { useQueryUserList } from './useQueryUserList';
+import { useQueryRoleList } from './useQueryRoleList';
 import { Container } from './index.styled';
 
 /**
- * 仪表盘
+ * 角色列表
  */
-export default function UserList(): JSX.Element {
+export default function RoleList(): JSX.Element {
   const router = useRouter();
-  const pager = useUserStore((state) => state.pager);
-  const setState = useUserStore((state) => state.setState);
-  const refreshToken = useUserStore((state) => state.refreshToken);
+  const pager = useRoleStore((state) => state.pager);
+  const setState = useRoleStore((state) => state.setState);
+  const refreshToken = useRoleStore((state) => state.refreshToken);
   const columns = useColumns();
 
-  const {data, loading, refresh} = useQueryUserList();
+  const {data, loading, refresh} = useQueryRoleList();
 
   const getDataSource = () => {
     return data?.data || [];
@@ -37,7 +37,7 @@ export default function UserList(): JSX.Element {
    * 创建操作
    */
   const handleCreate = useMemoizedFn(() => {
-    router.push(r('/system/users/create'));
+    router.push(r('/system/roles/create'));
   });
 
   const handleRefresh = useMemoizedFn(() => {
@@ -83,7 +83,6 @@ export default function UserList(): JSX.Element {
   });
 
   useEffect(() => {
-    console.log('pagemount0-----userlist')
     if (refreshToken) {
       refresh();
     }
@@ -93,10 +92,10 @@ export default function UserList(): JSX.Element {
   return (
     <Container>
       <PageTitle
-        title='用户列表'
+        title='角色列表'
       />
       <Filters
-        createLabel="创建用户"
+        createLabel="创建角色"
         onCreate={handleCreate}
         onRefresh={handleRefresh}
         onSearch={handleSearch}
@@ -107,7 +106,7 @@ export default function UserList(): JSX.Element {
         dataSource={dataSource}
         columns={columns}
         loading={loading}
-        rowKey="uid"
+        rowKey="roleId"
         size="small"
         tableLayout="fixed"
         pagination={{

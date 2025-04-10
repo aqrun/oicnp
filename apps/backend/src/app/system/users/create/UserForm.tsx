@@ -6,7 +6,7 @@ import type { FormProps } from 'antd';
 import {
   FieldType,
 } from '../types';
-import { DescribeUserDetailResponseData } from '@/services/types';
+import { DescribeUserDetailResponseData } from '@/services';
 import {
   UserFormContainer,
 } from './index.styled';

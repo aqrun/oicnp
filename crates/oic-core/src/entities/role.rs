@@ -16,7 +16,7 @@ pub struct Model {
     pub scope: String,
     pub status: String,
     pub remark: String,
-    #[serde(rename(deserialize = "createAt", serialize = "createAt"))]
+    #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
     pub created_at: DateTime,
     #[serde(rename(deserialize = "updatedAt", serialize = "updatedAt"))]
     pub updated_at: Option<DateTime>,

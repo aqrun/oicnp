@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { MainLayout, AppProvider } from '@/components/layouts';
-import { DescribeMenuTree } from '@/services/actions';
+import { DescribeMenuTree } from '@/services/apis/menu/action';
 
 import "@/styles/globals.css";
 
