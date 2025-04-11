@@ -5,3 +5,4 @@ export * from './app.client';
 export * from './UrlState';
 export * from './fn';
 export * from './UrlHash';
+export * from './tree';

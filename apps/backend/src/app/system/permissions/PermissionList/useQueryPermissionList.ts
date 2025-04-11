@@ -1,35 +1,37 @@
 'use client';
 
 import {
-  DescribeRoleList,
-  DescribeRoleListRequestParams,
+  DescribePermissionList,
+  DescribePermissionListRequestParams,
 } from '@/services';
 import { useQuery } from '@tanstack/react-query';
-import { useRoleStore } from './useRoleStore';
+import { usePermissionStore } from './usePermissionStore';
 import { useMemoizedFn } from 'ahooks';
 
 export function useQueryRoleList() {
-  const filters = useRoleStore((state) => state.filters);
-  const pager = useRoleStore((state) => state.pager);
-  const setState = useRoleStore((state) => state.setState);
+  const filters = usePermissionStore((state) => state.filters);
+  const pager = usePermissionStore((state) => state.pager);
+  const setState = usePermissionStore((state) => state.setState);
 
   const { isFetching, data, refetch } = useQuery({
     queryKey: ['userList'],
     queryFn: async () => {
-      const params: DescribeRoleListRequestParams = {
-        page: pager?.page,
-        pageSize: pager?.pageSize,
+      const params: DescribePermissionListRequestParams = {
+        page: 1,
+        pageSize: 1000,
       };
 
       if (filters?.keyword) {
         params._name = filters.keyword;
       }
 
-      const res = await DescribeRoleList(params);
+      const res = await DescribePermissionList(params);
 
       setState({
         pager: {
           ...pager,
+          page: res?.page,
+          pageSize: res?.pageSize,
           total: res?.total || 0,
         }
       });

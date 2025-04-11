@@ -30,4 +30,9 @@ export interface FiltersProps {
    * 点击刷新
    */
   onRefresh?: () => void;
+  /**
+   * 展开收起
+   * @returns
+   */
+  onExpand?: () => void;
 }

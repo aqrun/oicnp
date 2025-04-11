@@ -5,6 +5,7 @@ import { CLASS_PREFIX } from '@/constants';
 import cls from 'clsx';
 import { CreateButton } from './CreateButton';
 import { RefreshButton } from './RefreshButton';
+import { ExpandButton } from './ExpandButton';
 import { SearchBox } from './SearchBox';
 import { FilterValues } from '@/types';
 import {
@@ -27,6 +28,7 @@ export function FiltersWidget(): JSX.Element {
     onSearch,
     onCreate,
     onRefresh,
+    onExpand,
   } = useFilterState();
 
   return (
@@ -36,6 +38,11 @@ export function FiltersWidget(): JSX.Element {
           <CreateButton
             label={createLabel}
             onCreate={onCreate}
+          />
+        )}
+        {Boolean(onExpand) && (
+          <ExpandButton
+            onExpand={onExpand}
           />
         )}
         {Boolean(onSearch) && (

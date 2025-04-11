@@ -8,6 +8,7 @@ mod node;
 mod auth;
 mod menu;
 mod role;
+mod permission;
 
 pub const VERSION: &str = "v1";
 
@@ -23,6 +24,7 @@ pub fn routes(ctx: &AppContext) -> Vec<Routes> {
         node::routes(),
         menu::routes(),
         role::routes(),
+        permission::routes(),
     ];
 
     for router in need_role_routes.into_iter() {

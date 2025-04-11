@@ -8,7 +8,7 @@ export interface BaseFilterParams {
 export interface BaseListResponseData {
   total: number;
   page: number;
-  page_size: number;
+  pageSize: number;
 }
 
 export interface DescribeLoginRequestParams {

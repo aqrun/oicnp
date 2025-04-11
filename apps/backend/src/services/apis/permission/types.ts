@@ -4,8 +4,9 @@ import {
 } from '../../types';
 
 export interface PermissionModel {
-  permissionId?: string;
+  permissionId: string;
   vid?: string;
+  pid?: string;
   name?: string;
   weight?: string;
   scope?: string;
@@ -13,6 +14,7 @@ export interface PermissionModel {
   remark?: string;
   createdAt?: string;
   updatedAt?: string;
+  children?: Array<PermissionModel>;
 }
 
 export interface DescribePermissionDetailRequestParams {

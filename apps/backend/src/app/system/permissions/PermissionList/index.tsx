@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Table } from 'antd';
 import { useRouter } from 'next/navigation';
 import {
@@ -10,28 +10,51 @@ import {
 import { useMemoizedFn } from 'ahooks';
 import { FilterValues, EnumFilterTrigger } from '@/types';
 import useColumns from './useColumns';
-import { RoleModel } from '@/services';
-import { useRoleStore } from './useRoleStore';
-import { nextTick, r } from '@/utils';
-import { useQueryRoleList } from './useQueryRoleList';
+import { PermissionModel } from '@/services';
+import { usePermissionStore } from './usePermissionStore';
+import {
+  nextTick, r,
+  convertPermissionListToTree,
+} from '@/utils';
+import { useQueryRoleList } from './useQueryPermissionList';
 import { Container } from './index.styled';
 
 /**
- * 角色列表
+ * 权限列表
  */
-export default function RoleList(): JSX.Element {
+export default function PermissionList(): JSX.Element {
   const router = useRouter();
-  const pager = useRoleStore((state) => state.pager);
-  const setState = useRoleStore((state) => state.setState);
-  const refreshToken = useRoleStore((state) => state.refreshToken);
+  const pager = usePermissionStore((state) => state.pager);
+  const setState = usePermissionStore((state) => state.setState);
+  const refreshToken = usePermissionStore((state) => state.refreshToken);
   const columns = useColumns();
+
+  /**
+   * 展开收起状态
+   */
+  const [expand, setExpand] = useState(true);
 
   const {data, loading, refresh} = useQueryRoleList();
 
-  const getDataSource = () => {
-    return data?.data || [];
-  };
-  const dataSource = getDataSource();
+  const dataSource = useMemo(() => {
+    return convertPermissionListToTree(data?.data || []);
+  }, [data]);
+
+  const expandedRowKeys = useMemo(() => {
+    if (expand) {
+      const ids: Array<string> = [];
+
+      dataSource.forEach((m) => {
+        ids.push(m.permissionId);
+
+        (m?.children || []).forEach((n) => {
+          ids.push(n?.permissionId);
+        });
+      });
+      return ids;
+    }
+    return [];
+  }, [expand, dataSource]);
 
   /**
    * 创建操作
@@ -68,6 +91,13 @@ export default function RoleList(): JSX.Element {
   });
 
   /**
+   * 展开收起操作
+   */
+  const handleFilterExpand = useMemoizedFn(() => {
+    setExpand(!expand);
+  });
+
+  /**
    * 页码数据变化
    */
   const handlePagerChange = useMemoizedFn(async (page: number, pageSize: number) => {
@@ -92,28 +122,27 @@ export default function RoleList(): JSX.Element {
   return (
     <Container>
       <PageTitle
-        title='角色列表'
+        title='权限列表'
       />
       <Filters
-        createLabel="创建角色"
+        createLabel="创建权限"
         onCreate={handleCreate}
         onRefresh={handleRefresh}
         onSearch={handleSearch}
         onChange={handleFilterChange}
+        onExpand={handleFilterExpand}
       />
       
-      <Table<RoleModel>
+      <Table<PermissionModel>
         dataSource={dataSource}
         columns={columns}
         loading={loading}
-        rowKey="roleId"
+        rowKey="permissionId"
         size="small"
         tableLayout="fixed"
-        pagination={{
-          total: pager?.total,
-          pageSize: pager?.pageSize,
-          showQuickJumper: true,
-          onChange: handlePagerChange,
+        pagination={false}
+        expandable={{
+          expandedRowKeys,
         }}
       />
     </Container>

@@ -20,4 +20,7 @@ export const Container = styled.div`
     margin: 0 8px 8px 0;
     width: 300px;
   }
+  .${CLASS_PREFIX}-expand-button {
+    margin: 0 8px 8px 0;
+  }
 `;
