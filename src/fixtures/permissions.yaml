@@ -1,7 +1,7 @@
 ---
 - vid: system
   parentVid: ''
-  name: 查看系统管理
+  name: 系统管理
   api: /v1/system
   weight: 0
   status: 1
@@ -12,25 +12,25 @@
   weight: 0
   status: 1
 - vid: system:user:list
-  parentVid: user
+  parentVid: system:user
   name: 查看用户列表
   api: /v1/user/list
   weight: 0
   status: 1
 - vid: system:user:add
-  parentVid: user
+  parentVid: system:user
   name: 创建用户
   api: /v1/user/add
   weight: 0
   status: 1
 - vid: system:user:update
-  parentVid: user
+  parentVid: system:user
   name: 更新用户
   api: /v1/user/update
   weight: 0
   status: 1
 - vid: system:user:remove
-  parentVid: user
+  parentVid: system:user
   name: 删除用户
   api: /v1/user/remove
   weight: 0
@@ -48,25 +48,25 @@
   weight: 0
   status: 1
 - vid: cms:note:list
-  parentVid: note
+  parentVid: cms:note
   name: 查看笔记列表
   api: /v1/note/list
   weight: 0
   status: 1
 - vid: cms:note:add
-  parentVid: note
+  parentVid: cms:note
   name: 创建笔记
   api: /v1/note/add
   weight: 0
   status: 1
 - vid: cms:note:update
-  parentVid: note
+  parentVid: cms:note
   name: 更新笔记
   api: /v1/note/update
   weight: 0
   status: 1
 - vid: cms:note:remove
-  parentVid: note
+  parentVid: cms:note
   name: 删除笔记
   api: /v1/note/remove
   weight: 0

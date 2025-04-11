@@ -4,10 +4,11 @@
 //! 
 
 use oic_derives::{FilterParams, add_filter_fields};
+use serde::Deserialize;
 
 #[add_filter_fields]
-#[derive(FilterParams)]
-pub struct NoteFilters {
+#[derive(FilterParams, Deserialize)]
+pub struct ExampleNoteFilters {
     pub id: Option<i64>,
     pub title: Option<String>,
 }

@@ -1,7 +1,7 @@
 export interface BaseFilterParams {
   page?: number;
-  page_size?: number;
-  order_by?: string;
+  pageSize?: number;
+  orderBy?: string;
   order?: string;
 }
 

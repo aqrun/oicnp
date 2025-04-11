@@ -1,6 +1,7 @@
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{DeriveInput, parse::Parser};
+use crate::utils::parse_derive_attributes;
 
 use crate::error::GeneratorResult;
 
@@ -56,18 +57,44 @@ pub(crate) fn add_filter_methods(input: DeriveInput) -> GeneratorResult<TokenStr
 /// order: Option<String>
 /// 
 pub(crate) fn add_filter_fields(input: &mut DeriveInput) -> TokenStream {
+    // let struct_name = input.ident.to_string();
+    // 获取全部 derive 属性列表
+    let attr_list = parse_derive_attributes(input.attrs.as_slice());
+    let has_deserialize = attr_list.contains(&String::from("Deserialize"));
+
     let expanded = match input.data {
         syn::Data::Struct(ref mut struct_data) => {
             match &mut struct_data.fields {
                 syn::Fields::Named(fields) => {
                     let named_field_parser = syn::Field::parse_named;
 
+                    let page_size_token: TokenStream = if has_deserialize {
+                        quote! {
+                            #[serde(rename(deserialize = "pageSize"))]
+                            pub page_size: std::option::Option<u64>
+                        }
+                    } else {
+                        quote! {
+                            pub page_size: std::option::Option<u64>
+                        }
+                    };
+                    let order_by_token = if has_deserialize {
+                        quote! {
+                            #[serde(rename(deserialize = "orderBy"))]
+                            pub order_by: std::option::Option<String>
+                        }
+                    } else {
+                        quote! {
+                            pub order_by: std::option::Option<String>
+                        }
+                    };
+
                     let page_field = named_field_parser
                         .parse2(quote! { pub page: std::option::Option<u64> }).unwrap();
                     let page_size_field = named_field_parser
-                        .parse2(quote! { pub page_size: std::option::Option<u64> }).unwrap();
+                        .parse2(page_size_token).unwrap();
                     let order_by_field = named_field_parser
-                        .parse2(quote! { pub order_by: std::option::Option<String> }).unwrap();
+                        .parse2(order_by_token).unwrap();
                     let order_field = named_field_parser
                         .parse2(quote! { pub order: std::option::Option<String> }).unwrap();
 

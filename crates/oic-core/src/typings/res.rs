@@ -16,6 +16,7 @@ pub struct ListData<T> {
     /// 当前页码
     pub page: u64,
     /// 当前分页大小
+    #[serde(rename(serialize = "pageSize"))]
     pub page_size: u64,
 }
 
@@ -23,6 +24,7 @@ pub struct ListData<T> {
 #[derive(Deserialize, Clone, Debug, Serialize, Default)]
 pub struct PageParams {
     pub page: Option<u64>,
+    #[serde(rename(serialize = "pageSize"))]
     pub page_size: Option<u64>,
 }
 

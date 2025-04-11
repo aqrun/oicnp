@@ -18,7 +18,7 @@ export function useQueryUserList() {
     queryFn: async () => {
       const params: DescribeUserListRequestParams = {
         page: pager?.page,
-        page_size: pager?.pageSize,
+        pageSize: pager?.pageSize,
       };
 
       if (filters?.keyword) {
