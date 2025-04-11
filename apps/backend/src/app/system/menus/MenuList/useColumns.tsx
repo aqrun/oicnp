@@ -2,23 +2,12 @@
 
 import type { TableProps} from 'antd';
 import TableActions from './TableActions';
-import { RoleModel } from '@/services';
+import { MenuModel } from '@/services';
 import { formatDate } from '@/utils';
+import { Icon } from '@/components';
 
 export default function useColumns() {
-  const columns: TableProps<RoleModel>['columns'] = [
-    {
-      key: 'roleId',
-      title: 'ID',
-      dataIndex: 'roleId',
-      width: 80,
-    },
-    {
-      key: 'vid',
-      title: '标识',
-      dataIndex: 'vid',
-      width: 120,
-    },
+  const columns: TableProps<MenuModel>['columns'] = [
     {
       key: 'name',
       title: '名称',
@@ -26,16 +15,46 @@ export default function useColumns() {
       width: 200,
     },
     {
-      key: 'status',
-      title: '状态',
-      dataIndex: 'status',
-      width: 120,
+      key: 'icon',
+      title: '图标',
+      dataIndex: 'icon',
+      width: 80,
+      render: (value: string) => {
+        return (
+          <Icon
+            icon={value}
+          />
+        );
+      }
     },
     {
       key: 'weight',
       title: '排序',
       dataIndex: 'weight',
       width: 80,
+    },
+    {
+      key: 'vid',
+      title: '标识',
+      dataIndex: 'vid',
+      width: 200,
+    },
+    {
+      key: 'permissions',
+      title: '权限',
+      dataIndex: 'permissions',
+      width: 80,
+    },
+    {
+      key: 'path',
+      title: '路径',
+      dataIndex: 'path',
+    },
+    {
+      key: 'status',
+      title: '状态',
+      dataIndex: 'status',
+      width: 120,
     },
     {
       key: 'remark',
@@ -66,7 +85,7 @@ export default function useColumns() {
       fixed: 'right',
       width: 200,
       dataIndex: 'roleId',
-      render: (value: string, record: RoleModel) => {
+      render: (value: string, record: MenuModel) => {
         return (
           <TableActions
             record={record}

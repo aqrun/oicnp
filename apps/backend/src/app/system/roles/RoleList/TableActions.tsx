@@ -57,11 +57,11 @@ export default function TableActions({
   });
 
   const handleView = useMemoizedFn(() => {
-    router.push(r(`/system/roles/detail?uid=${record?.roleId}`));
+    router.push(r(`/system/roles/detail?id=${record?.roleId}`));
   });
 
   const handleEdit = useMemoizedFn(() => {
-    router.push(r(`/system/roles/edit?uid=${record?.roleId}`));
+    router.push(r(`/system/roles/edit?id=${record?.roleId}`));
   });
 
   return (

@@ -21,7 +21,7 @@ export const Header = styled.header`
   height: ${LAYOUT_HEADER_HEIGHT}px;
   border-right: 1px solid hsl(var(--border));
   border-bottom: 1px solid hsl(var(--border));
-  background: white;
+  background: transparent;
   display: flex;
   align-items: center;
   padding: 0 0 0 24px;
@@ -67,7 +67,7 @@ export const MainContent = styled.div`
 
 // Side component
 export const Side = styled.aside`
-  background-color: #001529;
+  background-color: white;
   width: 256px;
   height: 100vh;
   display: flex;
@@ -77,6 +77,8 @@ export const Side = styled.aside`
   .${CLASS_PREFIX}-side-menu {
     height: calc(100% - 64px - 64px);
     overflow: auto;
+    background: transparent;
+    color: #f4f4f5;
   }
 
   .${CLASS_PREFIX}-icon {

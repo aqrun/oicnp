@@ -28,11 +28,16 @@ pub struct Model {
     pub api: String,
     pub status: String,
     pub visible: String,
+    #[serde(rename(deserialize = "isCache", serialize = "isCache"))]
     pub is_cache: String,
+    #[serde(rename(deserialize = "isFrame", serialize = "isFrame"))]
     pub is_frame: String,
     pub remark: String,
+    #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
     pub created_at: DateTime,
+    #[serde(rename(deserialize = "updatedAt", serialize = "updatedAt"))]
     pub updated_at: Option<DateTime>,
+    #[serde(rename(deserialize = "deletedAt", serialize = "deletedAt"))]
     pub deleted_at: Option<DateTime>,
 }
 

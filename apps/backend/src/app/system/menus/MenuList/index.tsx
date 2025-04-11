@@ -10,57 +10,66 @@ import {
 import { useMemoizedFn } from 'ahooks';
 import { FilterValues, EnumFilterTrigger } from '@/types';
 import useColumns from './useColumns';
-import { PermissionModel } from '@/services';
-import { usePermissionStore } from './usePermissionStore';
+import { MenuModel } from '@/services';
+import { useMenuStore } from './useMenuStore';
 import {
   nextTick, r,
-  convertPermissionListToTree,
+  convertMenuListToTree,
 } from '@/utils';
-import { useQueryPermissionList } from './useQueryPermissionList';
+import { useQueryMenuList } from './useQueryMenuList';
 import { Container } from './index.styled';
 
 /**
- * 权限列表
+ * 菜单列表
  */
-export default function PermissionList(): JSX.Element {
+export default function MenuList(): JSX.Element {
   const router = useRouter();
-  const pager = usePermissionStore((state) => state.pager);
-  const setState = usePermissionStore((state) => state.setState);
-  const refreshToken = usePermissionStore((state) => state.refreshToken);
+  const pager = useMenuStore((state) => state.pager);
+  const setState = useMenuStore((state) => state.setState);
+  const refreshToken = useMenuStore((state) => state.refreshToken);
   const columns = useColumns();
 
   /**
    * 展开收起状态
    */
   const [expand, setExpand] = useState(true);
+  /**
+   * 当前表格操作的展开项
+   */
+  const [tableExpandKeys, setTableExpandKeys] = useState<string[] | undefined>(undefined);
 
-  const {data, loading, refresh} = useQueryPermissionList();
+  const {data, loading, refresh} = useQueryMenuList();
 
   const dataSource = useMemo(() => {
-    return convertPermissionListToTree(data?.data || []);
+    return convertMenuListToTree(data?.data || []);
   }, [data]);
 
   const expandedRowKeys = useMemo(() => {
+    // 表格有操作优化显示表格数据
+    if (typeof tableExpandKeys !== 'undefined') {
+      return tableExpandKeys;
+    }
+
     if (expand) {
       const ids: Array<string> = [];
 
       dataSource.forEach((m) => {
-        ids.push(m.permissionId);
+        ids.push(m.id);
 
         (m?.children || []).forEach((n) => {
-          ids.push(n?.permissionId);
+          ids.push(n?.id);
         });
       });
       return ids;
     }
     return [];
-  }, [expand, dataSource]);
+  }, [expand, dataSource, tableExpandKeys]);
 
   /**
    * 创建操作
    */
   const handleCreate = useMemoizedFn(() => {
-    router.push(r('/system/permissions/create'));
+    router.push(r('/system/menus/create'));
   });
 
   const handleRefresh = useMemoizedFn(() => {
@@ -95,6 +104,15 @@ export default function PermissionList(): JSX.Element {
    */
   const handleFilterExpand = useMemoizedFn(() => {
     setExpand(!expand);
+    // 重置表格数据 由 expand状态控制
+    setTableExpandKeys(undefined);
+  });
+
+  /**
+   * 单个数据展开收起操作
+   */
+  const handleTableExpandChange = useMemoizedFn((keys: readonly React.Key[]) => {
+    setTableExpandKeys(keys as unknown as Array<string>);
   });
 
   /**
@@ -122,10 +140,10 @@ export default function PermissionList(): JSX.Element {
   return (
     <Container>
       <PageTitle
-        title='权限列表'
+        title='菜单列表'
       />
       <Filters
-        createLabel="创建权限"
+        createLabel="创建菜单"
         onCreate={handleCreate}
         onRefresh={handleRefresh}
         onSearch={handleSearch}
@@ -133,16 +151,17 @@ export default function PermissionList(): JSX.Element {
         onExpand={handleFilterExpand}
       />
       
-      <Table<PermissionModel>
+      <Table<MenuModel>
         dataSource={dataSource}
         columns={columns}
         loading={loading}
-        rowKey="permissionId"
+        rowKey="id"
         size="small"
         tableLayout="fixed"
         pagination={false}
         expandable={{
           expandedRowKeys,
+          onExpandedRowsChange: handleTableExpandChange,
         }}
       />
     </Container>

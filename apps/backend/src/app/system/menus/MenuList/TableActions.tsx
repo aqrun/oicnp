@@ -3,29 +3,29 @@
 import { useMemoizedFn } from 'ahooks';
 import { Button, Divider, Modal } from 'antd';
 import {
-  PermissionModel,
-  DescribeDeletePermission,
-  DescribeDeletePermissionRequestParams,
+  MenuModel,
+  DescribeDeleteMenu,
+  DescribeDeleteMenuRequestParams,
 } from '@/services';
-import { usePermissionStore } from './usePermissionStore';
+import { useMenuStore } from './useMenuStore';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { r } from '@/utils';
 import { TableActionContainer } from '@/styles/app.styled';
 
 export interface TableActionsProps {
-  record: PermissionModel;
+  record: MenuModel;
 }
 
 export default function TableActions({
   record,
 }: TableActionsProps): JSX.Element {
   const router = useRouter();
-  const setState = usePermissionStore((state) => state.setState);
+  const setState = useMenuStore((state) => state.setState);
 
   const m = useMutation({
-    mutationFn: (params: DescribeDeletePermissionRequestParams) => {
-      return DescribeDeletePermission(params);
+    mutationFn: (params: DescribeDeleteMenuRequestParams) => {
+      return DescribeDeleteMenu(params);
     },
   });
 
@@ -34,8 +34,8 @@ export default function TableActions({
 
   const handleDelete = useMemoizedFn(() => {
     Modal.confirm({
-      title: '删除角色',
-      content: `确定删除角色: ${record?.name}?`,
+      title: '删除菜单',
+      content: `确定删除菜单: ${record?.name}?`,
       okText: '删除',
       okType: 'danger',
       type: 'warning',
@@ -43,8 +43,8 @@ export default function TableActions({
         loading: deleteLoading,
       },
       onOk: async () => {
-        const params: DescribeDeletePermissionRequestParams = {
-          permissionId: record?.permissionId,
+        const params: DescribeDeleteMenuRequestParams = {
+          id: record?.id,
         };
         // 删除用户
         await deleteUser(params);
@@ -57,11 +57,11 @@ export default function TableActions({
   });
 
   const handleView = useMemoizedFn(() => {
-    router.push(r(`/system/permissions/detail?uid=${record?.permissionId}`));
+    router.push(r(`/system/menus/detail?id=${record?.id}`));
   });
 
   const handleEdit = useMemoizedFn(() => {
-    router.push(r(`/system/permissions/edit?uid=${record?.permissionId}`));
+    router.push(r(`/system/menus/edit?id=${record?.id}`));
   });
 
   return (

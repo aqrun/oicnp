@@ -31,7 +31,7 @@ export default function RoleList(): JSX.Element {
   const getDataSource = () => {
     return data?.data || [];
   };
-  const dataSource = getDataSource();
+  const dataSource = getDataSource();console.log('dataSource---', dataSource);
 
   /**
    * 创建操作

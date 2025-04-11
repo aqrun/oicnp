@@ -14,7 +14,7 @@ export function useQueryRoleList() {
   const setState = useRoleStore((state) => state.setState);
 
   const { isFetching, data, refetch } = useQuery({
-    queryKey: ['userList'],
+    queryKey: ['roleList'],
     queryFn: async () => {
       const params: DescribeRoleListRequestParams = {
         page: pager?.page,

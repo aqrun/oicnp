@@ -4,7 +4,7 @@ import {
 } from '../../types';
 
 export interface MenuModel {
-  id?: string;
+  id: string;
   vid?: string;
   pid?: string;
   parentVid?: string;
@@ -19,7 +19,11 @@ export interface MenuModel {
   isFrame?: string;
   remark?: string;
   /// 指定权限
-  permission_vids?: Array<string>;
+  permissionVids?: Array<string>;
+  createdAt?: string;
+  updateAt?: string;
+  deletedAt?: string;
+  children?: Array<MenuModel>;
 }
 
 export interface DescribeMenuDetailRequestParams {

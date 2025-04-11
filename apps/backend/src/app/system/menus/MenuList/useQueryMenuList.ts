@@ -1,31 +1,31 @@
 'use client';
 
 import {
-  DescribePermissionList,
-  DescribePermissionListRequestParams,
+  DescribeMenuList,
+  DescribeMenuListRequestParams,
 } from '@/services';
 import { useQuery } from '@tanstack/react-query';
-import { usePermissionStore } from './usePermissionStore';
+import { useMenuStore } from './useMenuStore';
 import { useMemoizedFn } from 'ahooks';
 
-export function useQueryPermissionList() {
-  const filters = usePermissionStore((state) => state.filters);
-  const pager = usePermissionStore((state) => state.pager);
-  const setState = usePermissionStore((state) => state.setState);
+export function useQueryMenuList() {
+  const filters = useMenuStore((state) => state.filters);
+  const pager = useMenuStore((state) => state.pager);
+  const setState = useMenuStore((state) => state.setState);
 
   const { isFetching, data, refetch } = useQuery({
-    queryKey: ['permissionList'],
+    queryKey: ['menuList'],
     queryFn: async () => {
-      const params: DescribePermissionListRequestParams = {
-        page: 1,
-        pageSize: 1000,
+      const params: DescribeMenuListRequestParams = {
+        page: pager?.page,
+        pageSize: pager?.pageSize,
       };
 
       if (filters?.keyword) {
         params._name = filters.keyword;
       }
 
-      const res = await DescribePermissionList(params);
+      const res = await DescribeMenuList(params);
 
       setState({
         pager: {

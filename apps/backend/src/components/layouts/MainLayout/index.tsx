@@ -20,7 +20,7 @@ import {
   Footer,
 } from './index.styled';
 import { MenuItem, BreadItem } from '@/types';
-import { MenuTreeItem } from '@/services/types';
+import { MenuTreeItem } from '@/services';
 import { NavUser } from "@/components/nav-user"
 import {
   SidebarFooter,
