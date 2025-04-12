@@ -7,7 +7,7 @@ import {
   DescribeDeleteUser,
   DescribeDeleteUserRequestParams,
 } from '@/services';
-import { useRoleStore } from './useRoleStore';
+import { useListStore } from './useListStore';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { r } from '@/utils';
@@ -21,7 +21,7 @@ export default function TableActions({
   record,
 }: TableActionsProps): JSX.Element {
   const router = useRouter();
-  const setState = useRoleStore((state) => state.setState);
+  const setState = useListStore((state) => state.setState);
 
   const m = useMutation({
     mutationFn: (params: DescribeDeleteUserRequestParams) => {

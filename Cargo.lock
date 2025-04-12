@@ -3326,6 +3326,7 @@ dependencies = [
  "async-trait",
  "axum",
  "chrono",
+ "dotenv",
  "fluent-templates",
  "include_dir",
  "insta",

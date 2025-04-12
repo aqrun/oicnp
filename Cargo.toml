@@ -32,6 +32,7 @@ chrono = { workspace = true }
 validator = { workspace = true }
 sea-orm = { workspace = true }
 anyhow = { workspace = true }
+dotenv = { workspace = true }
 
 # view engine i18n
 fluent-templates = { workspace = true }

@@ -13,7 +13,8 @@ export interface RoleModel {
   remark?: string;
   createdAt?: string;
   updatedAt?: string;
-  permissionVids?: string;
+  permissionVids?: Array<string>;
+  permissionIds?: Array<string>;
 }
 
 export interface DescribeRoleDetailRequestParams {

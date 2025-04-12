@@ -11,9 +11,10 @@ import { useMemoizedFn } from 'ahooks';
 import { FilterValues, EnumFilterTrigger } from '@/types';
 import useColumns from './useColumns';
 import { RoleModel } from '@/services';
-import { useRoleStore } from './useRoleStore';
+import { useListStore } from './useListStore';
 import { nextTick, r } from '@/utils';
 import { useQueryRoleList } from './useQueryRoleList';
+import { useCreateStore } from '../create/useCreateStore';
 import { Container } from './index.styled';
 
 /**
@@ -21,9 +22,10 @@ import { Container } from './index.styled';
  */
 export default function RoleList(): JSX.Element {
   const router = useRouter();
-  const pager = useRoleStore((state) => state.pager);
-  const setState = useRoleStore((state) => state.setState);
-  const refreshToken = useRoleStore((state) => state.refreshToken);
+  const pager = useListStore((state) => state.pager);
+  const setState = useListStore((state) => state.setState);
+  const refreshToken = useListStore((state) => state.refreshToken);
+  const setCreateState = useCreateStore(state => state.setState);
   const columns = useColumns();
 
   const {data, loading, refresh} = useQueryRoleList();
@@ -37,7 +39,10 @@ export default function RoleList(): JSX.Element {
    * 创建操作
    */
   const handleCreate = useMemoizedFn(() => {
-    router.push(r('/system/roles/create'));
+    // router.push(r('/system/roles/create'));
+    setCreateState({
+      visible: true,
+    });
   });
 
   const handleRefresh = useMemoizedFn(() => {

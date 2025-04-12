@@ -5,13 +5,13 @@ import {
   DescribeRoleListRequestParams,
 } from '@/services';
 import { useQuery } from '@tanstack/react-query';
-import { useRoleStore } from './useRoleStore';
+import { useListStore } from './useListStore';
 import { useMemoizedFn } from 'ahooks';
 
 export function useQueryRoleList() {
-  const filters = useRoleStore((state) => state.filters);
-  const pager = useRoleStore((state) => state.pager);
-  const setState = useRoleStore((state) => state.setState);
+  const filters = useListStore((state) => state.filters);
+  const pager = useListStore((state) => state.pager);
+  const setState = useListStore((state) => state.setState);
 
   const { isFetching, data, refetch } = useQuery({
     queryKey: ['roleList'],
