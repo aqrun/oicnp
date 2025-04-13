@@ -11,7 +11,8 @@ import { useMemoizedFn } from 'ahooks';
 import { FilterValues, EnumFilterTrigger } from '@/types';
 import useColumns from './useColumns';
 import { PermissionModel } from '@/services';
-import { usePermissionStore } from './usePermissionStore';
+import { useListStore } from './useListStore';
+import { useCreateStore } from '../create/useCreateStore';
 import {
   nextTick, r,
   convertPermissionListToTree,
@@ -24,15 +25,20 @@ import { Container } from './index.styled';
  */
 export default function PermissionList(): JSX.Element {
   const router = useRouter();
-  const pager = usePermissionStore((state) => state.pager);
-  const setState = usePermissionStore((state) => state.setState);
-  const refreshToken = usePermissionStore((state) => state.refreshToken);
+  const pager = useListStore((state) => state.pager);
+  const setState = useListStore((state) => state.setState);
+  const refreshToken = useListStore((state) => state.refreshToken);
+  const setCreateState = useCreateStore(state => state.setState);
   const columns = useColumns();
 
   /**
    * 展开收起状态
    */
   const [expand, setExpand] = useState(true);
+   /**
+   * 当前表格操作的展开项
+   */
+   const [tableExpandKeys, setTableExpandKeys] = useState<string[] | undefined>(undefined);
 
   const {data, loading, refresh} = useQueryPermissionList();
 
@@ -41,26 +47,34 @@ export default function PermissionList(): JSX.Element {
   }, [data]);
 
   const expandedRowKeys = useMemo(() => {
+    // 表格有操作优化显示表格数据
+    if (typeof tableExpandKeys !== 'undefined') {
+      return tableExpandKeys;
+    }
+
     if (expand) {
-      const ids: Array<string> = [];
+      const ids: Array<number> = [];
 
       dataSource.forEach((m) => {
-        ids.push(m.permissionId);
+        ids.push(m.permissionId || 0);
 
         (m?.children || []).forEach((n) => {
-          ids.push(n?.permissionId);
+          ids.push(n?.permissionId || 0);
         });
       });
       return ids;
     }
     return [];
-  }, [expand, dataSource]);
+  }, [expand, dataSource, tableExpandKeys]);
 
   /**
    * 创建操作
    */
   const handleCreate = useMemoizedFn(() => {
-    router.push(r('/system/permissions/create'));
+    // router.push(r('/system/permissions/create'));
+    setCreateState({
+      visible: true,
+    });
   });
 
   const handleRefresh = useMemoizedFn(() => {
@@ -95,6 +109,13 @@ export default function PermissionList(): JSX.Element {
    */
   const handleFilterExpand = useMemoizedFn(() => {
     setExpand(!expand);
+  });
+
+  /**
+   * 单个数据展开收起操作
+   */
+  const handleTableExpandChange = useMemoizedFn((keys: readonly React.Key[]) => {
+    setTableExpandKeys(keys as unknown as Array<string>);
   });
 
   /**
@@ -143,6 +164,7 @@ export default function PermissionList(): JSX.Element {
         pagination={false}
         expandable={{
           expandedRowKeys,
+          onExpandedRowsChange: handleTableExpandChange,
         }}
       />
     </Container>

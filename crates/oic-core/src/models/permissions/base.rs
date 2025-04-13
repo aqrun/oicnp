@@ -12,7 +12,8 @@ use crate::{
 #[derive(FilterParams, Deserialize, Serialize, Debug, Default, Clone)]
 #[serde(default)]
 pub struct PermissionFilters {
-    pub id: Option<i64>,
+    #[serde(rename(deserialize = "permissionId"))]
+    pub permission_id: Option<i64>,
     pub vid: Option<String>,
 }
 
@@ -51,6 +52,10 @@ impl RequestParamsUpdater for PermissionReqParams {
         
         if let Some(x) = &self.vid {
             permission.vid = Set(String::from(x));
+        }
+
+        if let Some(x) = &self.pid {
+            permission.pid = Set(*x);
         }
 
         if let Some(x) = &self.name {

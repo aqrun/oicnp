@@ -5,13 +5,13 @@ import {
   DescribePermissionListRequestParams,
 } from '@/services';
 import { useQuery } from '@tanstack/react-query';
-import { usePermissionStore } from './usePermissionStore';
+import { useListStore } from './useListStore';
 import { useMemoizedFn } from 'ahooks';
 
 export function useQueryPermissionList() {
-  const filters = usePermissionStore((state) => state.filters);
-  const pager = usePermissionStore((state) => state.pager);
-  const setState = usePermissionStore((state) => state.setState);
+  const filters = useListStore((state) => state.filters);
+  const pager = useListStore((state) => state.pager);
+  const setState = useListStore((state) => state.setState);
 
   const { isFetching, data, refetch } = useQuery({
     queryKey: ['permissionList'],

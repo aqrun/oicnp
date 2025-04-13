@@ -3,17 +3,17 @@
 import { create } from 'zustand';
 import type { BaseState, BaseListState } from '@/stores/types';
 
-export type BasePermissionState = BaseListState & {
+export type BaseListPageState = BaseListState & {
   refreshToken: string;
   _name?: string;
 };
 
-export type PermissionState = BasePermissionState & BaseState<BasePermissionState>;
+export type ListState = BaseListPageState & BaseState<BaseListPageState>;
 
 /**
  *  筛选数据
  */
-export const usePermissionStore = create<PermissionState>()((set) => ({
+export const useListStore = create<ListState>()((set) => ({
   pager: {
     page: 1,
     pageSize: 10,

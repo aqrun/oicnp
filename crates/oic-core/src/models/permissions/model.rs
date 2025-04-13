@@ -30,7 +30,7 @@ impl ModelCrudHandler for PermissionModel {
         }
 
         let item = PermissionEntity::find()
-            .filter(RoleColumn::RoleId.eq(id))
+            .filter(PermissionColumn::PermissionId.eq(id))
             .one(db)
             .await?;
 
@@ -48,7 +48,7 @@ impl ModelCrudHandler for PermissionModel {
         }
 
         let item = PermissionEntity::find()
-            .filter(RoleColumn::Vid.eq(vid))
+            .filter(PermissionColumn::Vid.eq(vid))
             .one(db)
             .await?;
 
@@ -68,7 +68,7 @@ impl ModelCrudHandler for PermissionModel {
 
         let mut q = PermissionEntity::find();
 
-        if let Some(x) = params.id {
+        if let Some(x) = params.permission_id {
             if x > 0 {
                 q = q.filter(PermissionColumn::PermissionId.eq(x));
             }
@@ -202,7 +202,7 @@ impl ModelCrudHandler for PermissionModel {
             return Err(ModelError::Any(format!("数据不存在,id: {}", id).into()));
         }
 
-        let _res = RoleEntity::delete_by_id(id)
+        let _res = PermissionEntity::delete_by_id(id)
             .exec(db)
             .await?;
 

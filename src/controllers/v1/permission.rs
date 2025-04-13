@@ -18,7 +18,7 @@ pub async fn get_one(
     State(ctx): State<AppContext>,
     Json(params): Json<PermissionFilters>,
 ) -> JsonRes<PermissionModel> {
-    let id = params.id.unwrap_or(0);
+    let id = params.permission_id.unwrap_or(0);
     let res = PermissionModel::find_by_id(&ctx.db, id).await;
 
     JsonRes::from(res)

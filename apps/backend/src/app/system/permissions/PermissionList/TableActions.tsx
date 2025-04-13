@@ -1,16 +1,17 @@
 'use client';
 
+import { useState } from 'react';
 import { useMemoizedFn } from 'ahooks';
-import { Button, Divider, Modal } from 'antd';
+import { Button, Divider } from 'antd';
 import {
   PermissionModel,
   DescribeDeletePermission,
   DescribeDeletePermissionRequestParams,
 } from '@/services';
-import { usePermissionStore } from './usePermissionStore';
-import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import { r } from '@/utils';
+import { useListStore } from './useListStore';
+import { useViewStore } from '../view/useViewStore';
+import { useEditStore } from '../edit/useEditStore';
+import { useConfirmDelete } from '@/hooks/modals';
 import { TableActionContainer } from '@/styles/app.styled';
 
 export interface TableActionsProps {
@@ -20,48 +21,50 @@ export interface TableActionsProps {
 export default function TableActions({
   record,
 }: TableActionsProps): JSX.Element {
-  const router = useRouter();
-  const setState = usePermissionStore((state) => state.setState);
+  const confirmDelete = useConfirmDelete();
+  const setState = useListStore((state) => state.setState);
+  const setViewState = useViewStore(state => state.setState);
+  const setEditState = useEditStore(state => state.setState);
 
-  const m = useMutation({
-    mutationFn: (params: DescribeDeletePermissionRequestParams) => {
-      return DescribeDeletePermission(params);
-    },
+  const [loading, setLoading] = useState(false);
+
+  const deletePermission = useMemoizedFn(async () => {
+    setLoading(true);
+    const params: DescribeDeletePermissionRequestParams = {
+      permissionId: record?.permissionId,
+    };
+    // 删除
+    await DescribeDeletePermission(params);
+    // 更新列表
+    setState({
+      refreshToken: Date.now().toString(),
+    });
+    setLoading(false);
   });
 
-  const deleteUser = m.mutateAsync;
-  const deleteLoading = m.status === 'pending';
-
   const handleDelete = useMemoizedFn(() => {
-    Modal.confirm({
-      title: '删除角色',
-      content: `确定删除角色: ${record?.name}?`,
-      okText: '删除',
-      okType: 'danger',
-      type: 'warning',
-      okButtonProps: {
-        loading: deleteLoading,
-      },
-      onOk: async () => {
-        const params: DescribeDeletePermissionRequestParams = {
-          permissionId: record?.permissionId,
-        };
-        // 删除用户
-        await deleteUser(params);
-        // 更新列表
-        setState({
-          refreshToken: Date.now().toString(),
-        });
-      }
+    confirmDelete({
+      title: '删除权限',
+      content: `确定删除权限: ${record?.name}?`,
+      onOk: deletePermission,
+      loading: loading,
     });
   });
 
   const handleView = useMemoizedFn(() => {
-    router.push(r(`/system/permissions/detail?uid=${record?.permissionId}`));
+    // router.push(r(`/system/permissions/detail?uid=${record?.permissionId}`));
+    setViewState({
+      visible: true,
+      permissionId: record?.permissionId,
+    });
   });
 
   const handleEdit = useMemoizedFn(() => {
-    router.push(r(`/system/permissions/edit?uid=${record?.permissionId}`));
+    // router.push(r(`/system/permissions/edit?uid=${record?.permissionId}`));
+    setEditState({
+      visible: true,
+      permissionId: record?.permissionId,
+    });
   });
 
   return (
