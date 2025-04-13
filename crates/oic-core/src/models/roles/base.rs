@@ -12,7 +12,8 @@ use crate::{
 #[derive(FilterParams, Deserialize, Serialize, Debug, Default, Clone)]
 #[serde(default)]
 pub struct RoleFilters {
-    pub id: Option<i64>,
+    #[serde(rename(deserialize = "roleId"))]
+    pub role_id: Option<i64>,
     pub vid: Option<String>,
 }
 
@@ -20,6 +21,7 @@ pub struct RoleFilters {
 #[derive(Deserialize, Serialize, Debug, Validate, Clone, Default)]
 #[serde(default)]
 pub struct RoleReqParams {
+    #[serde(rename(deserialize = "roleId"))]
     pub role_id: Option<i64>,
     #[validate(required(message = "必须指定 vid"), length(min = 2, message = "vid 最少2个字符"))]
     pub vid: Option<String>,

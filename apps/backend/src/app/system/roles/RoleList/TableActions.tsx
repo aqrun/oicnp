@@ -1,16 +1,18 @@
 'use client';
 
+import { useState } from 'react';
 import { useMemoizedFn } from 'ahooks';
-import { Button, Divider, Modal } from 'antd';
+import { Button, Divider, Popconfirm } from 'antd';
 import {
   RoleModel,
-  DescribeDeleteUser,
-  DescribeDeleteUserRequestParams,
+  DescribeDeleteRole,
+  DescribeDeleteRoleRequestParams,
 } from '@/services';
 import { useListStore } from './useListStore';
-import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { r } from '@/utils';
+import { useViewStore } from '../detail/useViewStore';
+import { useGlobalState } from '@/context';
 import { TableActionContainer } from '@/styles/app.styled';
 
 export interface TableActionsProps {
@@ -20,44 +22,37 @@ export interface TableActionsProps {
 export default function TableActions({
   record,
 }: TableActionsProps): JSX.Element {
+  const { message } = useGlobalState();
   const router = useRouter();
   const setState = useListStore((state) => state.setState);
+  const setViewState = useViewStore(state => state.setState);
 
-  const m = useMutation({
-    mutationFn: (params: DescribeDeleteUserRequestParams) => {
-      return DescribeDeleteUser(params);
-    },
-  });
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
-  const deleteUser = m.mutateAsync;
-  const deleteLoading = m.status === 'pending';
-
-  const handleDelete = useMemoizedFn(() => {
-    Modal.confirm({
-      title: '删除角色',
-      content: `确定删除角色: ${record?.name}?`,
-      okText: '删除',
-      okType: 'danger',
-      type: 'warning',
-      okButtonProps: {
-        loading: deleteLoading,
-      },
-      onOk: async () => {
-        const params: DescribeDeleteUserRequestParams = {
-          uid: record?.roleId,
-        };
-        // 删除用户
-        await deleteUser(params);
-        // 更新列表
-        setState({
-          refreshToken: Date.now().toString(),
-        });
-      }
+  const handleDelete = useMemoizedFn(async () => {
+    setDeleteLoading(true);
+    const params: DescribeDeleteRoleRequestParams = {
+      roleId: record?.roleId,
+    };
+    // 删除
+    await DescribeDeleteRole(params);
+    // 更新列表
+    setState({
+      refreshToken: Date.now().toString(),
     });
+    message.open({
+      type: 'success',
+      content: '删除成功',
+    });
+    setDeleteLoading(false);
   });
 
   const handleView = useMemoizedFn(() => {
-    router.push(r(`/system/roles/detail?id=${record?.roleId}`));
+    // router.push(r(`/system/roles/detail?id=${record?.roleId}`));
+    setViewState({
+      visible: true,
+      roleId: record?.roleId,
+    });
   });
 
   const handleEdit = useMemoizedFn(() => {
@@ -87,15 +82,26 @@ export default function TableActions({
       >
         编辑
       </Button>
-      <Button
-        type="text"
-        size="small"
-        color="danger"
-        variant="link"
-        onClick={handleDelete}
+
+      <Popconfirm
+        placement="topRight"
+        title="确定删除？"
+        okText="删除"
+        cancelText="取消"
+        onConfirm={handleDelete}
+        okButtonProps={{
+          loading: deleteLoading,
+        }}
       >
-        删除
-      </Button>
+        <Button
+          type="text"
+          size="small"
+          color="danger"
+          variant="link"
+        >
+          删除
+        </Button>
+      </Popconfirm>
     </TableActionContainer>
   );
 }

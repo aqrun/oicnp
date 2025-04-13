@@ -65,7 +65,7 @@ impl ModelCrudHandler for RoleModel {
 
         let mut q = RoleEntity::find();
 
-        if let Some(x) = params.id {
+        if let Some(x) = params.role_id {
             if x > 0 {
                 q = q.filter(RoleColumn::RoleId.eq(x));
             }

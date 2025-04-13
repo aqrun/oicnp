@@ -2,6 +2,7 @@
 
 import RoleList from './RoleList';
 import CreateModal from './create/CreateModal';
+import ViewModal from './detail/ViewModal';
 
 export default function RolesPage() {
 
@@ -9,6 +10,7 @@ export default function RolesPage() {
     <>
       <RoleList />
       <CreateModal />
+      <ViewModal />
     </>
   );
 }

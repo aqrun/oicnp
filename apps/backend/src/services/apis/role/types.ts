@@ -4,7 +4,7 @@ import {
 } from '../../types';
 
 export interface RoleModel {
-  roleId?: string;
+  roleId?: number;
   vid?: string;
   name?: string;
   weight?: number;
@@ -17,7 +17,13 @@ export interface RoleModel {
   permissionIds?: Array<string>;
 }
 
-export interface DescribeRoleDetailRequestParams {
+export interface RoleFilters {
+  roleId?: number;
+  vid?: string;
+  name?: string;
+}
+
+export interface DescribeRoleDetailRequestParams extends RoleFilters {
   _name?: string;
 }
 export interface DescribeRoleDetailResponseData {

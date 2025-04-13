@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemoizedFn } from 'ahooks';
-import { Button, Divider, Modal } from 'antd';
+import { Button, Divider } from 'antd';
 import {
   UserModel,
   DescribeDeleteUser,
@@ -11,6 +11,7 @@ import { useUserStore } from './useUserStore';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { r } from '@/utils';
+import { useGlobalState } from '@/context';
 import { TableActionContainer } from '@/styles/app.styled';
 
 export interface TableActionsProps {
@@ -20,6 +21,7 @@ export interface TableActionsProps {
 export default function TableActions({
   record,
 }: TableActionsProps): JSX.Element {
+  const { modal } = useGlobalState();
   const router = useRouter();
   const setState = useUserStore((state) => state.setState);
 
@@ -33,7 +35,7 @@ export default function TableActions({
   const deleteLoading = m.status === 'pending';
 
   const handleDelete = useMemoizedFn(() => {
-    Modal.confirm({
+    modal.confirm({
       title: '删除用户',
       content: `确定删除用户: ${record?.username}?`,
       okText: '删除',

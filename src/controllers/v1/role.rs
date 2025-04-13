@@ -18,7 +18,7 @@ pub async fn get_one(
     State(ctx): State<AppContext>,
     Json(params): Json<RoleFilters>,
 ) -> JsonRes<RoleModel> {
-    let id = params.id.unwrap_or(0);
+    let id = params.role_id.unwrap_or(0);
     let res = RoleModel::find_by_id(&ctx.db, id).await;
 
     JsonRes::from(res)

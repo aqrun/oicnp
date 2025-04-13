@@ -13,6 +13,7 @@ export interface RoleFormProps {
   loading?: boolean;
   showSubmit?: boolean;
   form?: FormInstance<RoleModel>;
+  disabled?: boolean;
 }
 
 export default function RoleForm({
@@ -22,6 +23,7 @@ export default function RoleForm({
   role,
   showSubmit,
   form,
+  disabled,
 }: RoleFormProps): JSX.Element {
 
   const initialValues: FieldType = {
@@ -48,6 +50,7 @@ export default function RoleForm({
         autoComplete="off"
         layout="vertical"
         form={form}
+        disabled={disabled}
       >
         <Form.Item<FieldType>
           label="标识"

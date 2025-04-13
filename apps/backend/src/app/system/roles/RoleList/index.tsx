@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { Table } from 'antd';
-import { useRouter } from 'next/navigation';
 import {
   PageTitle,
   Filters,
@@ -12,7 +11,7 @@ import { FilterValues, EnumFilterTrigger } from '@/types';
 import useColumns from './useColumns';
 import { RoleModel } from '@/services';
 import { useListStore } from './useListStore';
-import { nextTick, r } from '@/utils';
+import { nextTick } from '@/utils';
 import { useQueryRoleList } from './useQueryRoleList';
 import { useCreateStore } from '../create/useCreateStore';
 import { Container } from './index.styled';
@@ -21,7 +20,6 @@ import { Container } from './index.styled';
  * 角色列表
  */
 export default function RoleList(): JSX.Element {
-  const router = useRouter();
   const pager = useListStore((state) => state.pager);
   const setState = useListStore((state) => state.setState);
   const refreshToken = useListStore((state) => state.refreshToken);
@@ -39,7 +37,6 @@ export default function RoleList(): JSX.Element {
    * 创建操作
    */
   const handleCreate = useMemoizedFn(() => {
-    // router.push(r('/system/roles/create'));
     setCreateState({
       visible: true,
     });
