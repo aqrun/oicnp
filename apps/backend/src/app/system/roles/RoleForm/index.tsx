@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Form, Input, Checkbox } from 'antd';
+import { Button, Form, Input, FormInstance, Radio } from 'antd';
 import type { FormProps } from 'antd';
 import { RoleModel } from '@/services';
 
@@ -12,6 +12,7 @@ export interface RoleFormProps {
   role?: RoleModel;
   loading?: boolean;
   showSubmit?: boolean;
+  form?: FormInstance<RoleModel>;
 }
 
 export default function RoleForm({
@@ -20,11 +21,22 @@ export default function RoleForm({
   isEdit,
   role,
   showSubmit,
+  form,
 }: RoleFormProps): JSX.Element {
 
-  const initialValues = {
+  const initialValues: FieldType = {
+    vid: '',
+    name: '',
+    remark: '',
+    weight: 0,
+    status: '1',
     ...(role || {}),
   };
+
+  const statusOptions = [
+    { value: '1', label: '启用'},
+    { value: '0', label: '停用'}
+  ];
 
   return (
     <div>
@@ -35,6 +47,7 @@ export default function RoleForm({
         onFinish={onFinish}
         autoComplete="off"
         layout="vertical"
+        form={form}
       >
         <Form.Item<FieldType>
           label="标识"
@@ -51,17 +64,24 @@ export default function RoleForm({
           <Input />
         </Form.Item>
         <Form.Item<FieldType>
-          label="邮箱"
-          name="remark"
-          rules={[{ required: true, message: '请输入描述！' }]}
+          label="排序"
+          name="weight"
         >
           <Input />
         </Form.Item>
         <Form.Item<FieldType>
+          label="状态"
           name="status"
-          valuePropName="checked"
         >
-          <Checkbox>启用</Checkbox>
+          <Radio.Group
+            options={statusOptions}
+          />
+        </Form.Item>
+        <Form.Item<FieldType>
+          label="描述"
+          name="remark"
+        >
+          <Input />
         </Form.Item>
         <Form.Item<FieldType>
           name="permissionIds"

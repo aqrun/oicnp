@@ -5,6 +5,10 @@ import type { BaseState } from '@/stores/types';
 
 export interface BaseCreateState {
   visible?: boolean;
+  /**
+   * 内容类型
+   */
+  contentType?: string;
 };
 
 export type CreateState = BaseCreateState & BaseState<BaseCreateState>;
@@ -14,6 +18,7 @@ export type CreateState = BaseCreateState & BaseState<BaseCreateState>;
  */
 export const useCreateStore = create<CreateState>()((set) => ({
   visible: false,
+  contentType: '',
   setState: (payload) => set((state) => {
     return {
       ...state,

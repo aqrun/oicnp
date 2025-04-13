@@ -7,7 +7,7 @@ export interface RoleModel {
   roleId?: string;
   vid?: string;
   name?: string;
-  weight?: string;
+  weight?: number;
   scope?: string;
   status?: string;
   remark?: string;
