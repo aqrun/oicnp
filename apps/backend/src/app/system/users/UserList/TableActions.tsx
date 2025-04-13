@@ -11,7 +11,7 @@ import { useUserStore } from './useUserStore';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { r } from '@/utils';
-import { useGlobalState } from '@/context';
+import { useConfirmDelete } from '@/hooks/modals';
 import { TableActionContainer } from '@/styles/app.styled';
 
 export interface TableActionsProps {
@@ -21,7 +21,7 @@ export interface TableActionsProps {
 export default function TableActions({
   record,
 }: TableActionsProps): JSX.Element {
-  const { modal } = useGlobalState();
+  const confirmDelete = useConfirmDelete();
   const router = useRouter();
   const setState = useUserStore((state) => state.setState);
 
@@ -35,15 +35,9 @@ export default function TableActions({
   const deleteLoading = m.status === 'pending';
 
   const handleDelete = useMemoizedFn(() => {
-    modal.confirm({
+    confirmDelete({
       title: '删除用户',
       content: `确定删除用户: ${record?.username}?`,
-      okText: '删除',
-      okType: 'danger',
-      type: 'warning',
-      okButtonProps: {
-        loading: deleteLoading,
-      },
       onOk: async () => {
         const params: DescribeDeleteUserRequestParams = {
           uid: record?.uid,
@@ -54,7 +48,8 @@ export default function TableActions({
         setState({
           refreshToken: Date.now().toString(),
         });
-      }
+      },
+      loading: deleteLoading,
     });
   });
 

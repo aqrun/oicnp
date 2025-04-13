@@ -2,15 +2,13 @@
 
 import { useState } from 'react';
 import { useMemoizedFn } from 'ahooks';
-import { Button, Divider, Popconfirm } from 'antd';
+import { Button, Divider } from 'antd';
 import {
   RoleModel,
   DescribeDeleteRole,
   DescribeDeleteRoleRequestParams,
 } from '@/services';
 import { useListStore } from './useListStore';
-import { useRouter } from 'next/navigation';
-import { r } from '@/utils';
 import { useViewStore } from '../detail/useViewStore';
 import { useEditStore } from '../edit/useEditStore';
 import { useGlobalState } from '@/context';
@@ -24,9 +22,8 @@ export interface TableActionsProps {
 export default function TableActions({
   record,
 }: TableActionsProps): JSX.Element {
-  const { modal, message } = useGlobalState();
+  const { message } = useGlobalState();
   const confirmDelete = useConfirmDelete();
-  const router = useRouter();
   const setState = useListStore((state) => state.setState);
   const setViewState = useViewStore(state => state.setState);
   const setEditState = useEditStore(state => state.setState);
