@@ -4,6 +4,7 @@ import {
   Button,
   ModalProps as AntModalProps,
 } from 'antd';
+import type { ButtonProps } from 'antd/lib/button';
 
 export interface ModalFooterProps {
   okText?: React.ReactNode;
@@ -13,6 +14,7 @@ export interface ModalFooterProps {
   onCancel?: AntModalProps['onCancel'];
   hasOk?: boolean;
   hasCancel?: boolean;
+  okButtonProps?: ButtonProps;
 }
 
 export default function ModalFooter({
@@ -23,6 +25,7 @@ export default function ModalFooter({
   onCancel,
   hasOk = true,
   hasCancel = true,
+  okButtonProps,
 }: ModalFooterProps) {
 
   const handleOk = useMemoizedFn(() => {
@@ -37,9 +40,10 @@ export default function ModalFooter({
     <div className="flex items-center justify-end">
       {hasOk && (
         <Button
-          type="primary"
+          type={'primary'}
           loading={loading}
           onClick={handleOk}
+          {...(okButtonProps || {})}
         >
           {okText || '确定'}
         </Button>

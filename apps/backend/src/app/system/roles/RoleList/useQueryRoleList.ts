@@ -36,7 +36,7 @@ export function useQueryRoleList() {
 
       return res;
     },
-  },);
+  });
 
   const refresh = useMemoizedFn(() => {
     refetch();

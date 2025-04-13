@@ -12,7 +12,9 @@ import { useListStore } from './useListStore';
 import { useRouter } from 'next/navigation';
 import { r } from '@/utils';
 import { useViewStore } from '../detail/useViewStore';
+import { useEditStore } from '../edit/useEditStore';
 import { useGlobalState } from '@/context';
+import { useConfirmDelete } from '@/hooks/modals';
 import { TableActionContainer } from '@/styles/app.styled';
 
 export interface TableActionsProps {
@@ -22,14 +24,16 @@ export interface TableActionsProps {
 export default function TableActions({
   record,
 }: TableActionsProps): JSX.Element {
-  const { message } = useGlobalState();
+  const { modal, message } = useGlobalState();
+  const confirmDelete = useConfirmDelete();
   const router = useRouter();
   const setState = useListStore((state) => state.setState);
   const setViewState = useViewStore(state => state.setState);
+  const setEditState = useEditStore(state => state.setState);
 
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  const handleDelete = useMemoizedFn(async () => {
+  const deleteRole = useMemoizedFn(async () => {
     setDeleteLoading(true);
     const params: DescribeDeleteRoleRequestParams = {
       roleId: record?.roleId,
@@ -47,6 +51,15 @@ export default function TableActions({
     setDeleteLoading(false);
   });
 
+  const handleDelete = useMemoizedFn(() => {
+    confirmDelete({
+      title: '删除角色',
+      content: `确定删除角色: ${record?.name}?`,
+      onOk: deleteRole,
+      loading: deleteLoading,
+    });
+  });
+
   const handleView = useMemoizedFn(() => {
     // router.push(r(`/system/roles/detail?id=${record?.roleId}`));
     setViewState({
@@ -56,7 +69,10 @@ export default function TableActions({
   });
 
   const handleEdit = useMemoizedFn(() => {
-    router.push(r(`/system/roles/edit?id=${record?.roleId}`));
+    setEditState({
+      visible: true,
+      roleId: record?.roleId,
+    });
   });
 
   return (
@@ -82,26 +98,15 @@ export default function TableActions({
       >
         编辑
       </Button>
-
-      <Popconfirm
-        placement="topRight"
-        title="确定删除？"
-        okText="删除"
-        cancelText="取消"
-        onConfirm={handleDelete}
-        okButtonProps={{
-          loading: deleteLoading,
-        }}
+      <Button
+        type="text"
+        size="small"
+        color="danger"
+        variant="link"
+        onClick={handleDelete}
       >
-        <Button
-          type="text"
-          size="small"
-          color="danger"
-          variant="link"
-        >
-          删除
-        </Button>
-      </Popconfirm>
+        删除
+      </Button>
     </TableActionContainer>
   );
 }
