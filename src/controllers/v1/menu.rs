@@ -18,7 +18,7 @@ use oic_core::utils::get_api_prefix;
 pub async fn get_one(
     State(ctx): State<AppContext>,
     Json(params): Json<MenuFilters>,
-) -> JsonRes<MenuModel> {
+) -> JsonRes {
     let id = params.id.unwrap_or(0);
     let res = MenuModel::find_by_id(&ctx.db, id as i64).await;
 
@@ -29,7 +29,7 @@ pub async fn get_one(
 pub async fn list(
     State(ctx): State<AppContext>,
     Json(params): Json<MenuFilters>,
-) -> JsonRes<ListData<MenuModel>> {
+) -> JsonRes {
     let res = MenuModel::find_list(&ctx.db, &params)
         .await;
     JsonRes::from(res)
@@ -40,7 +40,7 @@ pub async fn list(
 pub async fn get_tree(
     State(ctx): State<AppContext>,
     Json(params): Json<MenuFilters>,
-) -> JsonRes<MenuTreeItem> {
+) -> JsonRes {
     let res = MenuModel::find_tree(&ctx.db, params).await;
     JsonRes::from(res)
 }
@@ -49,7 +49,7 @@ pub async fn get_tree(
 pub async fn add(
     State(ctx): State<AppContext>,
     Json(params): Json<CreateMenuReqParams>,
-) -> JsonRes<i64> {
+) -> JsonRes {
     let res = MenuModel::create(&ctx.db, &params).await;
 
     JsonRes::from(res)
@@ -60,7 +60,7 @@ pub async fn add(
 pub async fn add_multi(
     State(ctx): State<AppContext>,
     Json(params): Json<Vec<CreateMenuReqParams>>,
-) -> JsonRes<String> {
+) -> JsonRes {
     let res = MenuModel::create_multi(&ctx.db, params.as_slice()).await;
 
     JsonRes::from(res)
@@ -70,7 +70,7 @@ pub async fn add_multi(
 pub async fn update(
     State(ctx): State<AppContext>,
     Json(params): Json<UpdateMenuReqParams>,
-) -> JsonRes<i64> {
+) -> JsonRes {
     let res = MenuModel::update(&ctx.db, &params).await;
 
     JsonRes::from(res)
@@ -80,7 +80,7 @@ pub async fn update(
 pub async fn remove(
     State(ctx): State<AppContext>,
     Json(params): Json<DeleteMenuReqParams>,
-) -> JsonRes<i64> {
+) -> JsonRes {
     let res = MenuModel::delete_one(&ctx.db, &params).await;
 
     JsonRes::from(res)

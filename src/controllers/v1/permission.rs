@@ -17,7 +17,7 @@ use oic_core::{
 pub async fn get_one(
     State(ctx): State<AppContext>,
     Json(params): Json<PermissionFilters>,
-) -> JsonRes<PermissionModel> {
+) -> JsonRes {
     let id = params.permission_id.unwrap_or(0);
     let res = PermissionModel::find_by_id(&ctx.db, id).await;
 
@@ -28,7 +28,7 @@ pub async fn get_one(
 pub async fn list(
     State(ctx): State<AppContext>,
     Json(params): Json<PermissionFilters>,
-) -> JsonRes<ListData<PermissionModel>> {
+) -> JsonRes {
     let res = PermissionModel::find_list(&ctx.db, &params)
         .await;
     JsonRes::from(res)
@@ -38,7 +38,7 @@ pub async fn list(
 pub async fn add(
     State(ctx): State<AppContext>,
     Json(params): Json<CreatePermissionReqParams>,
-) -> JsonRes<i64> {
+) -> JsonRes {
     let res = PermissionModel::create(&ctx.db, &params).await;
 
     JsonRes::from(res)
@@ -49,7 +49,7 @@ pub async fn add(
 pub async fn add_multi(
     State(ctx): State<AppContext>,
     Json(params): Json<Vec<CreatePermissionReqParams>>,
-) -> JsonRes<String> {
+) -> JsonRes {
     let res = PermissionModel::create_multi(&ctx.db, params.as_slice()).await;
 
     JsonRes::from(res)
@@ -59,7 +59,7 @@ pub async fn add_multi(
 pub async fn update(
     State(ctx): State<AppContext>,
     Json(params): Json<UpdatePermissionReqParams>,
-) -> JsonRes<i64> {
+) -> JsonRes {
     let res = PermissionModel::update(&ctx.db, &params).await;
 
     JsonRes::from(res)
@@ -69,7 +69,7 @@ pub async fn update(
 pub async fn remove(
     State(ctx): State<AppContext>,
     Json(params): Json<DeletePermissionReqParams>,
-) -> JsonRes<i64> {
+) -> JsonRes {
     let res = PermissionModel::delete_one(&ctx.db, &params).await;
 
     JsonRes::from(res)

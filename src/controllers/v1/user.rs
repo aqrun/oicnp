@@ -17,36 +17,33 @@ use oic_core::{
 pub async fn get_one(
     State(ctx): State<AppContext>,
     Json(params): Json<UserFilters>,
-) -> JsonRes<UserModel> {
+) -> JsonRes {
     let uid = params.uid.unwrap_or(0);
     let uuid = params.uuid.unwrap_or(String::from(""));
 
     if uid > 0 {
         let res = UserModel::find_by_uid(&ctx.db, uid).await;
-    
-        return JsonRes::from(res);
+        return JsonRes::wrap_model_result(res, "user");
     }
 
     let res = UserModel::find_by_uuid(&ctx.db, uuid.as_str()).await;
-
-    JsonRes::from(res)
+    JsonRes::wrap_model_result(res, "user")
 }
 
 #[debug_handler]
 pub async fn list(
     State(ctx): State<AppContext>,
     Json(params): Json<UserFilters>,
-) -> JsonRes<ListData<UserModel>> {
-    let res = UserModel::find_list(&ctx.db, &params)
-        .await;
-    JsonRes::from(res)
+) -> JsonRes {
+    let res = UserModel::find_list(&ctx.db, &params).await;
+    JsonRes::wrap_model_list(res, "users")
 }
 
 #[debug_handler]
 pub async fn add(
     State(ctx): State<AppContext>,
     Json(params): Json<CreateUserReqParams>,
-) -> JsonRes<i64> {
+) -> JsonRes {
     let res = UserModel::create(&ctx.db, &params).await;
 
     JsonRes::from(res)
@@ -57,7 +54,7 @@ pub async fn add(
 pub async fn add_multi(
     State(ctx): State<AppContext>,
     Json(params): Json<Vec<CreateUserReqParams>>,
-) -> JsonRes<String> {
+) -> JsonRes {
     let res = UserModel::create_multi(&ctx.db, params.as_slice()).await;
 
     JsonRes::from(res)
@@ -67,7 +64,7 @@ pub async fn add_multi(
 pub async fn update(
     State(ctx): State<AppContext>,
     Json(params): Json<UpdateUserReqParams>,
-) -> JsonRes<i64> {
+) -> JsonRes {
     let res = UserModel::update(&ctx.db, &params).await;
 
     JsonRes::from(res)
@@ -77,7 +74,7 @@ pub async fn update(
 pub async fn remove(
     State(ctx): State<AppContext>,
     Json(params): Json<DeleteUserReqParams>,
-) -> JsonRes<i64> {
+) -> JsonRes {
     let res = UserModel::delete_one(&ctx.db, &params).await;
 
     JsonRes::from(res)

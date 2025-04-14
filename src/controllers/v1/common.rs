@@ -6,7 +6,7 @@ use oic_core::{
 };
 
 #[debug_handler]
-pub async fn info() -> JsonRes<String> {
+pub async fn info() -> JsonRes {
     JsonRes::ok(String::from("Admin Api success"))
 }
 

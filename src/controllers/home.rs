@@ -23,7 +23,7 @@ pub async fn admin(
     views::admin::index(&v)
 }
 
-pub async fn fallback(uri: Uri) -> JsonRes<()> {
+pub async fn fallback(uri: Uri) -> JsonRes {
     JsonRes::err(format!("接口不存在 {}", uri.path()))
 }
 

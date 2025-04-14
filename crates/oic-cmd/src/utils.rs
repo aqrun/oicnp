@@ -5,7 +5,6 @@ use loco_rs::{
 };
 use oic_core::{typings::JsonRes, AppContext};
 use serde::Serialize;
-use serde_json::Value;
 
 /**
  * 生成API链接
@@ -17,7 +16,7 @@ pub fn r(ctx: &AppContext, uri: &str) -> String {
 }
 
 /// post 请求
-pub async fn post(url: &str, params: &impl Serialize) -> Result<JsonRes<Value>> {
+pub async fn post(url: &str, params: &impl Serialize) -> Result<JsonRes> {
     let client = Client::new();
     let res = client.post(url)
         .json(params)
@@ -27,7 +26,7 @@ pub async fn post(url: &str, params: &impl Serialize) -> Result<JsonRes<Value>> 
     let res = match res {
         Ok(res) => {
             if res.status().is_success() {
-                let a = res.json::<JsonRes<Value>>()
+                let a = res.json::<JsonRes>()
                     .await
                     .map_err(|err| {
                         Error::BadRequest(format!("1-{err}"))

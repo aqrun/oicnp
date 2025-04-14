@@ -24,7 +24,7 @@ use serde_json::Value;
 async fn register(
     State(ctx): State<AppContext>,
     Json(params): Json<RegisterParams>,
-) -> JsonRes<Value> {
+) -> JsonRes {
     let res = services::auth::register(&ctx.db, params).await;
     JsonRes::from(res)
 }
@@ -35,7 +35,7 @@ async fn register(
 async fn verify(
     State(ctx): State<AppContext>,
     Json(params): Json<VerifyParams>,
-) -> JsonRes<()> {
+) -> JsonRes {
     let res = services::auth::verify(&ctx.db, params).await;
     JsonRes::from(res)
 }
@@ -48,7 +48,7 @@ async fn verify(
 async fn forgot(
     State(ctx): State<AppContext>,
     Json(params): Json<ForgotParams>,
-) -> JsonRes<()> {
+) -> JsonRes {
     let res = services::auth::forgot(&ctx.db, params).await;
 
     JsonRes::from(res)
@@ -57,7 +57,7 @@ async fn forgot(
 
 /// reset user password by the given parameters
 #[debug_handler]
-async fn reset(State(ctx): State<AppContext>, Json(params): Json<ResetParams>) -> JsonRes<()> {
+async fn reset(State(ctx): State<AppContext>, Json(params): Json<ResetParams>) -> JsonRes {
     let res = services::auth::reset(&ctx.db, params).await;
 
     JsonRes::from(res)
@@ -65,7 +65,7 @@ async fn reset(State(ctx): State<AppContext>, Json(params): Json<ResetParams>) -
 
 /// Creates a user login and returns a token
 #[debug_handler]
-async fn login(State(ctx): State<AppContext>, Json(params): Json<LoginParams>) -> JsonRes<LoginResponse> {
+async fn login(State(ctx): State<AppContext>, Json(params): Json<LoginParams>) -> JsonRes {
     let res = services::auth::login(&ctx.db, &ctx.config, params).await;
 
     JsonRes::from(res)

@@ -114,5 +114,5 @@ fn no_auth(msg: &str) -> Response {
         valid_msg = String::from(msg);
     }
 
-    JsonRes::<String>::code("401", valid_msg.as_str()).into_response()
+    JsonRes::code("401", valid_msg.as_str()).into_response()
 }
