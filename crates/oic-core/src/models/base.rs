@@ -37,7 +37,7 @@ pub trait ModelCrudHandler {
     async fn find_by_vid(db: &DatabaseConnection, vid: &str) -> ModelResult<Self::DataModel>;
 
     /// 获取列表
-    async fn find_list(db: &DatabaseConnection, params: &Self::FilterParams) -> ModelResult<ListData<Self::DataModel>>;
+    async fn find_list(db: &DatabaseConnection, params: &Self::FilterParams) -> ModelResult<(Vec<Self::DataModel>, u64)>;
 
     /// 批量创建
     async fn create_multi(db: &DatabaseConnection, params: &[Self::CreateReqParams]) -> ModelResult<String>;

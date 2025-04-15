@@ -29,9 +29,20 @@ pub async fn list(
     State(ctx): State<AppContext>,
     Json(params): Json<PermissionFilters>,
 ) -> JsonRes<ListData<PermissionModel>> {
-    let res = PermissionModel::find_list(&ctx.db, &params)
-        .await;
-    JsonRes::from(res)
+    let (permissions, total) = match PermissionModel::find_list(&ctx.db, &params).await {
+        Ok(res) => res,
+        Err(err) => return JsonRes::err(err),
+    };
+    let page = params.page.unwrap_or(1);
+    let page_size = params.page_size.unwrap_or(10);
+    
+    let list_data = ListData {
+        data: permissions,
+        total,
+        page,
+        page_size,
+    };
+    JsonRes::from((list_data, "permissions"))
 }
 
 #[debug_handler]

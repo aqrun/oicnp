@@ -5,7 +5,6 @@ use uuid::Uuid;
 use crate::utils::catch_err;
 use crate::{
     auth::JWT,
-    typings::ListData,
     uuid,
     entities::prelude::*,
 };
@@ -115,7 +114,7 @@ impl ModelCrudHandler for UserModel {
     ////
     /// 获取user列表
     /// 
-    async fn find_list(db: &DatabaseConnection, params: &Self::FilterParams) -> ModelResult<ListData<Self>> {
+    async fn find_list(db: &DatabaseConnection, params: &Self::FilterParams) -> ModelResult<(Vec<Self>, u64)> {
         let page = params.get_page();
         let page_size = params.get_page_size();
         let order = params.get_order();
@@ -148,14 +147,7 @@ impl ModelCrudHandler for UserModel {
             .paginate(db, page_size);
         let list = pager.fetch_page(page - 1).await?;
 
-        let res = ListData {
-            data: list,
-            page,
-            page_size,
-            total,
-        };
-
-        Ok(res)
+        Ok((list, total))
     }
 
     async fn create_multi(

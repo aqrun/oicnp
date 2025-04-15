@@ -29,9 +29,22 @@ pub async fn list(
     State(ctx): State<AppContext>,
     Json(params): Json<RoleFilters>,
 ) -> JsonRes<ListData<RoleModel>> {
-    let res = RoleModel::find_list(&ctx.db, &params)
-        .await;
-    JsonRes::from(res)
+    let (roles, total) = match RoleModel::find_list(&ctx.db, &params)
+        .await 
+    {
+        Ok(res) => res,
+        Err(err) => return JsonRes::err(err),
+    };
+    let page = params.page.unwrap_or(1);
+    let page_size = params.page_size.unwrap_or(10);
+    
+    let list_data = ListData {
+        data: roles,
+        total,
+        page,
+        page_size,
+    };
+    JsonRes::from((list_data, "roles"))
 }
 
 #[debug_handler]

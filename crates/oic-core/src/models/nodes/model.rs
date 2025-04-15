@@ -1,6 +1,5 @@
 use crate::{
     entities::prelude::*,
-    typings::ListData,
     utils::catch_err,
     RequestParamsUpdater,
     ModelCrudHandler,
@@ -49,7 +48,7 @@ impl ModelCrudHandler for NodeModel {
     ////
     /// 获取node列表
     /// 
-    async fn find_list(db: &DatabaseConnection, params: &Self::FilterParams) -> ModelResult<ListData<Self>> {
+    async fn find_list(db: &DatabaseConnection, params: &Self::FilterParams) -> ModelResult<(Vec<Self>, u64)> {
         let page = params.get_page();
         let page_size = params.get_page_size();
         let order = params.get_order();
@@ -82,14 +81,7 @@ impl ModelCrudHandler for NodeModel {
             .paginate(db, page_size);
         let list = pager.fetch_page(page - 1).await?;
 
-        let res = ListData {
-            data: list,
-            page,
-            page_size,
-            total,
-        };
-
-        Ok(res)
+        Ok((list, total))
     }
 
     /// 批量创建

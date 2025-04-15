@@ -23,13 +23,11 @@ pub async fn get_one(
 
     if uid > 0 {
         let res = UserModel::find_by_uid(&ctx.db, uid).await;
-    
-        return JsonRes::from(res);
+        return JsonRes::from((res, "user"));
     }
 
     let res = UserModel::find_by_uuid(&ctx.db, uuid.as_str()).await;
-
-    JsonRes::from(res)
+    JsonRes::from((res, "user"))
 }
 
 #[debug_handler]
@@ -37,9 +35,20 @@ pub async fn list(
     State(ctx): State<AppContext>,
     Json(params): Json<UserFilters>,
 ) -> JsonRes<ListData<UserModel>> {
-    let res = UserModel::find_list(&ctx.db, &params)
-        .await;
-    JsonRes::from(res)
+    let (users, total) = match UserModel::find_list(&ctx.db, &params).await {
+        Ok(res) => res,
+        Err(err) => return JsonRes::err(err),
+    };
+    let page = params.page.unwrap_or(1);
+    let page_size = params.page_size.unwrap_or(10);
+    
+    let list_data = ListData {
+        data: users,
+        total,
+        page,
+        page_size,
+    };
+    JsonRes::wrap_list_data(list_data, "users")
 }
 
 #[debug_handler]
