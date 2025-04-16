@@ -7,8 +7,8 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use loco_rs::prelude::ModelResult;
 
-/// 查 数据返回
 #[derive(Debug, Serialize, Deserialize, Clone)]
+/// 查 数据返回
 pub struct ListData<T> {
     pub data: Vec<T>,
     /// 全部数据条数
@@ -21,9 +21,22 @@ pub struct ListData<T> {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum JsonResPayload<T> {
+    Data(T),
+    ListData {
+        data: T,
+        pagination: Pagination,
+    },
+    Empty,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Pagination {
+    /// 全部数据条数
     pub total: u64,
+    /// 当前页码
     pub page: u64,
+    /// 当前分页大小
     #[serde(rename(serialize = "pageSize"))]
     pub page_size: u64,
 }
@@ -47,7 +60,7 @@ pub struct ResJsonString(pub String);
 ///
 /// 调用方式：
 ///
-/// ```no_run
+/// ```rust
 /// let user = User {
 ///     uid: 1,
 ///     username: String::from("alex"),
@@ -73,7 +86,7 @@ pub struct ResJsonString(pub String);
 ///
 /// 调用方式：
 ///
-/// ```no_run
+/// ```rust
 /// let err = Err("请重新登录");
 ///
 /// JsonRes::code("401", err)
@@ -101,13 +114,13 @@ pub struct ResJsonString(pub String);
 ///
 /// 调用方式：
 ///
-/// ```no_run
+/// ```rust
 /// let user = User {
 ///     uid: 1,
 ///     username: String::from("alex"),
 /// };
 ///
-/// JsonRes::wrap_data(user, "user")
+/// JsonRes::from((user, "user"))
 /// ```
 ///
 /// 接口返回：
@@ -128,7 +141,7 @@ pub struct ResJsonString(pub String);
 ///
 /// ### 获取用户列表信息 `key: users`
 ///
-/// /// ```no_run
+/// /// ```rust
 /// let users = vec![
 ///     User {
 ///         uid: 1,
@@ -139,16 +152,14 @@ pub struct ResJsonString(pub String);
 ///         username: String::from("bob"),
 ///     },
 /// ];
-///
-/// // model 或 service 返回的列表数据
-/// let list_data = ListData {
-///     data: users,
+/// let pager = Pagination {
 ///     total: 100,
 ///     page: 1,
-///     pageSize: 10,
+///     page_size: 10,
 /// }
 ///
-/// JsonRes::wrap_list_data(user, "users")
+///
+/// JsonRes::from(user, pager, "users")
 /// ```
 ///
 /// ```json
@@ -173,8 +184,7 @@ pub struct JsonRes<T> {
     pub wrap_key: Option<String>,
     pub code: Option<String>,
     pub message: Option<String>,
-    pub data: Option<T>,
-    pub list_data: Option<ListData<T>>,
+    pub data: JsonResPayload<T>,
 }
 
 /// IntoResponse trait
@@ -222,38 +232,34 @@ where
     pub fn ok(data: T) -> Self {
         Self {
             code: Some(String::from("200")),
-            data: Some(data),
+            data: JsonResPayload::Data(data),
             message: Some("success".to_string()),
             wrap_key: None,
-            list_data: None,
         }
     }
 
     pub fn from_str(err: &str) -> Self {
         Self {
             code: Some(String::from("400")),
-            data: None,
+            data: JsonResPayload::Empty,
             message: Some(err.to_string()),
             wrap_key: None,
-            list_data: None,
         }
     }
     pub fn err(err: impl ToString) -> Self {
         Self {
             code: Some(String::from("400")),
-            data: None,
+            data: JsonResPayload::Empty,
             message: Some(err.to_string()),
             wrap_key: None,
-            list_data: None,
         }
     }
     pub fn code(code: &str, msg: &str) -> Self {
         Self {
             code: Some(String::from(code)),
-            data: None,
+            data: JsonResPayload::Empty,
             message: Some(msg.to_string()),
             wrap_key: None,
-            list_data: None,
         }
     }
     pub fn is_success(&self) -> bool {
@@ -298,25 +304,9 @@ where
             Ok(data) => {
                 Self {
                     code: Some(String::from("200")),
-                    data: Some(data),
+                    data: JsonResPayload::Data(data),
                     message: Some("success".to_string()),
                     wrap_key: None,
-                    list_data: None,
-                }
-            },
-            Err(err) => Self::err(err),
-        }
-    }
-
-    pub fn from_result_list_data(res: ModelResult<ListData<T>>) -> Self {
-        match res {
-            Ok(list_data) => {
-                Self {
-                    code: Some(String::from("200")),
-                    list_data: Some(list_data),
-                    message: Some("success".to_string()),
-                    wrap_key: None,
-                    data: None,
                 }
             },
             Err(err) => Self::err(err),
@@ -327,21 +317,19 @@ where
     pub fn wrap_data(data: T, wrap_key: &str) -> Self {
         Self {
             code: Some(String::from("200")),
-            data: Some(data),
+            data: JsonResPayload::Data(data),
             message: Some("success".to_string()),
             wrap_key: Some(String::from(wrap_key)),
-            list_data: None,
         }
     }
 
     /// 指定列表数据 和 结果key
-    pub fn wrap_list_data(list_data: ListData<T>, wrap_key: &str) -> Self {
+    pub fn wrap_list_data(list_data: JsonResPayload<T>, wrap_key: &str) -> Self {
         Self {
             code: Some(String::from("200")),
-            list_data: Some(list_data),
+            data: list_data,
             message: Some("success".to_string()),
             wrap_key: Some(String::from(wrap_key)),
-            data: None,
         }
     }
 
@@ -355,43 +343,53 @@ where
             wrap_key = String::from(x);
         }
 
-        // 存在列表数据 和 wrap_key
-        if self.list_data.is_some() && !wrap_key.is_empty() {
-            let list_data = self.list_data.as_ref().unwrap();
-
-            let json_res = serde_json::json!({
-                "code": self.code.as_ref().unwrap_or(&"200".to_string()),
-                "data": {
-                    wrap_key: list_data.data,
-                    "total": list_data.total,
-                    "page": list_data.page,
-                    "pageSize": list_data.page_size,
-                },
-                "message": self.message.as_ref().unwrap_or(&"success".to_string()),
-            });
-
-            return json_res;
-        } else if self.data.is_some() && !wrap_key.is_empty() {
-            // 存在普通数据 和 wrap_key
-            let json_res = serde_json::json!({
-                "code": self.code.as_ref().unwrap_or(&"200".to_string()),
-                "data": {
-                    wrap_key: self.data,
-                },
-                "message": self.message.as_ref().unwrap_or(&"success".to_string()),
-            });
-
-            return json_res;
+        match &self.data {
+            JsonResPayload::Data(data) => {
+                if !wrap_key.is_empty() {
+                    serde_json::json!({
+                        "code": self.code.as_ref().unwrap_or(&"200".to_string()),
+                        "data": {
+                            wrap_key: data,
+                        },
+                        "message": self.message.as_ref().unwrap_or(&"success".to_string()),
+                    })
+                } else {
+                    serde_json::json!({
+                        "code": self.code.as_ref().unwrap_or(&"200".to_string()),
+                        "data": data,
+                        "message": self.message.as_ref().unwrap_or(&"success".to_string()),
+                    })
+                }
+            },
+            JsonResPayload::ListData {
+                data,
+                pagination,
+            } => {
+                let valid_key = if wrap_key.is_empty() {
+                    String::from("list")
+                } else {
+                    wrap_key
+                };
+                
+                serde_json::json!({
+                    "code": self.code.as_ref().unwrap_or(&"200".to_string()),
+                    "data": {
+                        valid_key: data,
+                        "page": pagination.page,
+                        "pageSize": pagination.page_size,
+                        "total": pagination.total,
+                    },
+                    "message": self.message.as_ref().unwrap_or(&"success".to_string()),
+                })
+            },
+            JsonResPayload::Empty => {
+                serde_json::json!({
+                    "code": self.code.as_ref().unwrap_or(&"200".to_string()),
+                    "data": serde_json::Value::Null,
+                    "message": self.message.as_ref().unwrap_or(&"success".to_string()),
+                })
+            }
         }
-
-        // 无 wrap_key 正常返回
-        let json_res = serde_json::json!({
-            "code": self.code.as_ref().unwrap_or(&"200".to_string()),
-            "data": self.data,
-            "message": self.message.as_ref().unwrap_or(&"success".to_string()),
-        });
-
-        json_res
     }
 }
 
@@ -405,69 +403,40 @@ where
     fn from((data, wrap_key): (T, &str)) -> Self {
         Self {
             code: Some(String::from("200")),
-            data: Some(data),
+            data: JsonResPayload::Data(data),
             message: Some("success".to_string()),
             wrap_key: Some(wrap_key.to_string()),
-            list_data: None,
         }
     }
 }
 
-impl<T> From<(Vec<T>, Pagination, &str)> for JsonRes<T>
+///
+/// 列表数据 T 和 wrap_key
+///
+impl<T> From<(T, Pagination, &str)> for JsonRes<T>
 where
     T: Serialize + Send + Sync + Debug + 'static,
 {
-    fn from((list, pager, wrap_key): (Vec<T>, Pagination, &str)) -> JsonRes<T> {
+    fn from((list_data, pagination, wrap_key): (T, Pagination, &str)) -> Self {
         Self {
             code: Some(String::from("200")),
-            data: None,
+            data: JsonResPayload::ListData {
+                data: list_data,
+                pagination,
+            },
             message: Some("success".to_string()),
             wrap_key: Some(wrap_key.to_string()),
-            list_data: Some(ListData {
-                data: list,
-                total: pager.total,
-                page: pager.page,
-                page_size: pager.page_size,
-            }),
         }
     }
 }
 
-///
-/// ModelResult<T> 转换为 JsonRes<T>
-///
 impl<T> From<ModelResult<T>> for JsonRes<T>
 where
     T: Serialize + Send + Sync + Debug + 'static,
 {
     fn from(res: ModelResult<T>) -> Self {
         match res {
-            Ok(res) => Self::ok(res),
-            Err(err) => Self::err(err),
-        }
-    }
-}
-
-///
-/// 支持 ModelResult<T> 和 wrap_key
-///
-/// 支持 ModelResult<<ListData<T>> 和 wrap_key
-///
-impl<T> From<(ModelResult<T>, &str)> for JsonRes<T>
-where
-    T: Serialize + Send + Sync + Debug + 'static,
-{
-    fn from((res, wrap_key): (ModelResult<T>, &str)) -> Self {
-        match res {
-            Ok(data) => {
-                Self {
-                    code: Some(String::from("200")),
-                    data: Some(data),
-                    message: Some("success".to_string()),
-                    wrap_key: Some(wrap_key.to_string()),
-                    list_data: None,
-                }
-            },
+            Ok(data) => Self::ok(data),
             Err(err) => Self::err(err),
         }
     }
@@ -479,7 +448,7 @@ where
 {
     fn from(res: anyhow::Result<T>) -> Self {
         match res {
-            Ok(res) => Self::ok(res),
+            Ok(data) => Self::ok(data),
             Err(err) => Self::err(err),
         }
     }
@@ -490,7 +459,6 @@ mod test {
     use super::*;
     use serde_json::{json, Value};
     use serde::{Serialize, Deserialize};
-    use loco_rs::prelude::ModelResult;
 
     /// 获取JSON数据指定Key
     fn get_data_by_key(val: Value, key: &str) -> Value {
@@ -559,9 +527,9 @@ mod test {
             id: 1,
             name: String::from("alex"),
         };
-        let user_res: ModelResult<User> = Ok(user);
+
         // 转为 JsonRes 类型
-        let a = JsonRes::from((user_res, "user"));
+        let a = JsonRes::from((user, "user"));
         // 接口JSON结果
         let json_res = a.to_json();
         let data = get_data_by_key(json_res, "user");
@@ -575,85 +543,38 @@ mod test {
     /// {
     ///   "code": "200",
     ///   "data": {
-    ///         "user": {
-    ///             "id": 1,
-    ///             "name": "alex",
-    ///          },
+    ///         "users": [
+    ///            { id: 1, name: alex },
+    ///            { id: 2, name: bob },
+    ///         ]
     ///     },
     /// }
     ///
     #[test]
     fn test_json_res_wrap_list_data_and_key() {
         // 接口输出的用户数据
-        let user_list = ListData {
-            data: vec![
-                User {
-                    id: 1,
-                    name: String::from("alex"),
-                },
-                User {
-                    id: 2,
-                    name: String::from("bob"),
-                },
-            ],
-            total: 2,
+        let user_list = vec![
+            User {
+                id: 1,
+                name: String::from("alex"),
+            },
+            User {
+                id: 2,
+                name: String::from("bob"),
+            },
+        ];
+
+        let pagination  = Pagination {
+            total: 10,
             page: 1,
-            page_size: 10,
+            page_size: 10
         };
-        // 模拟数据库查询结果
-        let user_list_res: ModelResult<ListData<User>> = Ok(user_list).into();
-        let a = match user_list_res {
-            Ok(list_data) => JsonRes::wrap_list_data(list_data, "users"),
-            Err(err) => JsonRes::err(err),
-        };
+
+        let a = JsonRes::from((user_list, pagination, "users"));
 
         // 接口JSON结果
         let json_res = a.to_json();
-        let user_list_data = get_data_by_key(json_res, "users");
-        // 根据结果JSON反解析用户列表数据
-        let user_list_parsed = serde_json::from_value::<Vec<User>>(user_list_data).unwrap();
-        assert_eq!(user_list_parsed.len(), 2);
-    }
-
-    /// 指定 ModelResult<ListData<T>> 类型数据和 key
-    ///
-    /// {
-    ///   "code": "200",
-    ///   "data": {
-    ///         "user": {
-    ///             "id": 1,
-    ///             "name": "alex",
-    ///          },
-    ///     },
-    /// }
-    ///
-    #[test]
-    fn test_json_res_from_model_result_list_data() {
-        // 接口输出的用户数据
-        let user_list = ListData {
-            data: vec![
-                User {
-                    id: 1,
-                    name: String::from("alex"),
-                },
-                User {
-                    id: 2,
-                    name: String::from("bob"),
-                },
-            ],
-            total: 2,
-            page: 1,
-            page_size: 10,
-        };
-        // 模拟数据库查询结果
-        let user_list_res: ModelResult<ListData<User>> = Ok(user_list).into();
-        // 转为 JsonRes 类型
-        let mut a = JsonRes::from_result_list_data(user_list_res);
-        a.wrap("users");
-
-        // 接口JSON结果
-        let json_res = a.to_json();
-        let user_list_data = get_data_by_key(json_res, "users");
+        let user_list_data = get_data_by_key(json_res.clone(), "users");
         // 根据结果JSON反解析用户列表数据
         let user_list_parsed = serde_json::from_value::<Vec<User>>(user_list_data).unwrap();
         assert_eq!(user_list_parsed.len(), 2);

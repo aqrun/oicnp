@@ -2,7 +2,7 @@ use axum::debug_handler;
 use loco_rs::prelude::*;
 use oic_core::{
     entities::prelude::*,
-    typings::{JsonRes, ListData},
+    typings::{JsonRes, Pagination},
     utils::get_api_prefix,
     models::users::{
         UserFilters,
@@ -21,34 +21,42 @@ pub async fn get_one(
     let uid = params.uid.unwrap_or(0);
     let uuid = params.uuid.unwrap_or(String::from(""));
 
-    if uid > 0 {
-        let res = UserModel::find_by_uid(&ctx.db, uid).await;
-        return JsonRes::from((res, "user"));
-    }
+    let res = if uid > 0 {
+        UserModel::find_by_uid(&ctx.db, uid).await
+    } else {
+        UserModel::find_by_uuid(&ctx.db, uuid.as_str()).await
+    };
 
-    let res = UserModel::find_by_uuid(&ctx.db, uuid.as_str()).await;
-    JsonRes::from((res, "user"))
+    match res {
+        Ok(data) => {
+            // 使用两个数据的元组指定最终 JSON 数据 key
+            JsonRes::from((data, "user"))
+        },
+        Err(err) => {
+            JsonRes::err(err)
+        }
+    }
 }
 
 #[debug_handler]
 pub async fn list(
     State(ctx): State<AppContext>,
     Json(params): Json<UserFilters>,
-) -> JsonRes<ListData<UserModel>> {
+) -> JsonRes<Vec<UserModel>> {
     let (users, total) = match UserModel::find_list(&ctx.db, &params).await {
         Ok(res) => res,
         Err(err) => return JsonRes::err(err),
     };
-    let page = params.page.unwrap_or(1);
-    let page_size = params.page_size.unwrap_or(10);
     
-    let list_data = ListData {
-        data: users,
+    // 分页数据
+    let pager = Pagination {
         total,
-        page,
-        page_size,
+        page: params.page.unwrap_or(1),
+        page_size: params.page_size.unwrap_or(10),
     };
-    JsonRes::wrap_list_data(list_data, "users")
+
+    // 使用传递三个数据的元组指定最终 JSON 数据 key
+    JsonRes::from((users, pager, "users"))
 }
 
 #[debug_handler]

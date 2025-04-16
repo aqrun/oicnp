@@ -9,7 +9,7 @@ use oic_core::{
         RoleFilters,
     },
     utils::get_api_prefix,
-    typings::{JsonRes, ListData},
+    typings::{JsonRes, Pagination},
     ModelCrudHandler,
 };
 
@@ -21,30 +21,37 @@ pub async fn get_one(
     let id = params.role_id.unwrap_or(0);
     let res = RoleModel::find_by_id(&ctx.db, id).await;
 
-    JsonRes::from(res)
+    match res {
+        Ok(data) => {
+            // 使用两个数据的元组指定最终 JSON 数据 key
+            JsonRes::from((data, "role"))
+        },
+        Err(err) => {
+            JsonRes::err(err)
+        }
+    }
 }
 
 #[debug_handler]
 pub async fn list(
     State(ctx): State<AppContext>,
     Json(params): Json<RoleFilters>,
-) -> JsonRes<ListData<RoleModel>> {
+) -> JsonRes<Vec<RoleModel>> {
     let (roles, total) = match RoleModel::find_list(&ctx.db, &params)
         .await 
     {
         Ok(res) => res,
         Err(err) => return JsonRes::err(err),
     };
-    let page = params.page.unwrap_or(1);
-    let page_size = params.page_size.unwrap_or(10);
-    
-    let list_data = ListData {
-        data: roles,
+    // 分页数据
+    let pager = Pagination {
         total,
-        page,
-        page_size,
+        page: params.page.unwrap_or(1),
+        page_size: params.page_size.unwrap_or(10),
     };
-    JsonRes::from((list_data, "roles"))
+
+    // 使用传递三个数据的元组指定最终 JSON 数据 key
+    JsonRes::from((roles, pager, "roles"))
 }
 
 #[debug_handler]

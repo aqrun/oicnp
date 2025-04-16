@@ -9,7 +9,7 @@ use oic_core::{
         PermissionFilters,
     },
     utils::get_api_prefix,
-    typings::{JsonRes, ListData},
+    typings::{JsonRes, Pagination},
     ModelCrudHandler,
 };
 
@@ -21,28 +21,35 @@ pub async fn get_one(
     let id = params.permission_id.unwrap_or(0);
     let res = PermissionModel::find_by_id(&ctx.db, id).await;
 
-    JsonRes::from(res)
+    match res {
+        Ok(data) => {
+            // 使用两个数据的元组指定最终 JSON 数据 key
+            JsonRes::from((data, "permission"))
+        },
+        Err(err) => {
+            JsonRes::err(err)
+        }
+    }
 }
 
 #[debug_handler]
 pub async fn list(
     State(ctx): State<AppContext>,
     Json(params): Json<PermissionFilters>,
-) -> JsonRes<ListData<PermissionModel>> {
+) -> JsonRes<Vec<PermissionModel>> {
     let (permissions, total) = match PermissionModel::find_list(&ctx.db, &params).await {
         Ok(res) => res,
         Err(err) => return JsonRes::err(err),
     };
-    let page = params.page.unwrap_or(1);
-    let page_size = params.page_size.unwrap_or(10);
-    
-    let list_data = ListData {
-        data: permissions,
+    // 分页数据
+    let pager = Pagination {
         total,
-        page,
-        page_size,
+        page: params.page.unwrap_or(1),
+        page_size: params.page_size.unwrap_or(10),
     };
-    JsonRes::from((list_data, "permissions"))
+
+    // 使用传递三个数据的元组指定最终 JSON 数据 key
+    JsonRes::from((permissions, pager, "permissions"))
 }
 
 #[debug_handler]

@@ -11,7 +11,7 @@ use oic_core::{
     },
     ModelCrudHandler,
 };
-use oic_core::typings::{JsonRes, ListData};
+use oic_core::typings::{JsonRes, Pagination};
 use oic_core::utils::get_api_prefix;
 
 #[debug_handler]
@@ -22,28 +22,35 @@ pub async fn get_one(
     let id = params.id.unwrap_or(0);
     let res = MenuModel::find_by_id(&ctx.db, id as i64).await;
 
-    JsonRes::from(res)
+    match res {
+        Ok(data) => {
+            // 使用两个数据的元组指定最终 JSON 数据 key
+            JsonRes::from((data, "menu"))
+        },
+        Err(err) => {
+            JsonRes::err(err)
+        }
+    }
 }
 
 #[debug_handler]
 pub async fn list(
     State(ctx): State<AppContext>,
     Json(params): Json<MenuFilters>,
-) -> JsonRes<ListData<MenuModel>> {
+) -> JsonRes<Vec<MenuModel>> {
     let (menus, total) = match MenuModel::find_list(&ctx.db, &params).await {
         Ok(res) => res,
         Err(err) => return JsonRes::err(err),
     };
-    let page = params.page.unwrap_or(1);
-    let page_size = params.page_size.unwrap_or(10);
-    
-    let list_data = ListData {
-        data: menus,
+    // 分页数据
+    let pager = Pagination {
         total,
-        page,
-        page_size,
+        page: params.page.unwrap_or(1),
+        page_size: params.page_size.unwrap_or(10),
     };
-    JsonRes::from((list_data, "menus"))
+
+    // 使用传递三个数据的元组指定最终 JSON 数据 key
+    JsonRes::from((menus, pager, "menus"))
 }
 
 /// 生成树形数据

@@ -9,7 +9,7 @@ use oic_core::{
         NodeFilters,
     },
     utils::get_api_prefix,
-    typings::{JsonRes, ListData},
+    typings::{JsonRes, Pagination},
     ModelCrudHandler,
 };
 
@@ -21,28 +21,35 @@ pub async fn get_one(
     let nid = params.nid.unwrap_or(0);
     let res = NodeModel::find_by_id(&ctx.db, nid).await;
 
-    JsonRes::from(res)
+    match res {
+        Ok(data) => {
+            // 使用两个数据的元组指定最终 JSON 数据 key
+            JsonRes::from((data, "node"))
+        },
+        Err(err) => {
+            JsonRes::err(err)
+        }
+    }
 }
 
 #[debug_handler]
 pub async fn list(
     State(ctx): State<AppContext>,
     Json(params): Json<NodeFilters>,
-) -> JsonRes<ListData<NodeModel>> {
+) -> JsonRes<Vec<NodeModel>> {
     let (nodes, total) = match NodeModel::find_list(&ctx.db, &params).await {
         Ok(res) => res,
         Err(err) => return JsonRes::err(err),
     };
-    let page = params.page.unwrap_or(1);
-    let page_size = params.page_size.unwrap_or(10);
-    
-    let list_data = ListData {
-        data: nodes,
+    // 分页数据
+    let pager = Pagination {
         total,
-        page,
-        page_size,
+        page: params.page.unwrap_or(1),
+        page_size: params.page_size.unwrap_or(10),
     };
-    JsonRes::from((list_data, "nodes"))
+
+    // 使用传递三个数据的元组指定最终 JSON 数据 key
+    JsonRes::from((nodes, pager, "nodes"))
 }
 
 #[debug_handler]
