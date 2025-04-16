@@ -57,7 +57,9 @@ export interface DescribeUserDetailRequestParams {
   deletedAt?: string;
   _name?: string;
 }
-export type DescribeUserDetailResponseData = UserModel;
+export interface DescribeUserDetailResponseData {
+  user: UserModel;
+}
 
 export interface DescribeUserListRequestParams extends BaseFilterParams {
   uid?: string;
@@ -88,7 +90,7 @@ export interface DescribeUserListRequestParams extends BaseFilterParams {
 }
 
 export interface DescribeUserListResponseData extends BaseListResponseData {
-  data: Array<UserModel>;
+  users: Array<UserModel>;
   _name?: string;
 }
 

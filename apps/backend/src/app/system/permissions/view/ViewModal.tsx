@@ -36,14 +36,14 @@ export default function ViewModal() {
     const params: DescribePermissionDetailRequestParams = {
       permissionId,
     };
-    const res = await DescribePermissionDetail(params) as PermissionModel;
+    const res = await DescribePermissionDetail(params);
     const parentRes = await DescribePermissionDetail({
-      permissionId: res?.pid,
-    }) as PermissionModel;
+      permissionId: res?.permission?.pid,
+    });
     
     setState({
-      permission: res,
-      parentPermission: parentRes,
+      permission: res?.permission,
+      parentPermission: parentRes?.permission,
     });
     setLoading(false);
   });

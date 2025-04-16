@@ -23,5 +23,5 @@ export async function getUser() {
     uuid: decoded.uuid,
   });
 
-  return res;
+  return res?.user;
 }

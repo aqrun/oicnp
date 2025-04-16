@@ -43,7 +43,7 @@ export default function PermissionList(): JSX.Element {
   const {data, loading, refresh} = useQueryPermissionList();
 
   const dataSource = useMemo(() => {
-    return convertPermissionListToTree(data?.data || []);
+    return convertPermissionListToTree(data?.permissions || []);
   }, [data]);
 
   const expandedRowKeys = useMemo(() => {

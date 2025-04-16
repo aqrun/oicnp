@@ -6,8 +6,8 @@ import {
   FailModel,
 } from '@/types';
 import {
-  DescribeUserResponseData,
-} from '@/services/types';
+  UserModel,
+} from '@/services';
 
 export interface BaseAppState {
   /**
@@ -19,7 +19,7 @@ export interface BaseAppState {
   /**
    * 当前登陆用户信息
    */
-  user?: DescribeUserResponseData;
+  user?: UserModel;
 }
 
 export type AppState = BaseAppState & BaseState<BaseAppState>;

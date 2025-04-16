@@ -38,7 +38,7 @@ export default function ViewModal() {
     };
     const res = await DescribeRoleDetail(params);
     setState({
-      role: res as unknown as RoleModel,
+      role: res.role,
     });
     setLoading(false);
   });

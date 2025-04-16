@@ -15,7 +15,7 @@ export function useFetchUser() {
     };
     const res = await DescribeUserDetail(params);
     setLoading(false);
-    return res;
+    return res?.user;
   });
 
   return {

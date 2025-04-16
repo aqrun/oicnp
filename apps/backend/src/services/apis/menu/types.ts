@@ -30,7 +30,7 @@ export interface DescribeMenuDetailRequestParams {
   _name?: string;
 }
 export interface DescribeMenuDetailResponseData {
-  data: MenuModel;
+  menu: MenuModel;
   _name?: string;
 }
 
@@ -39,7 +39,7 @@ export interface DescribeMenuListRequestParams extends BaseFilterParams {
 }
 
 export interface DescribeMenuListResponseData extends BaseListResponseData {
-  data: Array<MenuModel>;
+  menus: Array<MenuModel>;
   _name?: string;
 }
 

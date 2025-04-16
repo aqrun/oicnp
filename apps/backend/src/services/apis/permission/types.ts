@@ -21,7 +21,7 @@ export interface DescribePermissionDetailRequestParams extends PermissionModel {
   _name?: string;
 }
 export interface DescribePermissionDetailResponseData {
-  data: PermissionModel;
+  permission: PermissionModel;
   _name?: string;
 }
 
@@ -30,7 +30,7 @@ export interface DescribePermissionListRequestParams extends BaseFilterParams {
 }
 
 export interface DescribePermissionListResponseData extends BaseListResponseData {
-  data: Array<PermissionModel>;
+  permissions: Array<PermissionModel>;
   _name?: string;
 }
 

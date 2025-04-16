@@ -6,7 +6,7 @@ import type { FormProps } from 'antd';
 import {
   FieldType,
 } from '../types';
-import { DescribeUserDetailResponseData } from '@/services';
+import { UserModel } from '@/services';
 import {
   UserFormContainer,
 } from './index.styled';
@@ -14,7 +14,7 @@ import {
 export interface UserFormProps {
   onFinish: FormProps<FieldType>['onFinish'];
   isEdit?: boolean;
-  user?: DescribeUserDetailResponseData;
+  user?: UserModel;
   loading?: boolean;
 }
 

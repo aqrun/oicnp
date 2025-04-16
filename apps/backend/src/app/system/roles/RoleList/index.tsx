@@ -29,9 +29,9 @@ export default function RoleList(): JSX.Element {
   const {data, loading, refresh} = useQueryRoleList();
 
   const getDataSource = () => {
-    return data?.data || [];
+    return data?.roles || [];
   };
-  const dataSource = getDataSource();console.log('dataSource---', dataSource);
+  const dataSource = getDataSource();
 
   /**
    * 创建操作

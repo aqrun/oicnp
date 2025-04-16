@@ -36,18 +36,18 @@ export default function EditModal() {
     const params: DescribeRoleDetailRequestParams = {
       roleId,
     };
-    const res = await DescribeRoleDetail(params) as unknown as RoleModel;
+    const res = await DescribeRoleDetail(params);
     
     setState({
-      role: res,
+      role: res.role,
     });
     
     form.setFieldsValue({
-      vid: res?.vid,
-      name: res?.name,
-      remark: res?.remark,
-      weight: res?.weight,
-      status: res?.status,
+      vid: res?.role?.vid,
+      name: res?.role?.name,
+      remark: res?.role?.remark,
+      weight: res?.role?.weight,
+      status: res?.role?.status,
     });
 
     setInitLoading(false);

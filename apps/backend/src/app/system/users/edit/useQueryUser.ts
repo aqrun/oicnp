@@ -19,7 +19,7 @@ export function useQueryUser() {
       };
 
       const res = await DescribeUserDetail(params);
-      return res;
+      return res?.user;
     }
   });
 

@@ -29,7 +29,7 @@ export default function UserList(): JSX.Element {
   const {data, loading, refresh} = useQueryUserList();
 
   const getDataSource = () => {
-    return data?.data || [];
+    return data?.users || [];
   };
   const dataSource = getDataSource();
 
@@ -83,7 +83,6 @@ export default function UserList(): JSX.Element {
   });
 
   useEffect(() => {
-    console.log('pagemount0-----userlist')
     if (refreshToken) {
       refresh();
     }

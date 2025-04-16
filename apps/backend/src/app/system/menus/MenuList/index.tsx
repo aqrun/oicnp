@@ -41,7 +41,7 @@ export default function MenuList(): JSX.Element {
   const {data, loading, refresh} = useQueryMenuList();
 
   const dataSource = useMemo(() => {
-    return convertMenuListToTree(data?.data || []);
+    return convertMenuListToTree(data?.menus || []);
   }, [data]);
 
   const expandedRowKeys = useMemo(() => {

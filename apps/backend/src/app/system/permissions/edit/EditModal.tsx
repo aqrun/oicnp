@@ -35,19 +35,19 @@ export default function EditModal() {
     const params: DescribePermissionDetailRequestParams = {
       permissionId,
     };
-    const res = await DescribePermissionDetail(params) as unknown as PermissionModel;
+    const res = await DescribePermissionDetail(params);
     
     setState({
-      permission: res,
+      permission: res?.permission,
     });
     
     form.setFieldsValue({
-      vid: res?.vid,
-      name: res?.name,
-      remark: res?.remark,
-      weight: res?.weight,
-      status: res?.status,
-      pid: res?.pid,
+      vid: res?.permission?.vid,
+      name: res?.permission?.name,
+      remark: res?.permission?.remark,
+      weight: res?.permission?.weight,
+      status: res?.permission?.status,
+      pid: res?.permission?.pid,
     });
 
     setInitLoading(false);

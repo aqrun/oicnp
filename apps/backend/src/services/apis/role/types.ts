@@ -27,7 +27,7 @@ export interface DescribeRoleDetailRequestParams extends RoleFilters {
   _name?: string;
 }
 export interface DescribeRoleDetailResponseData {
-  data: RoleModel;
+  role: RoleModel;
   _name?: string;
 }
 
@@ -36,7 +36,7 @@ export interface DescribeRoleListRequestParams extends BaseFilterParams {
 }
 
 export interface DescribeRoleListResponseData extends BaseListResponseData {
-  data: Array<RoleModel>;
+  roles: Array<RoleModel>;
   _name?: string;
 }
 
