@@ -1,43 +1,37 @@
 use std::collections::HashMap;
-use crate::entities::prelude::*;
 use crate::models::menus::MenuTreeItem;
 
 ///
 /// 参考示例
 /// https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=7da973c6d740c895e57dd424ebcf0a35
 /// 
-pub fn build_menu_tree(menus: Vec<MenuModel>) -> MenuTreeItem {
-    // let mut roots = Vec::new();
-    // 只有一个根节点
-    let mut root = MenuModel::default();
-    let mut child_map: HashMap<i64, Vec<MenuModel>> = HashMap::new();
+pub fn build_menu_tree(menus: Vec<MenuTreeItem>) -> Vec<MenuTreeItem> {
+    let mut roots = Vec::new();
+    let mut child_map: HashMap<i64, Vec<MenuTreeItem>> = HashMap::new();
 
     for node in menus {
-        if node.pid > 0 {
-            if let Some(child_nodes) = child_map.get_mut(&node.pid) {
+        if node.parent_id > 0 {
+            if let Some(child_nodes) = child_map.get_mut(&node.parent_id) {
                 child_nodes.push(node);
             } else {
-                child_map.insert(node.pid, vec![node]);
+                child_map.insert(node.parent_id, vec![node]);
             }
         } else {
-            // roots.push(node);
-            root = node;
+            roots.push(node);
         }
     }
 
-    /*
     let mut tree_roots = Vec::new();
     for node in roots {
         tree_roots.push(into_tree_node(node, &mut child_map));
     }
-    */
 
-    into_tree_node(root, &mut child_map)
+    tree_roots
 }
 
 fn into_tree_node (
-    menu: MenuModel,
-    mut child_map: &mut HashMap<i64, Vec<MenuModel>>,
+    menu: MenuTreeItem,
+    mut child_map: &mut HashMap<i64, Vec<MenuTreeItem>>,
 ) -> MenuTreeItem {
     let mut children = Vec::new();
 
@@ -47,15 +41,11 @@ fn into_tree_node (
         }
     }
 
-    MenuTreeItem {
-        id: menu.id,
-        vid: menu.vid,
-        pid: menu.pid,
-        path: String::from(menu.path.as_str()),
-        key: String::from(menu.path.as_str()),
-        label: String::from(menu.name.as_str()),
-        weight: menu.weight,
-        icon: menu.icon,
-        children,
+    let mut new_node = menu;
+
+    if !children.is_empty() {
+        new_node.children = Some(children);
     }
+
+    new_node
 }

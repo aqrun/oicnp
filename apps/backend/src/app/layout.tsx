@@ -22,7 +22,7 @@ export default async function RootLayout({
       <body>
         <AppProvider>
           <MainLayout
-            navMenus={menuRes?.children || []}
+            navMenus={menuRes?.menus?.[0]?.children || []}
           >
             {children}
           </MainLayout>

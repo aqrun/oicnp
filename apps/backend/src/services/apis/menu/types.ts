@@ -71,4 +71,6 @@ export interface MenuTreeItem {
 export interface DescribeMenuTreeRequestParams {
   vid?: string;
 }
-export type DescribeMenuTreeResponseData = MenuTreeItem;
+export interface DescribeMenuTreeResponseData {
+  menus: Array<MenuTreeItem>;
+}

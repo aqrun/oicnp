@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useMemoizedFn } from 'ahooks';
-import { Button, Divider } from 'antd';
+import { Button, Divider, Dropdown } from 'antd';
+import { Icon} from '@/components';
 import {
   PermissionModel,
   DescribeDeletePermission,
@@ -12,6 +13,7 @@ import { useListStore } from './useListStore';
 import { useViewStore } from '../view/useViewStore';
 import { useEditStore } from '../edit/useEditStore';
 import { useConfirmDelete } from '@/hooks/modals';
+import { useCreateStore } from '../create/useCreateStore';
 import { TableActionContainer } from '@/styles/app.styled';
 
 export interface TableActionsProps {
@@ -25,7 +27,7 @@ export default function TableActions({
   const setState = useListStore((state) => state.setState);
   const setViewState = useViewStore(state => state.setState);
   const setEditState = useEditStore(state => state.setState);
-
+  const setCreateState = useCreateStore(state => state.setState);
   const [loading, setLoading] = useState(false);
 
   const deletePermission = useMemoizedFn(async () => {
@@ -67,6 +69,14 @@ export default function TableActions({
     });
   });
 
+  const handleInsert = useMemoizedFn(() => {
+    setCreateState({
+      visible: true,
+      initPid: record?.permissionId,
+      contentType: 'create',
+    });
+  });
+
   return (
     <TableActionContainer
       split={<Divider type="vertical" />}
@@ -77,28 +87,43 @@ export default function TableActions({
         size="small"
         color="primary"
         variant="link"
-        onClick={handleView}
+        onClick={handleInsert}
       >
-        查看
+        新增
       </Button>
       <Button
         type="text"
         size="small"
         color="primary"
         variant="link"
-        onClick={handleEdit}
+        onClick={handleView}
       >
-        编辑
+        查看
       </Button>
-      <Button
-        type="text"
-        size="small"
-        color="danger"
-        variant="link"
-        onClick={handleDelete}
+      <Dropdown
+        menu={{
+          items: [
+            {
+              key: 'edit',
+              label: '编辑',
+              onClick: handleEdit,
+            },
+            {
+              key: 'delete',
+              label: '删除',
+              danger: true,
+              onClick: handleDelete,
+            },
+          ],
+        }}
+        placement="bottomRight"
       >
-        删除
-      </Button>
+        <a>
+          <Icon
+            icon="DownOutlined"
+          />
+        </a>
+      </Dropdown>
     </TableActionContainer>
   );
 }

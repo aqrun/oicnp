@@ -17,6 +17,18 @@ export interface PermissionModel {
   children?: Array<PermissionModel>;
 }
 
+export interface PermissionTreeItem {
+  id: number;
+  parent_id: number;
+  vid: string;
+  api: string;
+  weight: number;
+  label: string;
+  status: string;
+  remark: string;
+  children?: Array<PermissionTreeItem>;
+}
+
 export interface DescribePermissionDetailRequestParams extends PermissionModel {
   _name?: string;
 }
@@ -26,6 +38,15 @@ export interface DescribePermissionDetailResponseData {
 }
 
 export interface DescribePermissionListRequestParams extends BaseFilterParams {
+  _name?: string;
+}
+
+export interface DescribePermissionTreeRequestParams extends BaseFilterParams {
+  _name?: string;
+}
+
+export interface DescribePermissionTreeResponseData {
+  permissions: Array<PermissionTreeItem>;
   _name?: string;
 }
 

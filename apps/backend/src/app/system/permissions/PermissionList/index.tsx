@@ -71,9 +71,10 @@ export default function PermissionList(): JSX.Element {
    * 创建操作
    */
   const handleCreate = useMemoizedFn(() => {
-    // router.push(r('/system/permissions/create'));
     setCreateState({
       visible: true,
+      initPid: 0,
+      contentType: 'create',
     });
   });
 

@@ -5,6 +5,7 @@ use crate::RequestParamsUpdater;
 use crate::entities::prelude::MenuActiveModel;
 use crate::utils::utc_now;
 use loco_rs::prelude::Set;
+use sea_orm::{FromQueryResult, entity::prelude::*};
 
 #[add_filter_fields]
 #[derive(FilterParams, Deserialize, Serialize, Debug, Clone, Default)]
@@ -115,12 +116,32 @@ pub type DeleteMenuReqParams = MenuReqParams;
 #[derive(Clone, Debug, Deserialize, Serialize, Default)]
 pub struct MenuTreeItem {
     pub id: i64,
-    pub vid: String,
+    /// 菜单组件需要的属性
     pub key: String,
-    pub pid: i64,
+    pub vid: String,
+    #[serde(rename(deserialize = "parentId"))]
+    pub parent_id: i64,
     pub path: String,
     pub label: String,
     pub weight: i32,
     pub icon: String,
-    pub children: Vec<MenuTreeItem>,
+    pub status: String,
+    pub children: Option<Vec<MenuTreeItem>>,
+}
+
+impl FromQueryResult for MenuTreeItem {
+    fn from_query_result(res: &QueryResult, pre: &str) -> Result<Self, DbErr> {
+        Ok(Self {
+            id: res.try_get(pre, "id")?,
+            key: res.try_get(pre, "key")?,
+            vid: res.try_get(pre, "vid")?,
+            parent_id: res.try_get(pre, "parent_id")?,
+            path: res.try_get(pre, "path")?,
+            label: res.try_get(pre, "label")?,
+            weight: res.try_get(pre, "weight")?,
+            icon: res.try_get(pre, "icon")?,
+            status: res.try_get(pre, "status")?,
+            children: None,
+        })
+    }
 }
