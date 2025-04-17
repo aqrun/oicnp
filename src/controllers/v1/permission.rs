@@ -7,6 +7,7 @@ use oic_core::{
         UpdatePermissionReqParams,
         DeletePermissionReqParams,
         PermissionFilters,
+        PermissionTreeItem,
     },
     utils::get_api_prefix,
     typings::{JsonRes, Pagination},
@@ -50,6 +51,25 @@ pub async fn list(
 
     // 使用传递三个数据的元组指定最终 JSON 数据 key
     JsonRes::from((permissions, pager, "permissions"))
+}
+
+/// 生成树形数据
+#[debug_handler]
+pub async fn get_tree(
+    State(ctx): State<AppContext>,
+    Json(params): Json<PermissionFilters>,
+) -> JsonRes<Vec<PermissionTreeItem>> {
+    let res = PermissionModel::find_tree(&ctx.db, params).await;
+    
+    match res {
+        Ok(data) => {
+            // 使用两个数据的元组指定最终 JSON 数据 key
+            JsonRes::from((data, "permissions"))
+        },
+        Err(err) => {
+            JsonRes::err(err)
+        }
+    }
 }
 
 #[debug_handler]
@@ -98,6 +118,7 @@ pub fn routes() -> Routes {
         .prefix(get_api_prefix(super::VERSION, "permission").as_str())
         .add("/one", post(get_one))
         .add("/list", post(list))
+        .add("/tree", post(get_tree))
         .add("/add", post(add))
         .add("/add-multi", post(add_multi))
         .add("/update", post(update))
