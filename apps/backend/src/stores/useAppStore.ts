@@ -14,6 +14,7 @@ export interface BaseAppState {
    * 全局接口加载状态
    */
   loading: boolean;
+  initComplete: boolean;
   errors: Array<FailModel>;
   addError: (failModel: FailModel) => void,
   /**
@@ -30,6 +31,7 @@ export type AppState = BaseAppState & BaseState<BaseAppState>;
 export const useAppStore = create<AppState>()((set) => ({
   user: undefined,
   loading: false,
+  initComplete: false,
   errors: [],
   setState: (payload) => set((state) => {
     return {

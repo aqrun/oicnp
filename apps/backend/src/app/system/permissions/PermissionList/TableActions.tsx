@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useMemoizedFn } from 'ahooks';
-import { Button, Divider, Dropdown } from 'antd';
-import { Icon} from '@/components';
+import { Divider } from 'antd';
+import { Actions, LinkButton } from '@/components';
 import {
   PermissionModel,
   DescribeDeletePermission,
@@ -82,48 +82,33 @@ export default function TableActions({
       split={<Divider type="vertical" />}
       size="small"
     >
-      <Button
-        type="text"
-        size="small"
-        color="primary"
-        variant="link"
-        onClick={handleInsert}
-      >
-        新增
-      </Button>
-      <Button
-        type="text"
-        size="small"
-        color="primary"
-        variant="link"
-        onClick={handleView}
-      >
-        查看
-      </Button>
-      <Dropdown
-        menu={{
-          items: [
-            {
-              key: 'edit',
-              label: '编辑',
-              onClick: handleEdit,
-            },
-            {
-              key: 'delete',
-              label: '删除',
-              danger: true,
-              onClick: handleDelete,
-            },
-          ],
-        }}
-        placement="bottomRight"
-      >
-        <a>
-          <Icon
-            icon="DownOutlined"
-          />
-        </a>
-      </Dropdown>
+      <Actions>
+        <LinkButton
+          key="insert"
+          onClick={handleInsert}
+        >
+          新增
+        </LinkButton>
+        <LinkButton
+          key="view"
+          onClick={handleView}
+        >
+          查看
+        </LinkButton>
+        <LinkButton
+          key="edit"
+          onClick={handleEdit}
+        >
+          编辑
+        </LinkButton>
+        <LinkButton
+          key="delete"
+          danger
+          onClick={handleDelete}
+        >
+          删除
+        </LinkButton>
+      </Actions>
     </TableActionContainer>
   );
 }
