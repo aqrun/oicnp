@@ -1,12 +1,10 @@
 ---
-- roleId: 1,
-  vid: admin
+- vid: admin
   name: 管理员
   weight: 0
   status: 1
   permissionVids: []
-- roleId: 2,
-  vid: author
+- vid: author
   name: 作者
   weight: 0
   status: 1
@@ -19,8 +17,7 @@
     - note-list
     - note-add
     - note-update
-- roleId: 3, 
-  vid: member
+- vid: member
   name: 成员
   weight: 0
   status: 1
@@ -28,8 +25,7 @@
     - cms
     - note
     - note-list
-- roleId: 4,
-  vid: guest
+- vid: guest
   name: 游客
   weight: 0
   status: 1
