@@ -1,8 +1,3 @@
-#[allow(dead_code)]
-
-use proc_macro2::{Ident, Span, TokenStream};
-use proc_macro_crate::{crate_name, FoundCrate};
-use quote::quote;
 use syn::{
     Attribute,
     Meta,
@@ -10,6 +5,10 @@ use syn::{
     punctuated::Punctuated,
 };
 
+/*
+use proc_macro2::{Ident, Span, TokenStream};
+use proc_macro_crate::{crate_name, FoundCrate};
+use quote::quote;
 pub(crate) fn get_crate_name(internal: bool) -> TokenStream {
     if internal {
         quote! { crate }
@@ -22,6 +21,7 @@ pub(crate) fn get_crate_name(internal: bool) -> TokenStream {
         quote!(#name)
     }
 }
+*/
 
 ///
 /// 解析结构体属性宏转为字符串数组
