@@ -162,6 +162,7 @@ export function MainLayout({
 
     setAppState({
       user: userRes,
+      initComplete: true,
     });
   };
 

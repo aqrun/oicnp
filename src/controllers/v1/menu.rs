@@ -58,9 +58,17 @@ pub async fn list(
 pub async fn get_tree(
     State(ctx): State<AppContext>,
     Json(params): Json<MenuFilters>,
-) -> JsonRes<MenuTreeItem> {
+) -> JsonRes<Vec<MenuTreeItem>> {
     let res = MenuModel::find_tree(&ctx.db, params).await;
-    JsonRes::from(res)
+    match res {
+        Ok(data) => {
+            // 使用两个数据的元组指定最终 JSON 数据 key
+            JsonRes::from((data, "menus"))
+        },
+        Err(err) => {
+            JsonRes::err(err)
+        }
+    }
 }
 
 #[debug_handler]

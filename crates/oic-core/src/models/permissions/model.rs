@@ -4,10 +4,24 @@ use crate::{
     utils::catch_err,
 };
 use loco_rs::prelude::*;
-use sea_orm::{prelude::*, IntoActiveModel, QueryOrder};
+use sea_orm::{
+    prelude::*,
+    IntoActiveModel,
+    QueryOrder,
+    QuerySelect,
+    // DbBackend,
+    // QueryTrait,
+};
 use validator::Validate;
 use crate::{RequestParamsUpdater, ModelCrudHandler};
-use super::{CreatePermissionReqParams, DeletePermissionReqParams, PermissionFilters, UpdatePermissionReqParams};
+use super::{
+    UpdatePermissionReqParams,
+    CreatePermissionReqParams,
+    DeletePermissionReqParams,
+    PermissionFilters,
+    PermissionTreeItem,
+};
+use crate::services::permission::build_permission_tree;
 
 #[async_trait::async_trait]
 impl ActiveModelBehavior for PermissionActiveModel {}
@@ -203,4 +217,55 @@ impl ModelCrudHandler for PermissionModel {
 }
 
 impl PermissionModel {
+    ////
+    /// 获取permission列表树型数据
+    /// 
+    pub async fn find_tree(
+        db: &DatabaseConnection,
+        params: PermissionFilters,
+    ) -> ModelResult<Vec<PermissionTreeItem>> {
+        let order = params.get_order();
+        let order_by_str = params.get_order_by();
+        
+        // 根据父级查找所有子级元素
+        let mut q = PermissionEntity::find()
+            .select_only()
+            // 指定主表字段
+            .columns([
+                PermissionColumn::Vid,
+                PermissionColumn::Api,
+                PermissionColumn::Weight,
+                PermissionColumn::Status,
+                PermissionColumn::Remark,
+            ])
+            // 指定关联表字段
+            .column_as(PermissionColumn::PermissionId, "id")
+            .column_as(PermissionColumn::Pid, "parent_id")
+            .column_as(PermissionColumn::Name, "label");
+
+        let mut order_by = PermissionColumn::PermissionId;
+
+        if order_by_str.eq("name") {
+            order_by = PermissionColumn::Name;
+        } else if order_by_str.eq("weight") {
+            order_by = PermissionColumn::Weight
+        }
+
+        // let sql = q
+        //     .build(DbBackend::Postgres)
+        //     .to_string();
+        // println!("sql----------: {:?}", sql);
+
+        q = q.order_by(order_by, order);
+
+        let list = q.into_model::<PermissionTreeItem>()
+            .all(db)
+            .await?;
+
+        // 列表转为树结构
+        let list = build_permission_tree(list);
+
+        Ok(list)
+    }
 }
+

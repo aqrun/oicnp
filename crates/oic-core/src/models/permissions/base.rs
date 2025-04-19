@@ -7,6 +7,7 @@ use crate::{
     utils::utc_now,
     entities::prelude::*,
 };
+use sea_orm::{FromQueryResult, entity::prelude::*};
 
 #[add_filter_fields]
 #[derive(FilterParams, Deserialize, Serialize, Debug, Default, Clone)]
@@ -14,6 +15,7 @@ use crate::{
 pub struct PermissionFilters {
     #[serde(rename(deserialize = "permissionId"))]
     pub permission_id: Option<i64>,
+    pub id: Option<i64>,
     pub vid: Option<String>,
 }
 
@@ -113,3 +115,33 @@ pub type UpdatePermissionReqParams = PermissionReqParams;
 /// 
 pub type DeletePermissionReqParams = PermissionReqParams;
 
+#[derive(Clone, Debug, Deserialize, Serialize, Default)]
+#[serde(default)]
+pub struct PermissionTreeItem {
+    pub id: i64,
+    #[serde(rename(deserialize = "parentId"))]
+    pub parent_id: i64,
+    pub vid: String,
+    pub api: String,
+    pub weight: i32,
+    pub label: String,
+    pub status: String,
+    pub remark: String,
+    pub children: Option<Vec<PermissionTreeItem>>,
+}
+
+impl FromQueryResult for PermissionTreeItem {
+    fn from_query_result(res: &QueryResult, pre: &str) -> Result<Self, DbErr> {
+        Ok(Self {
+            id: res.try_get(pre, "id")?,
+            parent_id: res.try_get(pre, "parent_id")?,
+            vid: res.try_get(pre, "vid")?,
+            api: res.try_get(pre, "api")?,
+            weight: res.try_get(pre, "weight")?,
+            label: res.try_get(pre, "label")?,
+            status: res.try_get(pre, "status")?,
+            remark: res.try_get(pre, "remark")?,
+            children: None,
+        })
+    }
+}

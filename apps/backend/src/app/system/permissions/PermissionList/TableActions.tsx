@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useMemoizedFn } from 'ahooks';
-import { Button, Divider } from 'antd';
+import { Divider } from 'antd';
+import { Actions, LinkButton } from '@/components';
 import {
   PermissionModel,
   DescribeDeletePermission,
@@ -12,6 +13,7 @@ import { useListStore } from './useListStore';
 import { useViewStore } from '../view/useViewStore';
 import { useEditStore } from '../edit/useEditStore';
 import { useConfirmDelete } from '@/hooks/modals';
+import { useCreateStore } from '../create/useCreateStore';
 import { TableActionContainer } from '@/styles/app.styled';
 
 export interface TableActionsProps {
@@ -25,7 +27,7 @@ export default function TableActions({
   const setState = useListStore((state) => state.setState);
   const setViewState = useViewStore(state => state.setState);
   const setEditState = useEditStore(state => state.setState);
-
+  const setCreateState = useCreateStore(state => state.setState);
   const [loading, setLoading] = useState(false);
 
   const deletePermission = useMemoizedFn(async () => {
@@ -67,38 +69,46 @@ export default function TableActions({
     });
   });
 
+  const handleInsert = useMemoizedFn(() => {
+    setCreateState({
+      visible: true,
+      initPid: record?.permissionId,
+      contentType: 'create',
+    });
+  });
+
   return (
     <TableActionContainer
       split={<Divider type="vertical" />}
       size="small"
     >
-      <Button
-        type="text"
-        size="small"
-        color="primary"
-        variant="link"
-        onClick={handleView}
-      >
-        查看
-      </Button>
-      <Button
-        type="text"
-        size="small"
-        color="primary"
-        variant="link"
-        onClick={handleEdit}
-      >
-        编辑
-      </Button>
-      <Button
-        type="text"
-        size="small"
-        color="danger"
-        variant="link"
-        onClick={handleDelete}
-      >
-        删除
-      </Button>
+      <Actions>
+        <LinkButton
+          key="insert"
+          onClick={handleInsert}
+        >
+          新增
+        </LinkButton>
+        <LinkButton
+          key="view"
+          onClick={handleView}
+        >
+          查看
+        </LinkButton>
+        <LinkButton
+          key="edit"
+          onClick={handleEdit}
+        >
+          编辑
+        </LinkButton>
+        <LinkButton
+          key="delete"
+          danger
+          onClick={handleDelete}
+        >
+          删除
+        </LinkButton>
+      </Actions>
     </TableActionContainer>
   );
 }

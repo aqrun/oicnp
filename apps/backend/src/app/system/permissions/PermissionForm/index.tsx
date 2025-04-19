@@ -1,8 +1,9 @@
 'use client';
 
-import { Button, Form, Input, FormInstance, Radio } from 'antd';
+import { Button, Form, Input, FormInstance, Radio, TreeSelect } from 'antd';
 import type { FormProps } from 'antd';
 import { PermissionModel } from '@/services';
+import PermissionSelect from './PermissionSelect';
 
 type FieldType = PermissionModel;
 
@@ -52,12 +53,7 @@ export default function PermissionForm({
         form={form}
         disabled={disabled}
       >
-        <Form.Item<FieldType>
-          label="父级权限"
-          name="pid"
-        >
-          <Input />
-        </Form.Item>
+        <PermissionSelect />
         <Form.Item<FieldType>
           label="名称"
           name="name"

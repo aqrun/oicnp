@@ -12,12 +12,19 @@ import {
   DescribeCreatePermissionResponseData,
   DescribeUpdatePermissionRequestParams,
   DescribeUpdatePermissionResponseData,
+  DescribePermissionTreeRequestParams,
+  DescribePermissionTreeResponseData,
 } from './types';
 
 export const DescribePermissionList = createService<
 DescribePermissionListRequestParams,
 DescribePermissionListResponseData
 >('/permission/list', 'post', { ignoreError: true, });
+
+export const DescribePermissionTree = createService<
+DescribePermissionTreeRequestParams,
+DescribePermissionTreeResponseData
+>('/permission/tree', 'post', { ignoreError: true, });
 
 export const DescribePermissionDetail = createService<
 DescribePermissionDetailRequestParams,

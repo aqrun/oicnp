@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Form } from 'antd';
 import { Modal } from '@/components';
 import PermissionForm from '../PermissionForm';
@@ -20,7 +20,7 @@ export default function CreateModal() {
   const contentType = useCreateStore(state => state.contentType);
   const setState = useCreateStore(state => state.setState);
   const setListState = useListStore(state => state.setState);
-
+  const initPid = useCreateStore(state => state.initPid);
   const [loading, setLoading] = useState(false);
 
   const [form] = Form.useForm<PermissionModel>();
@@ -81,6 +81,20 @@ export default function CreateModal() {
       />
     );
   }
+
+  const init = useMemoizedFn(() => {
+    if (initPid) {
+      form.setFieldValue('pid', initPid);
+    } else {
+      form.setFieldValue('pid', undefined);
+    }
+  });
+
+  useEffect(() => {
+    if (visible) {
+      init();
+    }
+  }, [visible]);
 
   return (
     <Modal

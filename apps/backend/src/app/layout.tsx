@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { MainLayout, AppProvider } from '@/components/layouts';
 import { DescribeMenuTree } from '@/services/apis/menu/action';
+import FullLoading from '@/components/layouts/FullLoading';
 
 import "@/styles/globals.css";
 
@@ -20,9 +21,10 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body>
+        <FullLoading />
         <AppProvider>
           <MainLayout
-            navMenus={menuRes?.children || []}
+            navMenus={menuRes?.menus?.[0]?.children || []}
           >
             {children}
           </MainLayout>

@@ -8,7 +8,15 @@ use crate::{
     ModelCrudHandler,
 };
 use loco_rs::prelude::*;
-use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, Set};
+use sea_orm::{
+    prelude::*,
+    IntoActiveModel,
+    QueryOrder,
+    QuerySelect,
+    // Condition,
+    // DbBackend,
+    // QueryTrait,
+};
 use validator::Validate;
 use super::{CreateMenuReqParams, MenuFilters, UpdateMenuReqParams, DeleteMenuReqParams};
 
@@ -269,7 +277,7 @@ impl MenuModel {
     ////
     /// 获取node列表树型数据
     /// 
-    pub async fn find_tree(db: &DatabaseConnection, params: MenuFilters) -> ModelResult<MenuTreeItem> {
+    pub async fn find_tree(db: &DatabaseConnection, params: MenuFilters) -> ModelResult<Vec<MenuTreeItem>> {
         let order = params.get_order();
         let order_by_str = params.get_order_by();
         let vid = params.vid.unwrap_or(String::from(""));
@@ -278,8 +286,21 @@ impl MenuModel {
         let menu = Self::find_by_vid(db, vid.as_str()).await?;
 
         // 根据父级查找所有子级元素
-        let mut q = MenuEntity::find();
-
+        let mut q = MenuEntity::find()
+            .select_only()
+            .columns([
+                MenuColumn::Id,
+                MenuColumn::Vid,
+                MenuColumn::Weight,
+                MenuColumn::Icon,
+                MenuColumn::Path,
+                MenuColumn::Status,
+            ])
+            // 指定关联表字段
+            .column_as(MenuColumn::Pid, "parent_id")
+            .column_as(MenuColumn::Path, "key")
+            .column_as(MenuColumn::Name, "label");
+        
         if menu.depth == 1 {
             q = q.filter(MenuColumn::P1.eq(menu.id));
         }
@@ -313,7 +334,11 @@ impl MenuModel {
             order_by = MenuColumn::Weight
         }
 
-        let list = q.order_by(order_by, order).all(db).await?;
+
+        let list = q.order_by(order_by, order)
+            .into_model::<MenuTreeItem>()
+            .all(db)
+            .await?;
 
         // 列表转为树结构
         let root = build_menu_tree(list);

@@ -9,6 +9,10 @@ export interface BaseCreateState {
    * 内容类型
    */
   contentType?: string;
+  /**
+   * 初始化父级权限
+   */
+  initPid?: number;
 };
 
 export type CreateState = BaseCreateState & BaseState<BaseCreateState>;
@@ -19,6 +23,7 @@ export type CreateState = BaseCreateState & BaseState<BaseCreateState>;
 export const useCreateStore = create<CreateState>()((set) => ({
   visible: false,
   contentType: '',
+  initPid: 0,
   setState: (payload) => set((state) => {
     return {
       ...state,
