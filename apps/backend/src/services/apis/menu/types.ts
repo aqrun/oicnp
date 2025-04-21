@@ -1,4 +1,5 @@
 import {
+  BaseResponse,
   BaseFilterParams,
   BaseListResponseData,
 } from '../../types';
@@ -71,6 +72,6 @@ export interface MenuTreeItem {
 export interface DescribeMenuTreeRequestParams {
   vid?: string;
 }
-export interface DescribeMenuTreeResponseData {
+export interface DescribeMenuTreeResponseData extends BaseResponse{
   menus: Array<MenuTreeItem>;
 }

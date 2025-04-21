@@ -30,8 +30,11 @@ export function createFetcher<TRequest, TResponse> (action: string, method?: str
         return json;
       }
     } catch (err) {
-      console.log('fetcher ERR]', err);
-      return err as any as TResponse;
+      return {
+        code: '500',
+        data: null,
+        message: (err as any).toString(),
+      } as any as TResponse;
     }
   }
 }

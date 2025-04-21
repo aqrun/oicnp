@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Breadcrumb, Menu } from 'antd';
+import { Breadcrumb, Menu, Result } from 'antd';
 import { SelectInfo } from 'rc-menu/lib/interface';
 import { CLASS_PREFIX } from '@/constants';
 import cls from 'clsx';
@@ -10,6 +10,20 @@ import { Icon } from '@/components';
 import { logoutAction } from '@/actions/logout';
 import { getUser } from '@/actions/getUser';
 import { useAppStore } from '@/stores/useAppStore';
+import { MenuItem, BreadItem } from '@/types';
+import {
+  isNetworkErr,
+} from '@/utils';
+import {
+  DescribeMenuTreeResponseData,
+} from '@/services';
+import { NavUser } from "@/components/nav-user"
+import {
+  SidebarFooter,
+  SidebarProvider,
+  SidebarMenuButton,
+} from "@/components/ui/sidebar";
+import { useMemoizedFn } from 'ahooks';
 import {
   Container,
   Header,
@@ -19,23 +33,14 @@ import {
   Content,
   Footer,
 } from './index.styled';
-import { MenuItem, BreadItem } from '@/types';
-import { MenuTreeItem } from '@/services';
-import { NavUser } from "@/components/nav-user"
-import {
-  SidebarFooter,
-  SidebarProvider,
-  SidebarMenuButton,
-} from "@/components/ui/sidebar";
-import { useMemoizedFn } from 'ahooks';
 
 export interface MainLayoutProps extends React.PropsWithChildren {
-  navMenus: MenuTreeItem[];
+  menuRes: DescribeMenuTreeResponseData;
 }
 
 export function MainLayout({
   children,
-  navMenus,
+  menuRes,
 }: MainLayoutProps): JSX.Element {
   const router = useRouter();
   const pathname = usePathname();
@@ -46,6 +51,7 @@ export function MainLayout({
 
   const [selectedKeys, setSelectedKeys] = useState<Array<string> | undefined>(undefined);
   const [openKeys, setOpenKeys] = useState<Array<string> | undefined>(undefined);
+  const navMenus = menuRes?.menus?.[0]?.children || [];
 
   const sideMenus = useMemo(() => {
     const items = navMenus?.map((item) => {
@@ -174,6 +180,19 @@ export function MainLayout({
     return (
       <div className="min-h-screen flex items-center justify-center">
         {children}
+      </div>
+    );
+  }
+
+  // 菜单接口是服务端请求 存在错误信息
+  if (isNetworkErr(menuRes)) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Result
+          status="500"
+          title="网络故障"
+          subTitle="服务不可用，请稍后重试 ~_~"
+        />
       </div>
     );
   }

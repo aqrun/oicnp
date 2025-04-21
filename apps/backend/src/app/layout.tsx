@@ -24,7 +24,7 @@ export default async function RootLayout({
         <FullLoading />
         <AppProvider>
           <MainLayout
-            navMenus={menuRes?.menus?.[0]?.children || []}
+            menuRes={menuRes}
           >
             {children}
           </MainLayout>

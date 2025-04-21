@@ -4,6 +4,7 @@ import { STATIC_URI, BACK_BASE_URI } from '@/constants';
 import { MenuItem, BreadItem } from '@/types';
 import { UrlState } from './UrlState';
 import dayjs from 'dayjs';
+import { BaseResponse } from '@/services';
 
 /**
  * 获取链接前缀
@@ -174,4 +175,13 @@ export function formatDate(strDate: string): string {
   if (!strDate) return strDate;
   const res = dayjs(strDate).add(8, 'h').format('YYYY年MM月DD日 HH:mm:ss');
   return res;
+}
+
+/**
+ * 是否是接口不可用等服务端错误
+ */
+export function isNetworkErr(res: BaseResponse) {
+  const code = res?.code ?? '200';
+
+  return `${code}` === '500';
 }

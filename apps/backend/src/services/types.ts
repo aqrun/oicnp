@@ -1,3 +1,8 @@
+export interface BaseResponse {
+  code?: string;
+  message?: string;
+}
+
 export interface BaseFilterParams {
   page?: number;
   pageSize?: number;
