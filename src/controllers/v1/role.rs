@@ -95,10 +95,25 @@ pub async fn remove(
     JsonRes::from(res)
 }
 
+#[debug_handler]
+pub async fn get_permissions(
+    State(ctx): State<AppContext>,
+    Json(params): Json<RoleFilters>,
+) -> JsonRes<Vec<PermissionModel>> {
+    let role_id = params.role_id.unwrap_or(0);
+    let permissions = match RoleModel::get_permissions_by_role_id(&ctx.db, role_id).await {
+        Ok(data) => data,
+        Err(err) => return JsonRes::err(err),
+    };
+
+    JsonRes::from((permissions, "permissions"))
+}
+
 pub fn routes() -> Routes {
     Routes::new()
         .prefix(get_api_prefix(super::VERSION, "role").as_str())
         .add("/one", post(get_one))
+        .add("/permissions", post(get_permissions))
         .add("/list", post(list))
         .add("/add", post(add))
         .add("/add-multi", post(add_multi))

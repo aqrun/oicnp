@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from 'react';
-import { useMemoizedFn, useDebounceFn } from 'ahooks';
+import { useDebounceFn } from 'ahooks';
 import { useGlobalState } from '@/context';
 import { ModalFuncProps } from 'antd/lib/modal';
 

@@ -48,6 +48,7 @@ export const Main = styled.main`
   display: flex;
   height: 100vh;
   flex: 1;
+  width: calc(100% - 256px);
 `;
 
 // MainContent component

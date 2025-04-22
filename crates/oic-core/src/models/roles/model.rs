@@ -133,9 +133,17 @@ impl ModelCrudHandler for RoleModel {
         params.update(&mut item);
         params.update_by_create(&mut item);
     
-        let item = item.insert(db).await?;
+        let role = item.insert(db).await?;
 
-        Ok(item.role_id)
+        let mut permission_ids: Vec<i64> = Vec::new();
+
+        if let Some(x) = &params.permission_ids {
+            permission_ids = x.clone();
+        }
+
+        Self::assign_permissions_to_role(db, role.role_id, permission_ids.as_slice()).await?;
+
+        Ok(role.role_id)
     }
 
     /// 更新数据
@@ -154,6 +162,14 @@ impl ModelCrudHandler for RoleModel {
         params.update(&mut item);
 
         let item = item.update(db).await?;
+
+        let mut permission_ids: Vec<i64> = Vec::new();
+
+        if let Some(x) = &params.permission_ids {
+            permission_ids = x.clone();
+        }
+
+        Self::assign_permissions_to_role(db, id, permission_ids.as_slice()).await?;
 
         Ok(item.role_id)
     }
@@ -244,5 +260,48 @@ impl RoleModel {
         let _ = RolePermissionsMapEntity::insert_many(role_permission_list).exec(db).await?;
 
         Ok(())
+    }
+    
+    /// 
+    /// 给角色指定权限
+    /// 
+    pub async fn assign_permissions_to_role(
+        db: &DatabaseConnection,
+        role_id: i64,
+        permission_ids: &[i64],
+    ) -> ModelResult<()> {
+        // 清除全部权限
+        let _ = RolePermissionsMapEntity::delete_many()
+            .filter(RolePermissionsMapColumn::RoleId.eq(role_id))
+            .exec(db)
+            .await?;
+
+        let mut list: Vec<RolePermissionsMapActiveModel> = Vec::new();
+
+        for permission_id in permission_ids {
+            let role_permission_map = RolePermissionsMapActiveModel {
+                role_id: Set(role_id),
+                permission_id: Set(*permission_id),
+                ..Default::default()
+            };
+            list.push(role_permission_map);
+        }
+
+        let _ = RolePermissionsMapEntity::insert_many(list).exec(db).await?;
+
+        Ok(())
+    }
+
+    ///
+    /// 根据角色ID获取权限列表
+    /// 
+    pub async fn get_permissions_by_role_id(db: &DatabaseConnection, role_id: i64) -> ModelResult<Vec<PermissionModel>> {
+        let list = PermissionEntity::find()
+            .left_join(RolePermissionsMapEntity)
+            .filter(RolePermissionsMapColumn::RoleId.eq(role_id))
+            .all(db)
+            .await?;
+
+        Ok(list)
     }
 }

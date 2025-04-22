@@ -18,8 +18,8 @@ impl MigrationTrait for Migration {
                     .auto_increment(),
             )
             .col(ColumnDef::new(RolePermissionsMap::RoleId).big_integer().not_null().default(0))
-            .col(ColumnDef::new(RolePermissionsMap::PermissionId).string_len(255).not_null().default(""))
-            .col(ColumnDef::new(RolePermissionsMap::Method).string_len(10).not_null().default(0))
+            .col(ColumnDef::new(RolePermissionsMap::PermissionId).big_integer().not_null().default(0))
+            .col(ColumnDef::new(RolePermissionsMap::Method).string_len(10).not_null().default(""))
             .col(ColumnDef::new(RolePermissionsMap::CreatedBy).big_integer().not_null().default(0))
             .col(
                 ColumnDef::new(RolePermissionsMap::CreatedAt)

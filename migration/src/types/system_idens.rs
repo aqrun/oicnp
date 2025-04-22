@@ -423,7 +423,7 @@ pub enum RolePermissionsMap {
     Id,
     #[oic(data_type = "bigInt", comment = "")]
     RoleId,
-    #[oic(data_type = "string", len = 255, comment = "")]
+    #[oic(data_type = "bigInt", comment = "")]
     PermissionId,
     #[oic(data_type = "char", len = 10, default = "", comment = "")]
     Method,

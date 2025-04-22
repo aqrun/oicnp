@@ -163,6 +163,9 @@ export default function PermissionList(): JSX.Element {
         size="small"
         tableLayout="fixed"
         pagination={false}
+        scroll={{
+          x: 'max-content',
+        }}
         expandable={{
           expandedRowKeys,
           onExpandedRowsChange: handleTableExpandChange,

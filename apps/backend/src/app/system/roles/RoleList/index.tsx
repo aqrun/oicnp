@@ -111,6 +111,9 @@ export default function RoleList(): JSX.Element {
         rowKey="roleId"
         size="small"
         tableLayout="fixed"
+        scroll={{
+          x: 'max-content',
+        }}
         pagination={{
           total: pager?.total,
           pageSize: pager?.pageSize,

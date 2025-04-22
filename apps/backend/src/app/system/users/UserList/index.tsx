@@ -109,6 +109,9 @@ export default function UserList(): JSX.Element {
         rowKey="uid"
         size="small"
         tableLayout="fixed"
+        scroll={{
+          x: 'max-content',
+        }}
         pagination={{
           total: pager?.total,
           pageSize: pager?.pageSize,

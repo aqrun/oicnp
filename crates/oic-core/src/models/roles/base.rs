@@ -39,6 +39,8 @@ pub struct RoleReqParams {
     /// 指定权限
     #[serde(rename(deserialize = "permissionVids"))]
     pub permission_vids: Option<Vec<String>>,
+    #[serde(rename(deserialize = "permissionIds"))]
+    pub permission_ids: Option<Vec<i64>>,
 }
 
 impl RequestParamsUpdater for RoleReqParams {

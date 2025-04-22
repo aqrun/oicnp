@@ -1,8 +1,11 @@
 'use client';
 
 import { Button, Form, Input, FormInstance, Radio } from 'antd';
-import type { FormProps } from 'antd';
+import type { FormProps, TreeProps } from 'antd';
 import { RoleModel } from '@/services';
+import PermissionTree from '../../permissions/PermissionForm/PermissionTree';
+import { useMemoizedFn } from 'ahooks';
+import { Container } from './index.styled';
 
 type FieldType = RoleModel;
 
@@ -40,8 +43,14 @@ export default function RoleForm({
     { value: '0', label: '停用'}
   ];
 
+  const handleTreeCheck = useMemoizedFn((checkedKeys: Array<string>, info: any) => {
+    form?.setFieldsValue({
+      permissionIds: checkedKeys,
+    });
+  });
+
   return (
-    <div>
+    <Container>
       <Form
         name="basic"
         wrapperCol={{ span: 10 }}
@@ -88,8 +97,13 @@ export default function RoleForm({
         </Form.Item>
         <Form.Item<FieldType>
           name="permissionIds"
+          label="权限列表"
+          className="oic-permission-tree-form-item"
+          wrapperCol={{ span: 24 }}
         >
-          权限列表
+          <PermissionTree
+            onCheck={handleTreeCheck as any}
+          />
         </Form.Item>
 
         {showSubmit && (
@@ -104,6 +118,6 @@ export default function RoleForm({
           </Form.Item>
         )}
       </Form>
-    </div>
+    </Container>
   );
 }
