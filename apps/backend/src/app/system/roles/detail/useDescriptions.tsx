@@ -1,9 +1,23 @@
-import { Form, Descriptions, DescriptionsProps } from 'antd';
+import { useMemo } from 'react';
+import { DescriptionsProps } from 'antd';
 import { useViewStore } from './useViewStore';
 import { formatDate } from '@/utils';
+import {
+  PermissionTree,
+  usePermissionTree,
+} from '@/components/PermissionTree';
 
 export default function useDescriptions() {
   const role = useViewStore(state => state.role);
+  const rolePermissions = useViewStore(state => state.rolePermissions);
+
+  const {
+    treeData,
+  } = usePermissionTree();
+
+  const permissionTreeData = useMemo(() => {
+    
+  }, [treeData, rolePermissions]);
 
   const items: DescriptionsProps['items'] = [
     {
@@ -27,19 +41,26 @@ export default function useDescriptions() {
       children: role?.weight,
     },
     {
+      key: 'createdAt',
+      label: '创建时间',
+      children: role?.createdAt ? formatDate(role?.createdAt) : '-',
+      span: 12,
+    },
+    {
       key: 'remark',
       label: '描述',
       children: role?.remark || '-',
+      span: 24,
     },
     {
       key: 'permissions',
       label: '权限列表',
-      children: '-',
-    },
-    {
-      key: 'createdAt',
-      label: '创建时间',
-      children: role?.createdAt ? formatDate(role?.createdAt) : '-',
+      children: (
+        <PermissionTree
+
+        />
+      ),
+      span: 12,
     },
   ];
 

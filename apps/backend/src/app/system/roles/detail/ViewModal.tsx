@@ -5,9 +5,14 @@ import { useViewStore } from './useViewStore';
 import { useMemoizedFn } from 'ahooks';
 import useDescriptions from './useDescriptions';
 import {
+  usePermissionTree,
+} from '@/components/PermissionTree';
+import {
   RoleModel,
   DescribeRoleDetail,
   DescribeRoleDetailRequestParams,
+  DescribeRolePermissionsRequestParams,
+  DescribeRolePermissions,
 } from '@/services';
 
 /**
@@ -23,6 +28,10 @@ export default function ViewModal() {
 
   const [form] = Form.useForm<RoleModel>();
 
+  const {
+    fetchPermissionTree,
+  } = usePermissionTree();
+
   const handleCancel = useMemoizedFn(() => {
     form.resetFields();
     setState({
@@ -31,14 +40,35 @@ export default function ViewModal() {
     });
   });
 
-  const fetchInitialData = useMemoizedFn(async () => {
-    setLoading(true);
+  const fetchRolePermissions = useMemoizedFn(async () => {
+    const params: DescribeRolePermissionsRequestParams = {
+      roleId: roleId || 0,
+    };
+    const res = await DescribeRolePermissions(params);
+    return res;
+  });
+
+  const fetchRole = useMemoizedFn(async () => {
     const params: DescribeRoleDetailRequestParams = {
-      roleId: roleId,
+      roleId,
     };
     const res = await DescribeRoleDetail(params);
+    
+    return res;
+  });
+
+  const fetchInitialData = useMemoizedFn(async () => {
+    setLoading(true);
+    const requests: Array<Promise<any>> = [
+      fetchPermissionTree(),
+      fetchRolePermissions(),
+      fetchRole(),
+    ];
+    const allRes = await Promise.all(requests);
+
     setState({
-      role: res.role,
+      role: allRes?.[2]?.role,
+      rolePermissions: allRes?.[1]?.permissions,
     });
     setLoading(false);
   });

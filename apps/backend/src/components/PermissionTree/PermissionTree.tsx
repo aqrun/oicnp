@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { Tree, TreeProps, Spin } from 'antd';
-import useFetchPermissionTree from './useFetchPermissionTree';;
+import usePermissionTree from './usePermissionTree';
 import {
   PermissionTreeWrapper,
 } from './index.styled';
@@ -11,6 +11,7 @@ type TreeItem = NonNullable<TreeProps['treeData']>[number];
 
 export interface PermissionTreeProps {
   onCheck?: TreeProps['onCheck'];
+  defaultCheckedKeys?: Array<React.Key>;
 }
 
 /**
@@ -18,13 +19,14 @@ export interface PermissionTreeProps {
  */
 export default function PermissionTree({
   onCheck,
+  defaultCheckedKeys,
 }: PermissionTreeProps): JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
+
   const {
     treeData,
     loading,
-    fetchTree,
-  } = useFetchPermissionTree();
+  } = usePermissionTree();
 
   const validTreeData = useMemo(() => {
     const list = treeData?.map((item) => {
@@ -66,10 +68,6 @@ export default function PermissionTree({
     return list;
   }, [treeData]);
 
-  useEffect(() => {
-    fetchTree();
-  }, []);
-
   if (loading) {
     return <Spin />;
   }
@@ -82,6 +80,7 @@ export default function PermissionTree({
         onCheck={onCheck}
         defaultExpandParent
         defaultExpandedKeys={defaultExpandedKeys}
+        defaultCheckedKeys={defaultCheckedKeys}
       />
     </PermissionTreeWrapper>
   )

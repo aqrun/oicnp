@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 import type { BaseState } from '@/stores/types';
-import { RoleModel } from '@/services';
+import { RoleModel, PermissionModel } from '@/services';
 
 export interface BaseEditState {
   visible?: boolean;
@@ -12,6 +12,7 @@ export interface BaseEditState {
   contentType?: string;
   roleId: number;
   role: RoleModel | undefined;
+  rolePermissions: Array<PermissionModel>;
 };
 
 export type EditState = BaseEditState & BaseState<BaseEditState>;
@@ -24,6 +25,7 @@ export const useEditStore = create<EditState>()((set) => ({
   roleId: 0,
   role: undefined,
   contentType: '',
+  rolePermissions: [],
   setState: (payload) => set((state) => {
     return {
       ...state,

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Form } from 'antd';
 import { Modal } from '@/components';
 import RoleForm from '../RoleForm';
@@ -6,6 +6,9 @@ import { useCreateStore } from './useCreateStore';
 import { useMemoizedFn } from 'ahooks';
 import CreateSuccess from './CreateSuccess';
 import { useListStore } from '../RoleList/useListStore';
+import {
+  usePermissionTree,
+} from '@/components/PermissionTree'
 import {
   RoleModel,
   DescribeCreateRole,
@@ -24,6 +27,10 @@ export default function CreateModal() {
   const [loading, setLoading] = useState(false);
 
   const [form] = Form.useForm<RoleModel>();
+
+  const {
+    fetchPermissionTree,
+  } = usePermissionTree();
 
   const handleOk = useMemoizedFn(async () => {
     setLoading(true);
@@ -67,6 +74,10 @@ export default function CreateModal() {
     });
   });
 
+  const fetchInitialData = useMemoizedFn(async () => {
+    await fetchPermissionTree();
+  });
+
   let content = (
     <RoleForm
       form={form}
@@ -81,6 +92,12 @@ export default function CreateModal() {
       />
     );
   }
+
+  useEffect(() => {
+    if (visible) {
+      fetchInitialData();
+    }
+  }, [visible]);
 
   return (
     <Modal

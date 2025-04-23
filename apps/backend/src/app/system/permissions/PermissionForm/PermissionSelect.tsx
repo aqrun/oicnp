@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef } from 'react';
 import { Form, TreeSelect, TreeSelectProps } from 'antd';
-import useFetchPermissionTree from './useFetchPermissionTree';
+import usePermissionTree from '@/components/PermissionTree/usePermissionTree';
 import { PermissionModel } from '@/services';
 
 type TreeItem = NonNullable<TreeSelectProps['treeData']>[number];
@@ -15,8 +15,7 @@ export default function PermissionSelect(): JSX.Element {
   const {
     treeData,
     loading,
-    fetchTree,
-  } = useFetchPermissionTree();
+  } = usePermissionTree();
 
   const validTreeData = useMemo(() => {
     const list = treeData?.map((item) => {
@@ -49,10 +48,6 @@ export default function PermissionSelect(): JSX.Element {
 
     return list;
   }, [treeData]);
-
-  useEffect(() => {
-    fetchTree();
-  }, []);
 
   return (
     <div ref={ref}>

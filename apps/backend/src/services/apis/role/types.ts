@@ -2,6 +2,9 @@ import {
   BaseFilterParams,
   BaseListResponseData,
 } from '../../types';
+import {
+  PermissionModel,
+} from '../permission/types';
 
 export interface RoleModel {
   roleId?: number;
@@ -52,3 +55,11 @@ export type DescribeUpdateRoleRequestParams = DescribeCreateRoleRequestParams;
 export type DescribeUpdateRoleResponseData = DescribeCreateRoleResponseData;
 export type DescribeDeleteRoleRequestParams = DescribeCreateRoleRequestParams;
 export type DescribeDeleteRoleResponseData = DescribeCreateRoleResponseData;
+
+export interface DescribeRolePermissionsRequestParams {
+  roleId: number;
+}
+
+export interface DescribeRolePermissionsResponseData {
+  permissions: Array<PermissionModel>;
+}

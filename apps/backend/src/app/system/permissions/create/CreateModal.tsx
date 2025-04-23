@@ -11,6 +11,9 @@ import {
   DescribeCreatePermission,
   DescribeCreatePermissionRequestParams,
 } from '@/services';
+import {
+  usePermissionTree,
+} from '@/components/PermissionTree';
 
 /**
  * 创建弹框
@@ -24,6 +27,10 @@ export default function CreateModal() {
   const [loading, setLoading] = useState(false);
 
   const [form] = Form.useForm<PermissionModel>();
+
+  const {
+    fetchPermissionTree,
+  } = usePermissionTree();
 
   const handleOk = useMemoizedFn(async () => {
     setLoading(true);
@@ -83,6 +90,8 @@ export default function CreateModal() {
   }
 
   const init = useMemoizedFn(() => {
+    fetchPermissionTree();
+
     if (initPid) {
       form.setFieldValue('pid', initPid);
     } else {

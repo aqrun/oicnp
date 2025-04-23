@@ -5,14 +5,19 @@ import RoleForm from '../RoleForm';
 import { useEditStore } from './useEditStore';
 import { useMemoizedFn } from 'ahooks';
 import Success from './Success';
-import { nextTick } from '@/utils/fn';
 import { useListStore } from '../RoleList/useListStore';
+import {
+  usePermissionTree,
+} from '@/components/PermissionTree';
 import {
   RoleModel,
   DescribeRoleDetail,
   DescribeRoleDetailRequestParams,
   DescribeUpdateRole,
   DescribeUpdateRoleRequestParams,
+  DescribeRolePermissions,
+  DescribeRolePermissionsRequestParams,
+  PermissionModel,
 } from '@/services';
 
 /**
@@ -23,6 +28,7 @@ export default function EditModal() {
   const contentType = useEditStore(state => state.contentType);
   const roleId = useEditStore(state => state.roleId);
   const role = useEditStore(state => state.role);
+  const rolePermissions = useEditStore(state => state.rolePermissions);
   const setState = useEditStore(state => state.setState);
   const setListState = useListStore(state => state.setState);
 
@@ -31,8 +37,11 @@ export default function EditModal() {
 
   const [form] = Form.useForm<RoleModel>();
 
+  const {
+    fetchPermissionTree,
+  } = usePermissionTree();
+
   const fetchRole = useMemoizedFn(async () => {
-    setInitLoading(true);
     const params: DescribeRoleDetailRequestParams = {
       roleId,
     };
@@ -49,8 +58,17 @@ export default function EditModal() {
       weight: res?.role?.weight,
       status: res?.role?.status,
     });
+  });
 
-    setInitLoading(false);
+  const fetchRolePermissions = useMemoizedFn(async () => {
+    const params: DescribeRolePermissionsRequestParams = {
+      roleId,
+    };
+    const res = await DescribeRolePermissions(params);
+    setState({
+      rolePermissions: res?.permissions,
+    });
+    return res?.permissions;
   });
 
   const handleOk = useMemoizedFn(async () => {
@@ -113,15 +131,33 @@ export default function EditModal() {
           form={form}
           loading={loading}
           role={role}
+          rolePermissions={rolePermissions}
         />
       );
     }
   };
   const content = getContent();
 
+  const fetchInitialData = useMemoizedFn(async () => {
+    setInitLoading(true);
+    const requests = [
+      fetchPermissionTree(),
+      fetchRole(),
+      fetchRolePermissions(),
+    ];
+    const allRes = await Promise.all(requests);
+
+    // 更新表单值
+    const permissions = (allRes?.[2] || []) as Array<PermissionModel>;
+    const ids = permissions?.map((item) => item.permissionId) as Array<React.Key>;
+    form.setFieldValue('permissionIds', ids);
+    
+    setInitLoading(false);
+  });
+
   useEffect(() => {
     if (visible) {
-      fetchRole();
+      fetchInitialData();
     }
   }, [visible]);
 

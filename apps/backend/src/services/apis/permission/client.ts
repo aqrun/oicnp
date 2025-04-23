@@ -45,3 +45,4 @@ export const DescribeUpdatePermission = createService<
 DescribeUpdatePermissionRequestParams,
 DescribeUpdatePermissionResponseData
 >('/permission/update', 'post');
+

@@ -13,6 +13,9 @@ import {
   DescribeUpdatePermission,
   DescribeUpdatePermissionRequestParams,
 } from '@/services';
+import {
+  usePermissionTree,
+} from '@/components/PermissionTree';
 
 /**
  * 更新弹框
@@ -29,6 +32,10 @@ export default function EditModal() {
   const [initLoading, setInitLoading] = useState(true);
 
   const [form] = Form.useForm<PermissionModel>();
+
+  const {
+    fetchPermissionTree,
+  } = usePermissionTree();
 
   const fetchRole = useMemoizedFn(async () => {
     setInitLoading(true);
@@ -121,6 +128,7 @@ export default function EditModal() {
 
   useEffect(() => {
     if (visible) {
+      fetchPermissionTree();
       fetchRole();
     }
   }, [visible]);

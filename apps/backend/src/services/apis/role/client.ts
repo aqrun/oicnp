@@ -12,6 +12,8 @@ import {
   DescribeCreateRoleResponseData,
   DescribeUpdateRoleRequestParams,
   DescribeUpdateRoleResponseData,
+  DescribeRolePermissionsRequestParams,
+  DescribeRolePermissionsResponseData,
 } from './types';
 
 export const DescribeRoleList = createService<
@@ -38,3 +40,8 @@ export const DescribeUpdateRole = createService<
 DescribeUpdateRoleRequestParams,
 DescribeUpdateRoleResponseData
 >('/role/update', 'post');
+
+export const DescribeRolePermissions = createService<
+DescribeRolePermissionsRequestParams,
+DescribeRolePermissionsResponseData
+>('/role/permissions', 'post');

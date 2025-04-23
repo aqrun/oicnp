@@ -1,9 +1,10 @@
 'use client';
 
+import { useMemo } from 'react';
 import { Button, Form, Input, FormInstance, Radio } from 'antd';
-import type { FormProps, TreeProps } from 'antd';
-import { RoleModel } from '@/services';
-import PermissionTree from '../../permissions/PermissionForm/PermissionTree';
+import type { FormProps } from 'antd';
+import { RoleModel, PermissionModel } from '@/services';
+import { PermissionTree } from '@/components/PermissionTree';
 import { useMemoizedFn } from 'ahooks';
 import { Container } from './index.styled';
 
@@ -17,6 +18,7 @@ export interface RoleFormProps {
   showSubmit?: boolean;
   form?: FormInstance<RoleModel>;
   disabled?: boolean;
+  rolePermissions?: Array<PermissionModel>;
 }
 
 export default function RoleForm({
@@ -27,6 +29,7 @@ export default function RoleForm({
   showSubmit,
   form,
   disabled,
+  rolePermissions,
 }: RoleFormProps): JSX.Element {
 
   const initialValues: FieldType = {
@@ -42,6 +45,10 @@ export default function RoleForm({
     { value: '1', label: '启用'},
     { value: '0', label: '停用'}
   ];
+
+  const checkedPermissionsIds = useMemo(() => {
+    return (rolePermissions || [])?.map((item) => item.permissionId) as Array<React.Key>;
+  }, [rolePermissions]);
 
   const handleTreeCheck = useMemoizedFn((checkedKeys: Array<string>, info: any) => {
     form?.setFieldsValue({
@@ -103,6 +110,7 @@ export default function RoleForm({
         >
           <PermissionTree
             onCheck={handleTreeCheck as any}
+            defaultCheckedKeys={checkedPermissionsIds}
           />
         </Form.Item>
 
