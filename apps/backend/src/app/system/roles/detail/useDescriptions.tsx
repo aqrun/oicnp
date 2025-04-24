@@ -4,20 +4,15 @@ import { useViewStore } from './useViewStore';
 import { formatDate } from '@/utils';
 import {
   PermissionTree,
-  usePermissionTree,
 } from '@/components/PermissionTree';
 
 export default function useDescriptions() {
   const role = useViewStore(state => state.role);
   const rolePermissions = useViewStore(state => state.rolePermissions);
 
-  const {
-    treeData,
-  } = usePermissionTree();
-
-  const permissionTreeData = useMemo(() => {
-    
-  }, [treeData, rolePermissions]);
+  const permissionIds = useMemo(() => {
+    return rolePermissions.map(item => item.permissionId) as Array<React.Key>;
+  }, [rolePermissions]);
 
   const items: DescriptionsProps['items'] = [
     {
@@ -57,7 +52,7 @@ export default function useDescriptions() {
       label: '权限列表',
       children: (
         <PermissionTree
-
+          checkedKeys={permissionIds}
         />
       ),
       span: 12,

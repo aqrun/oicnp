@@ -2,7 +2,9 @@
 
 import { useMemo, useRef } from 'react';
 import { Tree, TreeProps, Spin } from 'antd';
+import { useMemoizedFn } from 'ahooks';
 import usePermissionTree from './usePermissionTree';
+import { callFn } from '@/utils';
 import {
   PermissionTreeWrapper,
 } from './index.styled';
@@ -11,7 +13,8 @@ type TreeItem = NonNullable<TreeProps['treeData']>[number];
 
 export interface PermissionTreeProps {
   onCheck?: TreeProps['onCheck'];
-  defaultCheckedKeys?: Array<React.Key>;
+  checkedKeys?: Array<React.Key>;
+  onCheckChange?: (keys: Array<React.Key>) => void;
 }
 
 /**
@@ -19,13 +22,16 @@ export interface PermissionTreeProps {
  */
 export default function PermissionTree({
   onCheck,
-  defaultCheckedKeys,
+  checkedKeys: paramCheckedKeys,
+  onCheckChange,
 }: PermissionTreeProps): JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
 
   const {
     treeData,
     loading,
+    checkedKeys,
+    setState,
   } = usePermissionTree();
 
   const validTreeData = useMemo(() => {
@@ -60,6 +66,14 @@ export default function PermissionTree({
     return list;
   }, [treeData]);
 
+  const handleCheck: TreeProps['onCheck'] = useMemoizedFn((keys: Array<React.Key>) => {
+    setState({
+      checkedKeys: keys,
+    });
+
+    callFn(onCheckChange, keys);
+  }) as any;
+
   const defaultExpandedKeys = useMemo(() => {
     const list = treeData?.map((item) => {
       return item.id;
@@ -73,14 +87,14 @@ export default function PermissionTree({
   }
 
   return (
-    <PermissionTreeWrapper ref={ref} className="rounded-sm border border-gray-200 p-2">
+    <PermissionTreeWrapper ref={ref} className="rounded-sm border border-gray-200 p-2 w-full">
       <Tree
         checkable
         treeData={validTreeData}
-        onCheck={onCheck}
+        onCheck={onCheck || handleCheck}
         defaultExpandParent
         defaultExpandedKeys={defaultExpandedKeys}
-        defaultCheckedKeys={defaultCheckedKeys}
+        checkedKeys={paramCheckedKeys || checkedKeys}
       />
     </PermissionTreeWrapper>
   )

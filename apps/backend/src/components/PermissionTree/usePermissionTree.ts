@@ -11,6 +11,7 @@ import { usePermissionTreeStore } from './usePermissionTreeStore';
 export default function usePermissionTree() {
   const treeData = usePermissionTreeStore(state => state.treeData);
   const loading = usePermissionTreeStore(state => state.loading);
+  const checkedKeys = usePermissionTreeStore(state => state.checkedKeys);
   const setState = usePermissionTreeStore(state => state.setState);
 
   const fetchPermissionTree = useMemoizedFn(async () => {
@@ -30,5 +31,7 @@ export default function usePermissionTree() {
     treeData,
     fetchPermissionTree,
     loading,
+    checkedKeys,
+    setState,
   };
 }

@@ -8,6 +8,7 @@ import Success from './Success';
 import { useListStore } from '../RoleList/useListStore';
 import {
   usePermissionTree,
+  usePermissionTreeStore,
 } from '@/components/PermissionTree';
 import {
   RoleModel,
@@ -31,6 +32,7 @@ export default function EditModal() {
   const rolePermissions = useEditStore(state => state.rolePermissions);
   const setState = useEditStore(state => state.setState);
   const setListState = useListStore(state => state.setState);
+  const setPermissionTreeState = usePermissionTreeStore(state => state.setState);
 
   const [loading, setLoading] = useState(false);
   const [initLoading, setInitLoading] = useState(true);
@@ -131,7 +133,6 @@ export default function EditModal() {
           form={form}
           loading={loading}
           role={role}
-          rolePermissions={rolePermissions}
         />
       );
     }
@@ -151,6 +152,9 @@ export default function EditModal() {
     const permissions = (allRes?.[2] || []) as Array<PermissionModel>;
     const ids = permissions?.map((item) => item.permissionId) as Array<React.Key>;
     form.setFieldValue('permissionIds', ids);
+    setPermissionTreeState({
+      checkedKeys: ids,
+    });
     
     setInitLoading(false);
   });

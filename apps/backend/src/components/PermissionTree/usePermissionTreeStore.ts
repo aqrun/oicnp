@@ -7,8 +7,9 @@ import {
 } from '@/services';
 
 export interface BaseTreeState {
-  treeData: PermissionTreeItem[];
+  treeData: PermissionTreeItem[] | undefined;
   loading: boolean;
+  checkedKeys: Array<React.Key> | undefined;
 }
 
 export type TreeState = BaseTreeState & BaseState<BaseTreeState>;
@@ -18,7 +19,8 @@ export type TreeState = BaseTreeState & BaseState<BaseTreeState>;
  */
 export const usePermissionTreeStore = create<TreeState>()((set) => ({
   loading: false,
-  treeData: [],
+  treeData: undefined,
+  checkedKeys: undefined,
   setState: (payload) => set((state) => {
     return {
       ...state,

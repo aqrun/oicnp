@@ -8,6 +8,7 @@ import CreateSuccess from './CreateSuccess';
 import { useListStore } from '../RoleList/useListStore';
 import {
   usePermissionTree,
+  usePermissionTreeStore,
 } from '@/components/PermissionTree'
 import {
   RoleModel,
@@ -23,6 +24,7 @@ export default function CreateModal() {
   const contentType = useCreateStore(state => state.contentType);
   const setState = useCreateStore(state => state.setState);
   const setListState = useListStore(state => state.setState);
+  const setPermissionTreeState = usePermissionTreeStore(state => state.setState);
 
   const [loading, setLoading] = useState(false);
 
@@ -75,6 +77,9 @@ export default function CreateModal() {
   });
 
   const fetchInitialData = useMemoizedFn(async () => {
+    setPermissionTreeState({
+      checkedKeys: undefined,
+    });
     await fetchPermissionTree();
   });
 
