@@ -1,12 +1,12 @@
 ---
 - vid: admin
   name: 管理员
-  weight: 0
+  weight: 1
   status: 1
   permissionVids: []
 - vid: author
   name: 作者
-  weight: 0
+  weight: 2
   status: 1
   permissionVids:
     - system
@@ -19,7 +19,7 @@
     - note-update
 - vid: member
   name: 成员
-  weight: 0
+  weight: 3
   status: 1
   permissionVids:
     - cms
@@ -27,6 +27,6 @@
     - note-list
 - vid: guest
   name: 游客
-  weight: 0
+  weight: 4
   status: 1
   permissionVids: []

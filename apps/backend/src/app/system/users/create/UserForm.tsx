@@ -1,12 +1,13 @@
 'use client';
 
 import React from 'react';
-import { Button, Form, Input, Checkbox } from 'antd';
+import { Button, Form, Input, Checkbox, Select } from 'antd';
 import type { FormProps } from 'antd';
 import {
   FieldType,
 } from '../types';
 import { UserModel } from '@/services';
+import { useCreateStore } from './useCreateStore';
 import {
   UserFormContainer,
 } from './index.styled';
@@ -16,6 +17,7 @@ export interface UserFormProps {
   isEdit?: boolean;
   user?: UserModel;
   loading?: boolean;
+  roleIds?: Array<number>;
 }
 
 export default function UserForm({
@@ -23,7 +25,10 @@ export default function UserForm({
   isEdit,
   user,
   loading,
+  roleIds,
 }: UserFormProps): JSX.Element {
+  const roleList = useCreateStore(state => state.roleList);
+
   let initialValues: Partial<FieldType> = {
     remember: true,
   };
@@ -35,6 +40,7 @@ export default function UserForm({
       email: user?.email,
       status: user?.status,
       isAdmin: user?.isAdmin,
+      roleIds: roleIds,
     };
   }
 
@@ -89,6 +95,26 @@ export default function UserForm({
           valuePropName="checked"
         >
           <Checkbox>超级管理员</Checkbox>
+        </Form.Item>
+        <Form.Item<FieldType>
+          name="roleIds"
+          label="角色"
+        >
+          <Select
+            mode="multiple"
+            allowClear
+          >
+            {roleList?.map((item) => {
+              return (
+                <Select.Option
+                  key={item.roleId}
+                  value={item.roleId}
+                >
+                  {item?.name}
+                </Select.Option>
+              );
+            })}
+          </Select>
         </Form.Item>
 
         <Form.Item label={null}>

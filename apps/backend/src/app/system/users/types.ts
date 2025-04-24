@@ -8,4 +8,5 @@ export type FieldType = {
   status?: string;
   isAdmin?: string;
   remember?: boolean;
+  roleIds?: Array<number>;
 };

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import type { FormProps } from 'antd';
 import {
   PageTitle,
@@ -11,16 +12,22 @@ import { r } from '@/utils';
 import {
   DescribeCreateUser,
   DescribeCreateUserRequestParams,
+  useFetchRoleList,
  } from '@/services';
  import { useFetchUser } from '@/hooks/apis';
  import UserForm from './UserForm';
+ import { useCreateStore } from './useCreateStore';
  import { FieldType } from '../types';
 
 export default function UserCreatePage() {
+  const setCreateState = useCreateStore(state => state.setState);
   const router = useRouter();
   const {
     fetchUserByUid,
   } = useFetchUser();
+  const {
+    fetchRoleList,
+  } = useFetchRoleList();
 
   const handleBack = useMemoizedFn(() => {
     router.push(r('/system/users'));
@@ -41,6 +48,17 @@ export default function UserCreatePage() {
       router.push(r(`/system/users/create/success?uuid=${user?.uuid}&nickname=${user?.nickname}`));
     }
   };
+
+  const fetchPageData = useMemoizedFn(async () => {
+    const res = await fetchRoleList();
+    setCreateState({
+      roleList: res?.roles || [],
+    });
+  });
+
+  useEffect(() => {
+    fetchPageData();
+  }, []);
 
   return (
     <Container>

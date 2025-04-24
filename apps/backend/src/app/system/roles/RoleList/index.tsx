@@ -29,7 +29,13 @@ export default function RoleList(): JSX.Element {
   const {data, loading, refresh} = useQueryRoleList();
 
   const getDataSource = () => {
-    return data?.roles || [];
+    const list = data?.roles || [];
+    list.sort((a, b) => {
+      const ia = a?.weight || 10000;
+      const ib = b?.weight || 10000;
+      return ia - ib;
+    });
+    return list;
   };
   const dataSource = getDataSource();
 

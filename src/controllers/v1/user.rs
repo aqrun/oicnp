@@ -100,6 +100,21 @@ pub async fn remove(
     JsonRes::from(res)
 }
 
+#[debug_handler]
+pub async fn get_roles(
+    State(ctx): State<AppContext>,
+    Json(params): Json<UserFilters>,
+) -> JsonRes<Vec<RoleModel>> {
+    let uid = params.uid.unwrap_or(0);
+
+    let roles = match UserModel::get_roles_by_uid(&ctx.db, uid).await {
+        Ok(data) => data,
+        Err(err) => return JsonRes::err(err),
+    };
+
+    JsonRes::from((roles, "roles"))
+}
+
 pub fn routes() -> Routes {
     Routes::new()
         .prefix(get_api_prefix(super::VERSION, "user").as_str())
@@ -109,4 +124,5 @@ pub fn routes() -> Routes {
         .add("/add-multi", post(add_multi))
         .add("/update", post(update))
         .add("/remove", post(remove))
+        .add("/roles", post(get_roles))
 }

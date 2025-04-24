@@ -87,6 +87,8 @@ pub struct UserReqParams {
     pub updated_at: Option<DateTime>,
     #[serde(rename(deserialize = "deletedAt"))]
     pub deleted_at: Option<DateTime>,
+    #[serde(rename(deserialize = "roleIds"))]
+    pub role_ids: Option<Vec<i64>>,
 }
 
 impl RequestParamsUpdater for UserReqParams {
@@ -144,6 +146,12 @@ impl RequestParamsUpdater for UserReqParams {
 
         if let Some(x) = &self.role_id {
             user.role_id = Set(*x);
+        }
+
+        if let Some(x) = &self.role_ids {
+            if let Some(y) = x.first() {
+                user.role_id = Set(*y);
+            }
         }
 
         if let Some(x) = &self.dpt_id {

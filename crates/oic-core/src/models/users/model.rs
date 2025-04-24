@@ -189,6 +189,14 @@ impl ModelCrudHandler for UserModel {
         // println!("test---{:?}", user.clone());
         let user = user.insert(db).await?;
 
+        let mut role_ids: Vec<i64> = Vec::new();
+
+        if let Some(x) = &params.role_ids {
+            role_ids = x.clone();
+        }
+
+        Self::assign_roles_to_user(db, user.uid, role_ids.as_slice()).await?;
+
         Ok(user.uid)
     }
 
@@ -207,6 +215,15 @@ impl ModelCrudHandler for UserModel {
         params.update(&mut user);
     
         let item = user.update(db).await?;
+
+        let mut role_ids: Vec<i64> = Vec::new();
+
+        if let Some(x) = &params.role_ids {
+            role_ids = x.clone();
+        }
+
+        Self::assign_roles_to_user(db, item.uid, role_ids.as_slice()).await?;
+
         Ok(item.uid)
     }
 
@@ -306,6 +323,36 @@ impl UserModel {
         }
 
         let _ = UserRoleMapEntity::insert_many(user_role_list).exec(db).await?;
+
+        Ok(())
+    }
+
+    /// 
+    /// 给用户指定角色
+    /// 
+    pub async fn assign_roles_to_user(
+        db: &DatabaseConnection,
+        user_id: i64,
+        role_ids: &[i64],
+    ) -> ModelResult<()> {
+        // 清除全部权限
+        let _ = UserRoleMapEntity::delete_many()
+            .filter(UserRoleMapColumn::Uid.eq(user_id))
+            .exec(db)
+            .await?;
+
+        let mut list: Vec<UserRoleMapActiveModel> = Vec::new();
+
+        for role_id in role_ids {
+            let user_role_map = UserRoleMapActiveModel {
+                uid: Set(user_id),
+                role_id: Set(*role_id),
+                ..Default::default()
+            };
+            list.push(user_role_map);
+        }
+
+        let _ = UserRoleMapEntity::insert_many(list).exec(db).await?;
 
         Ok(())
     }
@@ -476,6 +523,19 @@ impl UserModel {
     /// when could not convert user claims to jwt token
     pub fn generate_jwt(&self, secret: &str, expiration: &u64) -> ModelResult<String> {
         Ok(JWT::new(secret).generate_token(expiration, self.uid, self.uuid.as_str(), None)?)
+    }
+
+    ///
+    /// 根据用户ID获取角色列表
+    /// 
+    pub async fn get_roles_by_uid(db: &DatabaseConnection, uid: i64) -> ModelResult<Vec<RoleModel>> {
+        let list = RoleEntity::find()
+            .left_join(UserRoleMapEntity)
+            .filter(UserRoleMapColumn::Uid.eq(uid))
+            .all(db)
+            .await?;
+
+        Ok(list)
     }
 }
 

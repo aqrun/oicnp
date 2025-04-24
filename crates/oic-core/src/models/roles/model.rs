@@ -85,7 +85,13 @@ impl ModelCrudHandler for RoleModel {
         // 分页获取数据
         let pager = q.order_by(order_by, order)
             .paginate(db, page_size);
-        let list = pager.fetch_page(page - 1).await?;
+        let mut list = pager.fetch_page(page - 1).await?;
+
+        list.sort_by(|a, b| {
+            let ia = if a.weight == 0 { 10000 } else { a.weight };
+            let ib = if b.weight == 0 { 10000 } else { b.weight };
+            ia.cmp(&ib)
+        });
 
         Ok((list, total))
     }

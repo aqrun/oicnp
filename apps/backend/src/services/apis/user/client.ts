@@ -12,6 +12,8 @@ import {
   DescribeCreateUserResponseData,
   DescribeUpdateUserRequestParams,
   DescribeUpdateUserResponseData,
+  DescribeUserRolesRequestParams,
+  DescribeUserRolesResponseData,
 } from './types';
 
 
@@ -39,3 +41,8 @@ export const DescribeUpdateUser = createService<
 DescribeUpdateUserRequestParams,
 DescribeUpdateUserResponseData
 >('/user/update', 'post');
+
+export const DescribeUserRoles = createService<
+DescribeUserRolesRequestParams,
+DescribeUserRolesResponseData
+>('/user/roles', 'post');

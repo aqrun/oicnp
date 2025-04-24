@@ -2,6 +2,7 @@ import {
   BaseFilterParams,
   BaseListResponseData,
 } from '../../types';
+import { RoleModel } from '../role/types';
 
 export interface UserModel {
   uid?: string;
@@ -109,3 +110,11 @@ export type DescribeUpdateUserRequestParams = DescribeCreateUserRequestParams;
 export type DescribeUpdateUserResponseData = DescribeCreateUserResponseData;
 export type DescribeDeleteUserRequestParams = DescribeCreateUserRequestParams;
 export type DescribeDeleteUserResponseData = DescribeCreateUserResponseData;
+
+export interface DescribeUserRolesRequestParams {
+  uid?: number | string;
+}
+
+export interface DescribeUserRolesResponseData {
+  roles: Array<RoleModel>;
+}
