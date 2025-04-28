@@ -1,16 +1,18 @@
 'use client';
 
+import { useState } from 'react';
 import { useMemoizedFn } from 'ahooks';
-import { Button, Divider, Modal } from 'antd';
+import { Divider } from 'antd';
+import { Actions, LinkButton } from '@/components';
 import {
   MenuModel,
   DescribeDeleteMenu,
   DescribeDeleteMenuRequestParams,
 } from '@/services';
-import { useMenuStore } from './useMenuStore';
-import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import { r } from '@/utils';
+import { useListStore } from './useListStore';
+import { useViewStore } from '../view/useViewStore';
+import { useEditStore } from '../edit/useEditStore';
+import { useConfirmDelete } from '@/hooks/modals';
 import { TableActionContainer } from '@/styles/app.styled';
 
 export interface TableActionsProps {
@@ -20,48 +22,48 @@ export interface TableActionsProps {
 export default function TableActions({
   record,
 }: TableActionsProps): JSX.Element {
-  const router = useRouter();
-  const setState = useMenuStore((state) => state.setState);
+  const confirmDelete = useConfirmDelete();
+  const setState = useListStore((state) => state.setState);
+  const setViewState = useViewStore(state => state.setState);
+  const setEditState = useEditStore(state => state.setState);
 
-  const m = useMutation({
-    mutationFn: (params: DescribeDeleteMenuRequestParams) => {
-      return DescribeDeleteMenu(params);
-    },
+  const [delLoading, setDelLoading] = useState(false);
+
+  const deletePermission = useMemoizedFn(async () => {
+    setDelLoading(true);
+    const params: DescribeDeleteMenuRequestParams = {
+      id: record?.id,
+    };
+    // 删除
+    await DescribeDeleteMenu(params);
+    // 更新列表
+    setState({
+      refreshToken: Date.now().toString(),
+    });
+    setDelLoading(false);
   });
 
-  const deleteUser = m.mutateAsync;
-  const deleteLoading = m.status === 'pending';
-
   const handleDelete = useMemoizedFn(() => {
-    Modal.confirm({
+    confirmDelete({
       title: '删除菜单',
       content: `确定删除菜单: ${record?.name}?`,
-      okText: '删除',
-      okType: 'danger',
-      type: 'warning',
-      okButtonProps: {
-        loading: deleteLoading,
-      },
-      onOk: async () => {
-        const params: DescribeDeleteMenuRequestParams = {
-          id: record?.id,
-        };
-        // 删除用户
-        await deleteUser(params);
-        // 更新列表
-        setState({
-          refreshToken: Date.now().toString(),
-        });
-      }
+      onOk: deletePermission,
+      loading: delLoading,
     });
   });
 
   const handleView = useMemoizedFn(() => {
-    router.push(r(`/system/menus/detail?id=${record?.id}`));
+    setViewState({
+      visible: true,
+      menuId: record?.id,
+    });
   });
 
   const handleEdit = useMemoizedFn(() => {
-    router.push(r(`/system/menus/edit?id=${record?.id}`));
+    setEditState({
+      visible: true,
+      menuId: record?.id,
+    });
   });
 
   return (
@@ -69,33 +71,27 @@ export default function TableActions({
       split={<Divider type="vertical" />}
       size="small"
     >
-      <Button
-        type="text"
-        size="small"
-        color="primary"
-        variant="link"
-        onClick={handleView}
-      >
-        查看
-      </Button>
-      <Button
-        type="text"
-        size="small"
-        color="primary"
-        variant="link"
-        onClick={handleEdit}
-      >
-        编辑
-      </Button>
-      <Button
-        type="text"
-        size="small"
-        color="danger"
-        variant="link"
-        onClick={handleDelete}
-      >
-        删除
-      </Button>
+      <Actions threshold={3} >
+        <LinkButton
+          key="view"
+          onClick={handleView}
+        >
+          查看
+        </LinkButton>
+        <LinkButton
+          key="edit"
+          onClick={handleEdit}
+        >
+          编辑
+        </LinkButton>
+        <LinkButton
+          key="delete"
+          danger
+          onClick={handleDelete}
+        >
+          删除
+        </LinkButton>
+      </Actions>
     </TableActionContainer>
   );
 }

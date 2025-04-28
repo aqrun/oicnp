@@ -13,7 +13,7 @@ export type MenuState = BaseMenuState & BaseState<BaseMenuState>;
 /**
  *  筛选数据
  */
-export const useMenuStore = create<MenuState>()((set) => ({
+export const useListStore = create<MenuState>()((set) => ({
   pager: {
     page: 1,
     pageSize: 1000,

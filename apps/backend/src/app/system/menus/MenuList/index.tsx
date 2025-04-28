@@ -11,7 +11,7 @@ import { useMemoizedFn } from 'ahooks';
 import { FilterValues, EnumFilterTrigger } from '@/types';
 import useColumns from './useColumns';
 import { MenuModel } from '@/services';
-import { useMenuStore } from './useMenuStore';
+import { useListStore } from './useListStore';
 import {
   nextTick, r,
   convertMenuListToTree,
@@ -24,9 +24,9 @@ import { Container } from './index.styled';
  */
 export default function MenuList(): JSX.Element {
   const router = useRouter();
-  const pager = useMenuStore((state) => state.pager);
-  const setState = useMenuStore((state) => state.setState);
-  const refreshToken = useMenuStore((state) => state.refreshToken);
+  const pager = useListStore((state) => state.pager);
+  const setState = useListStore((state) => state.setState);
+  const refreshToken = useListStore((state) => state.refreshToken);
   const columns = useColumns();
 
   /**
@@ -51,7 +51,7 @@ export default function MenuList(): JSX.Element {
     }
 
     if (expand) {
-      const ids: Array<string> = [];
+      const ids: Array<number> = [];
 
       dataSource.forEach((m) => {
         ids.push(m.id);

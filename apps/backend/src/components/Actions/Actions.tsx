@@ -43,19 +43,21 @@ export default function Actions({
         size="small"
       >
         {list.slice(0, threshold)}
-        <Dropdown
-          menu={{
-            items: menuItems,
-          }}
-          placement="bottomRight"
-          overlayClassName="oic-actions-dropdown-overlay"
-        >
-          <a>
-            <Icon
-              icon="MoreOutlined"
-            />
-          </a>
-        </Dropdown>
+        {menuItems?.length > 0 && (
+          <Dropdown
+            menu={{
+              items: menuItems,
+            }}
+            placement="bottomRight"
+            overlayClassName="oic-actions-dropdown-overlay"
+          >
+            <a>
+              <Icon
+                icon="MoreOutlined"
+              />
+            </a>
+          </Dropdown>
+        )}
       </Space>
     </Container>
   );

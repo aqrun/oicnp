@@ -5,13 +5,13 @@ import {
   DescribeMenuListRequestParams,
 } from '@/services';
 import { useQuery } from '@tanstack/react-query';
-import { useMenuStore } from './useMenuStore';
+import { useListStore } from './useListStore';
 import { useMemoizedFn } from 'ahooks';
 
 export function useQueryMenuList() {
-  const filters = useMenuStore((state) => state.filters);
-  const pager = useMenuStore((state) => state.pager);
-  const setState = useMenuStore((state) => state.setState);
+  const filters = useListStore((state) => state.filters);
+  const pager = useListStore((state) => state.pager);
+  const setState = useListStore((state) => state.setState);
 
   const { isFetching, data, refetch } = useQuery({
     queryKey: ['menuList'],

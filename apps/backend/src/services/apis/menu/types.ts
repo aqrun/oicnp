@@ -5,14 +5,14 @@ import {
 } from '../../types';
 
 export interface MenuModel {
-  id: string;
+  id: number;
   vid?: string;
-  pid?: string;
+  pid?: number;
   parentVid?: string;
   path?: string;
   name?: string;
   icon?: string;
-  weight?: string;
+  weight?: number;
   api?: string;
   status?: string;
   visible?: string;
@@ -20,14 +20,14 @@ export interface MenuModel {
   isFrame?: string;
   remark?: string;
   /// 指定权限
-  permissionVids?: Array<string>;
+  permissionVids?: Array<number>;
   createdAt?: string;
   updateAt?: string;
   deletedAt?: string;
   children?: Array<MenuModel>;
 }
 
-export interface DescribeMenuDetailRequestParams {
+export interface DescribeMenuDetailRequestParams extends Partial<MenuModel> {
   _name?: string;
 }
 export interface DescribeMenuDetailResponseData {
@@ -44,7 +44,7 @@ export interface DescribeMenuListResponseData extends BaseListResponseData {
   _name?: string;
 }
 
-export interface DescribeCreateMenuRequestParams extends MenuModel {
+export interface DescribeCreateMenuRequestParams extends Partial<MenuModel> {
   _name?: string;
 }
 
