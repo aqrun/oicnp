@@ -16,7 +16,13 @@ export const Container = styled.div`
 `;
 
 export const LinkButtonWrapper = styled.a`
-  
+  &.oic-danger {
+    color: var(--ant-color-danger, #ff4d4f);
+
+    &:hover {
+      color: #f5222d;
+    }
+  }
 `;
 
 export const DropdownItemWrapper = styled.div`
