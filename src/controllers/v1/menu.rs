@@ -112,10 +112,25 @@ pub async fn remove(
     JsonRes::from(res)
 }
 
+#[debug_handler]
+pub async fn get_permissions(
+    State(ctx): State<AppContext>,
+    Json(params): Json<MenuFilters>,
+) -> JsonRes<Vec<PermissionModel>> {
+    let menu_id = params.id.unwrap_or(0);
+    let permissions = match MenuModel::get_permissions_by_menu_id(&ctx.db, menu_id).await {
+        Ok(data) => data,
+        Err(err) => return JsonRes::err(err),
+    };
+
+    JsonRes::from((permissions, "permissions"))
+}
+
 pub fn routes() -> Routes {
     Routes::new()
         .prefix(get_api_prefix(super::VERSION, "menu").as_str())
         .add("/one", post(get_one))
+        .add("/permissions", post(get_permissions))
         .add("/list", post(list))
         .add("/tree", post(get_tree))
         .add("/add", post(add))

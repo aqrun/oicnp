@@ -3,7 +3,7 @@
 import { useMemo, useRef } from 'react';
 import { Form, TreeSelect, TreeSelectProps } from 'antd';
 import usePermissionTree from '@/components/PermissionTree/usePermissionTree';
-import { PermissionModel } from '@/services';
+import { MenuModel } from '@/services';
 
 type TreeItem = NonNullable<TreeSelectProps['treeData']>[number];
 
@@ -51,9 +51,9 @@ export default function PermissionSelect(): JSX.Element {
 
   return (
     <div ref={ref}>
-      <Form.Item<PermissionModel>
-        label="父级权限"
-        name="pid"
+      <Form.Item<MenuModel>
+        label="指定权限"
+        name="permissionIds"
       >
         <TreeSelect
           showSearch
@@ -61,9 +61,10 @@ export default function PermissionSelect(): JSX.Element {
           allowClear
           treeData={validTreeData}
           loading={loading}
-          // treeDefaultExpandAll
           listHeight={200}
           getPopupContainer={() => ref.current || document.body}
+          multiple
+          treeDefaultExpandAll={false}
         />
       </Form.Item>
     </div>

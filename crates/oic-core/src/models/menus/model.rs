@@ -231,9 +231,17 @@ impl ModelCrudHandler for MenuModel {
         params.update(&mut item);
         params.update_by_create(&mut item);
     
-        let item = item.insert(db).await?;
+        let menu = item.insert(db).await?;
 
-        Ok(item.id)
+        let mut permission_ids: Vec<i64> = Vec::new();
+
+        if let Some(x) = &params.permission_ids {
+            permission_ids = x.clone();
+        }
+
+        Self::assign_permissions_to_menu(db, menu.id, permission_ids.as_slice()).await?;
+
+        Ok(menu.id)
     }
 
     /// 更新数据
@@ -252,9 +260,17 @@ impl ModelCrudHandler for MenuModel {
         params.update(&mut item);
         item.updated_at = Set(Some(utc_now()));
     
-        let item = item.update(db).await?;
+        let menu = item.update(db).await?;
 
-        Ok(item.id)
+        let mut permission_ids: Vec<i64> = Vec::new();
+
+        if let Some(x) = &params.permission_ids {
+            permission_ids = x.clone();
+        }
+
+        Self::assign_permissions_to_menu(db, menu.id, permission_ids.as_slice()).await?;
+
+        Ok(menu.id)
     }
 
     /// 删除数据
@@ -406,5 +422,48 @@ impl MenuModel {
         let _ = MenuPermissionsMapEntity::insert_many(menu_permissions_list).exec(db).await?;
 
         Ok(())
+    }
+
+    /// 
+    /// 给指定菜单指定权限
+    /// 
+    pub async fn assign_permissions_to_menu(
+        db: &DatabaseConnection,
+        menu_id: i64,
+        permission_ids: &[i64],
+    ) -> ModelResult<()> {
+        // 清除全部权限
+        let _ = MenuPermissionsMapEntity::delete_many()
+            .filter(MenuPermissionsMapColumn::MenuId.eq(menu_id))
+            .exec(db)
+            .await?;
+
+        let mut list: Vec<MenuPermissionsMapActiveModel> = Vec::new();
+
+        for permission_id in permission_ids {
+            let menu_permission_map = MenuPermissionsMapActiveModel {
+                menu_id: Set(menu_id),
+                permission_id: Set(*permission_id),
+                ..Default::default()
+            };
+            list.push(menu_permission_map);
+        }
+
+        let _ = MenuPermissionsMapEntity::insert_many(list).exec(db).await?;
+
+        Ok(())
+    }
+
+    ///
+    /// 根据菜单ID获取权限列表
+    /// 
+    pub async fn get_permissions_by_menu_id(db: &DatabaseConnection, menu_id: i64) -> ModelResult<Vec<PermissionModel>> {
+        let list = PermissionEntity::find()
+            .left_join(MenuPermissionsMapEntity)
+            .filter(MenuPermissionsMapColumn::MenuId.eq(menu_id))
+            .all(db)
+            .await?;
+
+        Ok(list)
     }
 }

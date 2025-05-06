@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { Table } from 'antd';
-import { useRouter } from 'next/navigation';
 import {
   PageTitle,
   Filters,
@@ -12,8 +11,9 @@ import { FilterValues, EnumFilterTrigger } from '@/types';
 import useColumns from './useColumns';
 import { MenuModel } from '@/services';
 import { useListStore } from './useListStore';
+import { useCreateStore } from '../create/useCreateStore';
 import {
-  nextTick, r,
+  nextTick,
   convertMenuListToTree,
 } from '@/utils';
 import { useQueryMenuList } from './useQueryMenuList';
@@ -23,10 +23,10 @@ import { Container } from './index.styled';
  * 菜单列表
  */
 export default function MenuList(): JSX.Element {
-  const router = useRouter();
   const pager = useListStore((state) => state.pager);
   const setState = useListStore((state) => state.setState);
   const refreshToken = useListStore((state) => state.refreshToken);
+  const setCreateState = useCreateStore(state => state.setState);
   const columns = useColumns();
 
   /**
@@ -69,7 +69,9 @@ export default function MenuList(): JSX.Element {
    * 创建操作
    */
   const handleCreate = useMemoizedFn(() => {
-    router.push(r('/system/menus/create'));
+    setCreateState({
+      visible: true,
+    });
   });
 
   const handleRefresh = useMemoizedFn(() => {

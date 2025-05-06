@@ -11,6 +11,8 @@ import {
   RoleModel,
   DescribeMenuDetail,
   DescribeMenuDetailRequestParams,
+  DescribeMenuPermissions,
+  DescribeMenuPermissionsRequestParams,
 } from '@/services';
 
 /**
@@ -38,7 +40,7 @@ export default function ViewModal() {
     });
   });
 
-  const fetchRole = useMemoizedFn(async () => {
+  const fetchMenu = useMemoizedFn(async () => {
     const params: DescribeMenuDetailRequestParams = {
       id: menuId,
     };
@@ -47,15 +49,26 @@ export default function ViewModal() {
     return res;
   });
 
+  const fetchMenuPermissions = useMemoizedFn(async () => {
+    const params: DescribeMenuPermissionsRequestParams = {
+      id: menuId || 0,
+    };
+    const res = await DescribeMenuPermissions(params);
+    return res;
+  });
+
   const fetchInitialData = useMemoizedFn(async () => {
     setLoading(true);
     const requests: Array<Promise<any>> = [
-      fetchRole(),
+      fetchPermissionTree(),
+      fetchMenuPermissions(),
+      fetchMenu(),
     ];
     const allRes = await Promise.all(requests);
 
     setState({
-      menu: allRes?.[0]?.menu,
+      menu: allRes?.[2]?.menu,
+      menuPermissions: allRes?.[1]?.permissions,
     });
     setLoading(false);
   });

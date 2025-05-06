@@ -3,7 +3,7 @@
 import { Button, Form, Input, FormInstance, Radio } from 'antd';
 import type { FormProps } from 'antd';
 import { MenuModel } from '@/services';
-import { PermissionTree } from '@/components/PermissionTree';
+import PermissionSelect from './PermissionSelect';
 import { useMemoizedFn } from 'ahooks';
 import { Container } from './index.styled';
 
@@ -44,17 +44,17 @@ export default function MenuForm({
     { value: '0', label: '停用'}
   ];
 
-  const handleTreeCheck = useMemoizedFn((checkedKeys: Array<string>, info: any) => {
-    // form?.setFieldsValue({
-    //   permissionIds: checkedKeys,
-    // });
+  const handleTreeCheck = useMemoizedFn((checkedKeys: Array<React.Key>, info: any) => {
+    form?.setFieldsValue({
+      permissionIds: checkedKeys as Array<number>,
+    });
   });
 
   return (
     <Container>
       <Form
         name="basic"
-        wrapperCol={{ span: 10 }}
+        wrapperCol={{ span: 24 }}
         initialValues={initialValues}
         onFinish={onFinish}
         autoComplete="off"
@@ -66,6 +66,7 @@ export default function MenuForm({
           label="标识"
           name="vid"
           rules={[{ required: true, message: '请输入标识！' }]}
+          wrapperCol={{ span: 10 }}
         >
           <Input />
         </Form.Item>
@@ -73,12 +74,14 @@ export default function MenuForm({
           label="名称"
           name="name"
           rules={[{ required: true, message: '请输入角色名称！' }]}
+          wrapperCol={{ span: 10 }}
         >
           <Input />
         </Form.Item>
         <Form.Item<FieldType>
           label="排序"
           name="weight"
+          wrapperCol={{ span: 6 }}
         >
           <Input />
         </Form.Item>
@@ -96,16 +99,7 @@ export default function MenuForm({
         >
           <Input />
         </Form.Item>
-        {/* <Form.Item<FieldType>
-          name="permissionIds"
-          label="权限列表"
-          className="oic-permission-tree-form-item"
-          wrapperCol={{ span: 24 }}
-        >
-          <PermissionTree
-            onCheckChange={handleTreeCheck as any}
-          />
-        </Form.Item> */}
+        <PermissionSelect />
 
         {showSubmit && (
           <Form.Item label={null}>

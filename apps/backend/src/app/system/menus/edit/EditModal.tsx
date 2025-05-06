@@ -8,7 +8,6 @@ import Success from './Success';
 import { useListStore } from '../MenuList/useListStore';
 import {
   usePermissionTree,
-  usePermissionTreeStore,
 } from '@/components/PermissionTree';
 import {
   MenuModel,
@@ -16,6 +15,9 @@ import {
   DescribeMenuDetailRequestParams,
   DescribeUpdateMenu,
   DescribeUpdateMenuRequestParams,
+  DescribeMenuPermissions,
+  DescribeMenuPermissionsRequestParams,
+  PermissionModel,
 } from '@/services';
 
 /**
@@ -28,7 +30,6 @@ export default function EditModal() {
   const menu = useEditStore(state => state.menu);
   const setState = useEditStore(state => state.setState);
   const setListState = useListStore(state => state.setState);
-  const setPermissionTreeState = usePermissionTreeStore(state => state.setState);
 
   const [loading, setLoading] = useState(false);
   const [initLoading, setInitLoading] = useState(true);
@@ -58,6 +59,17 @@ export default function EditModal() {
     });
   });
 
+  const fetchMenuPermissions = useMemoizedFn(async () => {
+    const params: DescribeMenuPermissionsRequestParams = {
+      id: menuId,
+    };
+    const res = await DescribeMenuPermissions(params);
+    setState({
+      menuPermissions: res?.permissions,
+    });
+    return res?.permissions;
+  });
+
   const handleOk = useMemoizedFn(async () => {
     setLoading(true);
     try {
@@ -70,6 +82,7 @@ export default function EditModal() {
         weight: Number(values?.weight ?? 0),
         remark: values?.remark,
         status: values?.status,
+        permissionIds: values?.permissionIds,
       };
 
       const res = await DescribeUpdateMenu(params);
@@ -128,17 +141,15 @@ export default function EditModal() {
     const requests = [
       fetchPermissionTree(),
       fetchMenu(),
+      fetchMenuPermissions(),
     ];
     const allRes = await Promise.all(requests);
 
     // 更新表单值
-    // const permissions = (allRes?.[2] || []) as Array<PermissionModel>;
-    // const ids = permissions?.map((item) => item.permissionId) as Array<React.Key>;
-    // form.setFieldValue('permissionIds', ids);
-    // setPermissionTreeState({
-    //   checkedKeys: ids,
-    // });
-    
+    const permissions = (allRes?.[2] || []) as Array<PermissionModel>;
+    const ids = permissions?.map((item) => item.permissionId) as Array<React.Key>;
+    form.setFieldValue('permissionIds', ids);
+
     setInitLoading(false);
   });
 

@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 import type { BaseState } from '@/stores/types';
-import { MenuModel } from '@/services';
+import { MenuModel, PermissionModel } from '@/services';
 
 export interface BaseEditState {
   visible?: boolean;
@@ -12,6 +12,7 @@ export interface BaseEditState {
   contentType?: string;
   menuId: number;
   menu: MenuModel | undefined;
+  menuPermissions: Array<PermissionModel>;
 };
 
 export type EditState = BaseEditState & BaseState<BaseEditState>;
@@ -23,6 +24,7 @@ export const useEditStore = create<EditState>()((set) => ({
   visible: false,
   menuId: 0,
   menu: undefined,
+  menuPermissions: [],
   setState: (payload) => set((state) => {
     return {
       ...state,

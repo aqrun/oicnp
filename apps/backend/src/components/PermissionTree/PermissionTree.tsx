@@ -15,6 +15,7 @@ export interface PermissionTreeProps {
   onCheck?: TreeProps['onCheck'];
   checkedKeys?: Array<React.Key>;
   onCheckChange?: (keys: Array<React.Key>) => void;
+  multiple?: boolean;
 }
 
 /**
@@ -24,6 +25,7 @@ export default function PermissionTree({
   onCheck,
   checkedKeys: paramCheckedKeys,
   onCheckChange,
+  multiple = true,
 }: PermissionTreeProps): JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -95,6 +97,7 @@ export default function PermissionTree({
         defaultExpandParent
         defaultExpandedKeys={defaultExpandedKeys}
         checkedKeys={paramCheckedKeys || checkedKeys}
+        multiple={multiple}
       />
     </PermissionTreeWrapper>
   )

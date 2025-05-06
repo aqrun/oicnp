@@ -3,6 +3,9 @@ import {
   BaseFilterParams,
   BaseListResponseData,
 } from '../../types';
+import {
+  PermissionModel,
+} from '../permission/types';
 
 export interface MenuModel {
   id: number;
@@ -19,8 +22,11 @@ export interface MenuModel {
   isCache?: string;
   isFrame?: string;
   remark?: string;
-  /// 指定权限
-  permissionVids?: Array<number>;
+  /**
+   * 指定权限
+   */
+  permissionVids?: Array<string>;
+  permissionIds?: Array<number>;
   createdAt?: string;
   updateAt?: string;
   deletedAt?: string;
@@ -74,4 +80,12 @@ export interface DescribeMenuTreeRequestParams {
 }
 export interface DescribeMenuTreeResponseData extends BaseResponse{
   menus: Array<MenuTreeItem>;
+}
+
+export interface DescribeMenuPermissionsRequestParams {
+  id: number;
+}
+
+export interface DescribeMenuPermissionsResponseData {
+  permissions: Array<PermissionModel>;
 }

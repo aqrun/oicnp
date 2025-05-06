@@ -12,6 +12,8 @@ import {
   DescribeCreateMenuResponseData,
   DescribeUpdateMenuRequestParams,
   DescribeUpdateMenuResponseData,
+  DescribeMenuPermissionsResponseData,
+  DescribeMenuPermissionsRequestParams,
 } from './types';
 
 export const DescribeMenuList = createService<
@@ -38,3 +40,8 @@ export const DescribeUpdateMenu = createService<
 DescribeUpdateMenuRequestParams,
 DescribeUpdateMenuResponseData
 >('/menu/update', 'post');
+
+export const DescribeMenuPermissions = createService<
+DescribeMenuPermissionsRequestParams,
+DescribeMenuPermissionsResponseData
+>('/menu/permissions', 'post');

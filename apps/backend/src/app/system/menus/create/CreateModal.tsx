@@ -14,6 +14,8 @@ import {
   MenuModel,
   DescribeCreateMenu,
   DescribeCreateMenuRequestParams,
+  DescribeMenuPermissions,
+  DescribeMenuPermissionsRequestParams,
 } from '@/services';
 
 /**

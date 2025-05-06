@@ -1,13 +1,21 @@
 import { useMemo } from 'react';
-import { DescriptionsProps } from 'antd';
+import { DescriptionsProps, Tag } from 'antd';
 import { useViewStore } from './useViewStore';
 import { formatDate } from '@/utils';
-import {
-  PermissionTree,
-} from '@/components/PermissionTree';
 
 export default function useDescriptions() {
   const menu = useViewStore(state => state.menu);
+  const menuPermissions = useViewStore(state => state.menuPermissions);
+
+  const permissionTags = useMemo(() => {
+    if (!menuPermissions?.length) {
+      return '-';
+    }
+
+    return menuPermissions?.map((item) => {
+      return <Tag key={item.permissionId}>{item.name}</Tag>;
+    });
+  }, [menuPermissions]);
 
   const items: DescriptionsProps['items'] = [
     {
@@ -45,12 +53,7 @@ export default function useDescriptions() {
     {
       key: 'permissions',
       label: '权限列表',
-      children: (
-        // <PermissionTree
-        //   checkedKeys={permissionIds}
-        // />
-        '-'
-      ),
+      children: permissionTags,
       span: 12,
     },
   ];
