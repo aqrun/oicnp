@@ -8,6 +8,7 @@ export interface PermissionModel {
   vid?: string;
   pid?: number;
   name?: string;
+  api?: string;
   weight?: number;
   scope?: string;
   status?: string;

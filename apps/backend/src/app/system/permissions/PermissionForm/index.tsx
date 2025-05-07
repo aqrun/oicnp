@@ -30,6 +30,7 @@ export default function PermissionForm({
   const initialValues: FieldType = {
     vid: '',
     name: '',
+    api: '',
     remark: '',
     weight: 0,
     status: '1',
@@ -65,6 +66,12 @@ export default function PermissionForm({
           label="标识"
           name="vid"
           rules={[{ required: true, message: '请输入标识！' }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item<FieldType>
+          label="API"
+          name="api"
         >
           <Input />
         </Form.Item>

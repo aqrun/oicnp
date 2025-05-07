@@ -24,6 +24,11 @@ export default function useDescriptions() {
       children: permission?.name,
     },
     {
+      key: 'api',
+      label: 'API',
+      children: permission?.api,
+    },
+    {
       key: 'status',
       label: '状态',
       children: permission?.status === '1' ? '启用' : '禁用',
@@ -37,11 +42,6 @@ export default function useDescriptions() {
       key: 'createdAt',
       label: '创建时间',
       children: permission?.createdAt ? formatDate(permission?.createdAt) : '-',
-    },
-    {
-      key: 'createdAt-empty',
-      label: null,
-      children: null,
     },
     {
       key: 'remark',

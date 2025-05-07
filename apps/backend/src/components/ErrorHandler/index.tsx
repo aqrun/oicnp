@@ -43,7 +43,7 @@ export function ErrorHandler(): JSX.Element {
       />
     );
 
-    if (error?.code === '401') {
+    if (error?.code === 'UserNeedLogin') {
       footer = (
         <ModalFooter
           okText="跳转登录"

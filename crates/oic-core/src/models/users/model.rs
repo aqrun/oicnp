@@ -10,7 +10,7 @@ use crate::{
 };
 use super::{RegisterParams, Validator};
 use crate::{RequestParamsUpdater, ModelCrudHandler};
-use sea_orm::{prelude::*, QueryOrder};
+use sea_orm::{prelude::*, QueryOrder, QuerySelect};
 use super::{
     UserFilters,
     CreateUserReqParams,
@@ -536,6 +536,35 @@ impl UserModel {
             .await?;
 
         Ok(list)
+    }
+
+    ///
+    ///  检测用户是否有操作权限
+    /// 
+    pub async fn can(&self, db: &DatabaseConnection, uri: &str) -> ModelResult<()> {
+        let mut q = PermissionEntity::find()
+            .join(
+                sea_orm::JoinType::InnerJoin,
+                PermissionRelation::RolePermission.def()
+            )
+            .join(
+                sea_orm::JoinType::InnerJoin,
+                RoleRelation::UserRole.def()
+            )
+            .filter(UserRoleMapColumn::Uid.eq(self.uid));
+
+        q = q.filter(PermissionColumn::Status.eq("1"));
+
+        let permissions = q.all(db).await?;
+        let apis = permissions.iter().map(|item| {
+            item.api.clone()
+        }).collect::<Vec<String>>();
+
+        if apis.contains(&uri.to_string()) {
+            Ok(())
+        } else {
+            Err(ModelError::Message(format!("无权限操作: {}", uri)))
+        }
     }
 }
 

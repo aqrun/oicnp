@@ -5,7 +5,7 @@ use std::{
 
 use axum::{
     body::Body,
-    extract::{FromRequestParts, Request},
+    extract::{FromRef, FromRequestParts, Request},
     response::Response,
 };
 use futures_util::future::BoxFuture;
@@ -62,57 +62,64 @@ where
     fn call(&mut self, req: Request<B>) -> Self::Future {
         let state = self.state.clone();
         let clone = self.inner.clone();
+        let ctx: AppContext = AppContext::from_ref(&state);
         // take the service that was ready
         let mut inner = std::mem::replace(&mut self.inner, clone);
+
         Box::pin(async move {
             // Example of extracting JWT and checking roles
             let (mut parts, body) = req.into_parts();
             // 当前 URL /v1/info
             let uri = String::from(parts.uri.path());
 
-            // 是否拥有访问权限检测标识
-            let mut has_permission = false;
-
             let not_auth_uris = vec![
                 "/v1/info",
+                "/v1/auth/login",
+                "/v1/auth/register",
+                "/v1/user/one",
+                "/v1/menu/tree",
             ];
 
             // 解析当前登录用户信息
             let auth = match JWTWithUser::<UserModel>::from_request_parts(&mut parts, &state).await {
                 Ok(auth) => auth,
                 Err(_) => {
-                    return Ok(no_auth("请先登录"));
+                    return Ok(no_auth("UserNeedLogin", "请先登录"));
                 },
             };
             // 检测登录状态
             if auth.claims.uuid.is_empty() {
-                return Ok(no_auth("请先登录"));
+                return Ok(no_auth("UserNeedLogin", "请先登录"));
             }
+
+            let req = Request::from_parts(parts, body);
 
             if auth.user.is_admin.eq("1") {
                 // 管理员账号拥有所有权限
-                has_permission = true;
+                return inner.call(req).await;
             } else if not_auth_uris.contains(&uri.as_str()) {
                 // 不需要权限检测
-                has_permission = true;
+                return inner.call(req).await;
             }
 
-            if has_permission {
-                let req = Request::from_parts(parts, body);
-                inner.call(req).await
-            } else {
-                Ok(no_auth(""))
+            match auth.user.can(&ctx.db, uri.as_str()).await {
+                Ok(_) => {
+                    inner.call(req).await
+                },
+                Err(_) => {
+                    Ok(no_auth("401", ""))
+                },
             }
         })
     }
 }
 
-fn no_auth(msg: &str) -> Response {
+fn no_auth(code: &str, msg: &str) -> Response {
     let mut valid_msg = String::from("无权限访问");
 
     if !msg.is_empty() {
         valid_msg = String::from(msg);
     }
 
-    JsonRes::<String>::code("401", valid_msg.as_str()).into_response()
+    JsonRes::<String>::code(code, valid_msg.as_str()).into_response()
 }

@@ -11,6 +11,7 @@ export default function useColumns() {
       key: 'name',
       title: '名称',
       dataIndex: 'name',
+      width: 400,
     },
     {
       key: 'weight',
@@ -22,6 +23,12 @@ export default function useColumns() {
       key: 'vid',
       title: '标识',
       dataIndex: 'vid',
+      width: 200,
+    },
+    {
+      key: 'api',
+      title: 'API',
+      dataIndex: 'api',
       width: 200,
     },
     {

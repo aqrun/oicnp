@@ -32,6 +32,7 @@ pub struct PermissionReqParams {
     pub pid: Option<i64>,
     #[validate(required(message = "必须指定 name"), length(min = 2, message = "name 最少2个字符"))]
     pub name: Option<String>,
+    pub api: Option<String>,
     pub weight: Option<i32>,
     pub scope: Option<String>,
     #[validate(required(message = "必须指定 status"))]
@@ -62,6 +63,10 @@ impl RequestParamsUpdater for PermissionReqParams {
 
         if let Some(x) = &self.name {
             permission.name = Set(String::from(x));
+        }
+
+        if let Some(x) = &self.api {
+            permission.api = Set(String::from(x));
         }
 
         if let Some(x) = &self.weight {
