@@ -23,6 +23,7 @@ import {
   MenuOutlined,
   DownOutlined,
   MoreOutlined,
+  ExperimentOutlined,
 } from '@ant-design/icons';
 import { Container } from './index.styled';
 
@@ -51,6 +52,7 @@ const antIcons: Record<string, JSX.Element> = {
   MenuOutlined: <MenuOutlined />,
   DownOutlined: <DownOutlined />,
   MoreOutlined: <MoreOutlined />,
+  ExperimentOutlined: <ExperimentOutlined />,
 };
 
 export interface IconProps {
@@ -71,6 +73,10 @@ export function Icon({
 
   if (typeof antIcons?.[icon] !== 'undefined') {
     iconWidget = antIcons?.[icon];
+  }
+
+  if (!icon) {
+    return <></>;
   }
 
   return (

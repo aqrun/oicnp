@@ -56,6 +56,7 @@ export default function EditModal() {
       remark: res?.menu?.remark,
       weight: res?.menu?.weight,
       status: res?.menu?.status,
+      icon: res?.menu?.icon,
     });
   });
 
@@ -82,6 +83,7 @@ export default function EditModal() {
         weight: Number(values?.weight ?? 0),
         remark: values?.remark,
         status: values?.status,
+        icon: values?.icon,
         permissionIds: values?.permissionIds,
       };
 

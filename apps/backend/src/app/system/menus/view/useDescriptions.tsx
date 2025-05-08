@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { DescriptionsProps, Tag } from 'antd';
 import { useViewStore } from './useViewStore';
 import { formatDate } from '@/utils';
-
+import { Icon } from '@/components';
 export default function useDescriptions() {
   const menu = useViewStore(state => state.menu);
   const menuPermissions = useViewStore(state => state.menuPermissions);
@@ -27,6 +27,11 @@ export default function useDescriptions() {
       key: 'name',
       label: '名称',
       children: menu?.name,
+    },
+    {
+      key: 'icon',
+      label: '图标',
+      children: <Icon icon={menu?.icon} />,
     },
     {
       key: 'status',

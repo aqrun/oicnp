@@ -10,7 +10,7 @@ export default function SettingsPage() {
   return (
     <Container>
       <PageTitle
-        title='系统设置'
+        title='分类列表'
       />
 
       <div>

@@ -84,6 +84,6 @@
   parentVid: cms
   path: '/cms/notes'
   name: 笔记
-  icon: ''
+  icon: 'ExperimentOutlined'
   permissionVids: 
     - cms:note

@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Form, Input, FormInstance, Radio } from 'antd';
+import { Button, Form, Input, FormInstance, Radio, Skeleton } from 'antd';
 import type { FormProps } from 'antd';
 import { MenuModel } from '@/services';
 import PermissionSelect from './PermissionSelect';
@@ -28,7 +28,6 @@ export default function MenuForm({
   form,
   disabled,
 }: MenuFormProps): JSX.Element {
-
   const initialValues: FieldType = {
     id: menu?.id || 0,
     vid: '',
@@ -36,6 +35,7 @@ export default function MenuForm({
     remark: '',
     weight: 0,
     status: '1',
+    icon: '',
     ...(menu || {}),
   };
 
@@ -74,6 +74,13 @@ export default function MenuForm({
           label="名称"
           name="name"
           rules={[{ required: true, message: '请输入角色名称！' }]}
+          wrapperCol={{ span: 10 }}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item<FieldType>
+          label="图标"
+          name="icon"
           wrapperCol={{ span: 10 }}
         >
           <Input />
