@@ -10,7 +10,7 @@ use crate::{
 };
 use super::{RegisterParams, Validator};
 use crate::{RequestParamsUpdater, ModelCrudHandler};
-use sea_orm::{prelude::*, QueryOrder, QuerySelect};
+use sea_orm::{prelude::*, QueryOrder, QuerySelect, Condition};
 use super::{
     UserFilters,
     CreateUserReqParams,
@@ -283,18 +283,17 @@ impl UserModel {
             .await?;
 
         for item in params.iter() {
-            let mut email = String::from("");
-            let mut item_roles: Vec<String> = Vec::new();
-
-            if let Some(x) = &item.email {
-                email = String::from(x);
+            let email = if let Some(x) = &item.email {
+                String::from(x)
             } else {
                 continue;
-            }
+            };
 
-            if let Some(x) = &item.roles {
-                item_roles = x.clone();
-            }
+            let item_roles = if let Some(x) = &item.roles {
+                x.clone()
+            } else {
+                continue;
+            };
 
             let user = match all_users.iter().find(|item| {
                 item.email.eq(email.as_str())
@@ -541,8 +540,8 @@ impl UserModel {
     ///
     ///  检测用户是否有操作权限
     /// 
-    pub async fn can(&self, db: &DatabaseConnection, uri: &str) -> ModelResult<()> {
-        let mut q = PermissionEntity::find()
+    pub async fn can(&self, db: &DatabaseConnection, uri: &str) -> ModelResult<PermissionModel> {
+        let q = PermissionEntity::find()
             .join(
                 sea_orm::JoinType::InnerJoin,
                 PermissionRelation::RolePermission.def()
@@ -551,20 +550,16 @@ impl UserModel {
                 sea_orm::JoinType::InnerJoin,
                 RoleRelation::UserRole.def()
             )
-            .filter(UserRoleMapColumn::Uid.eq(self.uid));
+            .filter(
+                Condition::all()
+                    .add(UserRoleMapColumn::Uid.eq(self.uid))
+                    .add(PermissionColumn::Status.eq("1"))
+                    .add(PermissionColumn::Api.eq(uri))
+            );
 
-        q = q.filter(PermissionColumn::Status.eq("1"));
+        let permission = q.one(db).await?;
 
-        let permissions = q.all(db).await?;
-        let apis = permissions.iter().map(|item| {
-            item.api.clone()
-        }).collect::<Vec<String>>();
-
-        if apis.contains(&uri.to_string()) {
-            Ok(())
-        } else {
-            Err(ModelError::Message(format!("无权限操作: {}", uri)))
-        }
+        permission.ok_or_else(|| ModelError::Message(format!("无权限操作: {}", uri)))
     }
 }
 

@@ -380,14 +380,13 @@ impl MenuModel {
             .await?;
 
         for item in params.iter() {
-            let mut menu_vid = String::from("");
             let mut permission_vids: Vec<String> = Vec::new();
 
-            if let Some(x) = &item.vid {
-                menu_vid = String::from(x);
+            let menu_vid = if let Some(x) = &item.vid {
+                String::from(x)
             } else {
                 continue;
-            }
+            };
 
             if let Some(x) = &item.permission_vids {
                 permission_vids = x.clone();

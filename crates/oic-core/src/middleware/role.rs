@@ -102,13 +102,10 @@ where
                 return inner.call(req).await;
             }
 
+            // 检测用户是否有权限访问当前API
             match auth.user.can(&ctx.db, uri.as_str()).await {
-                Ok(_) => {
-                    inner.call(req).await
-                },
-                Err(_) => {
-                    Ok(no_auth("401", ""))
-                },
+                Ok(_) => inner.call(req).await,
+                Err(_) => Ok(no_auth("401", "无权限访问")),
             }
         })
     }

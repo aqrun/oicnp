@@ -1,6 +1,5 @@
 use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
-use crate::typings::ListData;
 use std::fmt::Debug;
 
 ///
