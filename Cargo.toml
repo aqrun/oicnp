@@ -65,7 +65,7 @@ oic_derives = { path = "crates/oic-derives" }
 oic_cmd = { path = "crates/oic-cmd" }
 oic_web = { path = "crates/oic-web" }
 migration = { path = "migration" }
-loco-rs = { version = "0.14", features = ["with-db"] }
+loco-rs = { version = "0.15", features = ["with-db"] }
 clap = { version = "^4", features = ["derive"] }
 async-std = { version = "^1", features = ["attributes", "tokio1"] }
 async-graphql = {version = "^7", features = ["bson", "chrono"]}
@@ -101,7 +101,7 @@ unic-langid = "0.9.4"
 serial_test = "3.1.1"
 rstest = "0.23.0"
 insta = { version = "1.34.0", features = ["redactions", "yaml", "filters"] }
-validator = { version = "0.19" }
+validator = { version = "0.20" }
 reqwest = { version = "0.12.9" }
 mime = "0.3.16"
 tower-http = { version = "^0.6" }

@@ -31,7 +31,7 @@ export default function useDescriptions() {
     {
       key: 'icon',
       label: '图标',
-      children: <Icon icon={menu?.icon} />,
+      children: <Icon icon={menu?.icon || ''} />,
     },
     {
       key: 'status',
