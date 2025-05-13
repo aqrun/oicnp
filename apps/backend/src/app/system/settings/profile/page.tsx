@@ -1,6 +1,6 @@
 'use client';
 
-import { Form, Input, Radio, Layout } from 'antd';
+import { Form, Input, Radio } from 'antd';
 import { Container } from './index.styled';
 
 export default function ProfilePage() {
