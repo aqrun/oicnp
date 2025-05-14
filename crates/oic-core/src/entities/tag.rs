@@ -9,9 +9,12 @@ pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
     pub tag_id: i64,
+    #[serde(rename(deserialize = "tagVid", serialize = "tagVid"))]
     pub tag_vid: String,
+    #[serde(rename(deserialize = "tagName", serialize = "tagName"))]
     pub tag_name: String,
     pub weight: i32,
+    #[serde(rename(deserialize = "tagCount", serialize = "tagCount"))]
     pub tag_count: i64,
 }
 

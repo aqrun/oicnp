@@ -11,9 +11,11 @@ pub struct Model {
     pub nid: i64,
     #[sea_orm(column_type = "Text")]
     pub summary: String,
+    #[serde(rename(deserialize = "summaryFormat", serialize = "summaryFormat"))]
     pub summary_format: String,
     #[sea_orm(column_type = "Text")]
     pub body: String,
+    #[serde(rename(deserialize = "bodyFormat", serialize = "bodyFormat"))]
     pub body_format: String,
 }
 

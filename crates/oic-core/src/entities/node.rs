@@ -15,11 +15,17 @@ pub struct Model {
     pub title: String,
     pub viewed: i32,
     pub deleted: String,
+    #[serde(rename(deserialize = "publishedAt", serialize = "publishedAt"))]
     pub published_at: Option<DateTime>,
+    #[serde(rename(deserialize = "createdBy", serialize = "createdBy"))]
     pub created_by: i64,
+    #[serde(rename(deserialize = "updatedBy", serialize = "updatedBy"))]
     pub updated_by: i64,
+    #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
     pub created_at: DateTime,
+    #[serde(rename(deserialize = "updatedAt", serialize = "updatedAt"))]
     pub updated_at: Option<DateTime>,
+    #[serde(rename(deserialize = "deletedAt", serialize = "deletedAt"))]
     pub deleted_at: Option<DateTime>,
 }
 

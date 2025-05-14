@@ -9,10 +9,15 @@ pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
     pub cat_id: i64,
+    #[serde(rename(deserialize = "catVid", serialize = "catVid"))]
     pub cat_vid: String,
+    #[serde(rename(deserialize = "catPid", serialize = "catPid"))]
     pub cat_pid: i64,
+    #[serde(rename(deserialize = "catName", serialize = "catName"))]
     pub cat_name: String,
+    #[serde(rename(deserialize = "catDesc", serialize = "catDesc"))]
     pub cat_desc: String,
+    #[serde(rename(deserialize = "catDescFormat", serialize = "catDescFormat"))]
     pub cat_desc_format: String,
     pub weight: i32,
 }
