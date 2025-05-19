@@ -5,7 +5,7 @@ import {
 } from './types';
 
 /**
- * 获取菜单树
+ * 登录
  */
 export const DescribeAuthLogin = createFetcher<
 DescribeLoginRequestParams,

@@ -12,7 +12,9 @@ pub struct Model {
     pub id: i64,
     pub title: String,
     pub content: String,
+    #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
     pub created_at: DateTime,
+    #[serde(rename(deserialize = "updatedAt", serialize = "updatedAt"))]
     pub updated_at: Option<DateTime>,
 }
 

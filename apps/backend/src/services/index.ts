@@ -13,3 +13,5 @@ export * from './apis/role/hooks';
 export * from './apis/user/types';
 export * from './apis/user/client';
 export * from './apis/user/hooks';
+export * from './apis/note/types';
+export * from './apis/note/client';

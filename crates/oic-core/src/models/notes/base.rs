@@ -15,7 +15,9 @@ pub struct NoteFilters {
     pub id: Option<i64>,
     pub title: Option<String>,
     pub content: Option<String>,
+    #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
     pub created_at: Option<DateTime>,
+    #[serde(rename(deserialize = "updatedAt", serialize = "updatedAt"))]
     pub updated_at: Option<DateTime>,
 }
 
@@ -27,7 +29,9 @@ pub struct NoteReqParams {
     #[validate(required(message = "必须指定 title"), length(min = 2, message = "title 最少2个字符"))]
     pub title: Option<String>,
     pub content: Option<String>,
+    #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
     pub created_at: Option<DateTime>,
+    #[serde(rename(deserialize = "updatedAt", serialize = "updatedAt"))]
     pub updated_at: Option<DateTime>,
 }
 
