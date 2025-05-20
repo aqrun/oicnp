@@ -19,11 +19,17 @@ pub struct NodeFilters {
     pub title: Option<String>,
     pub viewed: Option<i32>,
     pub deleted: Option<String>,
+    #[serde(rename(deserialize = "publishedAt", serialize = "publishedAt"))]
     pub published_at: Option<DateTime>,
+    #[serde(rename(deserialize = "createdBy", serialize = "createdBy"))]
     pub created_by: Option<i64>,
+    #[serde(rename(deserialize = "updatedBy", serialize = "updatedBy"))]
     pub updated_by: Option<i64>,
+    #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
     pub created_at: Option<DateTime>,
+    #[serde(rename(deserialize = "updatedAt", serialize = "updatedAt"))]
     pub updated_at: Option<DateTime>,
+    #[serde(rename(deserialize = "deletedAt", serialize = "deletedAt"))]
     pub deleted_at: Option<DateTime>,
 }
 
@@ -42,11 +48,17 @@ pub struct NodeReqParams {
     pub content: Option<String>,
     pub viewed: Option<i32>,
     pub deleted: Option<String>,
+    #[serde(rename(deserialize = "publishedAt", serialize = "publishedAt"))]
     pub published_at: Option<DateTime>,
+    #[serde(rename(deserialize = "createdBy", serialize = "createdBy"))]
     pub created_by: Option<i64>,
+    #[serde(rename(deserialize = "updatedBy", serialize = "updatedBy"))]
     pub updated_by: Option<i64>,
+    #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
     pub created_at: Option<DateTime>,
+    #[serde(rename(deserialize = "updatedAt", serialize = "updatedAt"))]
     pub updated_at: Option<DateTime>,
+    #[serde(rename(deserialize = "deletedAt", serialize = "deletedAt"))]
     pub deleted_at: Option<DateTime>,
 }
 

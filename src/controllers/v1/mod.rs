@@ -9,6 +9,8 @@ mod auth;
 mod menu;
 mod role;
 mod permission;
+mod tag;
+mod category;
 
 pub const VERSION: &str = "v1";
 
@@ -25,6 +27,8 @@ pub fn routes(ctx: &AppContext) -> Vec<Routes> {
         menu::routes(),
         role::routes(),
         permission::routes(),
+        tag::routes(),
+        category::routes(),
     ];
 
     for router in need_role_routes.into_iter() {

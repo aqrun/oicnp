@@ -7,5 +7,7 @@ pub mod menus;
 pub mod roles;
 pub mod permissions;
 pub mod files;
+pub mod tags;
+pub mod categories;
 
 pub use base::*;

@@ -35,4 +35,3 @@ impl Related<super::node::Entity> for Entity {
     }
 }
 
-impl ActiveModelBehavior for ActiveModel {}

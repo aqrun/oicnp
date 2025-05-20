@@ -17,7 +17,7 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Command {
-    /// 密码加密
+    /// 密码加密 -p [pass]
     Hash {
         /// 指定明文密码
         #[clap(short = 'p', long, default_value = "")]
