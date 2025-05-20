@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
+    #[serde(rename(deserialize = "catId", serialize = "catId"))]
     pub cat_id: i64,
     #[serde(rename(deserialize = "catVid", serialize = "catVid"))]
     pub cat_vid: String,

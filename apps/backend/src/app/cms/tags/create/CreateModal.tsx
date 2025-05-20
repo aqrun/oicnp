@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { Form } from 'antd';
 import { Modal } from '@/components';
-import NoteForm from '../NoteForm';
+import TagForm from '../TagForm';
 import { useCreateStore } from './useCreateStore';
 import { useMemoizedFn } from 'ahooks';
 import CreateSuccess from './CreateSuccess';
 import { useListStore } from '../List/useListStore';
 import {
-  NoteModel,
-  DescribeCreateNote,
-  DescribeCreateNoteRequestParams,
+  TagModel,
+  DescribeCreateTag,
+  DescribeCreateTagRequestParams,
 } from '@/services';
 
 /**
@@ -23,19 +23,18 @@ export default function CreateModal() {
 
   const [loading, setLoading] = useState(false);
 
-  const [form] = Form.useForm<NoteModel>();
+  const [form] = Form.useForm<TagModel>();
 
   const handleOk = useMemoizedFn(async () => {
     setLoading(true);
     try {
       const values = await form.validateFields();
 
-      const params: DescribeCreateNoteRequestParams = {
-        title: values?.title,
-        content: values?.content,
+      const params: DescribeCreateTagRequestParams = {
+        tagName: values?.tagName,
       };
 
-      const res = await DescribeCreateNote(params);
+      const res = await DescribeCreateTag(params);
 
       if (res) {
         setState({
@@ -64,7 +63,7 @@ export default function CreateModal() {
   });
 
   let content = (
-    <NoteForm
+    <TagForm
       form={form}
       loading={loading}
     />
@@ -73,14 +72,14 @@ export default function CreateModal() {
   if (contentType === 'success') {
     content = (
       <CreateSuccess
-        title={form.getFieldValue('title')}
+        title={form.getFieldValue('tagName')}
       />
     );
   }
 
   return (
     <Modal
-      title="创建笔记"
+      title="创建标签"
       open={visible}
       onOk={handleOk}
       onCancel={handleCancel}

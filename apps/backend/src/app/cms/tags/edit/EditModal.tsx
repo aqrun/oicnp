@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Form, Skeleton } from 'antd';
 import { Modal } from '@/components';
-import NoteForm from '../NoteForm';
+import TagForm from '../TagForm';
 import { useEditStore } from './useEditStore';
 import { useMemoizedFn } from 'ahooks';
 import Success from './Success';
 import { useListStore } from '../List/useListStore';
 import {
-  NoteModel,
-  DescribeNoteDetail,
-  DescribeNoteDetailRequestParams,
-  DescribeUpdateNote,
-  DescribeUpdateNoteRequestParams,
+  TagModel,
+  DescribeTagDetail,
+  DescribeTagDetailRequestParams,
+  DescribeUpdateTag,
+  DescribeUpdateTagRequestParams,
 } from '@/services';
 
 /**
@@ -20,29 +20,28 @@ import {
 export default function EditModal() {
   const visible = useEditStore(state => state.visible);
   const contentType = useEditStore(state => state.contentType);
-  const noteId = useEditStore(state => state.noteId);
-  const note = useEditStore(state => state.note);
+  const tagId = useEditStore(state => state.tagId);
+  const tag = useEditStore(state => state.tag);
   const setState = useEditStore(state => state.setState);
   const setListState = useListStore(state => state.setState);
 
   const [loading, setLoading] = useState(false);
   const [initLoading, setInitLoading] = useState(true);
 
-  const [form] = Form.useForm<NoteModel>();
+  const [form] = Form.useForm<TagModel>();
 
   const fetchNote = useMemoizedFn(async () => {
-    const params: DescribeNoteDetailRequestParams = {
-      id: noteId,
+    const params: DescribeTagDetailRequestParams = {
+      tagId,
     };
-    const res = await DescribeNoteDetail(params);
+    const res = await DescribeTagDetail(params);
     
     setState({
-      note: res.note,
+      tag: res.tag,
     });
     
     form.setFieldsValue({
-      title: res?.note?.title,
-      content: res?.note?.content,
+      tagName: res?.tag?.tagName,
     });
   });
 
@@ -51,13 +50,12 @@ export default function EditModal() {
     try {
       const values = await form.validateFields();
 
-      const params: DescribeUpdateNoteRequestParams = {
-        id: noteId,
-        title: values?.title,
-        content: values?.content,
+      const params: DescribeUpdateTagRequestParams = {
+        tagId,
+        tagName: values?.tagName,
       };
 
-      const res = await DescribeUpdateNote(params);
+      const res = await DescribeUpdateTag(params);
 
       if (res) {
         setState({
@@ -93,15 +91,15 @@ export default function EditModal() {
     } else if (contentType === 'success') {
       return (
         <Success
-          title={form.getFieldValue('title')}
+          title={form.getFieldValue('tagName')}
         />
       );
     } else {
       return (
-        <NoteForm
+        <TagForm
           form={form}
           loading={loading}
-          note={note}
+          tag={tag}
         />
       );
     }
@@ -110,7 +108,11 @@ export default function EditModal() {
 
   const fetchInitialData = useMemoizedFn(async () => {
     setInitLoading(true);
-    await fetchNote();
+    const requests = [
+      fetchNote(),
+    ];
+    await Promise.all(requests);
+    
     setInitLoading(false);
   });
 
@@ -122,7 +124,7 @@ export default function EditModal() {
 
   return (
     <Modal
-      title="编辑角色"
+      title="编辑标签"
       open={visible}
       onOk={handleOk}
       onCancel={handleCancel}

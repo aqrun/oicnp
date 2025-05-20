@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Form, Descriptions, Spin } from 'antd';
+import { Descriptions, Spin } from 'antd';
 import { Modal } from '@/components';
 import { useViewStore } from './useViewStore';
 import { useMemoizedFn } from 'ahooks';
 import useDescriptions from './useDescriptions';
 import {
-  NoteModel,
-  DescribeNoteDetail,
-  DescribeNoteDetailRequestParams,
+  DescribeTagDetail,
+  DescribeTagDetailRequestParams,
 } from '@/services';
 
 /**
@@ -15,38 +14,34 @@ import {
  */
 export default function ViewModal() {
   const visible = useViewStore(state => state.visible);
-  const noteId = useViewStore(state => state.noteId);
+  const tagId = useViewStore(state => state.tagId);
   const setState = useViewStore(state => state.setState);
 
   const [loading, setLoading] = useState(false);
   const [items] = useDescriptions();
 
-  const [form] = Form.useForm<NoteModel>();
-
   const handleCancel = useMemoizedFn(() => {
-    form.resetFields();
     setState({
       visible: false,
-      note: undefined,
+      tag: undefined,
     });
   });
 
-  const fetchNote = useMemoizedFn(async () => {
-    const params: DescribeNoteDetailRequestParams = {
-      id: noteId,
+  const fetchTag = useMemoizedFn(async () => {
+    const params: DescribeTagDetailRequestParams = {
+      tagId,
     };
-    const res = await DescribeNoteDetail(params);
+    const res = await DescribeTagDetail(params);
 
     return res;
   });
 
   const fetchInitialData = useMemoizedFn(async () => {
     setLoading(true);
-
-    const res = await fetchNote();
+    const res = await fetchTag();
 
     setState({
-      note: res?.note,
+      tag: res?.tag,
     });
     setLoading(false);
   });
@@ -59,7 +54,7 @@ export default function ViewModal() {
 
   return (
     <Modal
-      title="查看笔记"
+      title="查看标签"
       open={visible}
       onCancel={handleCancel}
       confirmLoading={false}

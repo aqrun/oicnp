@@ -1,0 +1,40 @@
+'use client';
+
+import { createService } from '../../request';
+import {
+  DescribeNodeListRequestParams,
+  DescribeNodeListResponseData,
+  DescribeNodeDetailRequestParams,
+  DescribeNodeDetailResponseData,
+  DescribeDeleteNodeRequestParams,
+  DescribeDeleteNodeResponseData,
+  DescribeCreateNodeRequestParams,
+  DescribeCreateNodeResponseData,
+  DescribeUpdateNodeRequestParams,
+  DescribeUpdateNodeResponseData,
+} from './types';
+
+export const DescribeNodeList = createService<
+DescribeNodeListRequestParams,
+DescribeNodeListResponseData
+>('/node/list', 'post', { ignoreError: true, });
+
+export const DescribeNodeDetail = createService<
+DescribeNodeDetailRequestParams,
+DescribeNodeDetailResponseData
+>('/node/one', 'post', { ignoreError: true, });
+
+export const DescribeDeleteNode = createService<
+DescribeDeleteNodeRequestParams,
+DescribeDeleteNodeResponseData
+>('/node/remove', 'post');
+
+export const DescribeCreateNode = createService<
+DescribeCreateNodeRequestParams,
+DescribeCreateNodeResponseData
+>('/node/add', 'post');
+
+export const DescribeUpdateNode = createService<
+DescribeUpdateNodeRequestParams,
+DescribeUpdateNodeResponseData
+>('/node/update', 'post');
