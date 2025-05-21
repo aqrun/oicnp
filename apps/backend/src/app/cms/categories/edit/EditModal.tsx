@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Form, Skeleton } from 'antd';
 import { Modal } from '@/components';
-import TagForm from '../TagForm';
+import CategoryForm from '../CategoryForm';
 import { useEditStore } from './useEditStore';
 import { useMemoizedFn } from 'ahooks';
 import Success from './Success';
 import { useListStore } from '../List/useListStore';
 import {
-  TagModel,
-  DescribeTagDetail,
-  DescribeTagDetailRequestParams,
-  DescribeUpdateTag,
-  DescribeUpdateTagRequestParams,
+  CategoryModel,
+  DescribeCategoryDetail,
+  DescribeCategoryDetailRequestParams,
+  DescribeUpdateCategory,
+  DescribeUpdateCategoryRequestParams,
 } from '@/services';
 
 /**
@@ -20,30 +20,30 @@ import {
 export default function EditModal() {
   const visible = useEditStore(state => state.visible);
   const contentType = useEditStore(state => state.contentType);
-  const tagId = useEditStore(state => state.tagId);
-  const tag = useEditStore(state => state.tag);
+  const catId = useEditStore(state => state.catId);
+  const category = useEditStore(state => state.category);
   const setState = useEditStore(state => state.setState);
   const setListState = useListStore(state => state.setState);
 
   const [loading, setLoading] = useState(false);
   const [initLoading, setInitLoading] = useState(true);
 
-  const [form] = Form.useForm<TagModel>();
+  const [form] = Form.useForm<CategoryModel>();
 
   const fetchNote = useMemoizedFn(async () => {
-    const params: DescribeTagDetailRequestParams = {
-      tagId,
+    const params: DescribeCategoryDetailRequestParams = {
+      catId,
     };
-    const res = await DescribeTagDetail(params);
+    const res = await DescribeCategoryDetail(params);
     
     setState({
-      tag: res.tag,
+      category: res?.category,
     });
     
     form.setFieldsValue({
-      tagVid: res?.tag?.tagVid,
-      tagName: res?.tag?.tagName,
-      weight: res?.tag?.weight,
+      catVid: res?.category?.catVid,
+      catName: res?.category?.catName,
+      weight: res?.category?.weight,
     });
   });
 
@@ -52,14 +52,14 @@ export default function EditModal() {
     try {
       const values = await form.validateFields();
 
-      const params: DescribeUpdateTagRequestParams = {
-        tagId,
-        tagVid: values?.tagVid,
-        tagName: values?.tagName,
+      const params: DescribeUpdateCategoryRequestParams = {
+        catId,
+        catVid: values?.catVid,
+        catName: values?.catName,
         weight: Number(values?.weight || 0),
       };
 
-      const res = await DescribeUpdateTag(params);
+      const res = await DescribeUpdateCategory(params);
 
       if (res) {
         setState({
@@ -95,15 +95,15 @@ export default function EditModal() {
     } else if (contentType === 'success') {
       return (
         <Success
-          title={form.getFieldValue('tagName')}
+          title={form.getFieldValue('catName')}
         />
       );
     } else {
       return (
-        <TagForm
+        <CategoryForm
           form={form}
           loading={loading}
-          tag={tag}
+          category={category}
         />
       );
     }
@@ -128,7 +128,7 @@ export default function EditModal() {
 
   return (
     <Modal
-      title="编辑标签"
+      title="编辑分类"
       open={visible}
       onOk={handleOk}
       onCancel={handleCancel}

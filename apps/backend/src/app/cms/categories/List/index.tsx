@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect } from 'react';
 import { Table } from 'antd';
 import {
   PageTitle,
@@ -9,60 +9,29 @@ import {
 import { useMemoizedFn } from 'ahooks';
 import { FilterValues, EnumFilterTrigger } from '@/types';
 import useColumns from './useColumns';
-import { PermissionModel } from '@/services';
 import { useListStore } from './useListStore';
+import { nextTick } from '@/utils';
+import { useQueryCategoryList } from './useQueryCategoryList';
 import { useCreateStore } from '../create/useCreateStore';
-import {
-  nextTick,
-  convertPermissionListToTree,
-} from '@/utils';
-import { useQueryPermissionList } from './useQueryPermissionList';
+import { CategoryModel } from '@/services';
 import { Container } from './index.styled';
-
 /**
- * 权限列表
+ * 分类列表
  */
-export default function PermissionList(): JSX.Element {
+export default function CategoryList(): JSX.Element {
+  const pager = useListStore((state) => state.pager);
   const setState = useListStore((state) => state.setState);
   const refreshToken = useListStore((state) => state.refreshToken);
   const setCreateState = useCreateStore(state => state.setState);
   const columns = useColumns();
 
-  /**
-   * 展开收起状态
-   */
-  const [expand, setExpand] = useState(true);
-   /**
-   * 当前表格操作的展开项
-   */
-   const [tableExpandKeys, setTableExpandKeys] = useState<string[] | undefined>(undefined);
+  const {data, loading, refresh} = useQueryCategoryList();
 
-  const {data, loading, refresh} = useQueryPermissionList();
-
-  const dataSource = useMemo(() => {
-    return convertPermissionListToTree(data?.permissions || []);
-  }, [data]);
-
-  const expandedRowKeys = useMemo(() => {
-    // 表格有操作优化显示表格数据
-    if (typeof tableExpandKeys !== 'undefined') {
-      return tableExpandKeys;
-    }
-
-    if (expand) {
-      const ids: Array<number> = [];
-
-      dataSource.forEach((m) => {
-        ids.push(m.permissionId || 0);
-
-        (m?.children || []).forEach((n) => {
-          ids.push(n?.permissionId || 0);
-        });
-      });
-      return ids;
-    }
-    return [];
-  }, [expand, dataSource, tableExpandKeys]);
+  const getDataSource = () => {
+    const list = data?.categories || [];
+    return list;
+  };
+  const dataSource = getDataSource();
 
   /**
    * 创建操作
@@ -70,8 +39,6 @@ export default function PermissionList(): JSX.Element {
   const handleCreate = useMemoizedFn(() => {
     setCreateState({
       visible: true,
-      initPid: 0,
-      contentType: 'create',
     });
   });
 
@@ -103,17 +70,18 @@ export default function PermissionList(): JSX.Element {
   });
 
   /**
-   * 展开收起操作
+   * 页码数据变化
    */
-  const handleFilterExpand = useMemoizedFn(() => {
-    setExpand(!expand);
-  });
-
-  /**
-   * 单个数据展开收起操作
-   */
-  const handleTableExpandChange = useMemoizedFn((keys: readonly React.Key[]) => {
-    setTableExpandKeys(keys as unknown as Array<string>);
+  const handlePagerChange = useMemoizedFn(async (page: number, pageSize: number) => {
+    setState({
+      pager: {
+        ...pager,
+        page,
+        pageSize,
+      }
+    });
+    await nextTick();
+    refresh();
   });
 
   useEffect(() => {
@@ -122,35 +90,35 @@ export default function PermissionList(): JSX.Element {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshToken]);
-
+ 
   return (
     <Container>
       <PageTitle
-        title='权限列表'
+        title='分类列表'
       />
       <Filters
-        createLabel="创建权限"
+        createLabel="创建分类"
         onCreate={handleCreate}
         onRefresh={handleRefresh}
         onSearch={handleSearch}
         onChange={handleFilterChange}
-        onExpand={handleFilterExpand}
       />
       
-      <Table<PermissionModel>
+      <Table<CategoryModel>
         dataSource={dataSource}
         columns={columns}
         loading={loading}
-        rowKey="permissionId"
+        rowKey="catId"
         size="small"
         tableLayout="fixed"
-        pagination={false}
         scroll={{
           x: 'max-content',
         }}
-        expandable={{
-          expandedRowKeys,
-          onExpandedRowsChange: handleTableExpandChange,
+        pagination={{
+          total: pager?.total,
+          pageSize: pager?.pageSize,
+          showQuickJumper: true,
+          onChange: handlePagerChange,
         }}
       />
     </Container>

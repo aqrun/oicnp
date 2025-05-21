@@ -2,18 +2,18 @@
 
 import { Button, Form, Input, FormInstance } from 'antd';
 import type { FormProps } from 'antd';
-import { TagModel } from '@/services';
+import { CategoryModel } from '@/services';
 import { Container } from './index.styled';
 
-type FieldType = TagModel;
+type FieldType = CategoryModel;
 
-export interface TagFormProps {
+export interface CategoryFormProps {
   onFinish?: FormProps<FieldType>['onFinish'];
   isEdit?: boolean;
-  tag?: TagModel;
+  category?: CategoryModel;
   loading?: boolean;
   showSubmit?: boolean;
-  form?: FormInstance<TagModel>;
+  form?: FormInstance<CategoryModel>;
   disabled?: boolean;
 }
 
@@ -21,14 +21,14 @@ export default function NoteForm({
   onFinish,
   loading,
   isEdit,
-  tag,
+  category,
   showSubmit,
   form,
   disabled,
-}: TagFormProps): JSX.Element {
+}: CategoryFormProps): JSX.Element {
   const initialValues: FieldType = {
-    tagName: '',
-    ...(tag || {}),
+    catName: '',
+    ...(category || {}),
   };
 
   return (
@@ -41,19 +41,20 @@ export default function NoteForm({
         layout="vertical"
         form={form}
         disabled={disabled}
-        wrapperCol={{ span: 10 }}
       >
         <Form.Item<FieldType>
           label="VID"
-          name="tagVid"
+          name="catVid"
           rules={[{ required: true, message: '请输入VID！' }]}
+          wrapperCol={{ span: 10 }}
         >
           <Input />
         </Form.Item>
         <Form.Item<FieldType>
-          label="标签名称"
-          name="tagName"
-          rules={[{ required: true, message: '请输入标签名称！' }]}
+          label="名称"
+          name="catName"
+          rules={[{ required: true, message: '请输入名称！' }]}
+          wrapperCol={{ span: 10 }}
         >
           <Input />
         </Form.Item>
@@ -61,8 +62,15 @@ export default function NoteForm({
           label="权重"
           name="weight"
           initialValue={0}
+          wrapperCol={{ span: 10 }}
         >
           <Input />
+        </Form.Item>
+        <Form.Item<FieldType>
+          label="描述"
+          name="catDesc"
+        >
+          <Input.TextArea />
         </Form.Item>
 
         {showSubmit && (

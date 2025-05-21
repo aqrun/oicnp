@@ -5,8 +5,8 @@ import { useViewStore } from './useViewStore';
 import { useMemoizedFn } from 'ahooks';
 import useDescriptions from './useDescriptions';
 import {
-  DescribeTagDetail,
-  DescribeTagDetailRequestParams,
+  DescribeCategoryDetail,
+  DescribeCategoryDetailRequestParams,
 } from '@/services';
 
 /**
@@ -14,7 +14,7 @@ import {
  */
 export default function ViewModal() {
   const visible = useViewStore(state => state.visible);
-  const tagId = useViewStore(state => state.tagId);
+  const catId = useViewStore(state => state.catId);
   const setState = useViewStore(state => state.setState);
 
   const [loading, setLoading] = useState(false);
@@ -23,15 +23,15 @@ export default function ViewModal() {
   const handleCancel = useMemoizedFn(() => {
     setState({
       visible: false,
-      tag: undefined,
+      category: undefined,
     });
   });
 
   const fetchTag = useMemoizedFn(async () => {
-    const params: DescribeTagDetailRequestParams = {
-      tagId,
+    const params: DescribeCategoryDetailRequestParams = {
+      catId,
     };
-    const res = await DescribeTagDetail(params);
+    const res = await DescribeCategoryDetail(params);
 
     return res;
   });
@@ -41,7 +41,7 @@ export default function ViewModal() {
     const res = await fetchTag();
 
     setState({
-      tag: res?.tag,
+      category: res?.category,
     });
     setLoading(false);
   });
@@ -54,7 +54,7 @@ export default function ViewModal() {
 
   return (
     <Modal
-      title="查看标签"
+      title="查看分类"
       open={visible}
       onCancel={handleCancel}
       confirmLoading={false}

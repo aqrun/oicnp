@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { Form } from 'antd';
 import { Modal } from '@/components';
-import TagForm from '../TagForm';
+import CategoryForm from '../CategoryForm';
 import { useCreateStore } from './useCreateStore';
 import { useMemoizedFn } from 'ahooks';
 import CreateSuccess from './CreateSuccess';
 import { useListStore } from '../List/useListStore';
 import {
-  TagModel,
-  DescribeCreateTag,
-  DescribeCreateTagRequestParams,
+  CategoryModel,
+  DescribeCreateCategory,
+  DescribeCreateCategoryRequestParams,
 } from '@/services';
 
 /**
@@ -23,20 +23,21 @@ export default function CreateModal() {
 
   const [loading, setLoading] = useState(false);
 
-  const [form] = Form.useForm<TagModel>();
+  const [form] = Form.useForm<CategoryModel>();
 
   const handleOk = useMemoizedFn(async () => {
     setLoading(true);
     try {
       const values = await form.validateFields();
 
-      const params: DescribeCreateTagRequestParams = {
-        tagVid: values?.tagVid,
-        tagName: values?.tagName,
+      const params: DescribeCreateCategoryRequestParams = {
+        catVid: values?.catVid,
+        catName: values?.catName,
+        catDesc: values?.catDesc,
         weight: Number(values?.weight || 0),
       };
 
-      const res = await DescribeCreateTag(params);
+      const res = await DescribeCreateCategory(params);
 
       if (res) {
         setState({
@@ -65,7 +66,7 @@ export default function CreateModal() {
   });
 
   let content = (
-    <TagForm
+    <CategoryForm
       form={form}
       loading={loading}
     />
@@ -74,14 +75,14 @@ export default function CreateModal() {
   if (contentType === 'success') {
     content = (
       <CreateSuccess
-        title={form.getFieldValue('tagName')}
+        title={form.getFieldValue('catName')}
       />
     );
   }
 
   return (
     <Modal
-      title="创建标签"
+      title="创建分类"
       open={visible}
       onOk={handleOk}
       onCancel={handleCancel}

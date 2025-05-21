@@ -14,16 +14,16 @@ export function convertPermissionListToTree(list: PermissionModel[]): Permission
   
   // 创建节点映射
   list.forEach(item => {
-    map[item.permissionId] = {
+    map[item.permissionId!] = {
       ...item,
     };
   });
   
   // 构建树形结构
   list.forEach(item => {
-    const node = map[item.permissionId];
+    const node = map[item.permissionId!];
 
-    if (item.pid === '0' || !item?.pid) {
+    if (`${item.pid}` === '0' || !item?.pid) {
       tree.push(node);
     } else {
       const parent = map?.[item?.pid];
@@ -58,7 +58,7 @@ export function convertMenuListToTree(list: MenuModel[]): MenuModel[] {
   list.forEach(item => {
     const node = map[item.id];
 
-    if (item.pid === '0' || !item?.pid) {
+    if (`${item.pid}` === '0' || !item?.pid) {
       tree.push(node);
     } else {
       const parent = map?.[item?.pid];

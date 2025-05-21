@@ -16,9 +16,9 @@ import { useCreateStore } from '../create/useCreateStore';
 import { TagModel } from '@/services';
 import { Container } from './index.styled';
 /**
- * 角色列表
+ * 标签列表
  */
-export default function RoleList(): JSX.Element {
+export default function TagList(): JSX.Element {
   const pager = useListStore((state) => state.pager);
   const setState = useListStore((state) => state.setState);
   const refreshToken = useListStore((state) => state.refreshToken);
@@ -94,10 +94,10 @@ export default function RoleList(): JSX.Element {
   return (
     <Container>
       <PageTitle
-        title='笔记列表'
+        title='标签列表'
       />
       <Filters
-        createLabel="创建笔记"
+        createLabel="创建标签"
         onCreate={handleCreate}
         onRefresh={handleRefresh}
         onSearch={handleSearch}
@@ -108,7 +108,7 @@ export default function RoleList(): JSX.Element {
         dataSource={dataSource}
         columns={columns}
         loading={loading}
-        rowKey="id"
+        rowKey="tagId"
         size="small"
         tableLayout="fixed"
         scroll={{

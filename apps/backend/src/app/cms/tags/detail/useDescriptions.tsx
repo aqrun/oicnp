@@ -11,9 +11,24 @@ export default function useDescriptions() {
       children: tag?.tagId,
     },
     {
+      key: 'tagVid',
+      label: 'VID',
+      children: tag?.tagVid,
+    },
+    {
       key: 'tagName',
       label: '标签名称',
       children: tag?.tagName,
+    },
+    {
+      key: 'tagCount',
+      label: '计数',
+      children: tag?.tagCount,
+    },
+    {
+      key: 'weight',
+      label: '权重',
+      children: tag?.weight,
     },
   ];
 

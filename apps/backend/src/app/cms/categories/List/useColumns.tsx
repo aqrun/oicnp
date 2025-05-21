@@ -2,32 +2,31 @@
 
 import type { TableProps} from 'antd';
 import TableActions from './TableActions';
-import { TagModel } from '@/services';
+import { CategoryModel } from '@/services';
 
 export default function useColumns() {
-  const columns: TableProps<TagModel>['columns'] = [
+  const columns: TableProps<CategoryModel>['columns'] = [
     {
-      key: 'tagId',
+      key: 'catId',
       title: 'ID',
-      dataIndex: 'tagId',
+      dataIndex: 'catId',
       width: 80,
     },
     {
-      key: 'tagVid',
+      key: 'catVid',
       title: 'VID',
-      dataIndex: 'tagVid',
+      dataIndex: 'catVid',
       width: 120,
     },
     {
-      key: 'tagName',
-      title: '标签名称',
-      dataIndex: 'tagName',
+      key: 'catName',
+      title: '分类名称',
+      dataIndex: 'catName',
     },
     {
-      key: 'count',
-      title: '计数',
-      dataIndex: 'tagCount',
-      width: 80,
+      key: 'catDesc',
+      title: '分类描述',
+      dataIndex: 'catDesc',
     },
     {
       key: 'weight',
@@ -38,7 +37,7 @@ export default function useColumns() {
     {
       key: 'empty',
       title: null,
-      dataIndex: 'tagId',
+      dataIndex: 'catId',
       render: () => {
         return <></>;
       }
@@ -48,8 +47,8 @@ export default function useColumns() {
       title: '操作',
       fixed: 'right',
       width: 200,
-      dataIndex: 'tagId',
-      render: (value: string, record: TagModel) => {
+      dataIndex: 'catId',
+      render: (value: string, record: CategoryModel) => {
         return (
           <TableActions
             record={record}
