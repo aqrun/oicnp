@@ -1,6 +1,7 @@
 import {
   PermissionModel,
   MenuModel,
+  CategoryModel,
 } from '@/services';
 
 /**
@@ -71,4 +72,39 @@ export function convertMenuListToTree(list: MenuModel[]): MenuModel[] {
   });
   
   return tree;
-} 
+}
+
+/**
+ * 将分类列表转换回树形结构
+ * @param list 列表数据
+ * @returns 树形结构
+ */
+export function convertCategoryListToTree(list: CategoryModel[]): CategoryModel[] {
+  const map: Record<string | number, CategoryModel> = {};
+  const tree: CategoryModel[] = [];
+  
+  // 创建节点映射
+  list.forEach(item => {
+    map[item.catId!] = {
+      ...item,
+    };
+  });
+  
+  // 构建树形结构
+  list.forEach(item => {
+    const node = map[item.catId!];
+
+    if (`${item.catPid}` === '0' || !item?.catPid) {
+      tree.push(node);
+    } else {
+      const parent = map?.[item?.catPid];
+
+      if (parent) {
+        parent.children = parent?.children || [];
+        parent.children.push(node);
+      }
+    }
+  });
+  
+  return tree;
+}

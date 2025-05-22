@@ -14,7 +14,7 @@ export default function useColumns() {
     },
     {
       key: 'tagVid',
-      title: 'VID',
+      title: '标识',
       dataIndex: 'tagVid',
       width: 120,
     },

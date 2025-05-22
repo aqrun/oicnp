@@ -7,32 +7,27 @@ import { CategoryModel } from '@/services';
 export default function useColumns() {
   const columns: TableProps<CategoryModel>['columns'] = [
     {
-      key: 'catId',
-      title: 'ID',
-      dataIndex: 'catId',
-      width: 80,
-    },
-    {
-      key: 'catVid',
-      title: 'VID',
-      dataIndex: 'catVid',
-      width: 120,
-    },
-    {
       key: 'catName',
       title: '分类名称',
       dataIndex: 'catName',
+      width: 200,
     },
     {
-      key: 'catDesc',
-      title: '分类描述',
-      dataIndex: 'catDesc',
+      key: 'catVid',
+      title: '标识',
+      dataIndex: 'catVid',
+      width: 200,
     },
     {
       key: 'weight',
       title: '权重',
       dataIndex: 'weight',
       width: 80,
+    },
+    {
+      key: 'catDesc',
+      title: '分类描述',
+      dataIndex: 'catDesc',
     },
     {
       key: 'empty',

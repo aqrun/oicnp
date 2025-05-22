@@ -51,7 +51,7 @@ axiosInstance.interceptors.response.use(
     const action = config?.config?.params?._fetcher || config?.config?.url;
 
     // 未登陆状态需要先登录
-    if (code === '401') {
+    if (code === '401' || code === 'UserNeedLogin') {
       useAppStore.setState({
         loading: false,
         errors: [{

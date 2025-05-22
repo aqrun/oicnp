@@ -42,6 +42,10 @@ pub struct CategoryReqParams {
     pub cat_desc: Option<String>,
     #[serde(rename(deserialize = "catDescFormat", serialize = "catDescFormat"))]
     pub cat_desc_format: Option<String>,
+    #[serde(rename(deserialize = "parentVid", serialize = "parentVid"))]
+    pub parent_vid: Option<String>,
+    #[serde(rename(deserialize = "catPid", serialize = "catPid"))]
+    pub cat_pid: Option<i64>,
 }
 
 impl RequestParamsUpdater for CategoryReqParams {
@@ -50,6 +54,9 @@ impl RequestParamsUpdater for CategoryReqParams {
     fn update(&self, item: &mut Self::ActiveModel) {
         if let Some(x) = &self.cat_id {
             item.cat_id = Set(*x);
+        }
+        if let Some(x) = &self.cat_pid {
+            item.cat_pid = Set(*x);
         }
         if let Some(x) = &self.cat_vid {
             item.cat_vid = Set(String::from(x));

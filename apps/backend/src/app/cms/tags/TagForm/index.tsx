@@ -44,9 +44,9 @@ export default function NoteForm({
         wrapperCol={{ span: 10 }}
       >
         <Form.Item<FieldType>
-          label="VID"
+          label="标识"
           name="tagVid"
-          rules={[{ required: true, message: '请输入VID！' }]}
+          rules={[{ required: true, message: '请输入标识！' }]}
         >
           <Input />
         </Form.Item>

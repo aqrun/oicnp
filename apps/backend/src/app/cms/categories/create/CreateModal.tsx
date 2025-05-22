@@ -31,6 +31,7 @@ export default function CreateModal() {
       const values = await form.validateFields();
 
       const params: DescribeCreateCategoryRequestParams = {
+        catPid: Number(values?.catPid || 0),
         catVid: values?.catVid,
         catName: values?.catName,
         catDesc: values?.catDesc,

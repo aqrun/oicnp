@@ -16,6 +16,7 @@ pub async fn run(ctx: &AppContext) -> Result<()> {
     handle_seed::<UserModel>(ctx, "user").await?;
     handle_seed::<MenuModel>(ctx, "menu").await?;
     handle_seed::<NoteModel>(ctx, "note").await?;
+    handle_seed::<CategoryModel>(ctx, "category").await?;
     Ok(())
 }
 
@@ -38,7 +39,7 @@ where
     let seed_file = format!("src/fixtures/{seed_name}s.yaml");
     // 读取 yaml 文件并解析为指定的类型
     let seed_data: Vec<TModel::CreateReqParams> = serde_yaml::from_reader(File::open(seed_file)?)?;
-    // println!("---{:?}", seed_data);
+
     // 批量插入数据
     let _ = TModel::create_multi(&ctx.db, seed_data.as_slice()).await?;
     println!("{}数据初始化完成", seed_name);

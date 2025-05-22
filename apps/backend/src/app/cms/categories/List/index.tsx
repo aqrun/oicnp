@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Table } from 'antd';
 import {
   PageTitle,
@@ -14,7 +14,9 @@ import { nextTick } from '@/utils';
 import { useQueryCategoryList } from './useQueryCategoryList';
 import { useCreateStore } from '../create/useCreateStore';
 import { CategoryModel } from '@/services';
+import { convertCategoryListToTree } from '@/utils';
 import { Container } from './index.styled';
+
 /**
  * 分类列表
  */
@@ -27,11 +29,11 @@ export default function CategoryList(): JSX.Element {
 
   const {data, loading, refresh} = useQueryCategoryList();
 
-  const getDataSource = () => {
-    const list = data?.categories || [];
-    return list;
-  };
-  const dataSource = getDataSource();
+  const dataSource = useMemo(() => {
+    return convertCategoryListToTree(data?.categories || []);
+  }, [data]);
+
+  console.log('dataSource', dataSource);
 
   /**
    * 创建操作

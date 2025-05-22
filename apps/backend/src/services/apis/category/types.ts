@@ -5,6 +5,7 @@ import {
 
 export interface CategoryModel {
   catId?: number;
+  catPid?: number;
   catVid?: string;
   catName?: string;
   weight?: number;
@@ -12,6 +13,7 @@ export interface CategoryModel {
   catDescFormat?: string;
   createdAt?: string;
   updatedAt?: string;
+  children?: Array<CategoryModel>;
 }
 
 export interface CategoryFilters {

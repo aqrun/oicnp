@@ -43,9 +43,17 @@ export default function NoteForm({
         disabled={disabled}
       >
         <Form.Item<FieldType>
-          label="VID"
+          label="父级"
+          name="catPid"
+          rules={[{ required: true, message: '请选择父级！' }]}
+          wrapperCol={{ span: 10 }}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item<FieldType>
+          label="标识"
           name="catVid"
-          rules={[{ required: true, message: '请输入VID！' }]}
+          rules={[{ required: true, message: '请输入标识！' }]}
           wrapperCol={{ span: 10 }}
         >
           <Input />

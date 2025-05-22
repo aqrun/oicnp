@@ -1,9 +1,11 @@
+use std::collections::HashMap;
 use crate::{
     entities::prelude::*,
     utils::catch_err,
     RequestParamsUpdater,
     ModelCrudHandler,
 };
+use loco_rs::prelude::*;
 use loco_rs::model::{ModelError, ModelResult};
 use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, TransactionTrait};
 use validator::Validate;
@@ -42,8 +44,19 @@ impl ModelCrudHandler for CategoryModel {
     ///
     /// 根据ID查找一个
     /// 
-    async fn find_by_vid(_db: &DatabaseConnection, _vid: &str) -> ModelResult<Self> {
-        Ok(Self::default())
+    async fn find_by_vid(db: &DatabaseConnection, vid: &str) -> ModelResult<Self> {
+        if vid.is_empty() {
+            return Err(ModelError::Any(format!("vid为空: {}", vid).into()));
+        }
+
+        let item = CategoryEntity::find()
+            .filter(CategoryColumn::CatVid.eq(vid))
+            .one(db)
+            .await?;
+
+        item.ok_or_else(|| {
+            ModelError::Any(format!("数据不存在, vid: {}", vid).into())
+        })
     }
 
     ////
@@ -93,22 +106,49 @@ impl ModelCrudHandler for CategoryModel {
         for item in params {
             catch_err(item.validate())?;
         }
-        
-        let txn = db.begin().await?;
-        let mut categories: Vec<CategoryActiveModel> = Vec::new();
+
+        // 缓存已存在的权限数据
+        let mut exist_categories: HashMap<String, Self> = HashMap::new();
 
         for item in params.iter() {
+            // 先使用缓存父菜单数据
+            let mut parent_category: Option<Self> = None;
+            let mut parent_vid = String::from("");
+
+            if let Some(x) = &item.parent_vid {
+                parent_vid = String::from(x);
+            }
+            
+            if !parent_vid.is_empty() {
+                let res = exist_categories.get(parent_vid.as_str());
+
+                if let Some(res) = res {
+                    parent_category = Some(res.clone());
+                } else {
+                    // 不存在从数据库读取
+                    if let Ok(res) = Self::find_by_vid(db, parent_vid.as_str()).await {
+                        exist_categories.insert(String::from(res.cat_vid.as_str()), res.clone());
+                        parent_category = Some(res);
+                    }
+                }
+            }
+
             let mut category = CategoryActiveModel {
                 ..Default::default()
             };
-    
+
             item.update(&mut category);
             item.update_by_create(&mut category);
-            categories.push(category);
+
+            if let Some(parent_category) = parent_category {
+                category.cat_pid = Set(parent_category.cat_id);
+            }
+
+            let category_model = category.insert(db).await?;
+ 
+            // 添加缓存数据
+            exist_categories.insert(String::from(category_model.cat_vid.as_str()), category_model);
         }
-        
-        let _ = CategoryEntity::insert_many(categories).exec(&txn).await?;
-        txn.commit().await?;
 
         Ok(String::from("批量category添加完成"))
     }

@@ -44,6 +44,8 @@ export default function EditModal() {
       catVid: res?.category?.catVid,
       catName: res?.category?.catName,
       weight: res?.category?.weight,
+      catPid: res?.category?.catPid,
+      catDesc: res?.category?.catDesc,
     });
   });
 
@@ -57,6 +59,7 @@ export default function EditModal() {
         catVid: values?.catVid,
         catName: values?.catName,
         weight: Number(values?.weight || 0),
+        catPid: Number(values?.catPid || 0),
       };
 
       const res = await DescribeUpdateCategory(params);
