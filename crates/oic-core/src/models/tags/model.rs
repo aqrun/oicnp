@@ -4,6 +4,7 @@ use crate::{
     RequestParamsUpdater,
     ModelCrudHandler,
 };
+use loco_rs::prelude::*;
 use loco_rs::model::{ModelError, ModelResult};
 use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, TransactionTrait};
 use validator::Validate;
@@ -165,5 +166,18 @@ impl ModelCrudHandler for TagModel {
     }
 }
 
-impl NoteModel {  
+impl TagModel {
+    /// 更新标签计数
+    pub async fn update_count_by_id(db: &DatabaseConnection, tag_id: i64) -> ModelResult<()> {
+        let tag_model = Self::find_by_id(db, tag_id)
+            .await?;
+
+        let count = tag_model.tag_count;
+        let mut tag = tag_model.into_active_model();
+        tag.tag_count = Set(count + 1);
+
+        tag.update(db).await?;
+
+        Ok(())
+    }
 }

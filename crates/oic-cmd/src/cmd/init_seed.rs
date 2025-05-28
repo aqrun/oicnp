@@ -17,6 +17,7 @@ pub async fn run(ctx: &AppContext) -> Result<()> {
     handle_seed::<MenuModel>(ctx, "menu").await?;
     handle_seed::<NoteModel>(ctx, "note").await?;
     handle_seed::<CategoryModel>(ctx, "category").await?;
+    handle_seed::<NodeModel>(ctx, "node").await?;
     Ok(())
 }
 

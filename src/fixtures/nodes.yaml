@@ -1,0 +1,44 @@
+---
+- vid: 15-how-to-use-cli
+  bundle: post
+  title: 15.如何使用控制台命令
+  createdAt: '2019-12-20 00:00:00'
+  summary: Magento系统提供的一些命令
+  summaryFormat: markdown
+  body: gento 2 开发内容目 content
+  bodyFormat: markdown
+  createdByUsername: aqrun
+  tagVids:
+    - php
+    - magento2
+  categoryVids:
+    - backend
+- vid: 14-console-command-line
+  bundle: post
+  title: 14.Magento 2 中如何添加控制台命令
+  createdAt: '2019-11-23 00:00:00'
+  summary: 如何添加控制台命令。Magento 2 使用命令行可以快速实现一些操作
+  summaryFormat: markdown
+  body: 如何添加控制台命令。Magento 2 使用命令行可以快速实现一些操作 content
+  bodyFormat: markdown
+  createdByUsername: aqrun
+  tagVids:
+    - php
+    - magento2
+  categoryVids:
+    - backend
+- vid: ngrx-entity-jian-jie
+  bundle: post
+  title: '@ngrx/entity 简介'
+  createdAt: '2018-03-15 00:00:00'
+  summary: '@ngrx/entity 是 Angular 的实体管理库，用于管理实体状态和操作。'
+  summaryFormat: markdown
+  body: '@ngrx/entity 是 Angular 的实体管理库，用于管理实体状态和操作。content'
+  bodyFormat: markdown
+  createdByUsername: aqrun
+  tagVids:
+    - angular
+    - ngrx
+    - 'ngrx/entity'
+  categoryVids:
+    - frontend

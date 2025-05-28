@@ -5,31 +5,31 @@
   catDesc: '全部内容分类'
   catDescFormat: ''
   weight: 0
-- catVid: cms.rust
+- catVid: rust
   parentVid: 'cms'
   catName: Rust语言
   catDesc: ''
   catDescFormat: ''
   weight: 0
-- catVid: cms.server
+- catVid: server
   parentVid: 'cms'
   catName: 服务器
   catDesc: ''
   catDescFormat: ''
   weight: 0
-- catVid: cms.backend
+- catVid: backend
   parentVid: 'cms'
   catName: 后端开发
   catDesc: ''
   catDescFormat: ''
   weight: 0
-- catVid: cms.frontend
+- catVid: frontend
   parentVid: 'cms'
   catName: 前端开发
   catDesc: ''
   catDescFormat: ''
   weight: 0
-- catVid: cms.diary
+- catVid: diary
   parentVid: 'cms'
   catName: 每日小记
   catDesc: ''

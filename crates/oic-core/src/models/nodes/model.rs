@@ -3,9 +3,10 @@ use crate::{
     utils::catch_err,
     RequestParamsUpdater,
     ModelCrudHandler,
+    models::tags::CreateTagReqParams,
 };
 use loco_rs::prelude::*;
-use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, TransactionTrait};
+use sea_orm::{prelude::*, IntoActiveModel, QueryOrder};
 use validator::Validate;
 use super::{CreateNodeReqParams, NodeFilters, UpdateNodeReqParams, DeleteNodeReqParams};
 
@@ -41,8 +42,19 @@ impl ModelCrudHandler for NodeModel {
     ///
     /// 根据ID查找一个
     /// 
-    async fn find_by_vid(_db: &DatabaseConnection, _vid: &str) -> ModelResult<Self> {
-        Ok(Self::default())
+    async fn find_by_vid(db: &DatabaseConnection, vid: &str) -> ModelResult<Self> {
+        if vid.is_empty() {
+            return Err(ModelError::Any(format!("vid为空: {}", vid).into()));
+        }
+
+        let item = NodeEntity::find()
+            .filter(NodeColumn::Vid.eq(vid))
+            .one(db)
+            .await?;
+
+        item.ok_or_else(|| {
+            ModelError::Any(format!("数据不存在, vid: {}", vid).into())
+        })
     }
 
     ////
@@ -90,23 +102,32 @@ impl ModelCrudHandler for NodeModel {
         params: &[Self::CreateReqParams],
     ) -> ModelResult<String> {
         catch_err(params.validate())?;
-        
-        let txn = db.begin().await?;
-        let mut notes: Vec<NodeActiveModel> = Vec::new();
 
         for item in params.iter() {
-            let mut note = NodeActiveModel {
+            let mut node = NodeActiveModel {
                 ..Default::default()
             };
     
-            item.update(&mut note);
-            item.update_by_create(&mut note);
+            item.update(&mut node);
+            item.update_by_create(&mut node);
 
-            notes.push(note);
+            if let Some(x) = &item.created_by_username {
+                let user = UserModel::find_by_username(db, x).await?;
+                node.created_by = Set(user.uid);
+            }
+
+            let node_model = node.insert(db).await?;
+
+            if let Some(x) = &item.category_vids {
+                Self::assign_categories(db, node_model.nid, x.as_slice()).await?;
+            }
+
+            if let Some(x) = &item.tag_vids {
+                Self::assign_tags(db, node_model.nid, x.as_slice()).await?;
+            }
+
+            Self::save_content(db, node_model.nid, item).await?;
         }
-        
-        let _ = NodeEntity::insert_many(notes).exec(&txn).await?;
-        txn.commit().await?;
 
         Ok(String::from("批量node添加完成"))
     }
@@ -164,5 +185,93 @@ impl ModelCrudHandler for NodeModel {
 }
 
 impl NodeModel {
-    
+    /// 指定分类
+    pub async fn assign_categories(
+        db: &DatabaseConnection,
+        nid: i64,
+        category_vids: &[String],
+    ) -> ModelResult<()> {
+        let categories = CategoryEntity::find()
+            .all(db)
+            .await?;
+
+        for vid in category_vids.iter() {
+            let category = categories.iter().find(|c| c.cat_vid.eq(vid));
+
+            if let Some(category) = category {
+                let node_cat = NodeCategoriesMapActiveModel {
+                    bundle: Set(String::from("post")),
+                    nid: Set(nid),
+                    cat_id: Set(category.cat_id),
+                };
+
+                node_cat.insert(db).await?;
+            }
+        }
+
+        Ok(())
+    }
+
+    /// 指定标签
+    pub async fn assign_tags(
+        db: &DatabaseConnection,
+        nid: i64,
+        tag_vids: &[String],
+    ) -> ModelResult<()> {
+        let tag_params = tag_vids.iter().map(|vid| CreateTagReqParams {
+            tag_vid: Some(vid.to_string()),
+            tag_name: Some(vid.to_string()),
+            ..Default::default()
+        }).collect::<Vec<CreateTagReqParams>>();
+        TagModel::create_multi(db, tag_params.as_slice()).await?;
+
+        for vid in tag_vids.iter() {
+            let tag = TagEntity::find()
+                .filter(TagColumn::TagVid.eq(vid))
+                .one(db)
+                .await?;
+
+            if let Some(tag) = tag {
+                let node_tag = NodeTagsMapActiveModel {
+                    bundle: Set(String::from("post")),
+                    nid: Set(nid),
+                    tag_id: Set(tag.tag_id),
+                };
+
+                node_tag.insert(db).await?;
+                // 更新标签计数
+                TagModel::update_count_by_id(db, tag.tag_id).await?;
+            }
+        }
+
+        Ok(())
+    }
+
+    /// 保存内容
+    pub async fn save_content(db: &DatabaseConnection, nid: i64, params: &CreateNodeReqParams) -> ModelResult<()> {
+        let mut node_body = NodeBodyActiveModel {
+            nid: Set(nid),
+            ..Default::default()
+        };
+
+        if let Some(x) = &params.summary {
+            node_body.summary = Set(x.to_string());
+        }
+
+        if let Some(x) = &params.summary_format {
+            node_body.summary_format = Set(x.to_string());
+        }
+
+        if let Some(x) = &params.body {
+            node_body.body = Set(x.to_string());
+        }
+
+        if let Some(x) = &params.body_format {
+            node_body.body_format = Set(x.to_string());
+        }
+
+        node_body.insert(db).await?;
+
+        Ok(())
+    }
 }

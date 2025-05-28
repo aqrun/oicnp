@@ -447,6 +447,18 @@ impl UserModel {
         user.ok_or_else(|| ModelError::EntityNotFound)
     }
 
+    pub async fn find_by_username(db: &DatabaseConnection, username: &str) -> ModelResult<Self> {
+        let user = UserEntity::find()
+            .filter(
+                model::query::condition()
+                    .eq(UserColumn::Username, username)
+                    .build(),
+            )
+            .one(db)
+            .await?;
+        user.ok_or_else(|| ModelError::EntityNotFound)
+    }
+
     /// finds a user by the provided api key
     ///
     /// # Errors

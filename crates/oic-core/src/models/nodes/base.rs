@@ -6,6 +6,8 @@ use crate::{
     models::RequestParamsUpdater,
     utils::utc_now,
     entities::prelude::*,
+    constants::DATE_TIME_FORMAT,
+    uuid,
 };
 
 #[add_filter_fields]
@@ -20,17 +22,17 @@ pub struct NodeFilters {
     pub viewed: Option<i32>,
     pub deleted: Option<String>,
     #[serde(rename(deserialize = "publishedAt", serialize = "publishedAt"))]
-    pub published_at: Option<DateTime>,
+    pub published_at: Option<String>,
     #[serde(rename(deserialize = "createdBy", serialize = "createdBy"))]
     pub created_by: Option<i64>,
     #[serde(rename(deserialize = "updatedBy", serialize = "updatedBy"))]
     pub updated_by: Option<i64>,
     #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
-    pub created_at: Option<DateTime>,
+    pub created_at: Option<String>,
     #[serde(rename(deserialize = "updatedAt", serialize = "updatedAt"))]
-    pub updated_at: Option<DateTime>,
+    pub updated_at: Option<String>,
     #[serde(rename(deserialize = "deletedAt", serialize = "deletedAt"))]
-    pub deleted_at: Option<DateTime>,
+    pub deleted_at: Option<String>,
 }
 
 /// 创建 note 参数
@@ -44,22 +46,37 @@ pub struct NodeReqParams {
     pub bundle: Option<String>,
     #[validate(required(message = "必须指定 title"), length(min = 2, message = "title 最少2个字符"))]
     pub title: Option<String>,
-    #[validate(length(min = 2, message = "content 最少2个字符"))]
-    pub content: Option<String>,
+    #[validate(length(min = 2, message = "body 最少2个字符"))]
+    pub body: Option<String>,
+    pub summary: Option<String>,
+    #[serde(rename(deserialize = "summaryFormat", serialize = "summaryFormat"))]
+    pub summary_format: Option<String>,
+    #[serde(rename(deserialize = "bodyFormat", serialize = "bodyFormat"))]
+    pub body_format: Option<String>,
     pub viewed: Option<i32>,
     pub deleted: Option<String>,
     #[serde(rename(deserialize = "publishedAt", serialize = "publishedAt"))]
-    pub published_at: Option<DateTime>,
+    pub published_at: Option<String>,
     #[serde(rename(deserialize = "createdBy", serialize = "createdBy"))]
     pub created_by: Option<i64>,
     #[serde(rename(deserialize = "updatedBy", serialize = "updatedBy"))]
     pub updated_by: Option<i64>,
     #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
-    pub created_at: Option<DateTime>,
+    pub created_at: Option<String>,
+    #[serde(rename(deserialize = "createdByUsername", serialize = "createdByUsername"))]
+    pub created_by_username: Option<String>,
     #[serde(rename(deserialize = "updatedAt", serialize = "updatedAt"))]
-    pub updated_at: Option<DateTime>,
+    pub updated_at: Option<String>,
     #[serde(rename(deserialize = "deletedAt", serialize = "deletedAt"))]
-    pub deleted_at: Option<DateTime>,
+    pub deleted_at: Option<String>,
+    #[serde(rename(deserialize = "tagVids", serialize = "tagVids"))]
+    pub tag_vids: Option<Vec<String>>,
+    #[serde(rename(deserialize = "categoryVids", serialize = "categoryVids"))]
+    pub category_vids: Option<Vec<String>>,
+    #[serde(rename(deserialize = "tagIds", serialize = "tagIds"))]
+    pub tag_ids: Option<Vec<i64>>,
+    #[serde(rename(deserialize = "categoryIds", serialize = "categoryIds"))]
+    pub category_ids: Option<Vec<i64>>,
 }
 
 impl RequestParamsUpdater for NodeReqParams {
@@ -88,29 +105,40 @@ impl RequestParamsUpdater for NodeReqParams {
             item.deleted = Set(String::from(x));
         }
         if let Some(x) = &self.published_at {
-            item.published_at = Set(Some(*x));
+            if let Ok(x) = DateTime::parse_from_str(x, DATE_TIME_FORMAT) {
+                item.published_at = Set(Some(x));
+            }
         }
         if let Some(x) = &self.created_by {
             item.created_by = Set(*x);
         }
+
         if let Some(x) = &self.updated_by {
             item.updated_by = Set(*x);
         }
         if let Some(x) = &self.created_at {
-            item.created_at = Set(*x);
+            if let Ok(x) = DateTime::parse_from_str(x, DATE_TIME_FORMAT) {
+                item.created_at = Set(x);
+            }
         }
         if let Some(x) = &self.updated_at {
-            item.updated_at = Set(Some(*x));
-        } else {
-            item.updated_at = Set(Some(utc_now()));
+            if let Ok(x) = DateTime::parse_from_str(x, DATE_TIME_FORMAT) {
+                item.updated_at = Set(Some(x));
+            }
         }
         if let Some(x) = &self.deleted_at {
-            item.deleted_at = Set(Some(*x));
+            if let Ok(x) = DateTime::parse_from_str(x, DATE_TIME_FORMAT) {
+                item.deleted_at = Set(Some(x));
+            }
         }
     }
 
     fn update_by_create(&self, item: &mut Self::ActiveModel) {
         item.nid = ActiveValue::NotSet;
+
+        if self.uuid.is_none() {
+            item.uuid = Set(uuid!());
+        }
 
         if item.created_at.is_not_set() {
             item.created_at = Set(utc_now());
