@@ -2,6 +2,8 @@ import {
   BaseFilterParams,
   BaseListResponseData,
 } from '../../types';
+import { TagModel } from '../tag/types';
+import { CategoryModel } from '../category/types';
 
 export interface NodeModel {
   nid?: number;
@@ -62,3 +64,13 @@ export type DescribeUpdateNodeRequestParams = DescribeCreateNodeRequestParams;
 export type DescribeUpdateNodeResponseData = DescribeCreateNodeResponseData;
 export type DescribeDeleteNodeRequestParams = DescribeCreateNodeRequestParams;
 export type DescribeDeleteNodeResponseData = DescribeCreateNodeResponseData;
+export type DescribeNodeTagsRequestParams = NodeFilters;
+
+export interface DescribeNodeTagsResponseData {
+  tags: Array<TagModel>;
+}
+
+export type DescribeNodeCategoriesRequestParams = NodeFilters;
+export interface DescribeNodeCategoriesResponseData {
+  categories: Array<CategoryModel>;
+}

@@ -24,7 +24,10 @@ pub struct Model {
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {}
+pub enum Relation {
+    #[sea_orm(has_many = "super::node_categories_map::Entity")]
+    NodeCategory,
+}
 
 impl Related<super::node::Entity> for Entity {
     fn to() -> RelationDef {
@@ -33,6 +36,12 @@ impl Related<super::node::Entity> for Entity {
 
     fn via() -> Option<RelationDef> {
         Some(super::node_categories_map::Relation::Category.def().rev())
+    }
+}
+
+impl Related<super::node_categories_map::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::NodeCategory.def()
     }
 }
 

@@ -41,10 +41,21 @@ impl ModelCrudHandler for TagModel {
     }
 
     ///
-    /// 根据ID查找一个
+    /// 根据VID查找一个
     /// 
-    async fn find_by_vid(_db: &DatabaseConnection, _vid: &str) -> ModelResult<Self> {
-        Ok(Self::default())
+    async fn find_by_vid(db: &DatabaseConnection, vid: &str) -> ModelResult<Self> {
+        if vid.is_empty() {
+            return Err(ModelError::Any(format!("数据不存在,vid: {}", vid).into()));
+        }
+
+        let item = TagEntity::find()
+            .filter(TagColumn::TagVid.eq(vid))
+            .one(db)
+            .await?;
+
+        item.ok_or_else(|| {
+            ModelError::Any(format!("数据不存在,vid: {}", vid).into())
+        })
     }
 
     ////
@@ -94,22 +105,10 @@ impl ModelCrudHandler for TagModel {
         for item in params {
             catch_err(item.validate())?;
         }
-        
-        let txn = db.begin().await?;
-        let mut tags: Vec<TagActiveModel> = Vec::new();
 
         for item in params.iter() {
-            let mut tag = TagActiveModel {
-                ..Default::default()
-            };
-    
-            item.update(&mut tag);
-            item.update_by_create(&mut tag);
-            tags.push(tag);
+            Self::upsert(db, item).await?;
         }
-        
-        let _ = TagEntity::insert_many(tags).exec(&txn).await?;
-        txn.commit().await?;
 
         Ok(String::from("批量tag添加完成"))
     }
@@ -179,5 +178,27 @@ impl TagModel {
         tag.update(db).await?;
 
         Ok(())
+    }
+
+    /// 创建或更新标签
+    pub async fn upsert(db: &DatabaseConnection, params: &CreateTagReqParams) -> ModelResult<i64> {
+        if let Some(tag_vid) = &params.tag_vid {
+            match Self::find_by_vid(db, tag_vid.as_str()).await {
+                Ok(existing_tag) => {
+                    let count = existing_tag.tag_count;
+                    // Tag exists, update count
+                    let mut tag = existing_tag.into_active_model();
+                    tag.tag_count = Set(count + 1);
+                    let updated_tag = tag.update(db).await?;
+                    Ok(updated_tag.tag_id)
+                }
+                Err(_) => {
+                    // Tag doesn't exist, create new one
+                    Self::create(db, params).await
+                }
+            }
+        } else {
+            Err(ModelError::Any("tag_vid is required".into()))
+        }
     }
 }

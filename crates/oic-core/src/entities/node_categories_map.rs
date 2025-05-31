@@ -33,4 +33,16 @@ pub enum Relation {
     Category,
 }
 
+impl Related<super::node::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Node.def()
+    }
+}
+
+impl Related<super::category::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Category.def()
+    }
+}
+
 impl ActiveModelBehavior for ActiveModel {}

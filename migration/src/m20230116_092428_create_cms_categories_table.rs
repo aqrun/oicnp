@@ -17,7 +17,7 @@ impl MigrationTrait for Migration {
                     .primary_key()
                     .auto_increment(),
             )
-            .col(ColumnDef::new(Categories::CatVid).string_len(255).not_null().default(""))
+            .col(ColumnDef::new(Categories::CatVid).string_len(255).not_null().unique_key().default(""))
             .col(ColumnDef::new(Categories::CatPid).big_integer().not_null().default(0))
             .col(ColumnDef::new(Categories::CatName).string_len(128).not_null().default(""))
             .col(ColumnDef::new(Categories::CatDesc).string_len(512).not_null().default(""))

@@ -30,7 +30,7 @@ impl ModelCrudHandler for NodeModel {
         }
 
         let item = NodeEntity::find()
-            .filter(NoteColumn::Id.eq(id))
+            .filter(NodeColumn::Nid.eq(id))
             .one(db)
             .await?;
 
@@ -274,4 +274,38 @@ impl NodeModel {
 
         Ok(())
     }
+
+    /// 根据nid获取分类
+    pub async fn find_categories(db: &DatabaseConnection, nid: i64) -> ModelResult<Vec<CategoryModel>> {
+        let categories = CategoryEntity::find()
+            .left_join(NodeCategoriesMapEntity)
+            .filter(NodeCategoriesMapColumn::Nid.eq(nid))
+            .all(db)
+            .await?;
+
+        Ok(categories)
+    }
+
+    /// 根据nid获取标签
+    pub async fn find_tags(db: &DatabaseConnection, nid: i64) -> ModelResult<Vec<TagModel>> {
+        let tags = TagEntity::find()
+            .left_join(NodeTagsMapEntity)
+            .filter(NodeTagsMapColumn::Nid.eq(nid))
+            .all(db)
+            .await?;
+
+        Ok(tags)
+    }
+
+    pub async fn find_node_body(db: &DatabaseConnection, nid: i64) -> ModelResult<NodeBodyModel> {
+        let node_body = NodeBodyEntity::find()
+            .filter(NodeBodyColumn::Nid.eq(nid))
+            .one(db)
+            .await?;
+
+        node_body.ok_or_else(|| {
+            ModelError::Any(format!("数据不存在,id: {}", nid).into())
+        })
+    }
+
 }

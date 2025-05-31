@@ -20,4 +20,23 @@ pub struct Model {
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {}
+pub enum Relation {
+    #[sea_orm(has_many = "super::node_tags_map::Entity")]
+    NodeTag,
+}
+
+impl Related<super::node::Entity> for Entity {
+    fn to() -> RelationDef {
+        super::node_tags_map::Relation::Node.def()
+    }
+
+    fn via() -> Option<RelationDef> {
+        Some(super::node_tags_map::Relation::Tag.def().rev())
+    }
+}
+
+impl Related<super::node_tags_map::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::NodeTag.def()
+    }
+}

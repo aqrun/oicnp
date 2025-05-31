@@ -12,6 +12,10 @@ import {
   DescribeCreateNodeResponseData,
   DescribeUpdateNodeRequestParams,
   DescribeUpdateNodeResponseData,
+  DescribeNodeTagsRequestParams,
+  DescribeNodeTagsResponseData,
+  DescribeNodeCategoriesRequestParams,
+  DescribeNodeCategoriesResponseData,
 } from './types';
 
 export const DescribeNodeList = createService<
@@ -38,3 +42,13 @@ export const DescribeUpdateNode = createService<
 DescribeUpdateNodeRequestParams,
 DescribeUpdateNodeResponseData
 >('/node/update', 'post');
+
+export const DescribeNodeTags = createService<
+DescribeNodeTagsRequestParams,
+DescribeNodeTagsResponseData
+>('/node/tags', 'post');
+
+export const DescribeNodeCategories = createService<
+DescribeNodeCategoriesRequestParams,
+DescribeNodeCategoriesResponseData
+>('/node/categories', 'post');

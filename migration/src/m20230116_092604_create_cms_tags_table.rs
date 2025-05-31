@@ -17,7 +17,7 @@ impl MigrationTrait for Migration {
                     .primary_key()
                     .auto_increment(),
             )
-            .col(ColumnDef::new(Tags::TagVid).string_len(255).not_null().default(""))
+            .col(ColumnDef::new(Tags::TagVid).string_len(255).not_null().unique_key().default(""))
             .col(ColumnDef::new(Tags::TagName).string_len(128).not_null().default(""))
             .col(ColumnDef::new(Tags::Weight).integer().not_null().default(0))
             .col(ColumnDef::new(Tags::TagCount).big_integer().not_null().default(0))

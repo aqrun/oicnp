@@ -18,7 +18,7 @@ impl MigrationTrait for Migration {
                     .auto_increment(),
             )
             .col(ColumnDef::new(Nodes::Uuid).string_len(32).not_null().default(""))
-            .col(ColumnDef::new(Nodes::Vid).string_len(255).not_null().default(""))
+            .col(ColumnDef::new(Nodes::Vid).string_len(255).not_null().unique_key().default(""))
             .col(ColumnDef::new(Nodes::Bundle).string_len(64).not_null().default(""))
             .col(ColumnDef::new(Nodes::Title).string_len(512).not_null().default(""))
             .col(ColumnDef::new(Nodes::Viewed).integer().not_null().default(0))

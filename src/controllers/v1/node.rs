@@ -93,6 +93,61 @@ pub async fn remove(
     JsonRes::from(res)
 }
 
+#[debug_handler]
+pub async fn categories(
+    State(ctx): State<AppContext>,
+    Json(params): Json<NodeFilters>,
+) -> JsonRes<Vec<CategoryModel>> {
+    let nid = params.nid.unwrap_or(0);
+    let res = NodeModel::find_categories(&ctx.db, nid).await;
+
+    match res {
+        Ok(data) => {
+            JsonRes::from((data, "categories"))
+        },
+        Err(err) => {
+            JsonRes::err(err)
+        }
+    }
+}
+
+#[debug_handler]
+pub async fn tags(
+    State(ctx): State<AppContext>,
+    Json(params): Json<NodeFilters>,
+) -> JsonRes<Vec<TagModel>> {
+    let nid = params.nid.unwrap_or(0);
+    let res = NodeModel::find_tags(&ctx.db, nid).await;
+
+    match res {
+        Ok(data) => {
+            JsonRes::from((data, "tags"))
+        },
+        Err(err) => {
+            JsonRes::err(err)
+        }
+    }
+}
+
+#[debug_handler]
+pub async fn find_node_body(
+    State(ctx): State<AppContext>,
+    Json(params): Json<NodeFilters>,
+) -> JsonRes<NodeBodyModel> {
+    let nid = params.nid.unwrap_or(0);
+    let res = NodeModel::find_node_body(&ctx.db, nid).await;
+
+    match res {
+        Ok(data) => {
+            JsonRes::from((data, "body"))
+        },
+        Err(err) => {
+            JsonRes::err(err)
+        }
+    }
+}
+
+
 pub fn routes() -> Routes {
     Routes::new()
         .prefix(get_api_prefix(super::VERSION, "node").as_str())
@@ -102,4 +157,7 @@ pub fn routes() -> Routes {
         .add("/add-multi", post(add_multi))
         .add("/update", post(update))
         .add("/remove", post(remove))
+        .add("/categories", post(categories))
+        .add("/tags", post(tags))
+        .add("/body", post(find_node_body))
 }
