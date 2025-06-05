@@ -16,6 +16,8 @@ import {
   DescribeNodeTagsResponseData,
   DescribeNodeCategoriesRequestParams,
   DescribeNodeCategoriesResponseData,
+  DescribeNodeBodyRequestParams,
+  DescribeNodeBodyResponseData,
 } from './types';
 
 export const DescribeNodeList = createService<
@@ -52,3 +54,8 @@ export const DescribeNodeCategories = createService<
 DescribeNodeCategoriesRequestParams,
 DescribeNodeCategoriesResponseData
 >('/node/categories', 'post');
+
+export const DescribeNodeBody = createService<
+DescribeNodeBodyRequestParams,
+DescribeNodeBodyResponseData
+>('/node/body', 'post');

@@ -5,8 +5,8 @@ import { useViewStore } from './useViewStore';
 import { useMemoizedFn } from 'ahooks';
 import useDescriptions from './useDescriptions';
 import {
-  DescribeNodeDetail,
-  DescribeNodeDetailRequestParams,
+  NodeFilters,
+  useFetchNodeAll,
 } from '@/services';
 
 /**
@@ -19,19 +19,25 @@ export default function ViewModal() {
 
   const [loading, setLoading] = useState(false);
   const [items] = useDescriptions();
+  const {
+    fetchNodeAll,
+  } = useFetchNodeAll();
 
   const handleCancel = useMemoizedFn(() => {
     setState({
       visible: false,
       node: undefined,
+      body: undefined,
+      tags: [],
+      categories: [],
     });
   });
 
   const fetchNode = useMemoizedFn(async () => {
-    const params: DescribeNodeDetailRequestParams = {
+    const params: NodeFilters = {
       nid,
     };
-    const res = await DescribeNodeDetail(params);
+    const res = await fetchNodeAll(params);
 
     return res;
   });
@@ -41,7 +47,10 @@ export default function ViewModal() {
     const res = await fetchNode();
 
     setState({
-      node: res?.node,
+      node: res?.detailRes?.node,
+      body: res?.bodyRes?.body,
+      tags: res?.tagRes?.tags,
+      categories: res?.categoryRes?.categories,
     });
     setLoading(false);
   });

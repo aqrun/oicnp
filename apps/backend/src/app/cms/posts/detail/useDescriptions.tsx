@@ -1,9 +1,12 @@
-import { DescriptionsProps } from 'antd';
+import { DescriptionsProps, Tag } from 'antd';
 import { useViewStore } from './useViewStore';
 import { formatDate } from '@/utils';
 
 export default function useDescriptions() {
   const node = useViewStore(state => state.node);
+  const body = useViewStore(state => state.body);
+  const tags = useViewStore(state => state.tags);
+  const categories = useViewStore(state => state.categories);
 
   const items: DescriptionsProps['items'] = [
     {
@@ -27,6 +30,36 @@ export default function useDescriptions() {
       children: node?.title,
     },
     {
+      key: 'category',
+      label: '分类',
+      children: (
+        <div>
+          {categories.map(item => {
+            return (
+              <div key={item?.catId}>
+                {item?.catName}
+              </div>
+            );
+          })}
+        </div>
+      ),
+    },
+    {
+      key: 'tags',
+      label: '标签',
+      children: (
+        <div>
+          {tags.map(item => {
+            return (
+              <Tag key={item?.tagId}>
+                {item?.tagName}
+              </Tag>
+            );
+          })}
+        </div>
+      ),
+    },
+    {
       key: 'viewed',
       label: '浏览量',
       children: node?.viewed,
@@ -40,7 +73,23 @@ export default function useDescriptions() {
       key: 'createdAt',
       label: '创建时间',
       children: formatDate(node?.createdAt || ''),
-    }
+      span: 2
+    },
+    {
+      key: 'summary',
+      label: '摘要',
+      children: body?.summary,
+      span: 2,
+    },
+    {
+      key: 'body',
+      label: '内容',
+      children: (
+        <div>
+          {body?.body}
+        </div>
+      ),
+    },
   ];
 
   return [items];

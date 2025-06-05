@@ -11,7 +11,10 @@ export interface NodeModel {
   vid?: string;
   bundle?: string;
   title?: string;
-  content?: string;
+  body?: string;
+  summary?: string;
+  summaryFormat?: string;
+  bodyFormat?: string;
   viewed?: number;
   deleted?: string;
   publishedAt?: string;
@@ -19,6 +22,9 @@ export interface NodeModel {
   updatedBy?: number;
   createdAt?: string;
   updatedAt?: string;
+  categoryIds?: number[];
+  tagIds?: number[];
+  tagVids?: string[];
 }
 
 export interface NodeFilters {
@@ -73,4 +79,20 @@ export interface DescribeNodeTagsResponseData {
 export type DescribeNodeCategoriesRequestParams = NodeFilters;
 export interface DescribeNodeCategoriesResponseData {
   categories: Array<CategoryModel>;
+}
+
+export interface DescribeNodeBodyRequestParams extends NodeFilters {
+  _name?: string;
+}
+
+export interface NodeBody {
+    nid: number;
+    summary: string;
+    summaryFormat: string;
+    body: string;
+    bodyFormat: string;
+}
+
+export interface DescribeNodeBodyResponseData {
+  body: NodeBody;
 }

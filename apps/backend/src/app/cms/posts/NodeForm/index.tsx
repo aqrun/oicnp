@@ -1,8 +1,19 @@
 'use client';
 
-import { Button, Form, Input, FormInstance } from 'antd';
+import {
+  Button,
+  Form,
+  Input,
+  FormInstance,
+  Select,
+  DatePicker,
+} from 'antd';
+import { TagInput } from '@/components';
 import type { FormProps } from 'antd';
-import { NodeModel } from '@/services';
+import {
+  NodeModel,
+  CategoryModel,
+} from '@/services';
 import { Container } from './index.styled';
 
 type FieldType = NodeModel;
@@ -15,6 +26,9 @@ export interface TagFormProps {
   showSubmit?: boolean;
   form?: FormInstance<NodeModel>;
   disabled?: boolean;
+  categories?: CategoryModel[];
+  categoryLoading?: boolean;
+  onTagChange?: (tags: string[]) => void;
 }
 
 export default function NodeForm({
@@ -25,6 +39,9 @@ export default function NodeForm({
   showSubmit,
   form,
   disabled,
+  categories,
+  categoryLoading,
+  onTagChange,
 }: TagFormProps): JSX.Element {
   const initialValues: FieldType = {
     title: '',
@@ -41,7 +58,7 @@ export default function NodeForm({
         layout="vertical"
         form={form}
         disabled={disabled}
-        wrapperCol={{ span: 10 }}
+        wrapperCol={{ span: 24 }}
       >
         <Form.Item<FieldType>
           label="标识"
@@ -58,11 +75,54 @@ export default function NodeForm({
           <Input />
         </Form.Item>
         <Form.Item<FieldType>
-          label="内容"
-          name="content"
-          initialValue={0}
+          label="分类"
+          name="categoryIds"
         >
-          <Input />
+          <Select
+            mode="multiple"
+            options={categories?.map(item => ({
+              label: item?.catName,
+              value: item?.catId,
+            }))}
+            loading={categoryLoading}
+            allowClear
+          />
+        </Form.Item>
+        <Form.Item<FieldType>
+          label="标签"
+          name="tagIds"
+        >
+          <TagInput
+            onChange={onTagChange}
+          />
+        </Form.Item>
+        <Form.Item<FieldType>
+          label="摘要"
+          name="summary"
+        >
+          <Input.TextArea rows={2} />
+        </Form.Item>
+        <Form.Item<FieldType>
+          label="内容"
+          name="body"
+        >
+          <Input.TextArea rows={10} />
+        </Form.Item>
+        <Form.Item<FieldType>
+          label="发布时间"
+          name="publishedAt"
+        >
+          <DatePicker
+            showTime
+          />
+        </Form.Item>
+        <Form.Item<FieldType>
+          label="创建时间"
+          name="createdAt"
+        >
+          <DatePicker
+            showTime
+          />
         </Form.Item>
 
         {showSubmit && (

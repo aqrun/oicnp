@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Form } from 'antd';
 import { Modal } from '@/components';
 import NodeForm from '../NodeForm';
@@ -10,6 +10,7 @@ import {
   NodeModel,
   DescribeCreateNode,
   DescribeCreateNodeRequestParams,
+  useFetchCategoryList,
 } from '@/services';
 
 /**
@@ -18,10 +19,16 @@ import {
 export default function CreateModal() {
   const visible = useCreateStore(state => state.visible);
   const contentType = useCreateStore(state => state.contentType);
+  const tags = useCreateStore(state => state.tags);
+  const categories = useCreateStore(state => state.categories);
   const setState = useCreateStore(state => state.setState);
   const setListState = useListStore(state => state.setState);
 
   const [loading, setLoading] = useState(false);
+  const {
+    loading: categoryLoading,
+    fetchCategoryList,
+  } = useFetchCategoryList();
 
   const [form] = Form.useForm<NodeModel>();
 
@@ -33,6 +40,7 @@ export default function CreateModal() {
       const params: DescribeCreateNodeRequestParams = {
         vid: values?.vid,
         title: values?.title,
+        tagVids: tags,
       };
 
       const res = await DescribeCreateNode(params);
@@ -63,10 +71,32 @@ export default function CreateModal() {
     });
   });
 
+  const handleTagChange = useMemoizedFn((tags: string[]) => {
+    setState({
+      tags,
+    });
+  });
+
+  const init = useMemoizedFn(async () => {
+    const requests = [
+      fetchCategoryList({
+        page: 1,
+        pageSize: 10,
+      }),
+    ] as const;
+    const allRes = await Promise.all(requests);
+    setState({
+      categories: allRes[0].categories,
+    });
+  });
+
   let content = (
     <NodeForm
       form={form}
       loading={loading}
+      categoryLoading={categoryLoading}
+      categories={categories}
+      onTagChange={handleTagChange}
     />
   );
 
@@ -77,6 +107,12 @@ export default function CreateModal() {
       />
     );
   }
+
+  useEffect(() => {
+    if (visible) {
+      init();
+    }
+  }, [visible]);
 
   return (
     <Modal
