@@ -4,8 +4,9 @@ import {
 } from '../../types';
 import { TagModel } from '../tag/types';
 import { CategoryModel } from '../category/types';
+import { Dayjs } from 'dayjs';
 
-export interface NodeModel {
+export interface BaseNodeModel {
   nid?: number;
   uuid?: string;
   vid?: string;
@@ -17,15 +18,24 @@ export interface NodeModel {
   bodyFormat?: string;
   viewed?: number;
   deleted?: string;
-  publishedAt?: string;
   createdBy?: number;
   updatedBy?: number;
-  createdAt?: string;
-  updatedAt?: string;
   categoryIds?: number[];
   tagIds?: number[];
   tagVids?: string[];
 }
+
+export interface NodeModel extends BaseNodeModel {
+  publishedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface NodeFieldType extends BaseNodeModel {
+  createdAt?: Dayjs;
+  publishedAt?: Dayjs;
+}
+
 
 export interface NodeFilters {
   nid?: number;

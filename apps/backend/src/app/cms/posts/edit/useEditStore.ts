@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 import type { BaseState } from '@/stores/types';
-import { NodeModel } from '@/services';
+import { CategoryModel, NodeModel, TagModel } from '@/services';
 
 export interface BaseEditState {
   visible?: boolean;
@@ -12,6 +12,15 @@ export interface BaseEditState {
   contentType?: string;
   nid: number;
   node: NodeModel | undefined;
+  tags: TagModel[];
+  /**
+   * 当前选中的分类
+   */
+  categories: CategoryModel[];
+  /**
+   * 全部分类数据
+   */
+  categoryList: CategoryModel[];
 };
 
 export type EditState = BaseEditState & BaseState<BaseEditState>;
@@ -23,6 +32,9 @@ export const useEditStore = create<EditState>()((set) => ({
   visible: false,
   nid: 0,
   node: undefined,
+  tags: [],
+  categories: [],
+  categoryList: [],
   contentType: '',
   setState: (payload) => set((state) => {
     return {

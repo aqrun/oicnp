@@ -12,6 +12,9 @@ import {
   DescribeNodeDetailRequestParams,
   DescribeUpdateNode,
   DescribeUpdateNodeRequestParams,
+  NodeFieldType,
+  useFetchNodeAll,
+  useFetchCategoryList,
 } from '@/services';
 
 /**
@@ -22,28 +25,47 @@ export default function EditModal() {
   const contentType = useEditStore(state => state.contentType);
   const nid = useEditStore(state => state.nid);
   const node = useEditStore(state => state.node);
+  const tags = useEditStore(state => state.tags);
+  const categoryList = useEditStore(state => state.categoryList);
   const setState = useEditStore(state => state.setState);
   const setListState = useListStore(state => state.setState);
 
   const [loading, setLoading] = useState(false);
   const [initLoading, setInitLoading] = useState(true);
+  const {
+    fetchNodeAll,
+  } = useFetchNodeAll();
+  const {
+    fetchCategoryList,
+  } = useFetchCategoryList();
 
-  const [form] = Form.useForm<NodeModel>();
+  const [form] = Form.useForm<NodeFieldType>();
 
   const fetchNote = useMemoizedFn(async () => {
     const params: DescribeNodeDetailRequestParams = {
       nid,
     };
-    const res = await DescribeNodeDetail(params);
+    const request = [
+      fetchNodeAll(params),
+      fetchCategoryList({}),
+    ] as const;
+    const allRes = await Promise.all(request);
+    const res = allRes?.[0];
     
     setState({
-      node: res.node,
+      node: res.detailRes?.node,
+      tags: res?.tagRes?.tags,
+      categories: res?.categoryRes?.categories,
+      categoryList: allRes?.[1]?.categories,
     });
-    
+    console.log('res---', res);
+
     form.setFieldsValue({
-      vid: res?.node?.vid,
-      title: res?.node?.title,
-      content: res?.node?.content,
+      vid: res?.detailRes?.node?.vid,
+      title: res?.detailRes?.node?.title,
+      summary: res?.bodyRes?.body?.summary,
+      body : res?.bodyRes?.body?.body,
+      categoryIds: res?.categoryRes?.categories?.map(item => item?.catId || 0),
     });
   });
 
@@ -103,6 +125,8 @@ export default function EditModal() {
           form={form}
           loading={loading}
           node={node}
+          categories={categoryList}
+          defaultTags={tags?.map?.((item) => item?.tagVid || '')}
         />
       );
     }

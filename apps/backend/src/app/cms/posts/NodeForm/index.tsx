@@ -13,21 +13,24 @@ import type { FormProps } from 'antd';
 import {
   NodeModel,
   CategoryModel,
+  NodeFieldType,
 } from '@/services';
+import dayjs from 'dayjs';
 import { Container } from './index.styled';
 
-type FieldType = NodeModel;
+type FieldType = NodeFieldType;
 
 export interface TagFormProps {
-  onFinish?: FormProps<FieldType>['onFinish'];
+  onFinish?: FormProps<NodeFieldType>['onFinish'];
   isEdit?: boolean;
   node?: NodeModel;
   loading?: boolean;
   showSubmit?: boolean;
-  form?: FormInstance<NodeModel>;
+  form?: FormInstance<FieldType>;
   disabled?: boolean;
   categories?: CategoryModel[];
   categoryLoading?: boolean;
+  defaultTags?: string[],
   onTagChange?: (tags: string[]) => void;
 }
 
@@ -42,11 +45,24 @@ export default function NodeForm({
   categories,
   categoryLoading,
   onTagChange,
+  defaultTags,
 }: TagFormProps): JSX.Element {
-  const initialValues: FieldType = {
-    title: '',
-    ...(node || {}),
+  const getInitialValues = () => {
+    const data: NodeFieldType = {
+      title: '',
+    }
+
+    if (node?.createdAt) {
+      data.createdAt = dayjs(node?.createdAt);
+    }
+
+    if (node?.publishedAt) {
+      data.publishedAt = dayjs(node?.publishedAt);
+    }
+
+    return data;
   };
+  const initialValues = getInitialValues();
 
   return (
     <Container>
@@ -90,9 +106,10 @@ export default function NodeForm({
         </Form.Item>
         <Form.Item<FieldType>
           label="标签"
-          name="tagIds"
+          name="tagVids"
         >
           <TagInput
+            defaultTags={defaultTags}
             onChange={onTagChange}
           />
         </Form.Item>
