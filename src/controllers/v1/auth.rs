@@ -66,6 +66,20 @@ async fn reset(State(ctx): State<AppContext>, Json(params): Json<ResetParams>) -
 /// Creates a user login and returns a token
 #[debug_handler]
 async fn login(State(ctx): State<AppContext>, Json(params): Json<LoginParams>) -> JsonRes<LoginResponse> {
+    let cache_captcha = match ctx.cache.get(params.captcha_id.as_str()).await {
+        Ok(text) => text.unwrap_or(String::from("")),
+        Err(_) => {
+            return JsonRes::err("验证码已过期, 刷新后重试");
+        }
+    };
+
+    let valid_cache = cache_captcha.to_lowercase();
+    let valid_captcha = params.captcha.to_lowercase();
+
+    if !valid_cache.eq(valid_captcha.as_str()) {
+        return JsonRes::err("验证码错误");
+    }
+
     let res = services::auth::login(&ctx.db, &ctx.config, params).await;
 
     JsonRes::from(res)

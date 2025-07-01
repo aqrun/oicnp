@@ -74,11 +74,19 @@ where
 
             let not_auth_uris = vec![
                 "/v1/info",
+                "/v1/captcha",
                 "/v1/auth/login",
                 "/v1/auth/register",
                 "/v1/user/one",
                 "/v1/menu/tree",
             ];
+
+            let req = Request::from_parts(parts.clone(), body);
+
+            if not_auth_uris.contains(&uri.as_str()) {
+                // 不需要权限检测
+                return inner.call(req).await;
+            }
 
             // 解析当前登录用户信息
             let auth = match JWTWithUser::<UserModel>::from_request_parts(&mut parts, &state).await {
@@ -87,18 +95,14 @@ where
                     return Ok(no_auth("UserNeedLogin", "请先登录"));
                 },
             };
+            
             // 检测登录状态
             if auth.claims.uuid.is_empty() {
                 return Ok(no_auth("UserNeedLogin", "请先登录"));
             }
 
-            let req = Request::from_parts(parts, body);
-
             if auth.user.is_admin.eq("1") {
                 // 管理员账号拥有所有权限
-                return inner.call(req).await;
-            } else if not_auth_uris.contains(&uri.as_str()) {
-                // 不需要权限检测
                 return inner.call(req).await;
             }
 

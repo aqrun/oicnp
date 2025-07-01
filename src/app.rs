@@ -11,6 +11,7 @@ use loco_rs::{
     bgworker::{BackgroundWorker, Queue},
     Result,
     config::Config,
+    cache,
 };
 use migration::Migrator;
 use oic_core::entities::prelude::*;
@@ -66,6 +67,13 @@ impl Hooks for App {
     async fn connect_workers(ctx: &AppContext, queue: &Queue) -> Result<()> {
         queue.register(DownloadWorker::build(ctx)).await?;
         Ok(())
+    }
+
+    async fn after_context(ctx: AppContext) -> Result<AppContext> {
+        Ok(AppContext {
+            cache: cache::Cache::new(cache::drivers::inmem::new()).into(),
+            ..ctx
+        })
     }
 
     fn register_tasks(tasks: &mut Tasks) {

@@ -51,4 +51,4 @@ mime = { workspace = true }
 tower = { workspace = true }
 futures-util = { workspace = true }
 nanoid = { workspace = true }
-
+captcha-rs = { workspace = true }

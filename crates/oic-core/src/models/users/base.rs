@@ -23,6 +23,10 @@ pub struct LoginParams {
     pub email: String,
     #[validate(length(min = 1, message = "必须指定 email 或 password"))]
     pub password: String,
+    #[serde(rename(deserialize = "captchaId"))]
+    pub captcha_id: String,
+    #[validate(length(min = 1, message = "必须指定 captcha"))]
+    pub captcha: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

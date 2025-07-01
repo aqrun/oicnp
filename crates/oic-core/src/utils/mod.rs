@@ -8,6 +8,7 @@ mod string;
 mod route;
 mod err;
 mod time;
+mod captcha;
 
 pub use app_config::*;
 pub use uuid::*;
@@ -19,3 +20,4 @@ pub use string::*;
 pub use route::*;
 pub use err::*;
 pub use time::*;
+pub use captcha::*;

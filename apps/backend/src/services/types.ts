@@ -21,6 +21,8 @@ export interface DescribeLoginRequestParams {
   email: string;
   password: string;
   remember: boolean;
+  captchaId?: string;
+  captcha?: string;
 }
 
 export interface DescribeLoginResponseData {
