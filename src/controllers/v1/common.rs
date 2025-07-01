@@ -18,6 +18,7 @@ pub async fn captcha(
 ) -> JsonRes<AuthCaptcha> {
     let captcha = get_auth_captcha();
 
+    // 缓存验证码 10 分钟
     match ctx.cache.insert_with_expiry(
         captcha.id.as_str(),
         captcha.text.as_str(),
@@ -35,6 +36,6 @@ pub async fn captcha(
 pub fn routes() -> Routes {
     Routes::new()
         .prefix(get_api_prefix(super::VERSION, "").as_str())
-        .add("/captcha", get(captcha))
         .add("/info", get(info).post(info))
+        .add("/captcha", get(captcha))
 }

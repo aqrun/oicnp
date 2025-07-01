@@ -80,6 +80,9 @@ async fn login(State(ctx): State<AppContext>, Json(params): Json<LoginParams>) -
         return JsonRes::err("验证码错误");
     }
 
+    // 验证成功后删除缓存中的验证码，防止重复使用
+    let _ =ctx.cache.remove(params.captcha_id.as_str()).await;
+
     let res = services::auth::login(&ctx.db, &ctx.config, params).await;
 
     JsonRes::from(res)
