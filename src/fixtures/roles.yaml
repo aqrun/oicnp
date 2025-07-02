@@ -10,23 +10,41 @@
   status: 1
   permissionVids:
     - system
-    - user
-    - user-list
+    - system:user
+    - system:user:list
     - cms
-    - note
-    - note-list
-    - note-add
-    - note-update
+    - cms:note
+    - cms:note:list
+    - cms:note:add
+    - cms:note:update
 - vid: member
   name: 成员
   weight: 3
   status: 1
   permissionVids:
     - cms
-    - note
-    - note-list
+    - cms:note
+    - cms:note:list
 - vid: guest
   name: 游客
   weight: 4
   status: 1
-  permissionVids: []
+  permissionVids:
+    - system
+    - system:user
+    - system:user:list
+    - system:role
+    - system:role:list
+    - system:permission
+    - system:permission:list
+    - system:menu
+    - system:menu:list
+    - cms
+    - cms:node
+    - cms:node:list
+    - cms:category
+    - cms:category:list
+    - cms:tag
+    - cms:tag:list
+    - cms:note
+    - cms:note:list

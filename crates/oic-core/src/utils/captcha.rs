@@ -35,7 +35,7 @@ pub fn get_auth_captcha() -> AuthCaptcha {
     let captcha = CaptchaBuilder::new()
 		.length(4)
 		.width(130)
-		.height(40)
+		.height(32)
 		.dark_mode(false)
 		.complexity(1) // min: 1, max: 10
 		.compression(40) // min: 1, max: 99

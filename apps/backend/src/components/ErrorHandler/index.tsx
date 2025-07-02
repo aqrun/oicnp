@@ -16,6 +16,7 @@ export function ErrorHandler(): JSX.Element {
   const errors = useAppStore((state) => state.errors);
   const setState = useAppStore((state) => state.setState);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const instanceRef = useRef<any>();
 
   /**
@@ -26,12 +27,20 @@ export function ErrorHandler(): JSX.Element {
       errors: [],
     });
     await logoutAction();
+    if (instanceRef.current) {
+      instanceRef.current?.destroy?.();
+      instanceRef.current = undefined;
+    }
   });
 
   const handleClose = useMemoizedFn(() => {
     setState({
       errors: [],
     });
+    if (instanceRef.current) {
+      instanceRef.current?.destroy?.();
+      instanceRef.current = undefined;
+    }
   });
 
   const showError = useMemoizedFn((error: FailModel) => {
@@ -56,33 +65,37 @@ export function ErrorHandler(): JSX.Element {
       );
     }
 
-    instanceRef.current = modal.error({
-      title: '请求失败',
-      content: (
-        <>
-          错误码: {error?.code}<br/>
-          错误信息：{error?.message}<br/>
-          {Boolean(error?.action) && (
-            <span>
-              操作：{error?.action}<br/>
-            </span>
-          )}
-          {Boolean(error?.requestId) && (
-            <span>
-              RequestId：{error?.requestId}<br/>
-            </span>
-          )}
-        </>
-      ),
-      footer,
-    });
+    if (!instanceRef.current) {
+      instanceRef.current = modal.error({
+        title: '请求失败',
+        content: (
+          <>
+            错误码: {error?.code}<br/>
+            错误信息：{error?.message}<br/>
+            {Boolean(error?.action) && (
+              <span>
+                操作：{error?.action}<br/>
+              </span>
+            )}
+            {Boolean(error?.requestId) && (
+              <span>
+                RequestId：{error?.requestId}<br/>
+              </span>
+            )}
+          </>
+        ),
+        footer,
+      });
+
+      setState({
+        errors: [],
+      });
+    }
   });
 
   useEffect(() => {
     if (errors?.length) {
       showError(errors?.[0]);
-    } else if (instanceRef.current) {
-      instanceRef.current?.destroy?.();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errors]);

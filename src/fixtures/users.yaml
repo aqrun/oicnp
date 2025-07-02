@@ -10,13 +10,13 @@
   roles:
     - admin
     - author
-- username: user2
-  nickname: user2
-  email: user2@sina.com
+- username: guest
+  nickname: guest
+  email: guest@ab.com
   password: ba4a62dfc677cabb143659b8f6485c82ec607445989716f5bcaba1e156c1714b
   salt: 2d51a4414562ed5a302fc377bc894f3631a8fe6d0728c2bb4bb9e06b762ed046
   status: 1
   isAdmin: 0
   gender: 1
   roles:
-    - member
+    - guest

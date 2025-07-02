@@ -35,10 +35,82 @@
   api: /v1/user/remove
   weight: 0
   status: 1
+- vid: system:role
+  parentVid: system
+  name: 角色管理
+  api: /v1/role
+  weight: 0
+  status: 1
+- vid: system:role:list
+  parentVid: system:role
+  name: 查看角色列表
+  api: /v1/role/list
+  weight: 0
+  status: 1
+- vid: system:permission
+  parentVid: system
+  name: 权限管理
+  api: /v1/permission
+  weight: 0
+  status: 1
+- vid: system:permission:list
+  parentVid: system:permission
+  name: 查看权限列表
+  api: /v1/permission/list
+  weight: 0
+  status: 1
+- vid: system:menu
+  parentVid: system
+  name: 菜单管理
+  api: /v1/menu
+  weight: 0
+  status: 1
+- vid: system:menu:list
+  parentVid: system:menu
+  name: 查看菜单列表
+  api: /v1/menu/list
+  weight: 0
+  status: 1
 - vid: cms
   parentVid: ''
   name: 内容管理
   api: /v1/cms
+  weight: 0
+  status: 1
+- vid: cms:node
+  parentVid: cms
+  name: 文章管理
+  api: /v1/node
+  weight: 0
+  status: 1
+- vid: cms:node:list
+  parentVid: cms:node
+  name: 查看文章列表
+  api: /v1/node/list
+  weight: 0
+  status: 1
+- vid: cms:category
+  parentVid: cms
+  name: 分类管理
+  api: /v1/category
+  weight: 0
+  status: 1
+- vid: cms:category:list
+  parentVid: cms:category
+  name: 查看分类列表
+  api: /v1/category/list
+  weight: 0
+  status: 1
+- vid: cms:tag
+  parentVid: cms
+  name: 标签管理
+  api: /v1/tag
+  weight: 0
+  status: 1
+- vid: cms:tag:list
+  parentVid: cms:tag
+  name: 查看标签列表
+  api: /v1/tag/list
   weight: 0
   status: 1
 - vid: cms:note

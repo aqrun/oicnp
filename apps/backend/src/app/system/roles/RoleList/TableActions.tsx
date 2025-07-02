@@ -36,7 +36,10 @@ export default function TableActions({
       roleId: record?.roleId,
     };
     // 删除
-    await DescribeDeleteRole(params);
+    const res = await DescribeDeleteRole(params);
+
+    console.log('res-----', res);
+
     // 更新列表
     setState({
       refreshToken: Date.now().toString(),

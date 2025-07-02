@@ -127,8 +127,8 @@ export default function Login() {
               <Image
                 src={captchaRes?.img || 'img'}
                 alt="captcha"
-                width={100}
-                height={30}
+                width={130}
+                height={32}
               />
             )}
           </div>

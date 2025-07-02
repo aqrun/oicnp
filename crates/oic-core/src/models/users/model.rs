@@ -1,6 +1,7 @@
+use std::time::Duration;
 use async_trait::async_trait;
 use chrono::offset::Utc;
-use loco_rs::{hash, prelude::*};
+use loco_rs::{hash, prelude::*, cache::Cache};
 use uuid::Uuid;
 use crate::utils::catch_err;
 use crate::{
@@ -541,7 +542,10 @@ impl UserModel {
     /// 
     pub async fn get_roles_by_uid(db: &DatabaseConnection, uid: i64) -> ModelResult<Vec<RoleModel>> {
         let list = RoleEntity::find()
-            .left_join(UserRoleMapEntity)
+            .join(
+                sea_orm::JoinType::InnerJoin,
+                RoleRelation::UserRole.def()
+            )
             .filter(UserRoleMapColumn::Uid.eq(uid))
             .all(db)
             .await?;
@@ -560,6 +564,10 @@ impl UserModel {
             )
             .join(
                 sea_orm::JoinType::InnerJoin,
+                RolePermissionMapRelation::Role.def()
+            )
+            .join(
+                sea_orm::JoinType::InnerJoin,
                 RoleRelation::UserRole.def()
             )
             .filter(
@@ -572,6 +580,81 @@ impl UserModel {
         let permission = q.one(db).await?;
 
         permission.ok_or_else(|| ModelError::Message(format!("无权限操作: {}", uri)))
+    }
+
+    ///
+    /// 获取用户拥有的API列表
+    /// 先读取缓存数据不存在再查询数据库
+    /// 
+    pub async fn get_apis(&self, db: &DatabaseConnection, cache: &Cache) -> ModelResult<Vec<String>> {
+        let cache_key = format!("user_apis:{}", self.uid);
+
+        let has_cache = match cache.contains_key(cache_key.as_str()).await {
+            Ok(x) => x,
+            Err(_) => false,
+        };
+
+        if has_cache {
+            let cache_apis = match cache.get(cache_key.as_str()).await {
+                Ok(x) => {
+                    match x {
+                        Some(x) => x,
+                        None => String::from(""),
+                    }
+                },
+                Err(_) => String::from(""),
+            };
+
+            let apis = cache_apis.split(",").map(|item| String::from(item)).collect();
+
+            return Ok(apis);
+        }
+
+        // 查询数据库
+        let q = PermissionEntity::find()
+            .join(
+                sea_orm::JoinType::InnerJoin,
+                PermissionRelation::RolePermission.def()
+            )
+            .join(
+                sea_orm::JoinType::InnerJoin,
+                RolePermissionMapRelation::Role.def()
+            )
+            .join(
+                sea_orm::JoinType::InnerJoin,
+                RoleRelation::UserRole.def()
+            )
+            .filter(
+                Condition::all()
+                    .add(UserRoleMapColumn::Uid.eq(self.uid))
+                    .add(PermissionColumn::Status.eq("1"))
+            )
+            .all(db)
+            .await;
+
+        let list = match q {
+            Ok(x) => x,
+            Err(_) => return Ok(vec![]),
+        };
+
+        let apis: Vec<String> = list.iter().map(|item| {
+            String::from(item.api.as_str())
+        }).collect();
+
+        if !apis.is_empty() {
+            let str_apis = apis.join(",");
+
+            // 设置缓存数据
+            let _ = cache.insert_with_expiry(
+                cache_key.as_str(), 
+                str_apis.as_str(),
+                Duration::from_secs(60 * 60 * 24)
+            ).await;
+
+            return Ok(apis);
+        }
+
+        Ok(vec![])
     }
 }
 
