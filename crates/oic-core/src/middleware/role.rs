@@ -14,6 +14,7 @@ use super::auth::JWTWithUser;
 use tower::{Layer, Service};
 use crate::entities::prelude::*;
 use crate::typings::JsonRes;
+use crate::services::permission::check_is_public_api;
 
 #[derive(Clone)]
 pub struct RoleRouteLayer {
@@ -103,6 +104,13 @@ where
 
             if auth.user.is_admin.eq("1") {
                 // 管理员账号拥有所有权限
+                return inner.call(req).await;
+            }
+
+            // 是否为公共接口
+            let is_public_api = check_is_public_api(&ctx.db, &ctx.cache, &uri).await;
+
+            if is_public_api {
                 return inner.call(req).await;
             }
 

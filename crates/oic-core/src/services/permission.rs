@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 use crate::models::permissions::PermissionTreeItem;
+use crate::entities::prelude::*;
+use loco_rs::{prelude::*, cache::Cache};
 
 ///
 /// 参考示例
@@ -51,4 +53,36 @@ fn into_tree_node (
     }
 
     new_node
+}
+
+///
+/// 检测是否为公共API
+/// 
+pub async fn check_is_public_api(
+    db: &DatabaseConnection,
+    cache: &Cache,
+    api: &str,
+) -> bool {
+    let cache_key = "public_api_list";
+
+    let is_exist = cache.contains_key(cache_key).await.unwrap_or(false);
+
+    if is_exist {
+        let str_public_apis = cache.get(cache_key)
+            .await
+            .unwrap_or(Some(String::from("")))
+            .unwrap_or(String::from(""));
+        let apis = str_public_apis.split(",").collect::<Vec<&str>>();
+        return apis.contains(&api);
+    }
+
+    let permissions = PermissionModel::get_public_permissions(db).await.unwrap();
+    let public_apis = permissions.into_iter()
+        .map(|p| p.api)
+        .collect::<Vec<String>>();
+    let apis_str = public_apis.join(",");
+
+    let _ = cache.insert(cache_key, apis_str.as_str()).await;
+
+    public_apis.contains(&String::from(api))
 }

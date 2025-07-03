@@ -628,6 +628,7 @@ impl UserModel {
                 Condition::all()
                     .add(UserRoleMapColumn::Uid.eq(self.uid))
                     .add(PermissionColumn::Status.eq("1"))
+                    .add(PermissionColumn::Scope.ne("public"))
             )
             .all(db)
             .await;

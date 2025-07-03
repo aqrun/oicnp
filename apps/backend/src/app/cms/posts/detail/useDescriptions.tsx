@@ -34,7 +34,7 @@ export default function useDescriptions() {
       label: '分类',
       children: (
         <div>
-          {categories.map(item => {
+          {categories?.map(item => {
             return (
               <div key={item?.catId}>
                 {item?.catName}
@@ -49,7 +49,7 @@ export default function useDescriptions() {
       label: '标签',
       children: (
         <div>
-          {tags.map(item => {
+          {tags?.map(item => {
             return (
               <Tag key={item?.tagId}>
                 {item?.tagName}

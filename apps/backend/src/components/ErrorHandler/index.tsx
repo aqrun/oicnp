@@ -26,11 +26,12 @@ export function ErrorHandler(): JSX.Element {
     setState({
       errors: [],
     });
-    await logoutAction();
+    
     if (instanceRef.current) {
       instanceRef.current?.destroy?.();
       instanceRef.current = undefined;
     }
+    await logoutAction();
   });
 
   const handleClose = useMemoizedFn(() => {

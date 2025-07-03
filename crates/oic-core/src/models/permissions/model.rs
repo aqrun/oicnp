@@ -11,6 +11,7 @@ use sea_orm::{
     QuerySelect,
     // DbBackend,
     // QueryTrait,
+    Condition,
 };
 use validator::Validate;
 use crate::{RequestParamsUpdater, ModelCrudHandler};
@@ -264,6 +265,22 @@ impl PermissionModel {
 
         // 列表转为树结构
         let list = build_permission_tree(list);
+
+        Ok(list)
+    }
+
+    ///
+    /// 获取公共权限列表
+    /// 
+    pub async fn get_public_permissions(db: &DatabaseConnection) -> ModelResult<Vec<Self>> {
+        let list = PermissionEntity::find()
+            .filter(
+                Condition::all()
+                    .add(PermissionColumn::Status.eq("1"))
+                    .add(PermissionColumn::Scope.eq("public"))
+            )
+            .all(db)
+            .await?;
 
         Ok(list)
     }

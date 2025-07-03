@@ -403,7 +403,7 @@ pub enum Permissions {
     Api,
     #[oic(data_type = "int", default = 0, comment = "")]
     Weight,
-    #[oic(data_type = "char", len = 1, default = "0", comment = "")]
+    #[oic(data_type = "string", len = 20, default = "", comment = "")]
     Scope,
     #[oic(data_type = "char", len = 1, default = "1", comment = "")]
     Status,

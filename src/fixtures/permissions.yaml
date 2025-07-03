@@ -5,141 +5,396 @@
   api: /v1/system
   weight: 0
   status: 1
+  scope: public
 - vid: system:user
   parentVid: system
   name: 用户管理
   api: /v1/user
   weight: 0
   status: 1
+  scope: public
 - vid: system:user:list
   parentVid: system:user
   name: 查看用户列表
   api: /v1/user/list
   weight: 0
   status: 1
+  scope: public
+- vid: system:user:roles
+  parentVid: system:user
+  name: 获取用户角色列表
+  api: /v1/user/roles
+  weight: 0
+  status: 1
+  scope: public
+- vid: system:user:one
+  parentVid: system:user
+  name: 查看用户
+  api: /v1/user/one
+  weight: 0
+  status: 1
+  scope: public
 - vid: system:user:add
   parentVid: system:user
   name: 创建用户
   api: /v1/user/add
   weight: 0
   status: 1
+  scope:
 - vid: system:user:update
   parentVid: system:user
   name: 更新用户
   api: /v1/user/update
   weight: 0
   status: 1
+  scope:
 - vid: system:user:remove
   parentVid: system:user
   name: 删除用户
   api: /v1/user/remove
   weight: 0
   status: 1
+  scope:
 - vid: system:role
   parentVid: system
   name: 角色管理
   api: /v1/role
   weight: 0
   status: 1
+  scope: public
 - vid: system:role:list
   parentVid: system:role
   name: 查看角色列表
   api: /v1/role/list
   weight: 0
   status: 1
+  scope: public
+- vid: system:role:one
+  parentVid: system:role
+  name: 查看角色
+  api: /v1/role/one
+  weight: 0
+  status: 1
+  scope: public
+- vid: system:role:permissions
+  parentVid: system:role
+  name: 获取角色权限列表
+  api: /v1/role/permissions
+  weight: 0
+  status: 1
+  scope: public
+- vid: system:role:add
+  parentVid: system:role
+  name: 创建角色
+  api: /v1/role/add
+  weight: 0
+  status: 1
+  scope:
+- vid: system:role:update
+  parentVid: system:role
+  name: 更新角色
+  api: /v1/role/update
+  weight: 0
+  status: 1
+  scope:
+- vid: system:role:remove
+  parentVid: system:role
+  name: 删除角色
+  api: /v1/role/remove
+  weight: 0
+  status: 1
+  scope:
 - vid: system:permission
   parentVid: system
   name: 权限管理
   api: /v1/permission
   weight: 0
   status: 1
+  scope: public
 - vid: system:permission:list
   parentVid: system:permission
   name: 查看权限列表
   api: /v1/permission/list
   weight: 0
   status: 1
+  scope: public
+- vid: system:permission:tree
+  parentVid: system:permission
+  name: 获取权限树
+  api: /v1/permission/tree
+  weight: 0
+  status: 1
+  scope: public
+- vid: system:permission:one
+  parentVid: system:permission
+  name: 查看权限
+  api: /v1/permission/one
+  weight: 0
+  status: 1
+  scope: public
+- vid: system:permission:add
+  parentVid: system:permission
+  name: 创建权限
+  api: /v1/permission/add
+  weight: 0
+  status: 1
+  scope:
+- vid: system:permission:update
+  parentVid: system:permission
+  name: 更新权限
+  api: /v1/permission/update
+  weight: 0
+  status: 1
+  scope:
+- vid: system:permission:remove
+  parentVid: system:permission
+  name: 删除权限
+  api: /v1/permission/remove
+  weight: 0
+  status: 1
+  scope:
 - vid: system:menu
   parentVid: system
   name: 菜单管理
   api: /v1/menu
   weight: 0
   status: 1
+  scope: public
 - vid: system:menu:list
   parentVid: system:menu
   name: 查看菜单列表
   api: /v1/menu/list
   weight: 0
   status: 1
+  scope: public
+- vid: system:menu:permissions
+  parentVid: system:menu
+  name: 获取菜单权限列表
+  api: /v1/menu/permissions
+  weight: 0
+  status: 1
+  scope: public
+- vid: system:menu:one
+  parentVid: system:menu
+  name: 查看菜单
+  api: /v1/menu/one
+  weight: 0
+  status: 1
+  scope: public
+- vid: system:menu:add
+  parentVid: system:menu
+  name: 创建菜单
+  api: /v1/menu/add
+  weight: 0
+  status: 1
+  scope:
+- vid: system:menu:update
+  parentVid: system:menu
+  name: 更新菜单
+  api: /v1/menu/update
+  weight: 0
+  status: 1
+  scope:
+- vid: system:menu:remove
+  parentVid: system:menu
+  name: 删除菜单
+  api: /v1/menu/remove
+  weight: 0
+  status: 1
+  scope:
 - vid: cms
   parentVid: ''
   name: 内容管理
   api: /v1/cms
   weight: 0
   status: 1
+  scope: public
 - vid: cms:node
   parentVid: cms
   name: 文章管理
   api: /v1/node
   weight: 0
   status: 1
+  scope: public
 - vid: cms:node:list
   parentVid: cms:node
   name: 查看文章列表
   api: /v1/node/list
   weight: 0
   status: 1
+  scope: public
+- vid: cms:node:categories
+  parentVid: cms:node
+  name: 文章分类列表
+  api: /v1/node/categories
+  weight: 0
+  status: 1
+  scope: public
+- vid: cms:node:tags
+  parentVid: cms:node
+  name: 文章标签列表
+  api: /v1/node/tags
+  weight: 0
+  status: 1
+  scope: public
+- vid: cms:node:body
+  parentVid: cms:node
+  name: 文章内容
+  api: /v1/node/body
+  weight: 0
+  status: 1
+  scope: public
+- vid: cms:node:one
+  parentVid: cms:node
+  name: 查看文章
+  api: /v1/node/one
+  weight: 0
+  status: 1
+  scope: public
+- vid: cms:node:add
+  parentVid: cms:node
+  name: 创建文章
+  api: /v1/node/add
+  weight: 0
+  status: 1
+  scope:
+- vid: cms:node:update
+  parentVid: cms:node
+  name: 更新文章
+  api: /v1/node/update
+  weight: 0
+  status: 1
+  scope:
+- vid: cms:node:remove
+  parentVid: cms:node
+  name: 删除文章
+  api: /v1/node/remove
+  weight: 0
+  status: 1
+  scope:
 - vid: cms:category
   parentVid: cms
   name: 分类管理
   api: /v1/category
   weight: 0
   status: 1
+  scope: public
 - vid: cms:category:list
   parentVid: cms:category
   name: 查看分类列表
   api: /v1/category/list
   weight: 0
   status: 1
+  scope: public
+- vid: cms:category:one
+  parentVid: cms:category
+  name: 查看分类
+  api: /v1/category/one
+  weight: 0
+  status: 1
+  scope: public
+- vid: cms:category:add
+  parentVid: cms:category
+  name: 创建分类
+  api: /v1/category/add
+  weight: 0
+  status: 1
+  scope:
+- vid: cms:category:update
+  parentVid: cms:category
+  name: 更新分类
+  api: /v1/category/update
+  weight: 0
+  status: 1
+  scope:
+- vid: cms:category:remove
+  parentVid: cms:category
+  name: 删除分类
+  api: /v1/category/remove
+  weight: 0
+  status: 1
+  scope:
 - vid: cms:tag
   parentVid: cms
   name: 标签管理
   api: /v1/tag
   weight: 0
   status: 1
+  scope: public
 - vid: cms:tag:list
   parentVid: cms:tag
   name: 查看标签列表
   api: /v1/tag/list
   weight: 0
   status: 1
+  scope: public
+- vid: cms:tag:one
+  parentVid: cms:tag
+  name: 查看标签
+  api: /v1/tag/one
+  weight: 0
+  status: 1
+  scope: public
+- vid: cms:tag:add
+  parentVid: cms:tag
+  name: 创建标签
+  api: /v1/tag/add
+  weight: 0
+  status: 1
+  scope:
+- vid: cms:tag:update
+  parentVid: cms:tag
+  name: 更新标签
+  api: /v1/tag/update
+  weight: 0
+  status: 1
+  scope:
+- vid: cms:tag:remove
+  parentVid: cms:tag
+  name: 删除标签
+  api: /v1/tag/remove
+  weight: 0
+  status: 1
+  scope:
 - vid: cms:note
   parentVid: cms
   name: 管理笔记
   api: /v1/note
   weight: 0
   status: 1
+  scope: public
 - vid: cms:note:list
   parentVid: cms:note
   name: 查看笔记列表
   api: /v1/note/list
   weight: 0
   status: 1
+  scope: public
+- vid: cms:note:one
+  parentVid: cms:note
+  name: 查看笔记
+  api: /v1/note/one
+  weight: 0
+  status: 1
+  scope: public
 - vid: cms:note:add
   parentVid: cms:note
   name: 创建笔记
   api: /v1/note/add
   weight: 0
   status: 1
+  scope:
 - vid: cms:note:update
   parentVid: cms:note
   name: 更新笔记
   api: /v1/note/update
   weight: 0
   status: 1
+  scope:
 - vid: cms:note:remove
   parentVid: cms:note
   name: 删除笔记
   api: /v1/note/remove
   weight: 0
   status: 1
+  scope:

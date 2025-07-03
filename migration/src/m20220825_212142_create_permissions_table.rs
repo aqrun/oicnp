@@ -22,7 +22,7 @@ impl MigrationTrait for Migration {
             .col(ColumnDef::new(Permissions::Name).string_len(64).not_null().default(""))
             .col(ColumnDef::new(Permissions::Api).string_len(255).not_null().default(""))
             .col(ColumnDef::new(Permissions::Weight).integer().not_null().default(0))
-            .col(ColumnDef::new(Permissions::Scope).char_len(1).not_null().default("0"))
+            .col(ColumnDef::new(Permissions::Scope).string_len(20).not_null().default(""))
             .col(ColumnDef::new(Permissions::Status).char_len(1).not_null().default(""))
             .col(ColumnDef::new(Permissions::Remark).string_len(255).not_null().default(""))
             .col(
