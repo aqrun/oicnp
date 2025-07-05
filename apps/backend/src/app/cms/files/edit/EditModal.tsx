@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Form, Skeleton } from 'antd';
 import { Modal } from '@/components';
-import NoteForm from '../NoteForm';
+import FileForm from '../FileForm';
 import { useEditStore } from './useEditStore';
 import { useMemoizedFn } from 'ahooks';
 import Success from './Success';
 import { useListStore } from '../List/useListStore';
 import {
-  NoteModel,
-  DescribeNoteDetail,
-  DescribeNoteDetailRequestParams,
-  DescribeUpdateNote,
-  DescribeUpdateNoteRequestParams,
+  DescribeFileDetailRequestParams,
+  DescribeUpdateFile,
+  DescribeUpdateFileRequestParams,
+  FileFieldType,
+  useFetchFile,
 } from '@/services';
 
 /**
@@ -20,29 +20,40 @@ import {
 export default function EditModal() {
   const visible = useEditStore(state => state.visible);
   const contentType = useEditStore(state => state.contentType);
-  const noteId = useEditStore(state => state.noteId);
-  const note = useEditStore(state => state.note);
+  const fileId = useEditStore(state => state.fileId);
+  const file = useEditStore(state => state.file);
   const setState = useEditStore(state => state.setState);
   const setListState = useListStore(state => state.setState);
 
   const [loading, setLoading] = useState(false);
   const [initLoading, setInitLoading] = useState(true);
 
-  const [form] = Form.useForm<NoteModel>();
+  const [form] = Form.useForm<FileFieldType>();
+
+  const {
+    fetchFile,
+  } = useFetchFile();
 
   const fetchNote = useMemoizedFn(async () => {
-    const params: DescribeNoteDetailRequestParams = {
-      id: noteId,
+    const params: DescribeFileDetailRequestParams = {
+      fileId,
     };
-    const res = await DescribeNoteDetail(params);
+    const request = [
+      fetchFile(params),
+    ] as const;
+    const allRes = await Promise.all(request);
     
     setState({
-      note: res.note,
+      file: allRes?.[0]?.file,
     });
-    
+
     form.setFieldsValue({
-      title: res?.note?.title,
-      content: res?.note?.content,
+      fileId: allRes?.[0]?.file?.fileId,
+      fileName: allRes?.[0]?.file?.fileName,
+      uri: allRes?.[0]?.file?.uri,
+      storage: allRes?.[0]?.file?.storage,
+      mime: allRes?.[0]?.file?.mime,
+      status: allRes?.[0]?.file?.status,
     });
   });
 
@@ -51,13 +62,16 @@ export default function EditModal() {
     try {
       const values = await form.validateFields();
 
-      const params: DescribeUpdateNoteRequestParams = {
-        id: noteId,
-        title: values?.title,
-        content: values?.content,
+      const params: DescribeUpdateFileRequestParams = {
+        fileId,
+        fileName: values?.fileName,
+        uri: values?.uri,
+        storage: values?.storage,
+        mime: values?.mime,
+        status: values?.status,
       };
 
-      const res = await DescribeUpdateNote(params);
+      const res = await DescribeUpdateFile(params);
 
       if (res) {
         setState({
@@ -93,15 +107,15 @@ export default function EditModal() {
     } else if (contentType === 'success') {
       return (
         <Success
-          title={form.getFieldValue('title')}
+          title={form.getFieldValue('fileName')}
         />
       );
     } else {
       return (
-        <NoteForm
+        <FileForm
           form={form}
           loading={loading}
-          note={note}
+          file={file}
         />
       );
     }
@@ -110,7 +124,11 @@ export default function EditModal() {
 
   const fetchInitialData = useMemoizedFn(async () => {
     setInitLoading(true);
-    await fetchNote();
+    const requests = [
+      fetchNote(),
+    ];
+    await Promise.all(requests);
+    
     setInitLoading(false);
   });
 
@@ -122,7 +140,7 @@ export default function EditModal() {
 
   return (
     <Modal
-      title="编辑角色"
+      title="编辑文件"
       open={visible}
       onOk={handleOk}
       onCancel={handleCancel}

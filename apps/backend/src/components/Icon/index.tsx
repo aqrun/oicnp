@@ -24,6 +24,14 @@ import {
   DownOutlined,
   MoreOutlined,
   ExperimentOutlined,
+  BankOutlined,
+  ApartmentOutlined,
+  FolderOutlined,
+  FundProjectionScreenOutlined,
+  ClockCircleOutlined,
+  CloudServerOutlined,
+  FileSearchOutlined,
+  AuditOutlined,
 } from '@ant-design/icons';
 import { Container } from './index.styled';
 
@@ -53,6 +61,14 @@ const antIcons: Record<string, JSX.Element> = {
   DownOutlined: <DownOutlined />,
   MoreOutlined: <MoreOutlined />,
   ExperimentOutlined: <ExperimentOutlined />,
+  BankOutlined: <BankOutlined />,
+  ApartmentOutlined: <ApartmentOutlined />,
+  FolderOutlined: <FolderOutlined />,
+  FundProjectionScreenOutlined: <FundProjectionScreenOutlined />,
+  ClockCircleOutlined: <ClockCircleOutlined />,
+  CloudServerOutlined: <CloudServerOutlined />,
+  FileSearchOutlined: <FileSearchOutlined />,
+  AuditOutlined: <AuditOutlined />,
 };
 
 export interface IconProps {

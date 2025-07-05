@@ -9,7 +9,6 @@
   gender: 1
   roles:
     - admin
-    - author
 - username: guest
   nickname: guest
   email: guest@ab.com

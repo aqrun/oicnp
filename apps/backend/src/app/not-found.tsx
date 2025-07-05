@@ -1,11 +1,10 @@
-import Link from 'next/link'
+'use client';
+
+import NotFound from '@/components/layouts/NotFound';
  
-export default function NotFound() {
+export default function NotFoundPage() {
+
   return (
-    <div>
-      <h2>Not Found</h2>
-      <p>Could not find requested resource</p>
-      <Link href="/">返回首页</Link>
-    </div>
+    <NotFound />
   )
 }

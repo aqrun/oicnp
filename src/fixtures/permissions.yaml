@@ -202,6 +202,90 @@
   weight: 0
   status: 1
   scope:
+- vid: system:department
+  parentVid: system
+  name: 部门管理
+  api: /v1/department
+  weight: 0
+  status: 1
+  scope: public
+- vid: system:department:list
+  parentVid: system:department
+  name: 查看部门列表
+  api: /v1/department/list
+  weight: 0
+  status: 1
+  scope: public
+- vid: system:department:one
+  parentVid: system:department
+  name: 查看部门
+  api: /v1/department/one
+  weight: 0
+  status: 1
+  scope: public
+- vid: system:department:add
+  parentVid: system:department
+  name: 创建部门
+  api: /v1/department/add
+  weight: 0
+  status: 1
+  scope:
+- vid: system:department:update
+  parentVid: system:department
+  name: 更新部门
+  api: /v1/department/update
+  weight: 0
+  status: 1
+  scope:
+- vid: system:department:remove
+  parentVid: system:department
+  name: 删除部门
+  api: /v1/department/remove
+  weight: 0
+  status: 1
+  scope:
+- vid: system:position
+  parentVid: system
+  name: 岗位管理
+  api: /v1/position
+  weight: 0
+  status: 1
+  scope: public
+- vid: system:position:list
+  parentVid: system:position
+  name: 查看岗位列表
+  api: /v1/position/list
+  weight: 0
+  status: 1
+  scope: public
+- vid: system:position:one
+  parentVid: system:position
+  name: 查看岗位
+  api: /v1/position/one
+  weight: 0
+  status: 1
+  scope: public
+- vid: system:position:add
+  parentVid: system:position
+  name: 创建岗位
+  api: /v1/position/add
+  weight: 0
+  status: 1
+  scope:
+- vid: system:position:update
+  parentVid: system:position
+  name: 更新岗位
+  api: /v1/position/update
+  weight: 0
+  status: 1
+  scope:
+- vid: system:position:remove
+  parentVid: system:position
+  name: 删除岗位
+  api: /v1/position/remove
+  weight: 0
+  status: 1
+  scope:
 - vid: cms
   parentVid: ''
   name: 内容管理
@@ -395,6 +479,48 @@
   parentVid: cms:note
   name: 删除笔记
   api: /v1/note/remove
+  weight: 0
+  status: 1
+  scope:
+- vid: cms:file
+  parentVid: cms
+  name: 文件管理
+  api: /v1/file
+  weight: 0
+  status: 1
+  scope: public
+- vid: cms:file:list
+  parentVid: cms:file
+  name: 查看文件列表
+  api: /v1/file/list
+  weight: 0
+  status: 1
+  scope: public
+- vid: cms:file:one
+  parentVid: cms:file
+  name: 查看文件
+  api: /v1/file/one
+  weight: 0
+  status: 1
+  scope: public
+- vid: cms:file:add
+  parentVid: cms:file
+  name: 创建文件
+  api: /v1/file/add
+  weight: 0
+  status: 1
+  scope:
+- vid: cms:file:update
+  parentVid: cms:file
+  name: 更新文件
+  api: /v1/file/update
+  weight: 0
+  status: 1
+  scope:
+- vid: cms:file:remove
+  parentVid: cms:file
+  name: 删除文件
+  api: /v1/file/remove
   weight: 0
   status: 1
   scope:

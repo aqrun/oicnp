@@ -27,3 +27,6 @@ export * from './apis/node/hooks';
 export * from './apis/common/types';
 export * from './apis/common/client';
 export * from './apis/common/hooks';
+export * from './apis/file/types';
+export * from './apis/file/client';
+export * from './apis/file/hooks';

@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Form } from 'antd';
 import { Modal } from '@/components';
-import NodeForm from '../NodeForm';
+import FileForm from '../FileForm';
 import { useCreateStore } from './useCreateStore';
 import { useMemoizedFn } from 'ahooks';
 import CreateSuccess from './CreateSuccess';
 import { useListStore } from '../List/useListStore';
 import {
-  NodeFieldType,
-  DescribeCreateNode,
-  DescribeCreateNodeRequestParams,
-  useFetchCategoryList,
+  FileFieldType,
+  DescribeCreateFile,
+  DescribeCreateFileRequestParams,
 } from '@/services';
 
 /**
@@ -19,31 +18,27 @@ import {
 export default function CreateModal() {
   const visible = useCreateStore(state => state.visible);
   const contentType = useCreateStore(state => state.contentType);
-  const tags = useCreateStore(state => state.tags);
-  const categories = useCreateStore(state => state.categories);
   const setState = useCreateStore(state => state.setState);
   const setListState = useListStore(state => state.setState);
 
   const [loading, setLoading] = useState(false);
-  const {
-    loading: categoryLoading,
-    fetchCategoryList,
-  } = useFetchCategoryList();
 
-  const [form] = Form.useForm<NodeFieldType>();
+  const [form] = Form.useForm<FileFieldType>();
 
   const handleOk = useMemoizedFn(async () => {
     setLoading(true);
     try {
       const values = await form.validateFields();
 
-      const params: DescribeCreateNodeRequestParams = {
-        vid: values?.vid,
-        title: values?.title,
-        tagVids: tags,
+      const params: DescribeCreateFileRequestParams = {
+        fileName: values?.fileName,
+        uri: values?.uri,
+        storage: values?.storage,
+        mime: values?.mime,
+        status: values?.status,
       };
 
-      const res = await DescribeCreateNode(params);
+      const res = await DescribeCreateFile(params);
 
       if (res) {
         setState({
@@ -71,39 +66,27 @@ export default function CreateModal() {
     });
   });
 
-  const handleTagChange = useMemoizedFn((tags: string[]) => {
-    setState({
-      tags,
-    });
-  });
-
   const init = useMemoizedFn(async () => {
-    const requests = [
-      fetchCategoryList({
-        page: 1,
-        pageSize: 10,
-      }),
-    ] as const;
-    const allRes = await Promise.all(requests);
-    setState({
-      categories: allRes[0].categories,
-    });
+    // const requests = [
+      
+    // ] as const;
+    // const allRes = await Promise.all(requests);
+    // setState({
+    //   categories: allRes[0].categories,
+    // });
   });
 
   let content = (
-    <NodeForm
+    <FileForm
       form={form}
       loading={loading}
-      categoryLoading={categoryLoading}
-      categories={categories}
-      onTagChange={handleTagChange}
     />
   );
 
   if (contentType === 'success') {
     content = (
       <CreateSuccess
-        title={form.getFieldValue('title')}
+        title={form.getFieldValue('fileName')}
       />
     );
   }
@@ -116,7 +99,7 @@ export default function CreateModal() {
 
   return (
     <Modal
-      title="创建内容"
+      title="创建文件"
       open={visible}
       onOk={handleOk}
       onCancel={handleCancel}

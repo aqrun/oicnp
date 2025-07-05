@@ -7,8 +7,6 @@ import { useMemoizedFn } from 'ahooks';
 import Success from './Success';
 import { useListStore } from '../List/useListStore';
 import {
-  NodeModel,
-  DescribeNodeDetail,
   DescribeNodeDetailRequestParams,
   DescribeUpdateNode,
   DescribeUpdateNodeRequestParams,
@@ -159,8 +157,9 @@ export default function EditModal() {
       okText="更新"
       cancelText={contentType !== 'success' ? '取消' : '关闭'}
       destroyOnClose
-      width={640}
+      width={840}
       hasOk={contentType !== 'success'}
+      maskClosable={false}
       okButtonProps={{
         loading,
       }}

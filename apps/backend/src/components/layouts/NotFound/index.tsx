@@ -1,9 +1,16 @@
 'use client';
 
 import { Result, Button } from 'antd';
+import { useRouter } from 'next/navigation';
+import { useMemoizedFn } from 'ahooks';
 import { Container } from './index.styled';
 
 export default function NotFound() {
+  const router = useRouter();
+
+  const handleBackHome = useMemoizedFn(() => {
+    router.push('/');
+  });
 
   return (
     <Container>
@@ -14,7 +21,9 @@ export default function NotFound() {
         extra={
           <Button
             type="primary"
-            onClick={() => {}}
+            onClick={() => {
+              handleBackHome();
+            }}
           >
             返回首页
           </Button>

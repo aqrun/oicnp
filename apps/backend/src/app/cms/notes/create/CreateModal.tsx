@@ -88,8 +88,9 @@ export default function CreateModal() {
       okText="创建"
       cancelText={contentType !== 'success' ? '取消' : '关闭'}
       destroyOnClose
-      width={640}
+      width={840}
       hasOk={contentType !== 'success'}
+      maskClosable={false}
       okButtonProps={{
         loading,
       }}

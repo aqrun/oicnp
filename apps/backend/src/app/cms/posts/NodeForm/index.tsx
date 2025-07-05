@@ -16,6 +16,7 @@ import {
   NodeFieldType,
 } from '@/services';
 import dayjs from 'dayjs';
+import MDEditor from '@uiw/react-md-editor';
 import { Container } from './index.styled';
 
 type FieldType = NodeFieldType;
@@ -123,7 +124,14 @@ export default function NodeForm({
           label="内容"
           name="body"
         >
-          <Input.TextArea rows={10} />
+          <MDEditor
+            value={node?.body || ''}
+            onChange={(value) => {
+              console.log(value);
+              console.log('-----', form?.getFieldsValue())
+            }}
+            style={{ minHeight: 400 }}
+          />
         </Form.Item>
         <Form.Item<FieldType>
           label="发布时间"

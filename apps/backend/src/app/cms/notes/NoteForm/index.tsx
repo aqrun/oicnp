@@ -61,6 +61,7 @@ export default function NoteForm({
               console.log(value);
               console.log('-----', form?.getFieldsValue())
             }}
+            style={{ minHeight: 450 }}
           />
         </Form.Item>
 

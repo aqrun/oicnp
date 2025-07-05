@@ -5,8 +5,8 @@ import { useViewStore } from './useViewStore';
 import { useMemoizedFn } from 'ahooks';
 import useDescriptions from './useDescriptions';
 import {
-  NodeFilters,
-  useFetchNodeAll,
+  FileFilters,
+  useFetchFile,
 } from '@/services';
 
 /**
@@ -14,43 +14,37 @@ import {
  */
 export default function ViewModal() {
   const visible = useViewStore(state => state.visible);
-  const nid = useViewStore(state => state.nid);
+  const fileId = useViewStore(state => state.fileId);
   const setState = useViewStore(state => state.setState);
 
   const [loading, setLoading] = useState(false);
   const [items] = useDescriptions();
   const {
-    fetchNodeAll,
-  } = useFetchNodeAll();
+    fetchFile,
+  } = useFetchFile();
 
   const handleCancel = useMemoizedFn(() => {
     setState({
       visible: false,
-      node: undefined,
-      body: undefined,
-      tags: [],
-      categories: [],
+      file: undefined,
     });
   });
 
-  const fetchNode = useMemoizedFn(async () => {
-    const params: NodeFilters = {
-      nid,
+  const fetchFileData = useMemoizedFn(async () => {
+    const params: FileFilters = {
+      fileId,
     };
-    const res = await fetchNodeAll(params);
+    const res = await fetchFile(params);
 
     return res;
   });
 
   const fetchInitialData = useMemoizedFn(async () => {
     setLoading(true);
-    const res = await fetchNode();
+    const res = await fetchFileData();
 
     setState({
-      node: res?.detailRes?.node,
-      body: res?.bodyRes?.body,
-      tags: res?.tagRes?.tags,
-      categories: res?.categoryRes?.categories,
+      file: res?.file,
     });
     setLoading(false);
   });
@@ -63,7 +57,7 @@ export default function ViewModal() {
 
   return (
     <Modal
-      title="查看内容"
+      title="查看文件"
       open={visible}
       onCancel={handleCancel}
       confirmLoading={false}

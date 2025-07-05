@@ -4,6 +4,7 @@
   path: ''
   name: Backend
   icon: ''
+  permissionVids: []
 - vid: dashboard
   parentVid: backend
   path: '/dashboard'
@@ -45,6 +46,20 @@
   icon: 'MenuOutlined'
   permissionVids:
     - system:menu
+- vid: departments
+  parentVid: system
+  path: '/system/departments'
+  name: 部门
+  icon: 'BankOutlined'
+  permissionVids:
+    - system:department
+- vid: positions
+  parentVid: system
+  path: '/system/positions'
+  name: 岗位
+  icon: 'ApartmentOutlined'
+  permissionVids:
+    - system:position
 - vid: settings
   parentVid: system
   path: '/system/settings'
@@ -65,7 +80,7 @@
   name: 文章
   icon: 'DollarOutlined'
   permissionVids:
-    - cms:post
+    - cms:node
 - vid: categories
   parentVid: cms
   path: '/cms/categories'
@@ -87,3 +102,52 @@
   icon: 'ExperimentOutlined'
   permissionVids: 
     - cms:note
+- vid: files
+  parentVid: cms
+  path: '/cms/files'
+  name: 文件
+  icon: FolderOutlined
+  permissionVids: 
+    - cms:file
+- vid: monitor
+  parentVid: backend
+  path: '/monitor'
+  name: 系统监控
+  icon: 'DesktopOutlined'
+  permissionVids:
+    - monitor
+- vid: online
+  parentVid: monitor
+  path: '/monitor/online'
+  name: 在线用户
+  icon: 'FundProjectionScreenOutlined'
+  permissionVids:
+    - monitor:online
+- vid: jobs
+  parentVid: monitor
+  path: '/monitor/jobs'
+  name: 定时任务
+  icon: 'ClockCircleOutlined'
+  permissionVids:
+    - monitor:job
+- vid: caches
+  parentVid: monitor
+  path: '/monitor/caches'
+  name: 缓存列表
+  icon: 'CloudServerOutlined'
+  permissionVids:
+    - monitor:cache
+- vid: operations
+  parentVid: monitor
+  path: '/monitor/operations'
+  name: 操作日志
+  icon: 'FileSearchOutlined'
+  permissionVids:
+    - monitor:operation
+- vid: loginLogs
+  parentVid: monitor
+  path: '/monitor/login-logs'
+  name: 登录日志
+  icon: 'AuditOutlined'
+  permissionVids:
+    - monitor:loginLog
