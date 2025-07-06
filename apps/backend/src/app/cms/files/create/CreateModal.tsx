@@ -31,7 +31,7 @@ export default function CreateModal() {
       const values = await form.validateFields();
 
       const params: DescribeCreateFileRequestParams = {
-        fileName: values?.fileName,
+        filename: values?.filename,
         uri: values?.uri,
         storage: values?.storage,
         mime: values?.mime,
@@ -86,7 +86,7 @@ export default function CreateModal() {
   if (contentType === 'success') {
     content = (
       <CreateSuccess
-        title={form.getFieldValue('fileName')}
+        title={form.getFieldValue('filename')}
       />
     );
   }

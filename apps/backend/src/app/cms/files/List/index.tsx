@@ -25,10 +25,15 @@ export default function TagList(): JSX.Element {
   const setCreateState = useCreateStore((state) => state.setState);
   const columns = useColumns();
 
-  const {loading, refresh} = useList();
+  const {
+    filesRes,
+    loading,
+    refresh,
+    fetchListPageData,
+  } = useList();
 
   const getDataSource = () => {
-    const list: FileModel[] = [];
+    const list: FileModel[] = filesRes;
     return list;
   };
   const dataSource = getDataSource();
@@ -86,10 +91,14 @@ export default function TagList(): JSX.Element {
 
   useEffect(() => {
     if (refreshToken) {
-      refresh();
+      fetchListPageData();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshToken]);
+
+  useEffect(() => {
+    fetchListPageData();
+  }, []);
  
   return (
     <Container>

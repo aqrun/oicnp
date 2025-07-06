@@ -6,12 +6,14 @@ use crate::{
     RequestParamsUpdater,
     utils::utc_now,
     entities::prelude::*,
+    constants::DATE_TIME_FORMAT,
 };
 
 #[add_filter_fields]
 #[derive(FilterParams, Deserialize, Serialize, Debug, Default, Clone)]
 #[serde(default)]
 pub struct FileFilters {
+    #[serde(rename(deserialize = "fileId", serialize = "fileId"))]
     pub file_id: Option<i64>,
     pub uid: Option<i64>,
     pub filename: Option<String>,
@@ -19,10 +21,15 @@ pub struct FileFilters {
     pub storage: Option<String>,
     pub mime: Option<String>,
     pub status: Option<String>,
+    #[serde(rename(deserialize = "createdBy", serialize = "createdBy"))]
     pub created_by: Option<i64>,
+    #[serde(rename(deserialize = "updatedBy", serialize = "updatedBy"))]
     pub updated_by: Option<i64>,
+    #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
     pub created_at: Option<DateTime>,
+    #[serde(rename(deserialize = "updatedAt", serialize = "updatedAt"))]
     pub updated_at: Option<DateTime>,
+    #[serde(rename(deserialize = "deletedAt", serialize = "deletedAt"))]
     pub deleted_at: Option<DateTime>,
 }
 
@@ -30,6 +37,7 @@ pub struct FileFilters {
 #[derive(Deserialize, Serialize, Debug, Validate, Default, Clone)]
 #[serde(default)]
 pub struct FileReqParams {
+    #[serde(rename(deserialize = "fileId", serialize = "fileId"))]
     pub file_id: Option<i64>,
     pub uid: Option<i64>,
     pub filename: Option<String>,
@@ -37,11 +45,18 @@ pub struct FileReqParams {
     pub storage: Option<String>,
     pub mime: Option<String>,
     pub status: Option<String>,
+    #[serde(rename(deserialize = "createdBy", serialize = "createdBy"))]
     pub created_by: Option<i64>,
+    #[serde(rename(deserialize = "updatedBy", serialize = "updatedBy"))]
     pub updated_by: Option<i64>,
-    pub created_at: Option<DateTime>,
-    pub updated_at: Option<DateTime>,
-    pub deleted_at: Option<DateTime>,
+    #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
+    pub created_at: Option<String>,
+    #[serde(rename(deserialize = "updatedAt", serialize = "updatedAt"))]
+    pub updated_at: Option<String>,
+    #[serde(rename(deserialize = "deletedAt", serialize = "deletedAt"))]
+    pub deleted_at: Option<String>,
+    #[serde(rename(deserialize = "createdByUsername", serialize = "createdByUsername"))]
+    pub created_by_username: Option<String>,
 }
 
 impl RequestParamsUpdater for FileReqParams {
@@ -76,15 +91,19 @@ impl RequestParamsUpdater for FileReqParams {
             item.updated_by = Set(*x);
         }
         if let Some(x) = &self.created_at {
-            item.created_at = Set(*x);
+            if let Ok(x) = DateTime::parse_from_str(x, DATE_TIME_FORMAT) {
+                item.created_at = Set(x);
+            }
         }
         if let Some(x) = &self.updated_at {
-            item.updated_at = Set(Some(*x));
-        } else {
-            item.updated_at = Set(Some(utc_now()));
+            if let Ok(x) = DateTime::parse_from_str(x, DATE_TIME_FORMAT) {
+                item.updated_at = Set(Some(x));
+            }
         }
         if let Some(x) = &self.deleted_at {
-            item.deleted_at = Set(Some(*x));
+            if let Ok(x) = DateTime::parse_from_str(x, DATE_TIME_FORMAT) {
+                item.deleted_at = Set(Some(x));
+            }
         }
     }
 

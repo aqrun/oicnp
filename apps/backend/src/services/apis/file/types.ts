@@ -7,7 +7,7 @@ import { Dayjs } from 'dayjs';
 export interface BaseFileModel {
   fileId?: number;
   uid?: string;
-  fileName?: string;
+  filename?: string;
   uri?: string;
   storage?: string;
   mime?: string;
@@ -30,7 +30,7 @@ export interface FileFieldType extends BaseFileModel {
 export interface FileFilters {
   fileId?: number;
   uid?: string;
-  fileName?: string;
+  filename?: string;
   uri?: string;
   storage?: string;
   mime?: string;

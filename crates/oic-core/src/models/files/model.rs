@@ -91,22 +91,28 @@ impl ModelCrudHandler for FileModel {
     ) -> ModelResult<String> {
         catch_err(params.validate())?;
         
-        let txn = db.begin().await?;
-        let mut list: Vec<FileActiveModel> = Vec::new();
-
         for item in params.iter() {
             let mut file = FileActiveModel {
                 ..Default::default()
             };
+
+            let mut username = String::from("");
+
+            if let Some(x) = &item.created_by_username {
+                username = String::from(x);
+            }
+
+            if file.uid.is_not_set() && !username.is_empty() {
+                let user = UserModel::find_by_username(db, &username).await?;
+                file.uid = Set(user.uid);
+            }
     
             item.update(&mut file);
             item.update_by_create(&mut file);
 
-            list.push(file);
+            // list.push(file);
+            let _ = file.insert(db).await?;
         }
-        
-        let _ = FileEntity::insert_many(list).exec(&txn).await?;
-        txn.commit().await?;
 
         Ok(String::from("批量file添加完成"))
     }

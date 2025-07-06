@@ -49,7 +49,7 @@ export default function EditModal() {
 
     form.setFieldsValue({
       fileId: allRes?.[0]?.file?.fileId,
-      fileName: allRes?.[0]?.file?.fileName,
+      filename: allRes?.[0]?.file?.filename,
       uri: allRes?.[0]?.file?.uri,
       storage: allRes?.[0]?.file?.storage,
       mime: allRes?.[0]?.file?.mime,
@@ -64,7 +64,7 @@ export default function EditModal() {
 
       const params: DescribeUpdateFileRequestParams = {
         fileId,
-        fileName: values?.fileName,
+        filename: values?.filename,
         uri: values?.uri,
         storage: values?.storage,
         mime: values?.mime,
@@ -107,7 +107,7 @@ export default function EditModal() {
     } else if (contentType === 'success') {
       return (
         <Success
-          title={form.getFieldValue('fileName')}
+          title={form.getFieldValue('filename')}
         />
       );
     } else {

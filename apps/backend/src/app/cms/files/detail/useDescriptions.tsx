@@ -12,9 +12,9 @@ export default function useDescriptions() {
       children: file?.fileId,
     },
     {
-      key: 'fileName',
+      key: 'filename',
       label: '文件名',
-      children: file?.fileName,
+      children: file?.filename,
     },
     {
       key: 'uri',

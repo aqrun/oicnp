@@ -1,0 +1,7 @@
+---
+- filename: 1.jpg
+  uri: 'images/1.jpg'
+  storage: 'oos'
+  mime: 'image/jpeg'
+  status: '1'
+  createdByUsername: aqrun

@@ -18,6 +18,7 @@ pub async fn run(ctx: &AppContext) -> Result<()> {
     handle_seed::<NoteModel>(ctx, "note").await?;
     handle_seed::<CategoryModel>(ctx, "category").await?;
     handle_seed::<NodeModel>(ctx, "node").await?;
+    handle_seed::<FileModel>(ctx, "file").await?; 
     Ok(())
 }
 

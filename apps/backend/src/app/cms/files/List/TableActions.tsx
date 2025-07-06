@@ -55,7 +55,7 @@ export default function TableActions({
   const handleDelete = useMemoizedFn(() => {
     confirmDelete({
       title: '删除文件',
-      content: `确定删除文件: ${record?.fileName}?`,
+      content: `确定删除文件: ${record?.filename}?`,
       onOk: deleteNode,
       loading: deleteLoading,
     });

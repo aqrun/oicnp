@@ -38,7 +38,7 @@ export default function FileForm({
 }: TagFormProps): JSX.Element {
   const getInitialValues = () => {
     const data: FileFieldType = {
-      fileName: '',
+      filename: '',
       uri: '',
       storage: '',
       mime: '',
@@ -67,7 +67,7 @@ export default function FileForm({
       >
         <Form.Item<FieldType>
           label="文件名"
-          name="fileName"
+          name="filename"
           rules={[{ required: true, message: '请输入文件名！' }]}
         >
           <Input />
