@@ -1,5 +1,12 @@
 'use client';
 
-export default function JobsPage(): JSX.Element {
-  return <div>jobs page</div>;
+import CronsList from './List';
+import { Container } from './index.styled';
+
+export default function OnlinePage(): JSX.Element {
+  return (
+    <Container>
+      <CronsList />
+    </Container>
+  );
 }
