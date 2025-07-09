@@ -18,3 +18,4 @@ bun dev
 
 * https://demo.owladmin.com/admin#/system/admin_users
 * https://gitee.com/Mr-zhang-wgr/react-antd-admin
+* https://vue.ruoyi.vip/index
