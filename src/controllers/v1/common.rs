@@ -4,11 +4,28 @@ use oic_core::{
     utils::{get_api_prefix, get_auth_captcha, AuthCaptcha},
     typings::JsonRes,
     AppContext,
+    services::cache::{RedisPool, Redis},
 };
 use std::time::Duration;
 
 #[debug_handler]
-pub async fn info() -> JsonRes<String> {
+pub async fn info(
+    State(ctx): State<AppContext>,
+) -> JsonRes<String> {
+    let redis = match Redis::from(&ctx).await {
+        Ok(redis) => redis,
+        Err(e) => {
+            return JsonRes::err(e.to_string());
+        },
+    };
+
+    let a = redis.set("test", "test123").await;
+    println!("{:?}", a);
+
+    let a = redis.get("test").await;
+    println!("{:?}", a);
+    
+
     JsonRes::ok(String::from("Admin Api success"))
 }
 

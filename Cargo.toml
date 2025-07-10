@@ -33,6 +33,8 @@ validator = { workspace = true }
 sea-orm = { workspace = true }
 anyhow = { workspace = true }
 dotenv = { workspace = true }
+bb8-redis = { workspace = true }
+bb8 = { workspace = true }
 
 # view engine i18n
 fluent-templates = { workspace = true }
@@ -65,7 +67,7 @@ oic_derives = { path = "crates/oic-derives" }
 oic_cmd = { path = "crates/oic-cmd" }
 oic_web = { path = "crates/oic-web" }
 migration = { path = "migration" }
-loco-rs = { version = "0.15", features = ["with-db"] }
+loco-rs = { version = "0.16", features = ["with-db", "cache_redis"] }
 clap = { version = "^4", features = ["derive"] }
 async-std = { version = "^1", features = ["attributes", "tokio1"] }
 async-graphql = {version = "^7", features = ["bson", "chrono"]}
@@ -109,6 +111,8 @@ tower = "0.4.13"
 futures-util = "0.3.30"
 nanoid = "0.4.0"
 captcha-rs = "0.2.11"
+bb8-redis = { version = "0.23" }
+bb8 = { version = "0.9" }
 
 [workspace.dependencies.sea-orm]
 version = "^1"

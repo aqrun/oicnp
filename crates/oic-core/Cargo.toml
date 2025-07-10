@@ -52,3 +52,5 @@ tower = { workspace = true }
 futures-util = { workspace = true }
 nanoid = { workspace = true }
 captcha-rs = { workspace = true }
+bb8-redis = { workspace = true }
+bb8 = { workspace = true }

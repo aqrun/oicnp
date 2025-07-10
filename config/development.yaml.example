@@ -91,6 +91,11 @@ queue:
   # Dangerously flush all data in Redis on startup. dangerous operation, make sure that you using this flag only on dev environments or test mode
   dangerously_flush: false
 
+cache:
+  kind: Redis
+  uri: {{ get_env(name="REDIS_URL", default="redis://127.0.0.1") }}
+  max_size: 100
+  
 # Authentication Configuration
 auth:
   # JWT authentication

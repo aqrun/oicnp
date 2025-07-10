@@ -1,6 +1,7 @@
+use std::sync::Arc;
 use loco_rs::{
     environment::{Environment, resolve_from_env},
-    app::AppContext,
+    app::{AppContext, SharedStore},
     db,
     bgworker,
     cache,
@@ -49,6 +50,7 @@ pub async fn create_context(environment: &Environment) -> Result<AppContext> {
         cache: cache::Cache::new(cache::drivers::null::new()).into(),
         config,
         mailer,
+        shared_store: Arc::new(SharedStore::default()),
     };
     Ok(ctx)
 }

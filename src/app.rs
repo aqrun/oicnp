@@ -11,10 +11,10 @@ use loco_rs::{
     bgworker::{BackgroundWorker, Queue},
     Result,
     config::Config,
-    cache,
 };
 use migration::Migrator;
 use oic_core::entities::prelude::*;
+use oic_core::services::cache::{get_redis_pool, RedisPool};
 use axum::Router as AxumRouter;
 use crate::controllers::home::fallback;
 
@@ -64,16 +64,31 @@ impl Hooks for App {
         Ok(router)
     }
 
+    async fn after_context(ctx: AppContext) -> Result<AppContext> {
+        let default_cache_config = loco_rs::config::RedisCacheConfig {
+            uri: String::from(""),
+            max_size: 0,
+        };
+        let cache_config = match &ctx.config.cache {
+            loco_rs::config::CacheConfig::Redis(config) => config,
+            _ => &default_cache_config,
+        };
+
+        let pool = match get_redis_pool(cache_config.uri.as_str(), cache_config.max_size).await {
+            Ok(pool) => pool,
+            Err(e) => {
+                return Err(loco_rs::Error::string(e.to_string().as_str()));
+            },
+        };
+
+        ctx.shared_store.insert::<RedisPool>(std::sync::Arc::new(pool));
+
+        Ok(ctx)
+    }
+
     async fn connect_workers(ctx: &AppContext, queue: &Queue) -> Result<()> {
         queue.register(DownloadWorker::build(ctx)).await?;
         Ok(())
-    }
-
-    async fn after_context(ctx: AppContext) -> Result<AppContext> {
-        Ok(AppContext {
-            cache: cache::Cache::new(cache::drivers::inmem::new()).into(),
-            ..ctx
-        })
     }
 
     fn register_tasks(tasks: &mut Tasks) {
