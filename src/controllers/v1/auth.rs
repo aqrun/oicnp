@@ -1,8 +1,12 @@
+use std::sync::Arc;
 use axum::debug_handler;
 use loco_rs::prelude::*;
-use oic_core::models::users::{LoginParams, RegisterParams};
-use oic_core::typings::JsonRes;
-use oic_core::utils::get_api_prefix;
+use oic_core::{
+    models::users::{LoginParams, RegisterParams},
+    typings::JsonRes,
+    utils::get_api_prefix,
+    services::cache::OicCache,
+};
 use oic_core::services::{
     self,
     auth::{
@@ -66,7 +70,14 @@ async fn reset(State(ctx): State<AppContext>, Json(params): Json<ResetParams>) -
 /// Creates a user login and returns a token
 #[debug_handler]
 async fn login(State(ctx): State<AppContext>, Json(params): Json<LoginParams>) -> JsonRes<LoginResponse> {
-    let cache_captcha = match ctx.cache.get(params.captcha_id.as_str()).await {
+    let cache = match ctx.shared_store.get::<Arc<OicCache>>() {
+        Some(cache) => cache,
+        None => {
+            return JsonRes::err(String::from("Cache not found"));
+        },
+    };
+
+    let cache_captcha = match cache.get(params.captcha_id.as_str()).await {
         Ok(text) => text.unwrap_or(String::from("")),
         Err(_) => {
             return JsonRes::err("验证码已过期, 刷新后重试");

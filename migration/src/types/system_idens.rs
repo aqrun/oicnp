@@ -604,3 +604,20 @@ pub enum UserOnline {
     Os,
 }
 
+// sys_caches
+#[derive(Iden, OicColumn)]
+pub enum Caches {
+    Table,
+    #[oic(data_type = "bigInt", len = 20, comment = "CacheID")]
+    Id,
+    #[oic(data_type = "string", len = 64, default = "", comment = "")]
+    CacheKey,
+    #[oic(data_type = "text", default = "", comment = "")]
+    CacheValue,
+    #[oic(data_type = "string", len = 32, default = "", comment = "缓存类型")]
+    Scope,
+    #[oic(data_type = "datetime", comment = "创建时间")]
+    CreatedAt,
+    #[oic(data_type = "datetime", comment = "创建时间")]
+    ExpiredAt,
+}

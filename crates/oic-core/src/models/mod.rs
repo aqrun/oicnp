@@ -9,5 +9,6 @@ pub mod permissions;
 pub mod files;
 pub mod tags;
 pub mod categories;
+pub mod caches;
 
 pub use base::*;

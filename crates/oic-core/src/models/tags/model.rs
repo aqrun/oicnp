@@ -6,7 +6,7 @@ use crate::{
 };
 use loco_rs::prelude::*;
 use loco_rs::model::{ModelError, ModelResult};
-use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, TransactionTrait};
+use sea_orm::{prelude::*, IntoActiveModel, QueryOrder};
 use validator::Validate;
 use super::{CreateTagReqParams, TagFilters, UpdateTagReqParams, DeleteTagReqParams};
 

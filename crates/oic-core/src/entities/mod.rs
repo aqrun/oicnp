@@ -38,3 +38,4 @@ pub mod user_position_map;
 pub mod user_role_map;
 pub mod user;
 pub mod note;
+pub mod cache;

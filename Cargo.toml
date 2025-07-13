@@ -33,8 +33,6 @@ validator = { workspace = true }
 sea-orm = { workspace = true }
 anyhow = { workspace = true }
 dotenv = { workspace = true }
-bb8-redis = { workspace = true }
-bb8 = { workspace = true }
 
 # view engine i18n
 fluent-templates = { workspace = true }

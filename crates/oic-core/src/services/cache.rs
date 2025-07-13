@@ -1,74 +1,157 @@
 use std::time::Duration;
-use bb8::Pool;
-use bb8_redis::{
-    bb8,
-    RedisConnectionManager,
-    redis::{cmd, AsyncCommands},
-};
+use std::sync::Arc;
 use anyhow::Result;
-use loco_rs::app::AppContext;
+use loco_rs::{
+    prelude::*,
+    cache::Cache,
+};
+use crate::entities::prelude::*;
+use crate::prelude::ModelCrudHandler;
+use crate::models::caches::{CreateCacheReqParams, CacheScope};
+use crate::{utils::utc_now, constants::DATE_TIME_FORMAT};
+use serde::{de::DeserializeOwned, Serialize};
+use anyhow::anyhow;
 
-pub async fn get_redis_pool(uri: &str, max_size: u32) -> Result<Pool<RedisConnectionManager>> {
-    let manager = RedisConnectionManager::new(uri)?;
-    let pool = Pool::builder()
-        .max_size(max_size)
-        .build(manager)
-        .await?;
-    Ok(pool)
+pub struct OicCache {
+    pub db: DatabaseConnection,
+    pub cache: Arc<Cache>,
 }
 
-pub type RedisPool = std::sync::Arc<Pool<RedisConnectionManager>>;
-
-pub struct Redis {
-    pool: RedisPool,
-}
-
-impl Redis {
-    pub fn new(pool: RedisPool) -> Self {
+impl OicCache {
+    pub fn new(
+        db: DatabaseConnection,
+        cache: Arc<Cache>,
+    ) -> Self {
         Self {
-            pool,
+            db,
+            cache,
         }
     }
 
-    pub async fn from(ctx: &AppContext) -> Result<Self> {
-        let pool = ctx.shared_store.get::<RedisPool>()
-            .ok_or(anyhow::anyhow!("Redis pool not found"))?;
+    ///
+    /// 优先获取内存缓存数据
+    /// 再获取数据表数据
+    /// 
+    pub async fn get<T: DeserializeOwned>(&self, key: &str) -> Result<Option<T>> {
+        let exist = self.cache.contains_key(key).await?;
 
-        Ok(Self {
-            pool,
-        })
+        if exist {
+            return Ok(self.cache.get::<T>(key).await?);
+        }
+
+        let res = CacheModel::find_by_vid(&self.db, key).await?;
+
+        // 检测缓存过期
+        if let Some(expired_at) = res.expired_at {
+            if expired_at < utc_now() {
+                return Ok(None);
+            }
+        }
+
+        let value = res.cache_value;
+
+        let deserialized = serde_json::from_str::<T>(&value)
+            .map_err(|e| anyhow!("缓存数据反序列化失败: {}", e))?;
+
+        Ok(Some(deserialized))
     }
 
-    pub async fn get(&self, key: &str) -> Result<Option<String>> {
-        let mut conn = self.pool.get().await?;
-        
-        let r: Option<String> = conn.get(key).await?;
-        Ok(r)
-    }
-
-    pub async fn set(&self, key: &str, value: &str) -> Result<()> {
-        let mut conn = self.pool.get().await?;
-        conn.set::<_, _, ()>(key, value).await?;
-        Ok(())
-    }
-
-    pub async fn remove(&self, key: &str) -> Result<()> {
-        let mut conn = self.pool.get().await?;
-        conn.del::<_, ()>(key).await?;
-        Ok(())
-    }
-
-    pub async fn set_ex(
+    ///
+    /// 插入缓存数据
+    /// 
+    pub async fn insert<T: Serialize + Sync + ?Sized>(
         &self,
         key: &str,
-        value: &str,
-        duration: Duration,
+        value: &T,
     ) -> Result<()> {
-        let mut conn = self.pool.get().await?;
-        // Redis expects the expiry in seconds as a u64
-        conn.set_ex::<_, _, ()>(key, value, duration.as_secs())
-            .await?;
+        self.cache.insert(key, value).await?;
+
+        let serialized = serde_json::to_string(value)
+            .map_err(|e| {
+                anyhow!("缓存数据序列化失败: {}", e)
+            })?;
+
+        let scope = Self::parse_scope_by_key(key);
+        
+        let create_model = CreateCacheReqParams {
+            cache_key: Some(key.to_string()),
+            cache_value: Some(serialized),
+            scope: Some(scope.to_string()),
+            created_at: Some(utc_now().format(DATE_TIME_FORMAT).to_string()),
+            ..Default::default()
+        };
+        CacheModel::create(&self.db, &create_model).await?;
+
         Ok(())
     }
 
+    ///
+    /// 移除指定key
+    /// 
+    pub async fn remove(&self, key: &str) -> Result<()> {
+        self.cache.remove(key).await?;
+        CacheModel::delete_by_key(&self.db, key).await?;
+
+        Ok(())
+    }
+
+    pub async fn clear(&self) -> Result<()> {
+        self.cache.clear().await?;
+        CacheModel::delete_all(&self.db).await?;
+
+        Ok(())
+    }
+
+    pub async fn insert_with_expiry<T: Serialize + Sync + ?Sized>(
+        &self,
+        key: &str,
+        value: &T,
+        duration: Duration,
+    ) -> Result<()> {
+        self.cache.insert_with_expiry(key, value, duration).await?;
+        
+        let serialized = serde_json::to_string(value)
+        .map_err(|e| {
+            anyhow!("缓存数据序列化失败: {}", e)
+        })?;
+
+        let expired_at = utc_now() + duration;
+        
+        let create_model = CreateCacheReqParams {
+            cache_key: Some(key.to_string()),
+            cache_value: Some(serialized),
+            scope: Some(CacheScope::Captcha.to_string()),
+            created_at: Some(utc_now().format(DATE_TIME_FORMAT).to_string()),
+            expired_at: Some(expired_at.format(DATE_TIME_FORMAT).to_string()),
+            ..Default::default()
+        };
+        CacheModel::create(&self.db, &create_model).await?;
+
+        Ok(())
+    }
+
+    ///
+    /// 数据刷新
+    /// 清空全部过期数据
+    /// 
+    pub async fn refresh(&self) -> Result<()> {
+        CacheModel::refresh(&self.db).await?;
+
+        Ok(())
+    }
+
+    ///
+    /// 根据 key 解析缓存作用域
+    /// 
+    pub fn parse_scope_by_key(key: &str) -> CacheScope {
+        if key.is_empty() {
+            return CacheScope::Other;
+        }
+
+        if key.starts_with("captcha-") {
+            return CacheScope::Captcha;
+        }
+
+        CacheScope::Other
+    }
 }

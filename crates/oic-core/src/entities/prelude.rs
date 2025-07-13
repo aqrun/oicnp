@@ -251,3 +251,10 @@ pub use super::note::{
     ActiveModel as NoteActiveModel,
     Relation as NoteRelation,
 };
+pub use super::cache::{
+    Entity as CacheEntity,
+    Model as CacheModel,
+    Column as CacheColumn,
+    ActiveModel as CacheActiveModel,
+    Relation as CacheRelation,
+};

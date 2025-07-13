@@ -1,5 +1,5 @@
 use std::path::Path;
-
+use std::sync::Arc;
 use async_trait::async_trait;
 use loco_rs::{
     app::{AppContext, Hooks, Initializer},
@@ -13,8 +13,10 @@ use loco_rs::{
     config::Config,
 };
 use migration::Migrator;
-use oic_core::entities::prelude::*;
-use oic_core::services::cache::{get_redis_pool, RedisPool};
+use oic_core::{
+    entities::prelude::*,
+    services::cache::OicCache,
+};
 use axum::Router as AxumRouter;
 use crate::controllers::home::fallback;
 
@@ -65,23 +67,8 @@ impl Hooks for App {
     }
 
     async fn after_context(ctx: AppContext) -> Result<AppContext> {
-        let default_cache_config = loco_rs::config::RedisCacheConfig {
-            uri: String::from(""),
-            max_size: 0,
-        };
-        let cache_config = match &ctx.config.cache {
-            loco_rs::config::CacheConfig::Redis(config) => config,
-            _ => &default_cache_config,
-        };
-
-        let pool = match get_redis_pool(cache_config.uri.as_str(), cache_config.max_size).await {
-            Ok(pool) => pool,
-            Err(e) => {
-                return Err(loco_rs::Error::string(e.to_string().as_str()));
-            },
-        };
-
-        ctx.shared_store.insert::<RedisPool>(std::sync::Arc::new(pool));
+        let cache = OicCache::new(ctx.db.clone(), ctx.cache.clone());
+        ctx.shared_store.insert::<Arc<OicCache>>(Arc::new(cache));
 
         Ok(ctx)
     }

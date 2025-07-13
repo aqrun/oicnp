@@ -40,6 +40,7 @@ mod m20230116_092931_create_cms_node_comments_map_table;
 mod m20230116_092944_create_cms_configs_table;
 mod m20230607_204902_create_short_links_table;
 mod m20241011_131809_crate_notes_table;
+mod m20250713_030227_create_caches_table;
 
 pub struct Migrator;
 
@@ -83,6 +84,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20230116_092944_create_cms_configs_table::Migration),
             Box::new(m20230607_204902_create_short_links_table::Migration),
             Box::new(m20241011_131809_crate_notes_table::Migration),
+            Box::new(m20250713_030227_create_caches_table::Migration),
         ]
     }
 }

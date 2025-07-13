@@ -21,7 +21,7 @@ tracing = { workspace = true }
 tokio = { workspace = true }
 chrono = { workspace = true }
 anyhow = { workspace = true }
-strum = { workspace = true }
+strum = { workspace = true, features = ["derive"] }
 strum_macros = { workspace = true }
 log = { workspace = true }
 rs-snowflake = "^0"
@@ -52,5 +52,3 @@ tower = { workspace = true }
 futures-util = { workspace = true }
 nanoid = { workspace = true }
 captcha-rs = { workspace = true }
-bb8-redis = { workspace = true }
-bb8 = { workspace = true }

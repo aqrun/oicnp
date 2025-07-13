@@ -5,7 +5,7 @@ use crate::{
     ModelCrudHandler,
 };
 use loco_rs::prelude::*;
-use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, TransactionTrait};
+use sea_orm::{prelude::*, IntoActiveModel, QueryOrder};
 use validator::Validate;
 use super::{CreateFileReqParams, FileFilters, UpdateFileReqParams, DeleteFileReqParams};
 
@@ -41,7 +41,7 @@ impl ModelCrudHandler for FileModel {
     ///
     /// 根据ID查找一个
     /// 
-    async fn find_by_vid(db: &DatabaseConnection, vid: &str) -> ModelResult<Self> {
+    async fn find_by_vid(_db: &DatabaseConnection, _vid: &str) -> ModelResult<Self> {
         Ok(Self::default())
     }
 
