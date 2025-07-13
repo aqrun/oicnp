@@ -1,0 +1,4 @@
+---
+- vid: cache_scope
+  name: '缓存分类'
+  status: 1

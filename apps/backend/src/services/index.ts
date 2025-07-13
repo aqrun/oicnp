@@ -36,3 +36,6 @@ export * from './apis/online/hooks';
 export * from './apis/cron/types';
 export * from './apis/cron/client';
 export * from './apis/cron/hooks';
+export * from './apis/cache/types';
+export * from './apis/cache/client';
+export * from './apis/cache/hooks';

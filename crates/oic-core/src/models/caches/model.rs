@@ -5,10 +5,17 @@ use crate::{
     ModelCrudHandler,
 };
 use loco_rs::prelude::*;
-use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, Condition};
+use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, Condition, QuerySelect};
 use validator::Validate;
-use super::{CreateCacheReqParams, CacheFilters, UpdateCacheReqParams, DeleteCacheReqParams};
-use crate::{utils::utc_now, constants::DATE_TIME_FORMAT};
+use super::{
+    CreateCacheReqParams, CacheFilters, UpdateCacheReqParams, DeleteCacheReqParams,
+    CacheScopeModel,
+    PartialCacheModel,
+};
+use crate::{
+    utils::utc_now, constants::DATE_TIME_FORMAT,
+    models::attribute_values::AttributeValueFilters,
+};
 
 #[async_trait::async_trait]
 impl ActiveModelBehavior for CacheActiveModel {}
@@ -168,6 +175,45 @@ impl ModelCrudHandler for CacheModel {
 }
 
 impl CacheModel {
+    pub async fn find_scope_list(db: &DatabaseConnection) -> ModelResult<Vec<CacheScopeModel>> {
+        let value_filters = AttributeValueFilters {
+            vid: Some(String::from("cache_scope")),
+            ..Default::default()
+        };
+        let (attr_values, _) = AttributeValueModel::find_list(db, &value_filters).await?;
+
+        let q = CacheEntity::find()
+            .select_only()
+            .columns([CacheColumn::Scope])
+            .group_by(CacheColumn::Scope);
+            
+        let list = q.into_model::<PartialCacheModel>()
+            .all(db)
+            .await?;
+
+        let scopes = list.iter().map(|scope_only| {
+            let mut scope = String::from("");
+            let mut label = String::from("其它");
+
+            if let Some(x) = &scope_only.scope {
+                scope = String::from(x);
+            }
+
+            let attr_value = attr_values.iter().find(|attr_value| attr_value.value == scope);
+            
+            if let Some(attr_value) = attr_value {
+                label = String::from(attr_value.label.as_str());
+            }
+
+            CacheScopeModel {
+                scope,
+                label,
+            }
+        }).collect::<Vec<CacheScopeModel>>();
+
+        Ok(scopes)
+    }
+
     /// 删除数据
     pub async fn delete_by_id(db: &DatabaseConnection, id: i64) -> ModelResult<i64> {
         let q = CacheEntity::delete_many()

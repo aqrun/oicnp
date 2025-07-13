@@ -9,9 +9,11 @@ import {
   Icon,
 } from '@/components';
 import useColumns from './useColumns';
+import { useListStore } from '../CacheList/useListStore';
 import { Container } from './index.styled';
 
 export default function KeyList(): JSX.Element {
+  const cachesRes = useListStore((state) => state.cachesRes);
   const columns = useColumns();
 
   return (
@@ -31,7 +33,7 @@ export default function KeyList(): JSX.Element {
         }
       >
         <Table
-          dataSource={[]}
+          dataSource={cachesRes?.caches || []}
           columns={columns}
           loading={false}
           rowKey="tagId"

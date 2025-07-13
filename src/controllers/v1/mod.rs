@@ -12,6 +12,7 @@ mod permission;
 mod tag;
 mod category;
 mod file;
+mod cache;
 
 pub const VERSION: &str = "v1";
 
@@ -31,6 +32,7 @@ pub fn routes(ctx: &AppContext) -> Vec<Routes> {
         tag::routes(),
         category::routes(),
         file::routes(),
+        cache::routes(),
     ];
 
     for router in need_role_routes.into_iter() {

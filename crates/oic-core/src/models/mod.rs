@@ -10,5 +10,7 @@ pub mod files;
 pub mod tags;
 pub mod categories;
 pub mod caches;
+pub mod attributes;
+pub mod attribute_values;
 
 pub use base::*;

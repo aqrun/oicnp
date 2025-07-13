@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import {
   Card,
   Button,
@@ -10,9 +11,31 @@ import {
 } from '@/components';
 import useColumns from './useColumns';
 import { Container } from './index.styled';
+import { useList } from './useList';
+import { useMemoizedFn } from 'ahooks';
 
 export default function CacheList(): JSX.Element {
+  const {
+    scopesRes,
+    refresh,
+    loading,
+    fetchListPageData,
+    refreshToken,
+  } = useList();
   const columns = useColumns();
+
+  const handleRefresh = useMemoizedFn(() => {
+    refresh();
+  });
+
+  useEffect(() => {
+    if (refreshToken) {
+      fetchListPageData();
+    }
+  }, [refreshToken]);
+  useEffect(() => {
+    fetchListPageData();
+  }, []);
 
   return (
     <Container
@@ -25,16 +48,17 @@ export default function CacheList(): JSX.Element {
         extra={
           <Button
             size="small"
+            onClick={handleRefresh}
           >
             <Icon icon="ReloadOutlined" />
           </Button>
         }
       >
         <Table
-          dataSource={[]}
+          dataSource={scopesRes?.scopes || []}
           columns={columns}
-          loading={false}
-          rowKey="tagId"
+          loading={loading}
+          rowKey="scope"
           size="small"
           pagination={false}
         />

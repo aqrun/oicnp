@@ -8,6 +8,7 @@ use crate::{
     entities::prelude::*,
     constants::DATE_TIME_FORMAT,
 };
+use sea_orm::FromQueryResult;
 use strum::EnumString;
 
 #[derive(strum::Display, EnumString, Debug, Clone)]
@@ -15,6 +16,13 @@ use strum::EnumString;
 pub enum CacheScope {
     Captcha,
     Other,
+}
+
+#[derive(Deserialize, Serialize, Debug, Validate, Default, Clone)]
+#[serde(default)]
+pub struct CacheScopeModel {
+    pub scope: String,
+    pub label: String,
 }
 
 #[add_filter_fields]
@@ -93,3 +101,18 @@ pub type CreateCacheReqParams = CacheReqParams;
 pub type UpdateCacheReqParams = CacheReqParams;
 /// 删除数据参数
 pub type DeleteCacheReqParams = CacheReqParams;
+
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize, Default, FromQueryResult)]
+pub struct PartialCacheModel {
+    pub id: Option<i64>,
+    #[serde(rename(deserialize = "cacheKey", serialize = "cacheKey"))]
+    pub cache_key: Option<String>,
+    #[serde(rename(deserialize = "cacheValue", serialize = "cacheValue"))]
+    pub cache_value: Option<String>,
+    #[serde(rename(deserialize = "scope", serialize = "scope"))]
+    pub scope: Option<String>,
+    #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
+    pub created_at: Option<DateTime>,
+    #[serde(rename(deserialize = "expiredAt", serialize = "expiredAt"))]
+    pub expired_at: Option<DateTime>,
+}

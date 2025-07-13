@@ -1,0 +1,11 @@
+---
+- vid: cache_scope
+  label: '验证码'
+  value: captcha
+  remark: '验证码'
+  status: 1
+- vid: cache_scope
+  label: '其他'
+  value: other
+  remark: '其他'
+  status: 1

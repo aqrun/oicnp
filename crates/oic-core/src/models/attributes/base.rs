@@ -12,15 +12,12 @@ use crate::{
 #[add_filter_fields]
 #[derive(FilterParams, Deserialize, Serialize, Debug, Default, Clone)]
 #[serde(default)]
-pub struct FileFilters {
-    #[serde(rename(deserialize = "fileId", serialize = "fileId"))]
-    pub file_id: Option<i64>,
-    pub uid: Option<i64>,
-    pub filename: Option<String>,
-    pub uri: Option<String>,
-    pub storage: Option<String>,
-    pub mime: Option<String>,
+pub struct AttributeFilters {
+    pub id: Option<i64>,
+    pub vid: Option<String>,
+    pub name: Option<String>,
     pub status: Option<String>,
+    pub remark: Option<String>,
     #[serde(rename(deserialize = "createdBy", serialize = "createdBy"))]
     pub created_by: Option<i64>,
     #[serde(rename(deserialize = "updatedBy", serialize = "updatedBy"))]
@@ -36,15 +33,12 @@ pub struct FileFilters {
 /// 创建 file 参数
 #[derive(Deserialize, Serialize, Debug, Validate, Default, Clone)]
 #[serde(default)]
-pub struct FileReqParams {
-    #[serde(rename(deserialize = "fileId", serialize = "fileId"))]
-    pub file_id: Option<i64>,
-    pub uid: Option<i64>,
-    pub filename: Option<String>,
-    pub uri: Option<String>,
-    pub storage: Option<String>,
-    pub mime: Option<String>,
+pub struct AttributeReqParams {
+    pub id: Option<i64>,
+    pub vid: Option<String>,
+    pub name: Option<String>,
     pub status: Option<String>,
+    pub remark: Option<String>,
     #[serde(rename(deserialize = "createdBy", serialize = "createdBy"))]
     pub created_by: Option<i64>,
     #[serde(rename(deserialize = "updatedBy", serialize = "updatedBy"))]
@@ -55,31 +49,23 @@ pub struct FileReqParams {
     pub updated_at: Option<String>,
     #[serde(rename(deserialize = "deletedAt", serialize = "deletedAt"))]
     pub deleted_at: Option<String>,
-    #[serde(rename(deserialize = "createdByUsername", serialize = "createdByUsername"))]
-    pub created_by_username: Option<String>,
 }
 
-impl RequestParamsUpdater for FileReqParams {
-    type ActiveModel = FileActiveModel;
+impl RequestParamsUpdater for AttributeReqParams {
+    type ActiveModel = AttributeActiveModel;
 
     fn update(&self, item: &mut Self::ActiveModel) {
-        if let Some(x) = &self.file_id {
-            item.file_id = Set(*x);
+        if let Some(x) = &self.id {
+            item.id = Set(*x);
         }
-        if let Some(x) = &self.uid {
-            item.uid = Set(*x);
+        if let Some(x) = &self.vid {
+            item.vid = Set(String::from(x));
         }
-        if let Some(x) = &self.filename {
-            item.filename = Set(String::from(x));
+        if let Some(x) = &self.name {
+            item.name = Set(String::from(x));
         }
-        if let Some(x) = &self.uri {
-            item.uri = Set(String::from(x));
-        }
-        if let Some(x) = &self.storage {
-            item.storage = Set(String::from(x));
-        }
-        if let Some(x) = &self.mime {
-            item.mime = Set(String::from(x));
+        if let Some(x) = &self.remark {
+            item.remark = Set(String::from(x));
         }
         if let Some(x) = &self.status {
             item.status = Set(String::from(x));
@@ -108,7 +94,7 @@ impl RequestParamsUpdater for FileReqParams {
     }
 
     fn update_by_create(&self, item: &mut Self::ActiveModel) {
-        item.file_id = ActiveValue::NotSet;
+        item.id = ActiveValue::NotSet;
 
         if item.created_at.is_not_set() {
             item.created_at = Set(utc_now());
@@ -116,10 +102,10 @@ impl RequestParamsUpdater for FileReqParams {
     }
 }
 
-pub type CreateFileReqParams = FileReqParams;
+pub type CreateAttributeReqParams = AttributeReqParams;
 ///
-/// 更新 note 参数
+/// 更新 attribute 参数
 /// 
-pub type UpdateFileReqParams = FileReqParams;
+pub type UpdateAttributeReqParams = AttributeReqParams;
 /// 删除数据参数
-pub type DeleteFileReqParams = FileReqParams;
+pub type DeleteAttributeReqParams = AttributeReqParams;

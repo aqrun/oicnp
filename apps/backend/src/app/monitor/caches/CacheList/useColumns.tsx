@@ -1,25 +1,35 @@
 'use client';
 
 import type { TableProps} from 'antd';
-import { OnlineModel } from '@/services';
+import { CacheScopeModel } from '@/services';
+import TableActions from './TableActions';
 
 export default function useColumns() {
-  const columns: TableProps<OnlineModel>['columns'] = [
+  const columns: TableProps<CacheScopeModel>['columns'] = [
     {
-      key: 'uid',
-      title: '序号',
-      dataIndex: 'uid',
-    }, 
-    {
-      key: 'tokenId',
-      title: '缓存名称',
-      dataIndex: 'tokenId',
+      key: 'scope',
+      title: '缓存Key',
+      dataIndex: 'scope',
     },
     {
-      key: 'username',
-      title: '备注',
-      dataIndex: 'username',
+      key: 'label',
+      title: '缓存分类',
+      dataIndex: 'label',
     },
+    {
+      key: 'action',
+      title: '操作',
+      fixed: 'right',
+      width: 200,
+      dataIndex: 'scope',
+      render: (value: string, record: CacheScopeModel) => {
+        return (
+          <TableActions
+            record={record}
+          />
+        );
+      }
+    }
   ];
 
   return columns;

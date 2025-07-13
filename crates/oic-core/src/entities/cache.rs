@@ -8,7 +8,6 @@ use serde::{Deserialize, Serialize};
 pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
-    #[serde(rename(deserialize = "id", serialize = "id"))]
     pub id: i64,
     #[serde(rename(deserialize = "cacheKey", serialize = "cacheKey"))]
     pub cache_key: String,
