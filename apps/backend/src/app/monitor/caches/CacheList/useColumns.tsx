@@ -20,7 +20,7 @@ export default function useColumns() {
       key: 'action',
       title: '操作',
       fixed: 'right',
-      width: 200,
+      width: 80,
       dataIndex: 'scope',
       render: (value: string, record: CacheScopeModel) => {
         return (

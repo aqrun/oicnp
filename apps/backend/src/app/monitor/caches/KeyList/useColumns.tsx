@@ -3,13 +3,15 @@
 import type { TableProps} from 'antd';
 import { CacheModel } from '@/services';
 import TableActions from './TableActions';
+import { formatDate } from '@/utils';
 
 export default function useColumns() {
   const columns: TableProps<CacheModel>['columns'] = [
     {
       key: 'id',
-      title: '序号',
+      title: 'ID',
       dataIndex: 'id',
+      width: 60,
     }, 
     {
       key: 'cacheKey',
@@ -20,12 +22,15 @@ export default function useColumns() {
       key: 'createdAt',
       title: '创建时间',
       dataIndex: 'createdAt',
+      render: (value: string) => {
+        return formatDate(value);
+      }
     },
     {
       key: 'action',
       title: '操作',
       fixed: 'right',
-      width: 200,
+      width: 80,
       dataIndex: 'scope',
       render: (value: string, record: CacheModel) => {
         return (

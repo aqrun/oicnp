@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import {
   Card,
   Button,
@@ -10,11 +11,37 @@ import {
 } from '@/components';
 import useColumns from './useColumns';
 import { useListStore } from '../CacheList/useListStore';
+import { useMemoizedFn } from 'ahooks';
+import { useList } from '../CacheList/useList';
 import { Container } from './index.styled';
 
+/**
+ * 缓存列表
+ */
 export default function KeyList(): JSX.Element {
   const cachesRes = useListStore((state) => state.cachesRes);
+  const scope = useListStore((state) => state.scope);
+  const cacheRefreshToken = useListStore((state) => state.cacheRefreshToken);
+  const setState = useListStore((state) => state.setState);
   const columns = useColumns();
+
+  const {
+    fetchCacheListByScope,
+    cacheLoading
+  } = useList();
+
+  const handleRefresh = useMemoizedFn(() => {
+    setState({
+      cacheRefreshToken: Date.now().toString(),
+      cacheDetailRes: undefined,
+    });
+  });
+
+  useEffect(() => {
+    if (cacheRefreshToken) {
+      fetchCacheListByScope(scope);
+    }
+  }, [cacheRefreshToken]);
 
   return (
     <Container
@@ -27,6 +54,8 @@ export default function KeyList(): JSX.Element {
         extra={
           <Button
             size="small"
+            onClick={handleRefresh}
+            loading={cacheLoading}
           >
             <Icon icon="ReloadOutlined" />
           </Button>
@@ -35,8 +64,8 @@ export default function KeyList(): JSX.Element {
         <Table
           dataSource={cachesRes?.caches || []}
           columns={columns}
-          loading={false}
-          rowKey="tagId"
+          loading={cacheLoading}
+          rowKey="id"
           size="small"
           pagination={false}
         />

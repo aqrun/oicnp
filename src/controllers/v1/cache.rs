@@ -62,6 +62,8 @@ pub async fn list(
 pub async fn scope_list(
     State(ctx): State<AppContext>,
 ) -> JsonRes<Vec<CacheScopeModel>> {
+    let _ = CacheModel::refresh(&ctx.db).await;
+
     let scopes = match CacheModel::find_scope_list(&ctx.db).await {
         Ok(res) => res,
         Err(err) => return JsonRes::err(err),

@@ -19,6 +19,7 @@ export type BaseListPageState = BaseListState & {
   cacheKey: string;
   refreshToken: string;
   cacheRefreshToken: string;
+  detailRefreshToken: string;
   _name?: string;
 };
 
@@ -43,6 +44,7 @@ export const useListStore = create<ListState>()((set) => ({
   },
   refreshToken: '',
   cacheRefreshToken: '',
+  detailRefreshToken: '',
   setState: (payload) => set((state) => {
     return {
       ...state,

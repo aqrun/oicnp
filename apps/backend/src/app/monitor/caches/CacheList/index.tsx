@@ -14,6 +14,9 @@ import { Container } from './index.styled';
 import { useList } from './useList';
 import { useMemoizedFn } from 'ahooks';
 
+/**
+ * 缓存 scope 列表
+ */
 export default function CacheList(): JSX.Element {
   const {
     scopesRes,
@@ -49,6 +52,7 @@ export default function CacheList(): JSX.Element {
           <Button
             size="small"
             onClick={handleRefresh}
+            loading={loading}
           >
             <Icon icon="ReloadOutlined" />
           </Button>

@@ -53,6 +53,8 @@ export function useList() {
   const refresh = useMemoizedFn(async () => {
     setState({
       refreshToken: Date.now().toString(),
+      cachesRes: undefined,
+      cacheDetailRes: undefined,
     });
   });
 

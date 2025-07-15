@@ -251,7 +251,7 @@ impl CacheModel {
         let q = CacheEntity::delete_many()
             .filter(
                 Condition::all()
-                    .add(CacheColumn::ExpiredAt.lt(utc_now().format(DATE_TIME_FORMAT).to_string()))
+                    .add(CacheColumn::ExpiredAt.lt(utc_now()))
                     .add(CacheColumn::ExpiredAt.is_not_null())
             );
 

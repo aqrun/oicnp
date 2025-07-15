@@ -11,7 +11,7 @@ export function useList() {
     const res = await fetchFileList({});
 
     setState({
-      filesRes: res.files,
+      filesRes: res?.files,
     });
     return res;
   });
