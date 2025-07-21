@@ -32,6 +32,8 @@ import {
   CloudServerOutlined,
   FileSearchOutlined,
   AuditOutlined,
+  UploadOutlined,
+  DownloadOutlined,
 } from '@ant-design/icons';
 import { Container } from './index.styled';
 
@@ -69,6 +71,8 @@ const antIcons: Record<string, JSX.Element> = {
   CloudServerOutlined: <CloudServerOutlined />,
   FileSearchOutlined: <FileSearchOutlined />,
   AuditOutlined: <AuditOutlined />,
+  UploadOutlined: <UploadOutlined />,
+  DownloadOutlined: <DownloadOutlined />,
 };
 
 export interface IconProps {

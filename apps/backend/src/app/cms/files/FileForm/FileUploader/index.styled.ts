@@ -3,11 +3,9 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
+  border: 1px solid #e1d1d1;
   display: flex;
-  flex-direction: row;
-  gap: 16px;
-
-  .oic-form-w {
-    flex: 1;
-  }
+  flex-direction: column;
+  gap: 10px;
+  width: 400px;
 `;
