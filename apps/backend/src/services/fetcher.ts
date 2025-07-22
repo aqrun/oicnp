@@ -2,10 +2,16 @@ import { API_URI } from '@/constants';
 import { cookies } from 'next/headers';
 import { SESSION_ID } from '@/constants';
 
+export interface BaseResponse {
+  code: string;
+  data: unknown;
+  message: string;
+}
+
 /**
  * server端接口创建
  */
-export function createFetcher<TRequest, TResponse> (action: string, method?: string) {
+export function createFetcher<TRequest, TResponse extends BaseResponse> (action: string, method?: string) {
   const url = `${API_URI}/v1${action}`;
 
   return async function(data?: TRequest): Promise<TResponse> {
@@ -21,7 +27,7 @@ export function createFetcher<TRequest, TResponse> (action: string, method?: str
         },
         body: JSON.stringify(data),
       });
-      const json = await res.json() as any;
+      const json = await res.json() as unknown as TResponse;
   
       if (json?.code === '200') {
         return json?.data as TResponse;
@@ -33,8 +39,8 @@ export function createFetcher<TRequest, TResponse> (action: string, method?: str
       return {
         code: '500',
         data: null,
-        message: (err as any).toString(),
-      } as any as TResponse;
+        message: (err as Error).toString(),
+      } as unknown as TResponse;
     }
   }
 }

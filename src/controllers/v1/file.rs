@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use axum::{
     debug_handler,
     body::Bytes,
@@ -108,57 +109,41 @@ const UPLOADS_DIRECTORY: &str = "target/uploads";
 #[debug_handler]
 pub async fn upload(
     State(ctx): State<AppContext>,
-    request: Request,
+    mut multipart: Multipart,
 ) -> JsonRes<String> {
-    tokio::fs::create_dir(UPLOADS_DIRECTORY).await.expect("Failed to create uploads directory");
+    let mut map: HashMap<String, String> = HashMap::new();
 
-    let file_name = "test.png";
-    let _ = stream_to_file(file_name, request.into_body().into_data_stream()).await;
+    while let Some(field) = multipart.next_field().await.unwrap() {
+        let name = field.name().unwrap_or("").to_string();
 
-    JsonRes::ok(String::from("success"))
-}
+        if name.as_str().eq("file") {
+            let filename = if let Some(filename) = field.file_name() {
+                filename.to_string()
+            } else {
+                continue;
+            };
 
-async fn stream_to_file<S, E>(path: &str, stream: S) -> Result<(), (StatusCode, String)>
-where
-    S: Stream<Item = Result<Bytes, E>>,
-    E: Into<BoxError>,
-{
-    if !path_is_valid(path) {
-        return Err((StatusCode::BAD_REQUEST, "Invalid path".to_owned()));
-    }
+            let body_with_io_error = field.map_err(|err| io::Error::new(io::ErrorKind::Other, err));
 
-    async {
-        // Convert the stream into an `AsyncRead`.
-        let body_with_io_error = stream.map_err(|err| io::Error::new(io::ErrorKind::Other, err));
-        let body_reader = StreamReader::new(body_with_io_error);
-        futures::pin_mut!(body_reader);
+            let body_reader = StreamReader::new(body_with_io_error);
 
-        // Create the file. `File` implements `AsyncWrite`.
-        let path = std::path::Path::new(UPLOADS_DIRECTORY).join(path);
-        let mut file = BufWriter::new(File::create(path).await?);
+            futures::pin_mut!(body_reader);
 
-        // Copy the body into the file.
-        tokio::io::copy(&mut body_reader, &mut file).await?;
+            // Create the file. `File` implements `AsyncWrite`.
+            let path = std::path::Path::new(UPLOADS_DIRECTORY).join(filename.as_str());
+            let mut file = BufWriter::new(File::create(path).await.unwrap());
 
-        Ok::<_, io::Error>(())
-    }
-    .await
-    .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))
-}
-
-// to prevent directory traversal attacks we ensure the path consists of exactly one normal
-// component
-fn path_is_valid(path: &str) -> bool {
-    let path = std::path::Path::new(path);
-    let mut components = path.components().peekable();
-
-    if let Some(first) = components.peek() {
-        if !matches!(first, std::path::Component::Normal(_)) {
-            return false;
+            // Copy the body into the file.
+            tokio::io::copy(&mut body_reader, &mut file).await.unwrap();
+        } else {
+            let value = field.text().await.unwrap_or("".to_string());
+            map.insert(name, value);
         }
-    }
 
-    components.count() == 1
+    }
+    
+    println!("file_name--------: {:?}", map);
+    JsonRes::ok(String::from("success"))
 }
 
 pub fn routes() -> Routes {
