@@ -1,10 +1,7 @@
-use std::collections::HashMap;
+use std::sync::Arc;
 use axum::{
     debug_handler,
-    body::Bytes,
-    extract::{Multipart, Path, Request},
-    http::StatusCode,
-    BoxError,
+    extract::Multipart,
 };
 use loco_rs::prelude::*;
 use oic_core::{
@@ -14,15 +11,19 @@ use oic_core::{
         UpdateFileReqParams,
         DeleteFileReqParams,
         FileFilters,
+        UploadFileRes,
     },
     utils::get_api_prefix,
     typings::{JsonRes, Pagination},
     ModelCrudHandler,
+    prelude::Settings,
+    uuid,
 };
-use futures::{Stream, TryStreamExt};
+use futures::TryStreamExt;
 use std::io;
 use tokio::{fs::File, io::BufWriter};
 use tokio_util::io::StreamReader;
+use chrono::Utc;
 
 #[debug_handler]
 pub async fn get_one(
@@ -104,19 +105,38 @@ pub async fn remove(
     JsonRes::from(res)
 }
 
-const UPLOADS_DIRECTORY: &str = "target/uploads";
-
 #[debug_handler]
 pub async fn upload(
     State(ctx): State<AppContext>,
     mut multipart: Multipart,
-) -> JsonRes<String> {
-    let mut map: HashMap<String, String> = HashMap::new();
+) -> JsonRes<UploadFileRes> {
+    let settings = match ctx.shared_store.get::<Arc<Settings>>() {
+        Some(s) => s,
+        None => {
+            return JsonRes::err(String::from("Storage 配置参数不存在"));
+        },
+    };
+    let storage_cfg = settings.storage.clone();
+
+    let mut file_name = String::from("");
+    let mut file_size = 0;
+    let mut file_type = String::from("");
+    let mut storage = String::from("");
+    let mut url = String::from("");
 
     while let Some(field) = multipart.next_field().await.unwrap() {
         let name = field.name().unwrap_or("").to_string();
-
-        if name.as_str().eq("file") {
+        
+        if name.as_str().eq("name") {
+            file_name = field.text().await.unwrap_or("".to_string());
+        } else if name.as_str().eq("size") {
+            let size_str = field.text().await.unwrap_or("".to_string());
+            file_size = size_str.parse::<i32>().unwrap_or(0);
+        } else if name.as_str().eq("type") {
+            file_type = field.text().await.unwrap_or("".to_string());
+        } else if name.as_str().eq("storage") {
+            storage = field.text().await.unwrap_or("".to_string());
+        } else if name.as_str().eq("file") {
             let filename = if let Some(filename) = field.file_name() {
                 filename.to_string()
             } else {
@@ -129,21 +149,37 @@ pub async fn upload(
 
             futures::pin_mut!(body_reader);
 
-            // Create the file. `File` implements `AsyncWrite`.
-            let path = std::path::Path::new(UPLOADS_DIRECTORY).join(filename.as_str());
-            let mut file = BufWriter::new(File::create(path).await.unwrap());
+            // 按日期存储的路径
+            let date_path = Utc::now().format("%Y/%m").to_string();
+            let ext = filename.as_str().split(".").last().unwrap_or("");
+            let real_file_name = format!("{}.{}", uuid!(), ext);
+            // 本地存储
+            if storage_cfg.driver.as_str().eq("local") {
+                let file_path = format!("{}/{}", storage_cfg.path, date_path.as_str());
+                tokio::fs::create_dir_all(file_path.clone()).await.unwrap();
+                // Create the file. `File` implements `AsyncWrite`.
+                let path = std::path::Path::new(file_path.as_str()).join(real_file_name.as_str());
+                let mut file = BufWriter::new(File::create(path.clone()).await.unwrap());
 
-            // Copy the body into the file.
-            tokio::io::copy(&mut body_reader, &mut file).await.unwrap();
-        } else {
-            let value = field.text().await.unwrap_or("".to_string());
-            map.insert(name, value);
+                // Copy the body into the file.
+                tokio::io::copy(&mut body_reader, &mut file).await.unwrap();
+                url = format!("{}/{}/{}", storage_cfg.uri, date_path.as_str(), real_file_name.as_str());
+            } else if storage_cfg.driver.as_str().eq("oss") {
+
+            }
         }
-
     }
+
+    let res = UploadFileRes {
+        id: 0,
+        name: file_name,
+        size: file_size as i64,
+        file_type: file_type,
+        url,
+        ..Default::default()
+    };
     
-    println!("file_name--------: {:?}", map);
-    JsonRes::ok(String::from("success"))
+    JsonRes::from((res, "file"))
 }
 
 pub fn routes() -> Routes {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { getToken } from '@/actions/getUser';
+import Image from 'next/image';
 import {
   Upload,
   Button,
@@ -17,8 +18,15 @@ import { API_URI } from '@/constants';
 import { useMemoizedFn } from 'ahooks';
 import { Container } from './index.styled';
 
-export default function FileUploader() {
+export interface FileUploaderProps {
+  storage: string;
+}
+
+export default function FileUploader({
+  storage,
+}: FileUploaderProps) {
   const [token, setToken] = useState('');
+  const [imgUrl, setImgUrl] = useState('');
 
   const headers = {
     'Authorization': `Bearer ${token}`,
@@ -27,6 +35,7 @@ export default function FileUploader() {
   const handleChange: UploadProps['onChange'] = useMemoizedFn(async (info) => {
     if (info?.file?.percent !== 100 || info?.file?.status !== 'done') return;
     console.log(info);
+    setImgUrl(info.file.response?.data?.file?.url);
   });
 
   const uploadData = useMemoizedFn((file: UploadFile) => {
@@ -34,6 +43,7 @@ export default function FileUploader() {
       name: file?.name,
       size: file?.size,
       type: file?.type,
+      storage,
     }
   });
 
@@ -62,6 +72,17 @@ export default function FileUploader() {
             上传文件
           </Button>
         </Upload>
+
+        {Boolean(imgUrl) && (
+          <div className="oic-uploader-img">
+            <Image
+              src={imgUrl}
+              alt="img"
+              width={400}
+              height={300}
+            />
+          </div>
+        )}
       </div>
     </Container>
   );

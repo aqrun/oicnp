@@ -16,6 +16,7 @@ use migration::Migrator;
 use oic_core::{
     entities::prelude::*,
     services::cache::OicCache,
+    prelude::Settings,
 };
 use axum::Router as AxumRouter;
 use crate::controllers::home::fallback;
@@ -68,8 +69,18 @@ impl Hooks for App {
 
     async fn after_context(ctx: AppContext) -> Result<AppContext> {
         let cache = OicCache::new(ctx.db.clone(), ctx.cache.clone());
-        ctx.shared_store.insert::<Arc<OicCache>>(Arc::new(cache));
 
+        // 获取配置文件中的自定义配置项
+        let mut settings = Settings::default();
+
+        if let Some(s_str) = &ctx.config.settings {
+            if let Ok(sts) = serde_json::from_value::<Settings>(s_str.clone()) {
+                settings = sts;
+            };
+        }
+
+        ctx.shared_store.insert::<Arc<OicCache>>(Arc::new(cache));
+        ctx.shared_store.insert::<Arc<Settings>>(Arc::new(settings));
         Ok(ctx)
     }
 

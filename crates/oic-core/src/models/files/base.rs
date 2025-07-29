@@ -123,3 +123,16 @@ pub type CreateFileReqParams = FileReqParams;
 pub type UpdateFileReqParams = FileReqParams;
 /// 删除数据参数
 pub type DeleteFileReqParams = FileReqParams;
+
+#[derive(Deserialize, Serialize, Debug, Validate, Default, Clone)]
+#[serde(default)]
+pub struct UploadFileRes {
+    pub id: i64,
+    pub name: String,
+    pub size: i64,
+    #[serde(rename(deserialize = "fileType", serialize = "fileType"))]
+    pub file_type: String,
+    pub url: String,
+    pub mime: String,
+    pub status: String,
+}

@@ -105,3 +105,9 @@ auth:
     # Token expiration time in seconds
     expiration: 604800 # 7 days
 
+# 自定义附加配置参数
+settings:
+  storage:
+    driver: local
+    uri: http://localhost/uploads
+    path: /Users/aqrun/workspace/www/uploads

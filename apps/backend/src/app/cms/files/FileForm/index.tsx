@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import {
   Button,
   Form,
@@ -37,6 +38,8 @@ export default function FileForm({
   form,
   disabled,
 }: TagFormProps): JSX.Element {
+  const [storage, setStorage] = useState<string>('');
+
   const getInitialValues = () => {
     const data: FileFieldType = {
       filename: '',
@@ -54,9 +57,15 @@ export default function FileForm({
   };
   const initialValues = getInitialValues();
 
+  const handleStorageChange = (value: string) => {
+    setStorage(value);
+  };
+
   return (
     <Container>
-      <FileUploader />
+      <FileUploader
+        storage={storage}
+      />
       <div className="oic-form-w">
         <Form
           name="basic"
@@ -87,7 +96,18 @@ export default function FileForm({
             name="storage"
           >
             <Select
-              options={[]}
+              placeholder="请选择存储"
+              onChange={handleStorageChange}
+              options={[
+                {
+                  label: '本地',
+                  value: 'local',
+                },
+                {
+                  label: 'OSS',
+                  value: 'oss',
+                },
+              ]}
               loading={false}
               allowClear
             />

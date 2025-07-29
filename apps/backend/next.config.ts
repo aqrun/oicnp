@@ -7,6 +7,15 @@ const nextConfig: NextConfig = {
   compiler: {
     styledComponents: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '',
+      },
+    ],
+  },
 };
 
 export default nextConfig;
