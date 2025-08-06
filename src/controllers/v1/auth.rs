@@ -1,8 +1,11 @@
 use std::sync::Arc;
-use axum::debug_handler;
+use axum::{
+    debug_handler,
+    http::HeaderMap,
+};
 use loco_rs::prelude::*;
 use oic_core::{
-    models::users::{LoginParams, RegisterParams},
+    models::users::{LoginParams, RegisterParams, UserModel},
     typings::JsonRes,
     utils::get_api_prefix,
     services::cache::OicCache,
@@ -69,7 +72,11 @@ async fn reset(State(ctx): State<AppContext>, Json(params): Json<ResetParams>) -
 
 /// Creates a user login and returns a token
 #[debug_handler]
-async fn login(State(ctx): State<AppContext>, Json(params): Json<LoginParams>) -> JsonRes<LoginResponse> {
+async fn login(
+    headers: HeaderMap,
+    State(ctx): State<AppContext>,
+    Json(params): Json<LoginParams>,
+) -> JsonRes<LoginResponse> {
     let cache = match ctx.shared_store.get::<Arc<OicCache>>() {
         Some(cache) => cache,
         None => {
@@ -92,11 +99,18 @@ async fn login(State(ctx): State<AppContext>, Json(params): Json<LoginParams>) -
     }
 
     // 验证成功后删除缓存中的验证码，防止重复使用
-    let _ =ctx.cache.remove(params.captcha_id.as_str()).await;
+    let _ = ctx.cache.remove(params.captcha_id.as_str()).await;
 
-    let res = services::auth::login(&ctx.db, &ctx.config, params).await;
+    let info = match services::auth::login(&ctx.db, &ctx.config, params).await {
+        Ok(res) => res,
+        Err(err) => {
+            return JsonRes::err(err.to_string());
+        }
+    };
 
-    JsonRes::from(res)
+    let _ = UserModel::update_last_login_info(&ctx.db, info.uid, headers).await;
+
+    JsonRes::ok(info)
 }
 
 pub fn routes() -> Routes {

@@ -153,14 +153,20 @@ pub async fn login(
     let user = UserModel::find_by_email(db, params.email.as_str()).await?;
 
     // let valid = user.verify_password(&params.password);
-    let valid = verify_password(
+    let valid = match verify_password(
         params.password.as_str(), 
         user.password.as_str(),
         user.salt.as_str()
-    )?;
+    ) {
+        Ok(valid) => valid,
+        Err(err) => {
+            tracing::info!(message = err.to_string(), "invalid password");
+            false
+        }
+    };
 
     if !valid {
-        return Err(anyhow!("invalid password"));
+        return Err(anyhow!("用户名或密码错误"));
     }
 
     let jwt_secret = config.get_jwt_config()?;

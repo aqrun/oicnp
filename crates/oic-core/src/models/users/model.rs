@@ -18,6 +18,7 @@ use super::{
     UpdateUserReqParams,
     DeleteUserReqParams,
 };
+use axum::http::{HeaderMap, HeaderValue};
 
 impl Validatable for UserActiveModel {
     fn validator(&self) -> Box<dyn Validate> {
@@ -656,6 +657,25 @@ impl UserModel {
         }
 
         Ok(vec![])
+    }
+
+    /**
+     * 更新用户登陆状态数据
+     */
+    pub async fn update_last_login_info(
+        db: &DatabaseConnection,
+        uid: i64,
+        headers: HeaderMap,
+    ) -> ModelResult<()> {
+        let user = Self::find_by_uid(db, uid).await?;
+        let default_ip = HeaderValue::from_static("");
+        let ip = headers.get("x-forwarded-for").unwrap_or(&default_ip).to_str().unwrap_or("");
+
+        let mut user = user.into_active_model();
+        user.last_login_at = ActiveValue::set(Some(Utc::now().naive_utc()));
+        user.last_login_ip = ActiveValue::set(String::from(ip));
+        user.update(db).await?;
+        Ok(())
     }
 }
 
