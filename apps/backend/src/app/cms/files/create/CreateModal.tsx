@@ -10,6 +10,7 @@ import {
   FileFieldType,
   DescribeCreateFile,
   DescribeCreateFileRequestParams,
+  UploadFileRes,
 } from '@/services';
 
 /**
@@ -22,6 +23,7 @@ export default function CreateModal() {
   const setListState = useListStore(state => state.setState);
 
   const [loading, setLoading] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<UploadFileRes | undefined>(undefined);
 
   const [form] = Form.useForm<FileFieldType>();
 
@@ -31,11 +33,12 @@ export default function CreateModal() {
       const values = await form.validateFields();
 
       const params: DescribeCreateFileRequestParams = {
+        fileId: uploadedFile?.id,
         filename: values?.filename,
         uri: values?.uri,
         storage: values?.storage,
         mime: values?.mime,
-        status: values?.status,
+        status: "1",
       };
 
       const res = await DescribeCreateFile(params);
@@ -55,6 +58,7 @@ export default function CreateModal() {
   const handleCancel = useMemoizedFn(() => {
     if (contentType === 'success') {
       form.resetFields();
+      setUploadedFile(undefined);
       setListState({
         refreshToken: Date.now().toString(),
       });
@@ -66,20 +70,19 @@ export default function CreateModal() {
     });
   });
 
+  const handleUpload = useMemoizedFn((file: UploadFileRes) => {
+    setUploadedFile(file);
+  });
+
   const init = useMemoizedFn(async () => {
-    // const requests = [
-      
-    // ] as const;
-    // const allRes = await Promise.all(requests);
-    // setState({
-    //   categories: allRes[0].categories,
-    // });
+    setUploadedFile(undefined);
   });
 
   let content = (
     <FileForm
       form={form}
       loading={loading}
+      onUploadChange={handleUpload}
     />
   );
 

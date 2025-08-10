@@ -10,9 +10,11 @@ import {
 } from 'antd';
 import type { FormProps } from 'antd';
 import {
-  FileModel,
   FileFieldType,
+  UploadFileRes,
 } from '@/services';
+import { useMemoizedFn } from 'ahooks';
+import { callFn } from '@/utils';
 import dayjs from 'dayjs';
 import FileUploader from './FileUploader';
 import { Container } from './index.styled';
@@ -22,11 +24,12 @@ type FieldType = FileFieldType;
 export interface TagFormProps {
   onFinish?: FormProps<FileFieldType>['onFinish'];
   isEdit?: boolean;
-  file?: FileModel;
+  file?: UploadFileRes;
   loading?: boolean;
   showSubmit?: boolean;
   form?: FormInstance<FieldType>;
   disabled?: boolean;
+  onUploadChange?: (file: UploadFileRes) => void;
 }
 
 export default function FileForm({
@@ -37,8 +40,21 @@ export default function FileForm({
   showSubmit,
   form,
   disabled,
+  onUploadChange,
 }: TagFormProps): JSX.Element {
   const [storage, setStorage] = useState<string>('local');
+
+  const handleFileUpload = useMemoizedFn((paramFile: UploadFileRes) => {
+    if (paramFile) {
+      form?.setFieldsValue({
+        filename: paramFile?.name,
+        uri: paramFile?.uri,
+        mime: paramFile?.mime,
+      });
+    }
+
+    callFn(onUploadChange, paramFile);
+  });
 
   const getInitialValues = () => {
     const data: FileFieldType = {
@@ -64,7 +80,9 @@ export default function FileForm({
   return (
     <Container>
       <FileUploader
+        file={file}
         storage={storage}
+        onChange={handleFileUpload}
       />
       <div className="oic-form-w">
         <Form
@@ -92,6 +110,7 @@ export default function FileForm({
           >
             <Input
               placeholder="请输入文件路径"
+              disabled={Boolean(file)}
             />
           </Form.Item>
           <Form.Item<FieldType>
@@ -109,6 +128,7 @@ export default function FileForm({
             <Select
               placeholder="请选择存储"
               onChange={handleStorageChange}
+              disabled={Boolean(file)}
               options={[
                 {
                   label: '本地',
@@ -129,6 +149,7 @@ export default function FileForm({
           >
             <Input
               placeholder="请输入mime"
+              disabled={Boolean(file)}
             />
           </Form.Item>
           {showSubmit && (

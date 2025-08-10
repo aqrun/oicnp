@@ -1,22 +1,40 @@
 'use client';
 
+import Image from 'next/image';
 import type { TableProps} from 'antd';
 import TableActions from './TableActions';
-import { NodeModel } from '@/services';
+import { UploadFileRes } from '@/services';
 import { formatDate } from '@/utils';
 
 export default function useColumns() {
-  const columns: TableProps<NodeModel>['columns'] = [
+  const columns: TableProps<UploadFileRes>['columns'] = [
     {
       key: 'fileId',
       title: 'ID',
-      dataIndex: 'fileId',
+      dataIndex: 'id',
       width: 80,
-    }, 
+    },
+    {
+      key: 'preview',
+      title: '预览',
+      dataIndex: 'url',
+      width: 80,
+      render: (value: string, record: UploadFileRes) => {
+        return (
+          <Image
+            src={record?.link || record?.url}
+            alt={record?.name}
+            width={60}
+            height={60}
+          />
+        );
+      }
+    },
     {
       key: 'filename',
       title: '文件名',
-      dataIndex: 'filename',
+      dataIndex: 'name',
+      width: 200,
     },
     {
       key: 'uri',
@@ -56,7 +74,7 @@ export default function useColumns() {
       fixed: 'right',
       width: 200,
       dataIndex: 'nid',
-      render: (value: string, record: NodeModel) => {
+      render: (value: string, record: UploadFileRes) => {
         return (
           <TableActions
             record={record}

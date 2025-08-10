@@ -2,10 +2,10 @@
 
 import { create } from 'zustand';
 import type { BaseState, BaseListState } from '@/stores/types';
-import { FileModel } from '@/services';
+import { UploadFileRes } from '@/services';
 
 export type BaseListPageState = BaseListState & {
-  filesRes: FileModel[];
+  filesRes: UploadFileRes[];
   refreshToken: string;
   _name?: string;
 };

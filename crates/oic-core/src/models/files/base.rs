@@ -150,6 +150,9 @@ pub struct UploadFileRes {
     pub url: String,
     pub mime: String,
     pub status: String,
+    pub storage: String,
+    #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
+    pub created_at: String,
 }
 
 impl From<FileModel> for UploadFileRes {
@@ -163,6 +166,8 @@ impl From<FileModel> for UploadFileRes {
             mime: String::from(file.mime.as_str()),
             status: String::from(file.status.as_str()),
             file_type: String::from(file.mime.as_str()),
+            storage: String::from(file.storage.as_str()),
+            created_at: file.created_at.format(DATE_TIME_FORMAT).to_string(),
             ..Default::default()
         }
     }

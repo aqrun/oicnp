@@ -43,7 +43,7 @@ export interface DescribeFileDetailRequestParams extends FileFilters {
   _name?: string;
 }
 export interface DescribeFileDetailResponseData {
-  file: FileModel;
+  file: UploadFileRes;
   _name?: string;
 }
 
@@ -52,7 +52,7 @@ export interface DescribeFileListRequestParams extends BaseFilterParams {
 }
 
 export interface DescribeFileListResponseData extends BaseListResponseData {
-  files: Array<FileModel>;
+  files: Array<UploadFileRes>;
   _name?: string;
 }
 
@@ -68,3 +68,20 @@ export type DescribeUpdateFileRequestParams = DescribeCreateFileRequestParams;
 export type DescribeUpdateFileResponseData = DescribeCreateFileResponseData;
 export type DescribeDeleteFileRequestParams = DescribeCreateFileRequestParams;
 export type DescribeDeleteFileResponseData = DescribeCreateFileResponseData;
+
+export interface UploadFileRes {
+  id: number;
+  name: string;
+  size: number;
+  fileType: string;
+  /// 存储路径
+  uri: string;
+  /// 图床地址
+  link: string;
+  /// 内部全路径
+  url: string;
+  mime: string;
+  status: string;
+  storage?: string;
+  createdAt?: string;
+}

@@ -34,7 +34,7 @@ export default function EditModal() {
     fetchFile,
   } = useFetchFile();
 
-  const fetchNote = useMemoizedFn(async () => {
+  const fetchFileData = useMemoizedFn(async () => {
     const params: DescribeFileDetailRequestParams = {
       fileId,
     };
@@ -48,12 +48,12 @@ export default function EditModal() {
     });
 
     form.setFieldsValue({
-      fileId: allRes?.[0]?.file?.fileId,
-      filename: allRes?.[0]?.file?.filename,
+      fileId: allRes?.[0]?.file?.id,
+      filename: allRes?.[0]?.file?.name,
       uri: allRes?.[0]?.file?.uri,
-      storage: allRes?.[0]?.file?.storage,
       mime: allRes?.[0]?.file?.mime,
       status: allRes?.[0]?.file?.status,
+      storage: allRes?.[0]?.file?.storage,
     });
   });
 
@@ -125,7 +125,7 @@ export default function EditModal() {
   const fetchInitialData = useMemoizedFn(async () => {
     setInitLoading(true);
     const requests = [
-      fetchNote(),
+      fetchFileData(),
     ];
     await Promise.all(requests);
     

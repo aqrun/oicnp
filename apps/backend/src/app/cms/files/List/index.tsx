@@ -13,7 +13,7 @@ import { useListStore } from './useListStore';
 import { useCreateStore } from '../create/useCreateStore';
 import { nextTick } from '@/utils';
 import { useList } from './useList';
-import { FileModel } from '@/services';
+import { UploadFileRes } from '@/services';
 import { Container } from './index.styled';
 /**
  * 标签列表
@@ -33,7 +33,7 @@ export default function TagList(): JSX.Element {
   } = useList();
 
   const getDataSource = () => {
-    const list: FileModel[] = filesRes;
+    const list: UploadFileRes[] = filesRes;
     return list;
   };
   const dataSource = getDataSource();
@@ -113,7 +113,7 @@ export default function TagList(): JSX.Element {
         onChange={handleFilterChange}
       />
       
-      <Table<FileModel>
+      <Table<UploadFileRes>
         dataSource={dataSource}
         columns={columns}
         loading={loading}

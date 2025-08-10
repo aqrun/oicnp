@@ -170,5 +170,16 @@ impl ModelCrudHandler for FileModel {
 }
 
 impl FileModel {
-    
+    pub async fn upsert(db: &DatabaseConnection, params: &CreateFileReqParams) -> ModelResult<i64> {
+        let res = match Self::update(db, params).await {
+            Ok(id) => {
+                Ok(id)
+            },
+            _ => {
+                Self::create(db, params).await
+            }
+        };
+
+        res
+    }
 }

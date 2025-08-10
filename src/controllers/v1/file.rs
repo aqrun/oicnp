@@ -30,14 +30,23 @@ use tokio_util::io::StreamReader;
 pub async fn get_one(
     State(ctx): State<AppContext>,
     Json(params): Json<FileFilters>,
-) -> JsonRes<FileModel> {
+) -> JsonRes<UploadFileRes> {
+    let default_settings = std::sync::Arc::new(Settings::default());
+    let settings = match ctx.shared_store.get::<Arc<Settings>>() {
+        Some(s) => s,
+        None => default_settings,
+    };
+    let storage_cfg = settings.storage.clone();
+
     let id = params.file_id.unwrap_or(0);
     let res = FileModel::find_by_id(&ctx.db, id).await;
 
     match res {
         Ok(data) => {
+            let mut file = UploadFileRes::from(data);
+            file.url = format!("{}/{}", storage_cfg.uri, file.uri);
             // 使用两个数据的元组指定最终 JSON 数据 key
-            JsonRes::from((data, "file"))
+            JsonRes::from((file, "file"))
         },
         Err(err) => {
             JsonRes::err(err)
@@ -49,7 +58,14 @@ pub async fn get_one(
 pub async fn list(
     State(ctx): State<AppContext>,
     Json(params): Json<FileFilters>,
-) -> JsonRes<Vec<FileModel>> {
+) -> JsonRes<Vec<UploadFileRes>> {
+    let default_settings = std::sync::Arc::new(Settings::default());
+    let settings = match ctx.shared_store.get::<Arc<Settings>>() {
+        Some(s) => s,
+        None => default_settings,
+    };
+    let storage_cfg = settings.storage.clone();
+
     let (files, total) = match FileModel::find_list(&ctx.db, &params).await {
         Ok(res) => res,
         Err(err) => return JsonRes::err(err),
@@ -61,6 +77,12 @@ pub async fn list(
         page_size: params.page_size.unwrap_or(10),
     };
 
+    let files = files.iter().map(|file| {
+        let mut file = UploadFileRes::from(file.clone());
+        file.url = format!("{}/{}", storage_cfg.uri, file.uri);
+        file
+    }).collect::<Vec<UploadFileRes>>();
+
     // 使用传递三个数据的元组指定最终 JSON 数据 key
     JsonRes::from((files, pager, "files"))
 }
@@ -70,7 +92,7 @@ pub async fn add(
     State(ctx): State<AppContext>,
     Json(params): Json<CreateFileReqParams>,
 ) -> JsonRes<i64> {
-    let res = FileModel::create(&ctx.db, &params).await;
+    let res = FileModel::upsert(&ctx.db, &params).await;
 
     JsonRes::from(res)
 }
@@ -187,7 +209,7 @@ pub async fn upload(
         }
     }
 
-    file_req_params.uri = Some(uri);
+    file_req_params.uri = Some(String::from(uri.as_str()));
     let res = match FileModel::create(&ctx.db, &file_req_params).await {
         Ok(res) => res,
         Err(err) => {
@@ -203,7 +225,7 @@ pub async fn upload(
 
     // 转换为接口返回数据
     let mut res = UploadFileRes::from(res_file);
-    res.url = format!("{}/{}", storage_cfg.uri, res.url);
+    res.url = format!("{}/{}", storage_cfg.uri, uri.as_str());
     
     JsonRes::from((res, "file"))
 }

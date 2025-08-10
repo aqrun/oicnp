@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 import type { BaseState } from '@/stores/types';
-import { FileModel } from '@/services';
+import { UploadFileRes } from '@/services';
 
 export interface BaseEditState {
   visible?: boolean;
@@ -11,7 +11,7 @@ export interface BaseEditState {
    */
   contentType?: string;
   fileId: number;
-  file: FileModel | undefined;
+  file: UploadFileRes | undefined;
 };
 
 export type EditState = BaseEditState & BaseState<BaseEditState>;

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useMemoizedFn } from 'ahooks';
 import { Divider } from 'antd';
 import {
-  FileModel,
+  UploadFileRes,
   DescribeDeleteFile,
   DescribeDeleteFileRequestParams,
 } from '@/services';
@@ -20,7 +20,7 @@ import {
 import { TableActionContainer } from '@/styles/app.styled';
 
 export interface TableActionsProps {
-  record: FileModel;
+  record: UploadFileRes;
 }
 
 export default function TableActions({
@@ -37,7 +37,7 @@ export default function TableActions({
   const deleteNode = useMemoizedFn(async () => {
     setDeleteLoading(true);
     const params: DescribeDeleteFileRequestParams = {
-      fileId: record?.fileId,
+      fileId: record?.id,
     };
     // 删除
     await DescribeDeleteFile(params);
@@ -55,7 +55,7 @@ export default function TableActions({
   const handleDelete = useMemoizedFn(() => {
     confirmDelete({
       title: '删除文件',
-      content: `确定删除文件: ${record?.filename}?`,
+      content: `确定删除文件: ${record?.name}?`,
       onOk: deleteNode,
       loading: deleteLoading,
     });
@@ -64,14 +64,14 @@ export default function TableActions({
   const handleView = useMemoizedFn(() => {
     setViewState({
       visible: true,
-      fileId: record?.fileId,
+      fileId: record?.id,
     });
   });
 
   const handleEdit = useMemoizedFn(() => {
     setEditState({
       visible: true,
-      fileId: record?.fileId,
+      fileId: record?.id,
     });
   });
 
