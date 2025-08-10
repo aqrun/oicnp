@@ -41,9 +41,9 @@ pub fn routes(ctx: &AppContext) -> Vec<Routes> {
 
     routes
 }
-
 /// 需要检测授权的路由
 fn add_auth_middleware(ctx: &AppContext, router: Routes) -> Routes {
     let router = router.layer(RoleRouteLayer::new(ctx.clone()));
     router
 }
+

@@ -20,3 +20,4 @@ bun dev
 * https://gitee.com/Mr-zhang-wgr/react-antd-admin
 * https://vue.ruoyi.vip/index
 * image-crope: https://valentinh.github.io/react-easy-crop/
+* 聚合图床：https://www.superbed.cn/help

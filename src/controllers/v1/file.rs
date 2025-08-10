@@ -17,13 +17,14 @@ use oic_core::{
     typings::{JsonRes, Pagination},
     ModelCrudHandler,
     prelude::Settings,
-    uuid,
+    services::file::{
+        store_file_local,
+        store_file_oss,
+    },
 };
 use futures::TryStreamExt;
 use std::io;
-use tokio::{fs::File, io::BufWriter};
 use tokio_util::io::StreamReader;
-use chrono::Utc;
 
 #[debug_handler]
 pub async fn get_one(
@@ -121,8 +122,11 @@ pub async fn upload(
     let mut file_name = String::from("");
     let mut file_size = 0;
     let mut file_type = String::from("");
-    let mut storage = String::from("");
-    let mut url = String::from("");
+    let mut storage = String::from("local");
+    let mut uri = String::from("");
+    // 图床地址
+    let mut link = String::from("");
+    let mut file_req_params = CreateFileReqParams::default();
 
     while let Some(field) = multipart.next_field().await.unwrap() {
         let name = field.name().unwrap_or("").to_string();
@@ -135,49 +139,71 @@ pub async fn upload(
         } else if name.as_str().eq("type") {
             file_type = field.text().await.unwrap_or("".to_string());
         } else if name.as_str().eq("storage") {
-            storage = field.text().await.unwrap_or("".to_string());
+            storage = field.text().await.unwrap_or("local".to_string());
+
+            if !storage_cfg.driver.as_str().eq(storage.as_str()) {
+                return JsonRes::err(format!("指定 Storage 配置参数不匹配： {}", storage));
+            }
+        } else if name.as_str().eq("link") {
+            link = field.text().await.unwrap_or("".to_string());
         } else if name.as_str().eq("file") {
-            let filename = if let Some(filename) = field.file_name() {
+            file_name = if let Some(filename) = field.file_name() {
                 filename.to_string()
             } else {
                 continue;
             };
 
             let body_with_io_error = field.map_err(|err| io::Error::new(io::ErrorKind::Other, err));
-
             let body_reader = StreamReader::new(body_with_io_error);
 
             futures::pin_mut!(body_reader);
 
-            // 按日期存储的路径
-            let date_path = Utc::now().format("%Y/%m").to_string();
-            let ext = filename.as_str().split(".").last().unwrap_or("");
-            let real_file_name = format!("{}.{}", uuid!(), ext);
+            file_req_params.filename = Some(String::from(file_name.as_str()));
+            file_req_params.storage = Some(String::from(storage.as_str()));
+            file_req_params.mime = Some(String::from(file_type.as_str()));
+            file_req_params.link = Some(String::from(link.as_str()));
+            file_req_params.size = Some(file_size);
+            
             // 本地存储
-            if storage_cfg.driver.as_str().eq("local") {
-                let file_path = format!("{}/{}", storage_cfg.path, date_path.as_str());
-                tokio::fs::create_dir_all(file_path.clone()).await.unwrap();
-                // Create the file. `File` implements `AsyncWrite`.
-                let path = std::path::Path::new(file_path.as_str()).join(real_file_name.as_str());
-                let mut file = BufWriter::new(File::create(path.clone()).await.unwrap());
-
-                // Copy the body into the file.
-                tokio::io::copy(&mut body_reader, &mut file).await.unwrap();
-                url = format!("{}/{}/{}", storage_cfg.uri, date_path.as_str(), real_file_name.as_str());
+            if storage.as_str().eq("local") {
+                uri = match store_file_local(
+                    body_reader, 
+                    &storage_cfg, 
+                    &file_req_params
+                ).await {
+                    Ok(res) => res,
+                    Err(err) => {
+                        return JsonRes::err(err.to_string());
+                    }
+                };
             } else if storage_cfg.driver.as_str().eq("oss") {
-
+                uri = match store_file_oss(body_reader, &storage_cfg, &file_req_params).await {
+                    Ok(res) => res,
+                    Err(err) => {
+                        return JsonRes::err(err.to_string());
+                    }
+                };
             }
         }
     }
 
-    let res = UploadFileRes {
-        id: 0,
-        name: file_name,
-        size: file_size as i64,
-        file_type: file_type,
-        url,
-        ..Default::default()
+    file_req_params.uri = Some(uri);
+    let res = match FileModel::create(&ctx.db, &file_req_params).await {
+        Ok(res) => res,
+        Err(err) => {
+            return JsonRes::err(err.to_string());
+        }
     };
+    let res_file = match FileModel::find_by_id(&ctx.db, res).await {
+        Ok(res) => res,
+        Err(err) => {
+            return JsonRes::err(err.to_string());
+        }
+    };
+
+    // 转换为接口返回数据
+    let mut res = UploadFileRes::from(res_file);
+    res.url = format!("{}/{}", storage_cfg.uri, res.url);
     
     JsonRes::from((res, "file"))
 }

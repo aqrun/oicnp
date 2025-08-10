@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getToken } from '@/actions/getUser';
+import { getToken } from '@/services';
 import Image from 'next/image';
+import { useAppStore } from '@/stores/useAppStore';
 import {
   Upload,
   Button,
@@ -25,6 +26,7 @@ export interface FileUploaderProps {
 export default function FileUploader({
   storage,
 }: FileUploaderProps) {
+  const setAppState = useAppStore(state => state.setState);
   const [token, setToken] = useState('');
   const [imgUrl, setImgUrl] = useState('');
 
@@ -34,8 +36,9 @@ export default function FileUploader({
 
   const handleChange: UploadProps['onChange'] = useMemoizedFn(async (info) => {
     if (info?.file?.percent !== 100 || info?.file?.status !== 'done') return;
-    console.log(info);
-    setImgUrl(info.file.response?.data?.file?.url);
+    const file = info.file.response?.data?.file;
+    // 优先使用图床地址
+    setImgUrl(file?.link || file?.url);
   });
 
   const uploadData = useMemoizedFn((file: UploadFile) => {
@@ -49,6 +52,16 @@ export default function FileUploader({
 
   const init = useMemoizedFn(async () => {
     const token = await getToken();
+
+    if (!token) {
+      setAppState({
+        errors: [{
+          code: '401',
+          message: '用户未登录',
+        }],
+      });
+    }
+
     setToken(token || '');
   });
 

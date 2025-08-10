@@ -4,7 +4,7 @@ import { DescribeLoginRequestParams } from '@/services';
 import { DescribeAuthLogin } from '@/services/actions';
 import { cookies } from 'next/headers';
 import { SESSION_ID } from '@/constants';
-import { redirect } from 'next/navigation';
+// import { redirect } from 'next/navigation';
 
 /**
  * 登陆操作服务端请求
@@ -26,7 +26,7 @@ export async function loginAction(params: DescribeLoginRequestParams) {
       sameSite: 'lax',
       path: '/',
     });
-    redirect('/');
+    // redirect('/');
   }
 
   return res;

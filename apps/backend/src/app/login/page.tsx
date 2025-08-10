@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Form, Input, Button, Checkbox } from 'antd';
 import { CLASS_PREFIX } from '@/constants';
 import cls from 'clsx';
@@ -8,6 +9,7 @@ import { loginAction } from './loginAction';
 import { useFetchCaptcha, AuthCaptcha } from '@/services';
 import { useMemoizedFn } from 'ahooks';
 import Image from 'next/image';
+import { useAppStore } from '@/stores/useAppStore';
 import { Container } from './index.styled';
 
 export interface FormValues {
@@ -18,7 +20,9 @@ export interface FormValues {
 }
 
 export default function Login() {
+  const setAppState = useAppStore(state => state.setState);
   const [form] = Form.useForm<FormValues>();
+  const router = useRouter();
 
   const [errorInfo, setErrorInfo] = useState('');
   const [captchaRes, setCaptchaRes] = useState<AuthCaptcha | null>(null);
@@ -52,6 +56,11 @@ export default function Login() {
     if (code !== '200') {
       setErrorInfo(res?.message || '用户名或密码不正确');
       refreshCaptcha();
+    } else {
+      setAppState({
+        updateToken: Date.now().toString(),
+      });
+      router.push('/');
     }
     setLoading(false);
   });

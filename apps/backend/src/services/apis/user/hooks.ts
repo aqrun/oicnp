@@ -1,12 +1,16 @@
+'use client';
+
 import { useMemoizedFn } from "ahooks";
 import {
   DescribeUserRolesRequestParams,
   DescribeUserDetailRequestParams,
 } from './types';
+import { useAppStore } from '@/stores/useAppStore';
 import {
   DescribeUserRoles,
   DescribeUserDetail,
 } from "./client";
+import { getUserData } from './action';
 
 /**
  * 获取用户角色列表
@@ -33,5 +37,51 @@ export function useFetchUser() {
 
   return {
     fetchUser,
+  };
+}
+
+/**
+ * 获取当前登陆用户信息
+ */
+export function useGetCurrentUser() {
+  const stateUser = useAppStore(state => state.user);
+  const setAppState = useAppStore(state => state.setState);
+
+  const getCurrentUser = useMemoizedFn(async (refresh = false) => {
+    let user = stateUser;
+
+    // 获取 cookie 数据
+    const userData = await getUserData();
+
+    if (!userData) {
+      setAppState({
+        errors: [{
+          code: '401',
+          message: '用户未登录',
+        }],
+      });
+      return undefined;
+    }
+
+    if (refresh) {
+      const userRes = await DescribeUserDetail({
+        uuid: userData?.uuid,
+      });
+
+      if (userRes?.code && userRes?.code !== '200') {
+        return undefined;
+      }
+
+      setAppState({
+        user: userRes?.user,
+      });
+      user = userRes?.user;
+    }
+
+    return user;
+  });
+
+  return {
+    getCurrentUser,
   };
 }

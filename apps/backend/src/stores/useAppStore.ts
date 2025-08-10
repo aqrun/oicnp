@@ -21,6 +21,7 @@ export interface BaseAppState {
    * 当前登陆用户信息
    */
   user?: UserModel;
+  updateToken?: string;
 }
 
 export type AppState = BaseAppState & BaseState<BaseAppState>;
@@ -33,6 +34,7 @@ export const useAppStore = create<AppState>()((set) => ({
   loading: false,
   initComplete: false,
   errors: [],
+  updateToken: '',
   setState: (payload) => set((state) => {
     return {
       ...state,

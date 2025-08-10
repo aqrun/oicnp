@@ -1,6 +1,7 @@
 import {
   BaseFilterParams,
   BaseListResponseData,
+  BaseResponse,
 } from '../../types';
 import { RoleModel } from '../role/types';
 
@@ -58,7 +59,7 @@ export interface DescribeUserDetailRequestParams {
   deletedAt?: string;
   _name?: string;
 }
-export interface DescribeUserDetailResponseData {
+export interface DescribeUserDetailResponseData extends BaseResponse {
   user: UserModel;
 }
 

@@ -4,3 +4,4 @@ pub mod user;
 pub mod permission;
 pub mod cache;
 pub mod settings;
+pub mod file;

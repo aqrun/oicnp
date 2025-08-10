@@ -38,15 +38,15 @@ export default function FileForm({
   form,
   disabled,
 }: TagFormProps): JSX.Element {
-  const [storage, setStorage] = useState<string>('');
+  const [storage, setStorage] = useState<string>('local');
 
   const getInitialValues = () => {
     const data: FileFieldType = {
-      filename: '',
-      uri: '',
-      storage: '',
-      mime: '',
-      status: '',
+      filename: undefined,
+      uri: undefined,
+      storage: 'local',
+      mime: undefined,
+      status: undefined,
     }
 
     if (file?.createdAt) {
@@ -82,14 +82,25 @@ export default function FileForm({
             name="filename"
             rules={[{ required: true, message: '请输入文件名！' }]}
           >
-            <Input />
+            <Input
+              placeholder="请输入文件名"
+            />
           </Form.Item>
           <Form.Item<FieldType>
             label="文件路径"
             name="uri"
-            rules={[{ required: true, message: '请输入文件路径！' }]}
           >
-            <Input />
+            <Input
+              placeholder="请输入文件路径"
+            />
+          </Form.Item>
+          <Form.Item<FieldType>
+            label="图床地址"
+            name="link"
+          >
+            <Input
+              placeholder="请输入图床地址"
+            />
           </Form.Item>
           <Form.Item<FieldType>
             label="存储"
@@ -116,7 +127,9 @@ export default function FileForm({
             label="mime"
             name="mime"
           >
-            <Input />
+            <Input
+              placeholder="请输入mime"
+            />
           </Form.Item>
           {showSubmit && (
             <Form.Item label={null}>

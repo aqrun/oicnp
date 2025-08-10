@@ -1,12 +1,7 @@
 import { API_URI } from '@/constants';
 import { cookies } from 'next/headers';
 import { SESSION_ID } from '@/constants';
-
-export interface BaseResponse {
-  code: string;
-  data: unknown;
-  message: string;
-}
+import { BaseResponse } from './types';
 
 /**
  * server端接口创建

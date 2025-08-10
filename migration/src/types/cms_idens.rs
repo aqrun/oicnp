@@ -16,8 +16,12 @@ pub enum Files {
     Uri,
     #[oic(data_type = "string", len = 64, default = "", comment = "资源存储位置类型 local,qiniu,oos")]
     Storage,
+    #[oic(data_type = "string", len = 255, default = "", comment = "公开图床地址")]
+    Link,
     #[oic(data_type = "string", len = 64, default = "")]
     Mime,
+    #[oic(data_type = "int", default = 0, comment = "文件大小")]
+    Size,
     #[oic(data_type = "smallInt", default = "0")]
     Status,
     #[oic(data_type = "bigInt", len = 20, default = 0, comment = "创建者")]

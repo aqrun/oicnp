@@ -10,6 +10,7 @@ export interface BaseFileModel {
   filename?: string;
   uri?: string;
   storage?: string;
+  link?: string;
   mime?: string;
   status?: string;
   createdBy?: number;
@@ -33,6 +34,7 @@ export interface FileFilters {
   filename?: string;
   uri?: string;
   storage?: string;
+  link?: string;
   mime?: string;
   status?: string;
 }

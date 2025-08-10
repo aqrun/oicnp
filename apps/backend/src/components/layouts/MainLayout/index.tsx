@@ -7,10 +7,12 @@ import { SelectInfo } from 'rc-menu/lib/interface';
 import { CLASS_PREFIX } from '@/constants';
 import cls from 'clsx';
 import { Icon } from '@/components';
-import { logoutAction } from '@/actions/logout';
-import { getUser } from '@/actions/getUser';
 import { useAppStore } from '@/stores/useAppStore';
 import { MenuItem, BreadItem } from '@/types';
+import {
+  logoutAction,
+  useGetCurrentUser,
+} from '@/services';
 import {
   isNetworkErr,
 } from '@/utils';
@@ -47,7 +49,10 @@ export function MainLayout({
   const showSideNav = true;
 
   const user = useAppStore(state => state.user);
+  const updateToken = useAppStore(state => state.updateToken);
   const setAppState = useAppStore(state => state.setState);
+
+  const { getCurrentUser } = useGetCurrentUser();
 
   const [selectedKeys, setSelectedKeys] = useState<Array<string> | undefined>(undefined);
   const [openKeys, setOpenKeys] = useState<Array<string> | undefined>(undefined);
@@ -158,19 +163,25 @@ export function MainLayout({
 
   const handleLogout = useMemoizedFn(async () => {
     await logoutAction();
+    router.push('/login');
   });
 
   /**
    * 初始化信息获取
    */
   const fetchInitialData = async () => {
-    const userRes = await getUser();
+    await getCurrentUser(true);
 
     setAppState({
-      user: userRes,
       initComplete: true,
     });
   };
+
+  useEffect(() => {
+    if (updateToken) {
+      fetchInitialData();
+    }
+  }, [updateToken]);
 
   useEffect(() => {
     fetchInitialData();

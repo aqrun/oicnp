@@ -9,7 +9,7 @@ import { App, Modal, message as antMessage } from 'antd';
 import { ErrorHandler } from '../ErrorHandler';
 
 export interface AppProviderProps extends React.PropsWithChildren {
-
+  _?: string;
 }
 
 const queryClient = new QueryClient({

@@ -19,7 +19,9 @@ pub struct FileFilters {
     pub filename: Option<String>,
     pub uri: Option<String>,
     pub storage: Option<String>,
+    pub link: Option<String>,
     pub mime: Option<String>,
+    pub size: Option<i32>,
     pub status: Option<String>,
     #[serde(rename(deserialize = "createdBy", serialize = "createdBy"))]
     pub created_by: Option<i64>,
@@ -43,7 +45,9 @@ pub struct FileReqParams {
     pub filename: Option<String>,
     pub uri: Option<String>,
     pub storage: Option<String>,
+    pub link: Option<String>,
     pub mime: Option<String>,
+    pub size: Option<i32>,
     pub status: Option<String>,
     #[serde(rename(deserialize = "createdBy", serialize = "createdBy"))]
     pub created_by: Option<i64>,
@@ -78,8 +82,14 @@ impl RequestParamsUpdater for FileReqParams {
         if let Some(x) = &self.storage {
             item.storage = Set(String::from(x));
         }
+        if let Some(x) = &self.link {
+            item.link = Set(String::from(x));
+        }
         if let Some(x) = &self.mime {
             item.mime = Set(String::from(x));
+        }
+        if let Some(x) = &self.size {
+            item.size = Set(*x);
         }
         if let Some(x) = &self.status {
             item.status = Set(String::from(x));
@@ -129,10 +139,31 @@ pub type DeleteFileReqParams = FileReqParams;
 pub struct UploadFileRes {
     pub id: i64,
     pub name: String,
-    pub size: i64,
+    pub size: i32,
     #[serde(rename(deserialize = "fileType", serialize = "fileType"))]
     pub file_type: String,
+    /// 存储路径
+    pub uri: String,
+    /// 图床地址
+    pub link: String,
+    /// 内部全路径
     pub url: String,
     pub mime: String,
     pub status: String,
+}
+
+impl From<FileModel> for UploadFileRes {
+    fn from(file: FileModel) -> Self {
+        Self {
+            id: file.file_id,
+            name: String::from(file.filename.as_str()),
+            size: file.size,
+            uri: String::from(file.uri.as_str()),
+            link: String::from(file.link.as_str()),
+            mime: String::from(file.mime.as_str()),
+            status: String::from(file.status.as_str()),
+            file_type: String::from(file.mime.as_str()),
+            ..Default::default()
+        }
+    }
 }

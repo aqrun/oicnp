@@ -1,17 +1,19 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { App } from 'antd';
 import { useAppStore } from '@/stores';
 import { useMemoizedFn } from 'ahooks';
 import { FailModel } from '@/types';
 import ModalFooter from '@/components/Modal/ModalFooter';
-import { logoutAction } from '@/actions/logout';
+import { logoutAction } from '@/services';
 
 /**
  * 全局错误信息显示
  */
 export function ErrorHandler(): JSX.Element {
+  const router = useRouter();
   const { modal } = App.useApp();
   const errors = useAppStore((state) => state.errors);
   const setState = useAppStore((state) => state.setState);
@@ -32,6 +34,7 @@ export function ErrorHandler(): JSX.Element {
       instanceRef.current = undefined;
     }
     await logoutAction();
+    router.push('/login');
   });
 
   const handleClose = useMemoizedFn(() => {

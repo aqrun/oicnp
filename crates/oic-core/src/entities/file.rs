@@ -14,7 +14,9 @@ pub struct Model {
     pub filename: String,
     pub uri: String,
     pub storage: String,
+    pub link: String,
     pub mime: String,
+    pub size: i32,
     pub status: String,
     #[serde(rename(deserialize = "createdBy", serialize = "createdBy"))]
     pub created_by: i64,

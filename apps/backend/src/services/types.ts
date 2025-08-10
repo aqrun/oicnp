@@ -1,6 +1,7 @@
 export interface BaseResponse {
-  code?: string;
-  message?: string;
+  code: string;
+  data: unknown;
+  message: string;
 }
 
 export interface BaseFilterParams {
