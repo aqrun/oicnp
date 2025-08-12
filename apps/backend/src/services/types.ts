@@ -26,10 +26,17 @@ export interface DescribeLoginRequestParams {
   captcha?: string;
 }
 
-export interface DescribeLoginResponseData {
-  code?: string;
-  message?: string;
+export interface DescribeLoginResponseData extends BaseResponse {
   username?: string;
   token?: string;
   uuid?: string;
+  uid?: number;
+}
+
+export interface DescribeAuthInfoRequestParams {
+  _name?: string;
+}
+
+export interface DescribeAuthInfoResponseData extends BaseResponse {
+  user: DescribeLoginResponseData;
 }

@@ -20,5 +20,5 @@ export const API_URI = 'http://localhost:5150';
 export const BACK_BASE_URI = '/';
 
 
-export const SESSION_ID = 'session_abc';
+export const SESSION_ID = 'SESSIONID';
 

@@ -78,6 +78,7 @@ where
                 "/v1/captcha",
                 "/v1/auth/login",
                 "/v1/auth/register",
+                "/v1/auth/info",
                 "/v1/user/one",
                 "/v1/menu/tree",
             ];

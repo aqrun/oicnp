@@ -15,7 +15,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { MenuTreeItem } from '@/services/types';
+import { MenuTreeItem } from '@/services';
 
 export interface AppleLayoutProps extends React.PropsWithChildren {
   navMenus: MenuTreeItem[]

@@ -20,6 +20,7 @@
 //! }
 //! ```
 use std::collections::HashMap;
+use std::sync::Arc;
 
 use axum::{
     extract::{FromRef, FromRequestParts, Query},
@@ -36,6 +37,8 @@ use loco_rs::{
   Result as LocoResult,
 };
 use crate::auth::{UserClaims, JWT as AuthJWT};
+use crate::services::cache::OicCache;
+use crate::services::auth::LoginResponse;
 
 // ---------------------------------------
 //
@@ -60,42 +63,82 @@ impl<S, T> FromRequestParts<S> for JWTWithUser<T>
 where
     AppContext: FromRef<S>,
     S: Send + Sync,
-    T: Authenticable + Default,
+    T: Authenticable + Send + Sync + Default,
 {
     type Rejection = Error;
 
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Error> {
         let ctx: AppContext = AppContext::from_ref(state);
+        let empty_res = Self {
+            claims: UserClaims {
+                ..Default::default()
+            },
+            user: T::default(),
+        };
 
         let token = match extract_token(get_jwt_from_config(&ctx)?, parts) {
           Ok(token) => token,
           _ => {
-            let empty_res = Self {
-              claims: UserClaims {
-                ..Default::default()
-              },
-              user: T::default(),
-            };
             return Ok(empty_res);
           },
         };
 
-        let jwt_secret = ctx.config.get_jwt_config()?;
-
-        match AuthJWT::new(&jwt_secret.secret).validate(&token) {
-            Ok(claims) => {
-                let user = T::find_by_claims_key(&ctx.db, claims.claims.uuid.as_str())
-                    .await
-                    .map_err(|_| Error::Unauthorized("token is not valid".to_string()))?;
-                Ok(Self {
-                    claims: claims.claims,
-                    user,
-                })
+        // JWT token
+        if token.len() > 30 {
+            let jwt_secret = ctx.config.get_jwt_config()?;
+    
+            return match AuthJWT::new(&jwt_secret.secret).validate(&token) {
+                Ok(claims) => {
+                    let user = T::find_by_claims_key(&ctx.db, claims.claims.uuid.as_str())
+                        .await
+                        .map_err(|_| Error::Unauthorized("token is not valid".to_string()))?;
+                    Ok(Self {
+                        claims: claims.claims,
+                        user,
+                    })
+                }
+                Err(_err) => {
+                    println!("token is not valid");
+                    Ok(empty_res)
+                }
             }
-            Err(_err) => {
-                Err(Error::Unauthorized("token is not valid".to_string()))
-            }
+        } else {
+            // Session token
+            let cache = match ctx.shared_store.get::<Arc<OicCache>>() {
+                Some(cache) => cache,
+                None => {
+                    println!("Auth cache not found");
+                    return Ok(empty_res);
+                },
+            };
+            
+            let session_key = format!("session:{}", token.as_str());
+            let res = match cache.get::<LoginResponse>(session_key.as_str()).await {
+                Ok(text) => text.unwrap_or(LoginResponse::default()),
+                Err(_) => {
+                    println!("Auth cache not found");
+                    return Ok(empty_res);
+                }
+            };
+            let user = match T::find_by_claims_key(&ctx.db, res.uuid.as_str()).await {
+                Ok(user) => user,
+                Err(_) => {
+                    println!("User not found");
+                    return Ok(empty_res);
+                }
+            };
+            
+            return Ok(Self {
+                claims: UserClaims {
+                    uid: res.uid,
+                    uuid: res.uuid,
+                    exp: 0,
+                    claims: None,
+                },
+                user,
+            });
         }
+
     }
 }
 

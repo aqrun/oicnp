@@ -1,3 +1,5 @@
+'use server';
+
 import { createFetcher } from '../../fetcher';
 import {
   DescribeMenuTreeRequestParams,

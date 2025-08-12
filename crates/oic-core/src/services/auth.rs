@@ -6,6 +6,7 @@ use crate::models::users::{LoginParams, RegisterParams};
 use serde_json::{json, Value};
 use anyhow::{Result, anyhow};
 use crate::utils::{verify_password, catch_err};
+use crate::uuid;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct VerifyParams {
@@ -23,7 +24,7 @@ pub struct ResetParams {
     pub password: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Default)]
 pub struct LoginResponse {
     pub token: String,
     pub uid: i64,
@@ -144,6 +145,38 @@ pub async fn reset(db: &DatabaseConnection, params: ResetParams) -> Result<()> {
 
 /// Creates a user login and returns a token
 pub async fn login(
+    db: &DatabaseConnection,
+    config: &Config,
+    params: LoginParams,
+) -> Result<LoginResponse> {
+    catch_err(params.validate())?;
+
+    let user = UserModel::find_by_email(db, params.email.as_str()).await?;
+
+    // let valid = user.verify_password(&params.password);
+    let valid = match verify_password(
+        params.password.as_str(), 
+        user.password.as_str(),
+        user.salt.as_str()
+    ) {
+        Ok(valid) => valid,
+        Err(err) => {
+            tracing::info!(message = err.to_string(), "invalid password");
+            false
+        }
+    };
+
+    if !valid {
+        return Err(anyhow!("用户名或密码错误"));
+    }
+
+    let session_id = uuid!();
+
+    Ok(LoginResponse::new(&user, session_id.as_str()))
+}
+
+/// Creates a user login and returns a token
+pub async fn access_token(
     db: &DatabaseConnection,
     config: &Config,
     params: LoginParams,

@@ -24,7 +24,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { MenuTreeItem } from '@/services/types';
+import { MenuTreeItem } from '@/services';
 
 // This is sample data.
 const data = {

@@ -4,13 +4,12 @@ import { DescribeLoginRequestParams } from '@/services';
 import { DescribeAuthLogin } from '@/services/actions';
 import { cookies } from 'next/headers';
 import { SESSION_ID } from '@/constants';
-// import { redirect } from 'next/navigation';
 
 /**
  * 登陆操作服务端请求
  */
 export async function loginAction(params: DescribeLoginRequestParams) {
-  const res = await DescribeAuthLogin(params)
+  const res = await DescribeAuthLogin(params);
   const code = res?.code || '200';
 
   // 登陆成功设置 cookie
@@ -26,7 +25,6 @@ export async function loginAction(params: DescribeLoginRequestParams) {
       sameSite: 'lax',
       path: '/',
     });
-    // redirect('/');
   }
 
   return res;

@@ -13,29 +13,32 @@ export function createFetcher<TRequest, TResponse extends BaseResponse> (action:
     const cookieStore = await cookies();
     const token = cookieStore.get(SESSION_ID)?.value || '';
 
+    const res = await fetch(url, {
+      method: method || 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(data || {}),
+    });
+
+    let json = {} as TResponse;
+
     try {
-      const res = await fetch(url, {
-        method: method || 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      });
-      const json = await res.json() as unknown as TResponse;
-  
-      if (json?.code === '200') {
-        return json?.data as TResponse;
-      } else {
-        console.log('FETCHER:', json);
-        return json;
-      }
+      json = await res.json() as unknown as TResponse;
     } catch (err) {
-      return {
+      json = {
         code: '500',
         data: null,
         message: (err as Error).toString(),
       } as unknown as TResponse;
+    }
+
+    if (json?.code === '200') {
+      return json?.data as TResponse;
+    } else {
+      console.log('FETCHER:', json);
+      return json;
     }
   }
 }
