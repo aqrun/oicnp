@@ -116,11 +116,18 @@ impl OicCache {
         })?;
 
         let expired_at = utc_now() + duration;
+        let mut scope = CacheScope::Other;
+        
+        if key.starts_with("session-") {
+            scope = CacheScope::Session;
+        } else if key.starts_with("captcha-") {
+            scope = CacheScope::Captcha;
+        }
         
         let create_model = CreateCacheReqParams {
             cache_key: Some(key.to_string()),
             cache_value: Some(serialized),
-            scope: Some(CacheScope::Captcha.to_string()),
+            scope: Some(scope.to_string()),
             created_at: Some(utc_now().format(DATE_TIME_FORMAT).to_string()),
             expired_at: Some(expired_at.format(DATE_TIME_FORMAT).to_string()),
             ..Default::default()

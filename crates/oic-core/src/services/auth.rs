@@ -5,7 +5,7 @@ use crate::entities::prelude::*;
 use crate::models::users::{LoginParams, RegisterParams};
 use serde_json::{json, Value};
 use anyhow::{Result, anyhow};
-use crate::utils::{verify_password, catch_err};
+use crate::utils::{verify_password, catch_err, utc_now};
 use crate::uuid;
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -32,6 +32,7 @@ pub struct LoginResponse {
     pub username: String,
     pub email: String,
     pub is_verified: bool,
+    pub remember: bool,
 }
 
 impl LoginResponse {
@@ -44,6 +45,7 @@ impl LoginResponse {
             username: String::from(user.username.as_str()),
             email: String::from(user.email.as_str()),
             is_verified: user.email_verified_at.is_some(),
+            remember: false,
         }
     }
 }
@@ -146,7 +148,6 @@ pub async fn reset(db: &DatabaseConnection, params: ResetParams) -> Result<()> {
 /// Creates a user login and returns a token
 pub async fn login(
     db: &DatabaseConnection,
-    config: &Config,
     params: LoginParams,
 ) -> Result<LoginResponse> {
     catch_err(params.validate())?;
@@ -172,7 +173,34 @@ pub async fn login(
 
     let session_id = uuid!();
 
-    Ok(LoginResponse::new(&user, session_id.as_str()))
+    let mut login_res = LoginResponse::new(&user, session_id.as_str());
+    login_res.remember = params.remember;
+
+    let dpt = match DepartmentEntity::find()
+        .filter(DepartmentColumn::Id.eq(user.dpt_id))
+        .one(db)
+        .await?
+    {
+        Some(dpt) => dpt,
+        None => DepartmentModel::default(),
+    };
+
+    let _ = UserOnlineModel::upsert(db, &UserOnlineModel {
+        uid: user.uid,
+        token_id: session_id.to_string(),
+        token_expire: params.remember as i64,
+        login_at: utc_now(),
+        username: user.username.to_string(),
+        dpt_name: dpt.name.to_string(),
+        net: String::from(""),
+        ip: String::from(""),
+        location: String::from(""),
+        device: String::from(""),
+        browser: String::from(""),
+        os: String::from(""),
+    }).await;
+
+    Ok(login_res)
 }
 
 /// Creates a user login and returns a token

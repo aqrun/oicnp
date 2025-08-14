@@ -22,6 +22,7 @@ export function useFetchCacheList() {
     const res = await DescribeCacheList({
       page: params.page || 1,
       pageSize: params.pageSize || 10,
+      ...(params || {}),
     });
     setLoading(false);
     return res;

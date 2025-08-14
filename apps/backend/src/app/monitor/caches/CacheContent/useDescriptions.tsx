@@ -6,6 +6,14 @@ export default function useDescriptions() {
   const cacheDetailRes = useListStore(state => state.cacheDetailRes);
   const cache = cacheDetailRes?.cache;
 
+  let cacheValue = cache?.cacheValue;
+
+  try {
+    cacheValue = JSON.parse(cache?.cacheValue || '{}');
+  } catch (err) {
+    console.log('err', err);
+  }
+
   const items: DescriptionsProps['items'] = [
     {
       key: 'id',
@@ -20,11 +28,17 @@ export default function useDescriptions() {
     {
       key: 'cacheValue',
       label: '缓存值',
-      children: cache?.cacheValue,
+      children: (
+        <pre>
+          <code>
+            {JSON.stringify(cacheValue, null, 2)}
+          </code>
+        </pre>
+      ),
     },
     {
       key: 'scope',
-      label: '缓存范围',
+      label: '缓存分类',
       children: cache?.scope,
     },
     {

@@ -5,6 +5,11 @@
   remark: '验证码'
   status: 1
 - vid: cache_scope
+  label: '登录会话'
+  value: session
+  remark: '登录会话'
+  status: 1
+- vid: cache_scope
   label: '其他'
   value: other
   remark: '其他'

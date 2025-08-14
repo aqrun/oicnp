@@ -112,7 +112,7 @@ where
                 },
             };
             
-            let session_key = format!("session:{}", token.as_str());
+            let session_key = format!("session-{}", token.as_str());
             let res = match cache.get::<LoginResponse>(session_key.as_str()).await {
                 Ok(text) => text.unwrap_or(LoginResponse::default()),
                 Err(_) => {

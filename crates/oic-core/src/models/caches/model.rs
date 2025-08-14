@@ -83,6 +83,12 @@ impl ModelCrudHandler for CacheModel {
             }
         }
 
+        if let Some(x) = &params.scope {
+            if !x.is_empty() {
+                q = q.filter(CacheColumn::Scope.eq(x));
+            }
+        }
+
         let mut order_by = CacheColumn::Id;
 
         if order_by_str.eq("cache_key") {

@@ -7,11 +7,16 @@ use serde::{Deserialize, Serialize};
 #[sea_orm(table_name = "user_online")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
+    #[serde(skip_deserializing)]
     pub uid: i64,
+    #[serde(rename(deserialize = "tokenId", serialize = "tokenId"))]
     pub token_id: String,
+    #[serde(rename(deserialize = "tokenExpire", serialize = "tokenExpire"))]
     pub token_expire: i64,
+    #[serde(rename(deserialize = "loginAt", serialize = "loginAt"))]
     pub login_at: DateTime,
     pub username: String,
+    #[serde(rename(deserialize = "dptName", serialize = "dptName"))]
     pub dpt_name: String,
     pub net: String,
     pub ip: String,
@@ -23,5 +28,3 @@ pub struct Model {
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {}
-
-impl ActiveModelBehavior for ActiveModel {}

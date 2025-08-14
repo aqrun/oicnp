@@ -80,6 +80,7 @@ async fn login(
     State(ctx): State<AppContext>,
     Json(params): Json<LoginParams>,
 ) -> JsonRes<LoginResponse> {
+    let remember = params.remember;
     let cache = match ctx.shared_store.get::<Arc<OicCache>>() {
         Some(cache) => cache,
         None => {
@@ -104,20 +105,22 @@ async fn login(
     // 验证成功后删除缓存中的验证码，防止重复使用
     let _ = ctx.cache.remove(params.captcha_id.as_str()).await;
 
-    let info = match services::auth::login(&ctx.db, &ctx.config, params).await {
+    let info = match services::auth::login(&ctx.db, params).await {
         Ok(res) => res,
         Err(err) => {
             return JsonRes::err(err.to_string());
         }
     };
 
-    let cache_key = format!("session:{}", info.token);
+    let cache_key = format!("session-{}", info.token);
+    let duration = if remember {
+        // 7 days
+        Duration::from_secs(60 * 60 * 24 * 7)
+    } else {
+        Duration::from_secs(60 * 60 * 24)
+    };
 
-    if let Err(err) = cache.insert_with_expiry(
-        cache_key.as_str(),
-        &info,
-        Duration::from_secs(60 * 60 * 24),
-    ).await {
+    if let Err(err) = cache.insert_with_expiry(cache_key.as_str(), &info, duration).await {
         return JsonRes::err(err);
     }
 
@@ -157,7 +160,7 @@ async fn access_token(
     // 验证成功后删除缓存中的验证码，防止重复使用
     let _ = ctx.cache.remove(params.captcha_id.as_str()).await;
 
-    let info = match services::auth::login(&ctx.db, &ctx.config, params).await {
+    let info = match services::auth::login(&ctx.db, params).await {
         Ok(res) => res,
         Err(err) => {
             return JsonRes::err(err.to_string());

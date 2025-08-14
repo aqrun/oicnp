@@ -27,6 +27,7 @@ pub struct LoginParams {
     pub captcha_id: String,
     #[validate(length(min = 1, message = "必须指定 captcha"))]
     pub captcha: String,
+    pub remember: bool,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

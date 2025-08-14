@@ -15,6 +15,7 @@ use strum::EnumString;
 #[strum(serialize_all = "snake_case")]
 pub enum CacheScope {
     Captcha,
+    Session,
     Other,
 }
 

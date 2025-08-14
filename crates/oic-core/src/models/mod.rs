@@ -12,5 +12,6 @@ pub mod categories;
 pub mod caches;
 pub mod attributes;
 pub mod attribute_values;
+pub mod user_online;
 
 pub use base::*;
