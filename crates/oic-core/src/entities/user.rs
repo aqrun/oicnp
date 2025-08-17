@@ -14,8 +14,10 @@ pub struct Model {
     pub username: String,
     #[sea_orm(default_value = "")]
     pub nickname: String,
+    #[serde(skip_serializing)]
     pub password: String,
     #[sea_orm(default_value = "")]
+    #[serde(skip_serializing)]
     pub salt: String,
     #[serde(rename(deserialize = "apiKey", serialize = "apiKey"))]
     #[sea_orm(default_value = "")]

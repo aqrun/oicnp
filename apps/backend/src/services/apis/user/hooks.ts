@@ -52,11 +52,11 @@ export function useGetCurrentUser() {
 
     // 获取 cookie 数据
     const userData = await getUserData();
-
-    if (!userData) {
+    
+    if (!userData || !userData?.uuid) {
       setAppState({
         errors: [{
-          code: '401',
+          code: 'UserNeedLogin',
           message: '用户未登录',
         }],
       });
