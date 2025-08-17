@@ -150,6 +150,10 @@ pub async fn login(
     db: &DatabaseConnection,
     params: LoginParams,
 ) -> Result<LoginResponse> {
+    if params.captcha.is_empty() {
+        return Err(anyhow!("验证码不能为空"));
+    }
+
     catch_err(params.validate())?;
 
     let user = UserModel::find_by_email(db, params.email.as_str()).await?;
@@ -204,6 +208,12 @@ pub async fn login(
 }
 
 /// Creates a user login and returns a token
+/// 
+/// * Access Token: 短期有效（15分钟-1小时）
+/// * Refresh Token: 长期有效（7-30天）
+/// 
+/// 增加登陆尝试次数限制
+/// 
 pub async fn access_token(
     db: &DatabaseConnection,
     config: &Config,

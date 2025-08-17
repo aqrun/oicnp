@@ -136,31 +136,7 @@ async fn access_token(
     State(ctx): State<AppContext>,
     Json(params): Json<LoginParams>,
 ) -> JsonRes<LoginResponse> {
-    let cache = match ctx.shared_store.get::<Arc<OicCache>>() {
-        Some(cache) => cache,
-        None => {
-            return JsonRes::err(String::from("Cache not found"));
-        },
-    };
-
-    let cache_captcha = match cache.get(params.captcha_id.as_str()).await {
-        Ok(text) => text.unwrap_or(String::from("")),
-        Err(_) => {
-            return JsonRes::err("验证码已过期, 刷新后重试");
-        }
-    };
-
-    let valid_cache = cache_captcha.to_lowercase();
-    let valid_captcha = params.captcha.to_lowercase();
-
-    if !valid_cache.eq(valid_captcha.as_str()) {
-        return JsonRes::err("验证码错误");
-    }
-
-    // 验证成功后删除缓存中的验证码，防止重复使用
-    let _ = ctx.cache.remove(params.captcha_id.as_str()).await;
-
-    let info = match services::auth::login(&ctx.db, params).await {
+    let info = match services::auth::access_token(&ctx.db, &ctx.config, params).await {
         Ok(res) => res,
         Err(err) => {
             return JsonRes::err(err.to_string());

@@ -25,7 +25,6 @@ pub struct LoginParams {
     pub password: String,
     #[serde(rename(deserialize = "captchaId"))]
     pub captcha_id: String,
-    #[validate(length(min = 1, message = "必须指定 captcha"))]
     pub captcha: String,
     pub remember: bool,
 }
