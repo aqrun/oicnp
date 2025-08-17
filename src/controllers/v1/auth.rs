@@ -103,7 +103,7 @@ async fn login(
     }
 
     // 验证成功后删除缓存中的验证码，防止重复使用
-    let _ = ctx.cache.remove(params.captcha_id.as_str()).await;
+    let _ = cache.remove(params.captcha_id.as_str()).await;
 
     let info = match services::auth::login(&ctx.db, params).await {
         Ok(res) => res,

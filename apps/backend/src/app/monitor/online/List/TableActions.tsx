@@ -9,9 +9,14 @@ import {
 import { useGlobalState } from '@/context';
 import { useConfirmDelete } from '@/hooks/modals';
 import {
+  DescribeForceLogout,
+  DescribeForceLogoutRequestParams,
+} from '@/services';
+import {
   Actions,
   LinkButton,
 } from '@/components';
+import { useList } from './useList';
 import { TableActionContainer } from '@/styles/app.styled';
 
 export interface TableActionsProps {
@@ -25,9 +30,16 @@ export default function TableActions({
   const confirmDelete = useConfirmDelete();
 
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const { refresh } = useList();
 
   const forceLogout = useMemoizedFn(async () => {
     setDeleteLoading(true);
+    const params: DescribeForceLogoutRequestParams = {
+      uid: record.uid,
+      tokenId: record.tokenId,
+    };
+    await DescribeForceLogout(params);
+    refresh();
     message.open({
       type: 'success',
       content: '强退成功',
@@ -41,6 +53,7 @@ export default function TableActions({
       content: `确定强退用户: ${record?.username}?`,
       onOk: forceLogout,
       loading: deleteLoading,
+      okText: '强退',
     });
   });
 

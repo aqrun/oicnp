@@ -11,7 +11,7 @@ export function useList() {
     const res = await fetchOnlineList({});
 
     setState({
-      listRes: res.onlines,
+      listRes: res,
     });
     return res;
   });

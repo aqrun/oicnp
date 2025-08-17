@@ -2,10 +2,10 @@
 
 import { create } from 'zustand';
 import type { BaseState, BaseListState } from '@/stores/types';
-import { OnlineModel } from '@/services';
+import { DescribeOnlineListResponseData } from '@/services';
 
 export type BaseListPageState = BaseListState & {
-  listRes: OnlineModel[];
+  listRes: DescribeOnlineListResponseData | undefined;
   refreshToken: string;
   _name?: string;
 };
@@ -16,7 +16,7 @@ export type ListState = BaseListPageState & BaseState<BaseListPageState>;
  *  筛选数据
  */
 export const useListStore = create<ListState>()((set) => ({
-  listRes: [],
+  listRes: undefined,
   pager: {
     page: 1,
     pageSize: 10,

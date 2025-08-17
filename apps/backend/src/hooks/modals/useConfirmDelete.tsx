@@ -20,7 +20,7 @@ export function useConfirmDelete() {
       ...options,
       footer: (
         <ModalFooter
-          okText="删除"
+          okText={options?.okText || '删除'}
           cancelText="取消"
           onOk={() => {
             callFn(options?.onOk);

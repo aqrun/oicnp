@@ -15,18 +15,23 @@ import { useList } from './useList';
 import { OnlineModel } from '@/services';
 import { Container } from './index.styled';
 /**
- * 标签列表
+ * 在线用户列表
  */
-export default function TagList(): JSX.Element {
+export default function OnlineList(): JSX.Element {
   const pager = useListStore((state) => state.pager);
   const setState = useListStore((state) => state.setState);
   const refreshToken = useListStore((state) => state.refreshToken);
   const columns = useColumns();
 
-  const {listRes, loading, refresh} = useList();
+  const {
+    listRes,
+    loading,
+    refresh,
+    fetchListPageData,
+  } = useList();
 
   const getDataSource = () => {
-    const list = listRes || [];
+    const list = listRes?.onlineList || [];
     return list;
   };
   const dataSource = getDataSource();
@@ -75,10 +80,14 @@ export default function TagList(): JSX.Element {
 
   useEffect(() => {
     if (refreshToken) {
-      refresh();
+      fetchListPageData();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshToken]);
+  useEffect(() => {
+    refresh();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
  
   return (
     <Container>
@@ -95,7 +104,7 @@ export default function TagList(): JSX.Element {
         dataSource={dataSource}
         columns={columns}
         loading={loading}
-        rowKey="tagId"
+        rowKey="uid"
         size="small"
         tableLayout="fixed"
         scroll={{

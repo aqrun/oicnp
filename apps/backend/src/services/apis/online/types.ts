@@ -1,4 +1,5 @@
 import {
+  BaseResponse,
   BaseFilterParams,
   BaseListResponseData,
 } from '../../types';
@@ -19,8 +20,8 @@ export interface OnlineModel {
 }
 
 export interface OnlineFilters {
-  id?: number;
-  title?: string;
+  uid?: number;
+  tokenId?: string;
 }
 
 export interface DescribeOnlineListRequestParams extends BaseFilterParams {
@@ -28,6 +29,13 @@ export interface DescribeOnlineListRequestParams extends BaseFilterParams {
 }
 
 export interface DescribeOnlineListResponseData extends BaseListResponseData {
-  onlines: Array<OnlineModel>;
+  onlineList: Array<OnlineModel>;
+}
+
+export interface DescribeForceLogoutRequestParams extends OnlineFilters {
   _name?: string;
+}
+
+export interface DescribeForceLogoutResponseData extends BaseResponse {
+  res: string;
 }

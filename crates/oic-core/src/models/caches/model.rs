@@ -13,7 +13,7 @@ use super::{
     PartialCacheModel,
 };
 use crate::{
-    utils::utc_now, constants::DATE_TIME_FORMAT,
+    utils::utc_now,
     models::attribute_values::AttributeValueFilters,
 };
 

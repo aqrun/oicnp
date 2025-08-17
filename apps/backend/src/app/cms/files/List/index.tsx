@@ -16,9 +16,9 @@ import { useList } from './useList';
 import { UploadFileRes } from '@/services';
 import { Container } from './index.styled';
 /**
- * 标签列表
+ * 文件列表
  */
-export default function TagList(): JSX.Element {
+export default function FileList(): JSX.Element {
   const pager = useListStore((state) => state.pager);
   const setState = useListStore((state) => state.setState);
   const refreshToken = useListStore((state) => state.refreshToken);
@@ -117,7 +117,7 @@ export default function TagList(): JSX.Element {
         dataSource={dataSource}
         columns={columns}
         loading={loading}
-        rowKey="fileId"
+        rowKey="id"
         size="small"
         tableLayout="fixed"
         scroll={{
