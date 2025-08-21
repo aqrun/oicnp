@@ -118,7 +118,7 @@ async fn add_operation_log(
 
     let log_entity = OperationLogActiveModel {
         id: ActiveValue::NotSet,
-        time_id: Set(utc_now().timestamp()),
+        time_id: Set(utc_now().and_utc().timestamp()),
         title: Set(String::from("")),
         business_type: Set(String::from("")),
         method: Set(method.clone()),
