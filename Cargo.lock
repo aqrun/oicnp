@@ -3507,7 +3507,7 @@ dependencies = [
  "loco-rs",
  "oic_core",
  "oic_web",
- "rand 0.8.5",
+ "rand 0.9.1",
  "regex",
  "reqwest",
  "scru128",
@@ -3567,6 +3567,7 @@ dependencies = [
  "tower 0.4.13",
  "tracing",
  "tracing-subscriber",
+ "user-agent-parser",
  "uuid 1.10.0",
  "validator",
 ]
@@ -3598,7 +3599,7 @@ dependencies = [
  "lazy_static",
  "loco-rs",
  "oic_core",
- "rand 0.8.5",
+ "rand 0.9.1",
  "regex",
  "reqwest",
  "scru128",
@@ -3616,6 +3617,28 @@ name = "once_cell"
 version = "1.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3fdb12b2476b595f9358c5161aa467c2438859caa136dec86c26fdd2efe17b92"
+
+[[package]]
+name = "onig"
+version = "6.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "336b9c63443aceef14bea841b899035ae3abe89b7c486aaf4c5bd8aafedac3f0"
+dependencies = [
+ "bitflags 2.6.0",
+ "libc",
+ "once_cell",
+ "onig_sys",
+]
+
+[[package]]
+name = "onig_sys"
+version = "69.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c7f86c6eef3d6df15f23bcfb6af487cbd2fed4e5581d58d5bf1f5f8b7f6727dc"
+dependencies = [
+ "cc",
+ "pkg-config",
+]
 
 [[package]]
 name = "opendal"
@@ -6549,6 +6572,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "user-agent-parser"
+version = "0.3.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b633f74f48f23965364537db237495ebf48f02eb3fa00094550a7ecd5fbf7e98"
+dependencies = [
+ "onig",
+ "yaml-rust",
+]
+
+[[package]]
 name = "utf-8"
 version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7099,6 +7132,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "05f360fc0b24296329c78fda852a1e9ae82de9cf7b27dae4b7f62f118f77b9ed"
 dependencies = [
  "tap",
+]
+
+[[package]]
+name = "yaml-rust"
+version = "0.4.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "56c1936c4cc7a1c9ab21a1ebb602eb942ba868cbd44a99cb7cdc5892335e1c85"
+dependencies = [
+ "linked-hash-map",
 ]
 
 [[package]]

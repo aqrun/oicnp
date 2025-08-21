@@ -1,5 +1,11 @@
 use loco_rs::prelude::*;
-use oic_core::{AppContext, middleware::RoleRouteLayer};
+use oic_core::{
+    AppContext,
+    middleware::{
+        RoleRouteLayer,
+        OperationLogLayer,
+    },
+};
 
 mod common;
 mod note;
@@ -45,7 +51,8 @@ pub fn routes(ctx: &AppContext) -> Vec<Routes> {
 }
 /// 需要检测授权的路由
 fn add_auth_middleware(ctx: &AppContext, router: Routes) -> Routes {
-    let router = router.layer(RoleRouteLayer::new(ctx.clone()));
+    let router = router.layer(RoleRouteLayer::new(ctx.clone()))
+        .layer(OperationLogLayer::new(ctx.clone()));
     router
 }
 

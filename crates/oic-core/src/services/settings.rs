@@ -4,6 +4,8 @@ use serde::{Deserialize, Serialize};
 #[serde(default)]
 pub struct Settings {
     pub storage: StorageSettings,
+    /// 正则路径
+    pub user_agent_parser: String,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Default, Clone)]
