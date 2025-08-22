@@ -55,3 +55,4 @@ captcha-rs = { workspace = true }
 tokio-util = { workspace = true }
 futures = { workspace = true }
 user-agent-parser = { workspace = true }
+http-body-util = { workspace = true }

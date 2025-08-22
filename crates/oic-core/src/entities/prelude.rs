@@ -258,3 +258,10 @@ pub use super::cache::{
     ActiveModel as CacheActiveModel,
     Relation as CacheRelation,
 };
+pub use super::ip::{
+    Entity as IpEntity,
+    Model as IpModel,
+    Column as IpColumn,
+    ActiveModel as IpActiveModel,
+    Relation as IpRelation,
+};

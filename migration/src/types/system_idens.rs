@@ -621,3 +621,30 @@ pub enum Caches {
     #[oic(data_type = "datetime", comment = "创建时间")]
     ExpiredAt,
 }
+
+#[derive(Iden, OicColumn)]
+pub enum Ips {
+    Table,
+    #[oic(data_type = "bigInt", len = 20, comment = "IP ID")]
+    Id,
+    #[oic(data_type = "string", len = 64, default = "", comment = "")]
+    Ip,
+    #[oic(data_type = "string", len = 255, default = "", comment = "")]
+    Province,
+    #[oic(data_type = "string", len = 255, default = "", comment = "")]
+    City,
+    #[oic(data_type = "string", len = 255, default = "", comment = "")]
+    ProvinceCode,
+    #[oic(data_type = "string", len = 255, default = "", comment = "")]
+    CityCode,
+    #[oic(data_type = "string", len = 255, default = "", comment = "")]
+    Region,
+    #[oic(data_type = "string", len = 255, default = "", comment = "")]
+    RegionCode,
+    #[oic(data_type = "string", len = 255, default = "", comment = "")]
+    RegionNames,
+    #[oic(data_type = "string", len = 255, default = "", comment = "")]
+    Network,
+    #[oic(data_type = "datetime", comment = "创建时间")]
+    CreatedAt,
+}

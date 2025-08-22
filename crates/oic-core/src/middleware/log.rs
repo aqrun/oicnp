@@ -6,17 +6,22 @@ use std::{
 };
 
 use axum::{
-    body::Body,
+    body::{Body, Bytes},
     extract::{FromRef, FromRequestParts, Request},
     response::Response,
     http::request::Parts,
 };
+use http_body_util::BodyExt;
 use futures_util::future::BoxFuture;
-use loco_rs::prelude::*;
+use loco_rs::{
+    prelude::*,
+    controller::middleware::request_id::LocoRequestId,
+};
 use tower::{Layer, Service};
 use crate::{
     entities::prelude::*,
     utils::utc_now,
+    typings::ResJsonString,
 };
 use crate::services::settings::Settings;
 use super::{
@@ -55,7 +60,8 @@ impl<S, B> Service<Request<B>> for OperationLogService<S>
 where
     S: Service<Request<B>, Response = Response<Body>, Error = Infallible> + Clone + Send + 'static, /* Inner Service must return Response<Body> and never error */
     S::Future: Send + 'static,
-    B: Send + 'static,
+    B: axum::body::HttpBody<Data = Bytes> + From<Body> + Send + 'static,
+    B::Error: std::fmt::Display,
 {
     // Response type is the same as the inner service / handler
     type Response = S::Response;
@@ -79,8 +85,21 @@ where
         Box::pin(async move {
             // Example of extracting JWT and checking roles
             let (parts, body) = req.into_parts();
-            let response = inner.call(Request::from_parts(parts.clone(), body)).await?;
+            let (req_params, req_bytes) = get_req_body_data(body).await;
+
+            let current_request = Request::from_parts(parts.clone(), Body::from(req_bytes).into());
+            let response = inner.call(current_request).await?;
             
+            // 获取响应数据
+            let res_string = match response.extensions().get::<ResJsonString>() {
+                Some(x) => x.clone().0,
+                None => String::from(""),
+            };
+            let request_id = match response.extensions().get::<LocoRequestId>() {
+                Some(x) => String::from(x.get()),
+                None => String::from(""),
+            };
+
             // 计算执行时间
             let execution_time = start_time.elapsed().as_millis() as i64;
 
@@ -89,6 +108,9 @@ where
                     parts,
                     state,
                     execution_time,
+                    request_id,
+                    req_params,
+                    res_string,
                 ).await {
                     println!("add_operation_log error: {:?}", e);
                 }
@@ -102,7 +124,10 @@ where
 async fn add_operation_log(
     mut parts: Parts,
     state: AppContext,
-    execution_time: i64
+    execution_time: i64,
+    request_id: String,
+    req_params: String,
+    res_string: String,
 ) -> Result<()> {
     let ctx: AppContext = AppContext::from_ref(&state);
     let default_settings = std::sync::Arc::new(Settings::default());
@@ -119,7 +144,7 @@ async fn add_operation_log(
     let log_entity = OperationLogActiveModel {
         id: ActiveValue::NotSet,
         time_id: Set(utc_now().and_utc().timestamp()),
-        title: Set(String::from("")),
+        title: Set(request_id),
         business_type: Set(String::from("")),
         method: Set(method.clone()),
         request_method: Set(method),
@@ -129,9 +154,9 @@ async fn add_operation_log(
         url: Set(uri),
         ip: Set(client.ip),
         location: Set(client.location),
-        param: Set(String::from("")),
+        param: Set(if req_params.len() > 10000 { "数据太长不保存".to_string() } else { req_params }),
         path_param: Set(String::from("")),
-        json_result: Set(String::from("")),
+        json_result: Set(if res_string.len() > 65535 { "数据太长不保存".to_string() } else { res_string }),
         status: Set(String::from("1")),
         error_message: Set(String::from("")),
         duration: Set(execution_time),
@@ -144,4 +169,23 @@ async fn add_operation_log(
         .await?;
 
     Ok(())
+}
+
+/// 获取body数据
+async fn get_req_body_data<B>(body: B) -> (String, Bytes)
+where
+    B: axum::body::HttpBody<Data = Bytes>,
+    B::Error: std::fmt::Display,
+{
+    let bytes = match body.collect().await {
+        Ok(collected) => collected.to_bytes(),
+        Err(_err) => Bytes::new(),
+    };
+
+    let body_data = match std::str::from_utf8(&bytes) {
+        Ok(x) => x.to_string(),
+        Err(_) => "该数据无法转输出，可能为blob，binary".to_string(),
+    };
+
+    (body_data, bytes)
 }

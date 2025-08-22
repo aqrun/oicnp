@@ -13,5 +13,6 @@ pub mod caches;
 pub mod attributes;
 pub mod attribute_values;
 pub mod user_online;
+pub mod ips;
 
 pub use base::*;

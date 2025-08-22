@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::sync::Arc;
 use std::borrow::Cow;
 
@@ -9,10 +8,16 @@ use axum::{
 use serde::{Deserialize, Serialize};
 
 use loco_rs::{
-  app::AppContext,
-  errors::Error,
+    prelude::*,
+    app::AppContext,
+    errors::Error,
 };
-use crate::services::settings::Settings;
+use crate::{
+    services::settings::Settings,
+    entities::prelude::*,
+    prelude::ModelCrudHandler,
+    models::ips::CreateIpReqParams,
+};
 use user_agent_parser::UserAgentParser;
 
 // ---------------------------------------
@@ -27,7 +32,7 @@ use user_agent_parser::UserAgentParser;
 pub struct ClientInfo {
     pub ip: String,
     pub location: String,
-    pub net_work: String,
+    pub network: String,
     pub browser: String,
     pub os: String,
     pub device: String,
@@ -54,12 +59,15 @@ where
         let user_agent = headers.get("user-agent").unwrap().to_str().unwrap();
         let ip = get_remote_ip(headers.clone());
         let ua = get_user_agent_info(user_agent, user_agent_parser.as_str());
-        let net = get_city_by_ip(ip.as_str()).await.unwrap();
+        let net = match get_net_info(&ctx.db, ip.as_str()).await {
+            Ok(x) => x,
+            Err(_) => ClientNetInfo::default()
+        };
         
         let info = Self {
             ip: net.ip,
             location: net.location,
-            net_work: net.net_work,
+            network: net.network,
             browser: ua.browser,
             os: ua.os,
             device: ua.device,
@@ -83,6 +91,60 @@ pub fn get_remote_ip(header: HeaderMap) -> String {
     ip
 }
 
+pub async fn get_net_info(
+    db: &DatabaseConnection,
+    ip: &str,
+) -> Result<ClientNetInfo, Box<dyn std::error::Error>> {
+    if ip.is_empty() 
+        || ip.eq("127.0.0.1")
+        || ip.eq("::1")
+        || ip.eq("localhost")
+    {
+        return Ok(ClientNetInfo::default());
+    }
+
+    if let Ok(x) = IpModel::find_by_vid(db, ip).await {
+        let info = ClientNetInfo {
+            ip: x.ip,
+            province: String::from(x.province.as_str()),
+            city: String::from(x.city.as_str()),
+            province_code: String::from(x.province_code.as_str()),
+            city_code: String::from(x.city_code.as_str()),
+            region: String::from(x.region.as_str()),
+            region_code: String::from(x.region_code.as_str()),
+            region_names: String::from(x.region_names.as_str()),
+            location: format!("{}{}{}", x.province.as_str(), x.city.as_str(), x.region.as_str()),
+            network: String::from(x.network.as_str()),
+            ..Default::default()
+        };
+        return Ok(info);
+    }
+
+    let info = get_city_by_ip(ip).await?;
+
+    if !info.province.is_empty()
+        && !info.city.is_empty()
+        && !info.ip.is_empty()
+    {
+        let create_params = CreateIpReqParams {
+            id: None,
+            ip: Some(String::from(info.ip.as_str())),
+            province: Some(String::from(info.province.as_str())),
+            city: Some(String::from(info.city.as_str())),
+            province_code: Some(String::from(info.province_code.as_str())),
+            city_code: Some(String::from(info.city_code.as_str())),
+            region: Some(String::from(info.region.as_str())),
+            region_code: Some(String::from(info.region_code.as_str())),
+            region_names: Some(String::from(info.region_names.as_str())),
+            network: Some(String::from(info.network.as_str())),
+            created_at: None,
+        };
+        let _ = IpModel::upsert(db, &create_params).await?;
+    }
+
+    Ok(info)
+}
+
 pub fn get_user_agent_info(user_agent: &str, user_agent_parser: &str) -> UserAgentInfo {
     let ua_parser = UserAgentParser::from_path(user_agent_parser).unwrap();
     let product_v = ua_parser.parse_product(user_agent);
@@ -101,14 +163,12 @@ pub fn get_user_agent_info(user_agent: &str, user_agent_parser: &str) -> UserAge
 pub async fn get_city_by_ip(ip: &str) -> Result<ClientNetInfo, Box<dyn std::error::Error>> {
     let url = "http://whois.pconline.com.cn/ipJson.jsp?json=true&ip=".to_string() + ip;
     let resp = reqwest::get(url.as_str()).await?.text_with_charset("utf-8").await?;
-    let res = serde_json::from_str::<HashMap<String, String>>(resp.as_str())?;
-    let location = format!("{}{}", res["pro"], res["city"]);
-    let net_work = res["addr"].split(' ').collect::<Vec<&str>>()[1].to_string();
-    Ok(ClientNetInfo {
-        ip: res["ip"].to_string(),
-        location,
-        net_work,
-    })
+
+    let mut info = serde_json::from_str::<ClientNetInfo>(resp.as_str())?;
+    info.location = format!("{}{}", info.province, info.city);
+    info.network = info.address.split(' ').collect::<Vec<&str>>()[1].to_string();
+
+    Ok(info)
 }
 
 #[derive(Deserialize, Clone, Debug, Serialize)]
@@ -119,8 +179,45 @@ pub struct UserAgentInfo {
 }
 
 #[derive(Deserialize, Clone, Debug, Serialize)]
+#[serde(default)]
 pub struct ClientNetInfo {
     pub ip: String,
+    #[serde(rename(deserialize = "pro", serialize = "pro"))]
+    pub province: String,
+    pub city: String,
+    #[serde(rename(deserialize = "proCode", serialize = "proCode"))]
+    pub province_code: String,
+    #[serde(rename(deserialize = "cityCode", serialize = "cityCode"))]
+    pub city_code: String,
+    pub region: String,
+    #[serde(rename(deserialize = "regionCode", serialize = "regionCode"))]
+    pub region_code: String,
+    /// 陕西省西安市 电信ADSL
+    #[serde(rename(deserialize = "addr", serialize = "addr"))]
+    pub address: String,
+    #[serde(rename(deserialize = "regionNames", serialize = "regionNames"))]
+    pub region_names: String,
+    pub err: String,
+    /// 陕西省西安市
     pub location: String,
-    pub net_work: String,
+    pub network: String,
+}
+
+impl Default for ClientNetInfo {
+    fn default() -> Self {
+        Self {
+            ip: "127.0.0.1".to_string(),
+            location: "陕西省西安市".to_string(),
+            network: "电信".to_string(),
+            province: "陕西省".to_string(),
+            city: "西安市".to_string(),
+            province_code: "610000".to_string(),
+            city_code: "610100".to_string(),
+            region: "".to_string(),
+            region_code: "".to_string(),
+            address: "".to_string(),
+            region_names: "".to_string(),
+            err: "".to_string(),
+        }
+    }
 }

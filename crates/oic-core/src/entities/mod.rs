@@ -39,3 +39,4 @@ pub mod user_role_map;
 pub mod user;
 pub mod note;
 pub mod cache;
+pub mod ip;

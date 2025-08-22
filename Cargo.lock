@@ -3537,6 +3537,7 @@ dependencies = [
  "fast_log",
  "futures",
  "futures-util",
+ "http-body-util",
  "jsonwebtoken",
  "lazy_static",
  "loco-rs",

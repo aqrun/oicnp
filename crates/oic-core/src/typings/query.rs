@@ -1,4 +1,14 @@
+use serde::{Deserialize, Serialize};
 
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct RequestContext {
+    pub uri: String,
+    pub path: String,
+    pub path_params: String,
+    pub method: String,
+    pub data: String,
+}
 
 pub enum QueryParam {
     Id(Option<i64>),

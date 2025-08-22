@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { App } from 'antd';
 import { useAppStore } from '@/stores';
 import { useMemoizedFn } from 'ahooks';
@@ -14,6 +14,7 @@ import { logoutAction } from '@/services';
  */
 export function ErrorHandler(): JSX.Element {
   const router = useRouter();
+  const pathname = usePathname();
   const { modal } = App.useApp();
   const errors = useAppStore((state) => state.errors);
   const setState = useAppStore((state) => state.setState);
@@ -70,26 +71,28 @@ export function ErrorHandler(): JSX.Element {
     }
 
     if (!instanceRef.current) {
-      instanceRef.current = modal.error({
-        title: '请求失败',
-        content: (
-          <>
-            错误码: {error?.code}<br/>
-            错误信息：{error?.message}<br/>
-            {Boolean(error?.action) && (
-              <span>
-                操作：{error?.action}<br/>
-              </span>
-            )}
-            {Boolean(error?.requestId) && (
-              <span>
-                RequestId：{error?.requestId}<br/>
-              </span>
-            )}
-          </>
-        ),
-        footer,
-      });
+      if (pathname !== '/login') {
+        instanceRef.current = modal.error({
+          title: '请求失败',
+          content: (
+            <>
+              错误码: {error?.code}<br/>
+              错误信息：{error?.message}<br/>
+              {Boolean(error?.action) && (
+                <span>
+                  操作：{error?.action}<br/>
+                </span>
+              )}
+              {Boolean(error?.requestId) && (
+                <span>
+                  RequestId：{error?.requestId}<br/>
+                </span>
+              )}
+            </>
+          ),
+          footer,
+        });
+      }
 
       setState({
         errors: [],
