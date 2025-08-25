@@ -74,6 +74,9 @@ where
             let uri = String::from(parts.uri.path());
 
             let not_auth_uris = vec![
+                "/_ping",
+                "/_health",
+                "/admin",
                 "/v1/info",
                 "/v1/captcha",
                 "/v1/auth/login",

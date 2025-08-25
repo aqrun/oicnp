@@ -25,11 +25,10 @@ server:
     cors:
       enable: true
       allow_origins:
-        - 'http://localhost:3001'
-      allow_headers:
-        - '*'
-      allow_methods:
-        - '*'
+        - 'http://localhost:9001'
+        - 'http://localhost:9001/'
+    request_id:
+      enable: true
       
 # Worker Configuration
 workers:
@@ -111,3 +110,4 @@ settings:
     driver: local
     uri: http://localhost/uploads
     path: /Users/aqrun/workspace/www/uploads
+  user_agent_parser: config/regexes.yaml
