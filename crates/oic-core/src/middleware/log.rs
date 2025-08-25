@@ -13,15 +13,11 @@ use axum::{
 };
 use http_body_util::BodyExt;
 use futures_util::future::BoxFuture;
-use loco_rs::{
-    prelude::*,
-    controller::middleware::request_id::LocoRequestId,
-};
+use loco_rs::prelude::*;
 use tower::{Layer, Service};
 use crate::{
     entities::prelude::*,
-    utils::utc_now,
-    typings::ResJsonString,
+    prelude::*,
 };
 use crate::services::settings::Settings;
 use super::{
@@ -95,8 +91,8 @@ where
                 Some(x) => x.clone().0,
                 None => String::from(""),
             };
-            let request_id = match response.extensions().get::<LocoRequestId>() {
-                Some(x) => String::from(x.get()),
+            let request_id = match response.headers().get("x-request-id") {
+                Some(x) => String::from(x.to_str().unwrap_or("")),
                 None => String::from(""),
             };
 
@@ -131,7 +127,7 @@ async fn add_operation_log(
 ) -> Result<()> {
     let ctx: AppContext = AppContext::from_ref(&state);
     let default_settings = std::sync::Arc::new(Settings::default());
-    let settings = match ctx.shared_store.get::<Arc<Settings>>() {
+    let _settings = match ctx.shared_store.get::<Arc<Settings>>() {
         Some(s) => s,
         None => default_settings,
     };
@@ -141,16 +137,27 @@ async fn add_operation_log(
     let uri = String::from(parts.uri.path());
     let method = String::from(parts.method.as_str());
 
+    // 获取用户信息
+    let user = match UserModel::find_by_id(&ctx.db, jwt.user.uid).await {
+        Ok(user) => user,
+        Err(_) => UserModel::default(),
+    };
+    // 获取部门信息
+    let dpt = match DepartmentModel::find_by_id(&ctx.db, user.dpt_id).await {
+        Ok(dpt) => dpt,
+        Err(_) => DepartmentModel::default(),
+    };
+
     let log_entity = OperationLogActiveModel {
         id: ActiveValue::NotSet,
         time_id: Set(utc_now().and_utc().timestamp()),
         title: Set(request_id),
         business_type: Set(String::from("")),
-        method: Set(method.clone()),
-        request_method: Set(method),
+        method: Set(String::from(method.as_str())),
+        request_method: Set(String::from(method.as_str())),
         operator_type: Set(String::from("")),
-        name: Set(jwt.user.username),
-        department_name: Set(String::from("")),
+        name: Set(String::from(user.username.as_str())),
+        department_name: Set(String::from(dpt.name.as_str())),
         url: Set(uri),
         ip: Set(client.ip),
         location: Set(client.location),
@@ -163,10 +170,12 @@ async fn add_operation_log(
         created_at: Set(utc_now()),
     };
 
-    // 保存到数据库
-    OperationLogEntity::insert(log_entity)
-        .exec(&ctx.db)
-        .await?;
+    if method.eq("GET") || method.eq("POST") || method.eq("PUT") || method.eq("DELETE") {
+        // 保存到数据库
+        OperationLogEntity::insert(log_entity)
+            .exec(&ctx.db)
+            .await?;
+    }
 
     Ok(())
 }

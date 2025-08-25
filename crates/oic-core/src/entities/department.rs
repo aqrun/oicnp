@@ -18,7 +18,7 @@ pub struct Model {
     pub status: String,
     pub created_by: i64,
     pub updated_by: i64,
-    pub created_at: Option<DateTime>,
+    pub created_at: DateTime,
     pub updated_at: Option<DateTime>,
     pub deleted_at: Option<DateTime>,
 }
@@ -26,4 +26,3 @@ pub struct Model {
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {}
 
-impl ActiveModelBehavior for ActiveModel {}

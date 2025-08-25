@@ -1,11 +1,5 @@
 use loco_rs::prelude::*;
-use oic_core::{
-    AppContext,
-    middleware::{
-        RoleRouteLayer,
-        OperationLogLayer,
-    },
-};
+use oic_core::AppContext;
 
 mod common;
 mod note;
@@ -23,10 +17,10 @@ mod online;
 
 pub const VERSION: &str = "v1";
 
-pub fn routes(ctx: &AppContext) -> Vec<Routes> {
+pub fn routes(_ctx: &AppContext) -> Vec<Routes> {
     let mut routes = Vec::new();
     routes.push(auth::routes());
-
+    
     // 需要权限的路由列表
     let need_role_routes = vec![
         common::routes(),
@@ -42,17 +36,7 @@ pub fn routes(ctx: &AppContext) -> Vec<Routes> {
         cache::routes(),
         online::routes(),
     ];
-
-    for router in need_role_routes.into_iter() {
-        routes.push(add_auth_middleware(ctx, router));
-    }
+    routes.extend(need_role_routes);
 
     routes
 }
-/// 需要检测授权的路由
-fn add_auth_middleware(ctx: &AppContext, router: Routes) -> Routes {
-    let router = router.layer(RoleRouteLayer::new(ctx.clone()))
-        .layer(OperationLogLayer::new(ctx.clone()));
-    router
-}
-

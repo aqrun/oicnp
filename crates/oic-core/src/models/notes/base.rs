@@ -6,6 +6,7 @@ use crate::{
     models::RequestParamsUpdater,
     utils::utc_now,
     entities::prelude::*,
+    constants::DATE_TIME_FORMAT,
 };
 
 #[add_filter_fields]
@@ -16,9 +17,9 @@ pub struct NoteFilters {
     pub title: Option<String>,
     pub content: Option<String>,
     #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
-    pub created_at: Option<DateTime>,
+    pub created_at: Option<String>,
     #[serde(rename(deserialize = "updatedAt", serialize = "updatedAt"))]
-    pub updated_at: Option<DateTime>,
+    pub updated_at: Option<String>,
 }
 
 /// 创建 note 参数
@@ -30,9 +31,9 @@ pub struct NoteReqParams {
     pub title: Option<String>,
     pub content: Option<String>,
     #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
-    pub created_at: Option<DateTime>,
+    pub created_at: Option<String>,
     #[serde(rename(deserialize = "updatedAt", serialize = "updatedAt"))]
-    pub updated_at: Option<DateTime>,
+    pub updated_at: Option<String>,
 }
 
 impl RequestParamsUpdater for NoteReqParams {
@@ -49,12 +50,14 @@ impl RequestParamsUpdater for NoteReqParams {
             item.content = Set(String::from(x));
         }
         if let Some(x) = &self.created_at {
-            item.created_at = Set(*x);
+            if let Ok(x) = DateTime::parse_from_str(x, DATE_TIME_FORMAT) {
+                item.created_at = Set(x);
+            }
         }
         if let Some(x) = &self.updated_at {
-            item.updated_at = Set(Some(*x));
-        } else {
-            item.updated_at = Set(Some(utc_now()));
+            if let Ok(x) = DateTime::parse_from_str(x, DATE_TIME_FORMAT) {
+                item.updated_at = Set(Some(x));
+            }
         }
     }
 

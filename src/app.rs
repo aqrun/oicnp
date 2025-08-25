@@ -17,6 +17,10 @@ use oic_core::{
     entities::prelude::*,
     services::cache::OicCache,
     prelude::Settings,
+    middleware::{
+        RoleRouteLayer,
+        OperationLogLayer,
+    },
 };
 use axum::Router as AxumRouter;
 use crate::controllers::home::fallback;
@@ -62,8 +66,10 @@ impl Hooks for App {
         app_routes
     }
 
-    async fn after_routes(router: AxumRouter, _ctx: &AppContext) -> Result<AxumRouter> {
-        let router = router.fallback(fallback);
+    async fn after_routes(router: AxumRouter, ctx: &AppContext) -> Result<AxumRouter> {
+        let router = router.layer(RoleRouteLayer::new(ctx.clone()))
+            .layer(OperationLogLayer::new(ctx.clone()))
+            .fallback(fallback);
         Ok(router)
     }
 
