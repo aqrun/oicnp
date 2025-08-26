@@ -15,5 +15,7 @@ pub mod attribute_values;
 pub mod user_online;
 pub mod ips;
 pub mod departments;
+pub mod positions;
+pub mod operation_logs;
 
 pub use base::*;

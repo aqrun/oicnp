@@ -14,6 +14,9 @@ mod category;
 mod file;
 mod cache;
 mod online;
+mod operation_log;
+mod position;
+mod department;
 
 pub const VERSION: &str = "v1";
 
@@ -35,6 +38,9 @@ pub fn routes(_ctx: &AppContext) -> Vec<Routes> {
         file::routes(),
         cache::routes(),
         online::routes(),
+        operation_log::routes(),
+        position::routes(),
+        department::routes(),
     ];
     routes.extend(need_role_routes);
 
