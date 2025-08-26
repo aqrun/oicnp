@@ -7,9 +7,13 @@ use axum::{
     body::Body,
     extract::{FromRef, FromRequestParts, Request},
     response::Response,
+    Router as AXRouter,
 };
 use futures_util::future::BoxFuture;
-use loco_rs::prelude::*;
+use loco_rs::{
+    prelude::*,
+    controller::middleware::MiddlewareLayer,
+};
 use super::auth::JWTWithUser;
 use tower::{Layer, Service};
 use crate::entities::prelude::*;
@@ -37,6 +41,27 @@ impl<S> Layer<S> for RoleRouteLayer {
         }
     }
 }
+
+impl MiddlewareLayer for RoleRouteLayer {
+    fn name(&self) -> &'static str {
+        "role_route"
+    }
+
+    /// Returns whether the middleware is enabled or not
+    fn is_enabled(&self) -> bool {
+        true
+    }
+
+    fn config(&self) -> serde_json::Result<serde_json::Value> {
+        serde_json::to_value({})
+    }
+
+    /// Applies the RoleRoute middleware to the given Axum router.
+    fn apply(&self, app: AXRouter<AppContext>) -> Result<AXRouter<AppContext>> {
+        Ok(app.layer(self.clone()))
+    }
+}
+
 #[derive(Clone)]
 pub struct RoleRouteService<S> {
     inner: S,
@@ -74,9 +99,6 @@ where
             let uri = String::from(parts.uri.path());
 
             let not_auth_uris = vec![
-                "/_ping",
-                "/_health",
-                "/admin",
                 "/v1/info",
                 "/v1/captcha",
                 "/v1/auth/login",

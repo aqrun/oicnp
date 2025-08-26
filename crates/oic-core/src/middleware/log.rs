@@ -10,10 +10,14 @@ use axum::{
     extract::{FromRef, FromRequestParts, Request},
     response::Response,
     http::request::Parts,
+    Router as AXRouter,
 };
 use http_body_util::BodyExt;
 use futures_util::future::BoxFuture;
-use loco_rs::prelude::*;
+use loco_rs::{
+    prelude::*,
+    controller::middleware::{MiddlewareLayer, request_id::LocoRequestId},
+};
 use tower::{Layer, Service};
 use crate::{
     entities::prelude::*,
@@ -46,6 +50,27 @@ impl<S> Layer<S> for OperationLogLayer {
         }
     }
 }
+
+impl MiddlewareLayer for OperationLogLayer {
+    fn name(&self) -> &'static str {
+        "operation_log"
+    }
+
+    /// Returns whether the middleware is enabled or not
+    fn is_enabled(&self) -> bool {
+        true
+    }
+
+    fn config(&self) -> serde_json::Result<serde_json::Value> {
+        serde_json::to_value({})
+    }
+
+    /// Applies the OperationLog middleware to the given Axum router.
+    fn apply(&self, app: AXRouter<AppContext>) -> Result<AXRouter<AppContext>> {
+        Ok(app.layer(self.clone()))
+    }
+}
+
 #[derive(Clone)]
 pub struct OperationLogService<S> {
     inner: S,
@@ -82,8 +107,14 @@ where
             // Example of extracting JWT and checking roles
             let (parts, body) = req.into_parts();
             let (req_params, req_bytes) = get_req_body_data(body).await;
-
+ 
             let current_request = Request::from_parts(parts.clone(), Body::from(req_bytes).into());
+
+            let request_id = match current_request.extensions().get::<LocoRequestId>() {
+                Some(x) => String::from(x.get()),
+                None => String::from(""),
+            };
+
             let response = inner.call(current_request).await?;
             
             // 获取响应数据
@@ -91,11 +122,7 @@ where
                 Some(x) => x.clone().0,
                 None => String::from(""),
             };
-            let request_id = match response.headers().get("x-request-id") {
-                Some(x) => String::from(x.to_str().unwrap_or("")),
-                None => String::from(""),
-            };
-
+            
             // 计算执行时间
             let execution_time = start_time.elapsed().as_millis() as i64;
 

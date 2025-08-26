@@ -11,6 +11,7 @@ use loco_rs::{
     bgworker::{BackgroundWorker, Queue},
     Result,
     config::Config,
+    controller::middleware::{default_middleware_stack, MiddlewareLayer},
 };
 use migration::Migrator;
 use oic_core::{
@@ -67,9 +68,7 @@ impl Hooks for App {
     }
 
     async fn after_routes(router: AxumRouter, ctx: &AppContext) -> Result<AxumRouter> {
-        let router = router.layer(RoleRouteLayer::new(ctx.clone()))
-            .layer(OperationLogLayer::new(ctx.clone()))
-            .fallback(fallback);
+        let router = router.fallback(fallback);
         Ok(router)
     }
 
@@ -88,6 +87,16 @@ impl Hooks for App {
         ctx.shared_store.insert::<Arc<OicCache>>(Arc::new(cache));
         ctx.shared_store.insert::<Arc<Settings>>(Arc::new(settings));
         Ok(ctx)
+    }
+
+    fn middlewares(ctx: &AppContext) -> Vec<Box<dyn MiddlewareLayer>> {
+        // 中间件先进后出，最先添加的最后执行
+        let mut ms: Vec<Box<dyn MiddlewareLayer>> = vec![
+            Box::new(OperationLogLayer::new(ctx.clone())),
+            Box::new(RoleRouteLayer::new(ctx.clone())),
+        ];
+        ms.extend(default_middleware_stack(ctx));
+        ms
     }
 
     async fn connect_workers(ctx: &AppContext, queue: &Queue) -> Result<()> {
