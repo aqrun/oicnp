@@ -1,5 +1,14 @@
 'use client';
 
-export default function LoginLogsPage(): JSX.Element {
-  return <div>LoginLogsPage</div>;
+import LoginLogList from './List';
+import ViewModal from './detail/ViewModal';
+import { Container } from './index.styled';
+
+export default function LoginLogsPage() {
+  return (
+    <Container>
+      <LoginLogList />
+      <ViewModal />
+    </Container>
+  );
 }

@@ -14,7 +14,9 @@ pub struct Model {
     pub description: String,
     pub viewed: i32,
     pub deleted: String,
+    #[serde(rename(deserialize = "createdBy", serialize = "createdBy"))]
     pub created_by: i64,
+    #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
     pub created_at: DateTime,
 }
 

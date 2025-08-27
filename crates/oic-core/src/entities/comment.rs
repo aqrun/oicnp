@@ -8,21 +8,28 @@ use serde::{Deserialize, Serialize};
 pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
+    #[serde(rename(deserialize = "commentId", serialize = "commentId"))]
     pub comment_id: i64,
     pub uid: String,
     pub pid: String,
     pub status: String,
     pub bundle: String,
+    #[serde(rename(deserialize = "targetId", serialize = "targetId"))]
     pub target_id: String,
     pub subject: String,
     pub name: String,
     pub email: String,
     pub homepage: String,
     pub hostname: String,
+    #[serde(rename(deserialize = "createdBy", serialize = "createdBy"))]
     pub created_by: i64,
+    #[serde(rename(deserialize = "updatedBy", serialize = "updatedBy"))]
     pub updated_by: i64,
+    #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
     pub created_at: DateTime,
+    #[serde(rename(deserialize = "updatedAt", serialize = "updatedAt"))]
     pub updated_at: Option<DateTime>,
+    #[serde(rename(deserialize = "deletedAt", serialize = "deletedAt"))]
     pub deleted_at: Option<DateTime>,
 }
 

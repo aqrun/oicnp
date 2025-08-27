@@ -9,27 +9,36 @@ pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
     pub id: i64,
+    #[serde(rename(deserialize = "timeId", serialize = "timeId"))]
     pub time_id: i64,
     pub title: String,
+    #[serde(rename(deserialize = "businessType", serialize = "businessType"))]
     pub business_type: String,
     pub method: String,
+    #[serde(rename(deserialize = "requestMethod", serialize = "requestMethod"))]
     pub request_method: String,
+    #[serde(rename(deserialize = "operatorType", serialize = "operatorType"))]
     pub operator_type: String,
     pub name: String,
+    #[serde(rename(deserialize = "departmentName", serialize = "departmentName"))]
     pub department_name: String,
     pub url: String,
     pub ip: String,
     pub location: String,
     #[sea_orm(column_type = "Text")]
     pub param: String,
+    #[serde(rename(deserialize = "pathParam", serialize = "pathParam"))]
     #[sea_orm(column_type = "Text")]
     pub path_param: String,
+    #[serde(rename(deserialize = "jsonResult", serialize = "jsonResult"))]
     #[sea_orm(column_type = "Text")]
     pub json_result: String,
     pub status: String,
+    #[serde(rename(deserialize = "errorMessage", serialize = "errorMessage"))]
     #[sea_orm(column_type = "Text")]
     pub error_message: String,
     pub duration: i64,
+    #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
     pub created_at: DateTime,
 }
 

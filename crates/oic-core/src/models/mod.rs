@@ -17,5 +17,6 @@ pub mod ips;
 pub mod departments;
 pub mod positions;
 pub mod operation_logs;
+pub mod login_logs;
 
 pub use base::*;

@@ -1,10 +1,18 @@
 'use client';
 
-export default function DepartmentPage() {
+import DepartmentList from './List';
+import CreateModal from './create/CreateModal';
+import ViewModal from './detail/ViewModal';
+import EditModal from './edit/EditModal';
+import { Container } from './index.styled';
 
+export default function DepartmentsPage() {
   return (
-    <>
-      department page
-    </>
+    <Container>
+      <DepartmentList />
+      <CreateModal />
+      <ViewModal />
+      <EditModal />
+    </Container>
   );
 }

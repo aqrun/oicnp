@@ -9,6 +9,7 @@ pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
     pub id: i64,
+    #[serde(rename(deserialize = "loginName", serialize = "loginName"))]
     pub login_name: String,
     pub net: String,
     pub ip: String,
@@ -19,10 +20,9 @@ pub struct Model {
     pub status: String,
     pub message: String,
     pub module: String,
+    #[serde(rename(deserialize = "loginAt", serialize = "loginAt"))]
     pub login_at: Option<DateTime>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {}
-
-impl ActiveModelBehavior for ActiveModel {}

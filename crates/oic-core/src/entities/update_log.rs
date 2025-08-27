@@ -9,15 +9,22 @@ pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
     pub id: i64,
+    #[serde(rename(deserialize = "appVersion", serialize = "appVersion"))]
     pub app_version: String,
+    #[serde(rename(deserialize = "backendVersion", serialize = "backendVersion"))]
     pub backend_version: String,
     pub title: String,
     #[sea_orm(column_type = "Text")]
     pub content: String,
+    #[serde(rename(deserialize = "pathParam", serialize = "pathParam"))]
     pub created_by: i64,
+    #[serde(rename(deserialize = "updatedBy", serialize = "updatedBy"))]
     pub updated_by: i64,
+    #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
     pub created_at: DateTime,
+    #[serde(rename(deserialize = "updatedAt", serialize = "updatedAt"))]
     pub updated_at: Option<DateTime>,
+    #[serde(rename(deserialize = "deletedAt", serialize = "deletedAt"))]
     pub deleted_at: Option<DateTime>,
 }
 

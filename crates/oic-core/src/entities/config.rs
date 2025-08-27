@@ -9,6 +9,7 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub name: i64,
     pub data: String,
+    #[serde(rename(deserialize = "dataType", serialize = "dataType"))]
     pub data_type: String,
 }
 

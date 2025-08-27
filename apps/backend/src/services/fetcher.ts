@@ -12,19 +12,19 @@ export function createFetcher<TRequest, TResponse extends BaseResponse> (action:
   return async function(data?: TRequest): Promise<TResponse> {
     const cookieStore = await cookies();
     const token = cookieStore.get(SESSION_ID)?.value || '';
-
-    const res = await fetch(url, {
-      method: method || 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(data || {}),
-    });
-
+    
     let json = {} as TResponse;
 
     try {
+      const res = await fetch(url, {
+        method: method || 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(data || {}),
+      });
+  
       json = await res.json() as unknown as TResponse;
     } catch (err) {
       json = {

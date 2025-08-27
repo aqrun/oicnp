@@ -9,18 +9,24 @@ pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
     pub id: i64,
+    #[serde(rename(deserialize = "cronId", serialize = "cronId"))]
     pub cron_id: String,
+    #[serde(rename(deserialize = "lotId", serialize = "lotId"))]
     pub lot_id: String,
     pub weight: i16,
     pub name: String,
     pub group: String,
+    #[serde(rename(deserialize = "invokeTarget", serialize = "invokeTarget"))]
     pub invoke_target: String,
     pub params: String,
     pub message: String,
     pub status: String,
+    #[serde(rename(deserialize = "exceptionInfo", serialize = "exceptionInfo"))]
     pub exception_info: String,
     pub is_once: String,
+    #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
     pub created_at: DateTime,
+    #[serde(rename(deserialize = "elapsedTime", serialize = "elapsedTime"))]
     pub elapsed_time: Option<DateTime>,
 }
 
