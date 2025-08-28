@@ -7,7 +7,16 @@ use sea_orm::{
     QuerySelect,
 };
 use sea_orm::query::Condition;
-use crate::entities::{prelude::*, role};
+use crate::{
+    entities::{prelude::*, role},
+    models::{
+        ModelCrudHandler,
+        login_logs::CreateLoginLogReqParams,
+    },
+    middleware::ClientInfo,
+    utils::utc_now,
+    constants::DATE_TIME_FORMAT,
+};
 
 #[derive(Debug, FromQueryResult)]
 pub struct UserRoleRes {
@@ -103,4 +112,37 @@ pub async fn check_user_has_role(db: &DatabaseConnection, uid: i64, role_vid: &s
 ///
 pub async fn can(_db: &DatabaseConnection, _uid: i64, _permission_vid: &str) -> Result<bool> {
     Ok(true)
+}
+
+pub async fn add_user_login_log(
+    db: &DatabaseConnection,
+    info: ClientInfo,
+    email: String,
+    status: bool,
+    message: String,
+    module: String,
+) -> Result<()> {
+
+    let status_str = if status {
+        "1"
+    } else {
+        "0"
+    };
+
+    let _ = LoginLogModel::create(db, &CreateLoginLogReqParams {
+        login_name: Some(email),
+        net: Some(String::from(info.network.as_str())),
+        ip: Some(String::from(info.ip.as_str())),
+        location: Some(String::from(info.location.as_str())),
+        browser: Some(String::from(info.browser.as_str())),
+        os: Some(String::from(info.os.as_str())),
+        device: Some(String::from(info.device.as_str())),
+        status: Some(String::from(status_str)),
+        message: Some(message),
+        module: Some(module),
+        login_at: Some(utc_now().format(DATE_TIME_FORMAT).to_string()),
+        ..Default::default()
+    }).await?;
+
+    Ok(())
 }

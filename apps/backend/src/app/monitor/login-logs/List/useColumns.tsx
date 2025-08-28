@@ -14,12 +14,6 @@ export default function useColumns() {
       width: 80,
     }, 
     {
-      key: 'loginAt',
-      title: '登录时间',
-      dataIndex: 'loginAt',
-      width: 80,
-    },
-    {
       key: 'loginName',
       title: '登录名',
       dataIndex: 'loginName',

@@ -38,16 +38,11 @@ pub struct ClientInfo {
     pub device: String,
 }
 
-// Implement the FromRequestParts trait for the Auth struct
-impl<S> FromRequestParts<S> for ClientInfo
-where
-    AppContext: FromRef<S>,
-    S: Send + Sync,
-{
-    type Rejection = Error;
-
-    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Error> {
-        let ctx: AppContext = AppContext::from_ref(state);
+impl ClientInfo {
+    pub async fn from_headers(
+        ctx: &AppContext,
+        headers: &HeaderMap,
+    ) -> Result<Self, Error> {
         let default_settings = std::sync::Arc::new(Settings::default());
         let settings = match ctx.shared_store.get::<Arc<Settings>>() {
             Some(s) => s,
@@ -55,10 +50,10 @@ where
         };
         let user_agent_parser = settings.user_agent_parser.clone();
 
-        let headers = &parts.headers;
         let user_agent = headers.get("user-agent").unwrap().to_str().unwrap();
         let ip = get_remote_ip(headers.clone());
         let ua = get_user_agent_info(user_agent, user_agent_parser.as_str());
+        println!("user_agent-------------: {}, {:?}", user_agent, ua);
         let net = match get_net_info(&ctx.db, ip.as_str()).await {
             Ok(x) => x,
             Err(_) => ClientNetInfo::default()
@@ -74,6 +69,22 @@ where
         };
 
         Ok(info)
+    }
+}
+
+// Implement the FromRequestParts trait for the Auth struct
+impl<S> FromRequestParts<S> for ClientInfo
+where
+    AppContext: FromRef<S>,
+    S: Send + Sync,
+{
+    type Rejection = Error;
+
+    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Error> {
+        let ctx: AppContext = AppContext::from_ref(state);
+        let headers = &parts.headers;
+        
+        Self::from_headers(&ctx, headers).await
     }
 }
 

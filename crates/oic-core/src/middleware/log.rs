@@ -164,6 +164,10 @@ async fn add_operation_log(
     let uri = String::from(parts.uri.path());
     let method = String::from(parts.method.as_str());
 
+    if uri.eq("/v1/operation-log/one") {
+        return Ok(());
+    }
+
     // 获取用户信息
     let user = match UserModel::find_by_id(&ctx.db, jwt.user.uid).await {
         Ok(user) => user,
@@ -197,12 +201,14 @@ async fn add_operation_log(
         created_at: Set(utc_now()),
     };
 
-    if method.eq("GET") || method.eq("POST") || method.eq("PUT") || method.eq("DELETE") {
-        // 保存到数据库
-        OperationLogEntity::insert(log_entity)
-            .exec(&ctx.db)
-            .await?;
+    if method.eq("OPTIONS") {
+        return Ok(());
     }
+
+    // 保存到数据库
+    OperationLogEntity::insert(log_entity)
+        .exec(&ctx.db)
+        .await?;
 
     Ok(())
 }

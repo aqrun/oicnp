@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { MainLayout, AppProvider } from '@/components/layouts';
-import { DescribeMenuTree } from '@/services/apis/menu/action';
 import FullLoading from '@/components/layouts/FullLoading';
 
 import "@/styles/globals.css";
@@ -16,16 +15,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const menuRes = await DescribeMenuTree({ vid: 'backend' });
-
   return (
     <html lang="en">
       <body>
         <FullLoading />
         <AppProvider>
-          <MainLayout
-            menuRes={menuRes}
-          >
+          <MainLayout>
             {children}
           </MainLayout>
         </AppProvider>

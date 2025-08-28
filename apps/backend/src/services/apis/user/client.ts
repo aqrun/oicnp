@@ -14,6 +14,10 @@ import {
   DescribeUpdateUserResponseData,
   DescribeUserRolesRequestParams,
   DescribeUserRolesResponseData,
+  DescribeLoginRequestParams,
+  DescribeLoginResponseData,
+  DescribeAuthInfoRequestParams,
+  DescribeAuthInfoResponseData,
 } from './types';
 
 
@@ -46,3 +50,16 @@ export const DescribeUserRoles = createService<
 DescribeUserRolesRequestParams,
 DescribeUserRolesResponseData
 >('/user/roles', 'post');
+
+export const DescribeAuthLogin = createService<
+DescribeLoginRequestParams,
+DescribeLoginResponseData
+>('/auth/login', 'post');
+
+/**
+ * 获取当前登录用户信息
+ */
+export const DescribeAuthInfo = createService<
+DescribeAuthInfoRequestParams,
+DescribeAuthInfoResponseData
+>('/auth/info', 'post');

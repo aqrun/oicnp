@@ -12,13 +12,11 @@ import { MenuItem, BreadItem } from '@/types';
 import {
   logoutAction,
   useGetCurrentUser,
+  DescribeMenuTree,
 } from '@/services';
 import {
   isNetworkErr,
 } from '@/utils';
-import {
-  DescribeMenuTreeResponseData,
-} from '@/services';
 import { NavUser } from "@/components/nav-user"
 import {
   SidebarFooter,
@@ -37,18 +35,18 @@ import {
 } from './index.styled';
 
 export interface MainLayoutProps extends React.PropsWithChildren {
-  menuRes: DescribeMenuTreeResponseData;
+  _name?: string;
 }
 
 export function MainLayout({
   children,
-  menuRes,
 }: MainLayoutProps): JSX.Element {
   const router = useRouter();
   const pathname = usePathname();
   const showSideNav = true;
 
   const user = useAppStore(state => state.user);
+  const menuRes = useAppStore(state => state.menuRes);
   const updateToken = useAppStore(state => state.updateToken);
   const setAppState = useAppStore(state => state.setState);
 
@@ -170,9 +168,11 @@ export function MainLayout({
    * 初始化信息获取
    */
   const fetchInitialData = async () => {
+    const menuTreeRes = await DescribeMenuTree({ vid: 'backend' });
     await getCurrentUser(true);
 
     setAppState({
+      menuRes: menuTreeRes,
       initComplete: true,
     });
   };
@@ -196,7 +196,7 @@ export function MainLayout({
   }
 
   // 菜单接口是服务端请求 存在错误信息
-  if (isNetworkErr(menuRes)) {
+  if (isNetworkErr(menuRes!)) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Result

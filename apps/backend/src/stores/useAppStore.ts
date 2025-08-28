@@ -7,6 +7,7 @@ import {
 } from '@/types';
 import {
   UserModel,
+  DescribeMenuTreeResponseData,
 } from '@/services';
 
 export interface BaseAppState {
@@ -21,6 +22,10 @@ export interface BaseAppState {
    * 当前登陆用户信息
    */
   user?: UserModel;
+  /**
+   * 菜单数据
+   */
+  menuRes?: DescribeMenuTreeResponseData;
   updateToken?: string;
 }
 
@@ -35,6 +40,7 @@ export const useAppStore = create<AppState>()((set) => ({
   initComplete: false,
   errors: [],
   updateToken: '',
+  menuRes: undefined,
   setState: (payload) => set((state) => {
     return {
       ...state,

@@ -10,7 +10,7 @@ use oic_core::{
     typings::JsonRes,
     utils::get_api_prefix,
     services::cache::OicCache,
-    middleware::JWTWithUser,
+    middleware::{JWTWithUser, ClientInfo},
     auth::UserClaims,
 };
 use oic_core::services::{
@@ -21,6 +21,7 @@ use oic_core::services::{
         ResetParams,
         LoginResponse,
     },
+    user::add_user_login_log,
 };
 use serde_json::Value;
 
@@ -80,6 +81,13 @@ async fn login(
     State(ctx): State<AppContext>,
     Json(params): Json<LoginParams>,
 ) -> JsonRes<LoginResponse> {
+    println!("login-------------: {:?}", headers.clone());
+    let log_email = String::from(params.email.as_str());
+    let mut login_status = true;
+    let mut login_message = String::from("登陆成功");
+
+    let mut info = LoginResponse::default();
+    
     let remember = params.remember;
     let cache = match ctx.shared_store.get::<Arc<OicCache>>() {
         Some(cache) => cache,
@@ -91,7 +99,9 @@ async fn login(
     let cache_captcha = match cache.get(params.captcha_id.as_str()).await {
         Ok(text) => text.unwrap_or(String::from("")),
         Err(_) => {
-            return JsonRes::err("验证码已过期, 刷新后重试");
+            login_status = false;
+            login_message = String::from("验证码已过期, 刷新后重试");
+            String::from("")
         }
     };
 
@@ -99,34 +109,65 @@ async fn login(
     let valid_captcha = params.captcha.to_lowercase();
 
     if !valid_cache.eq(valid_captcha.as_str()) {
-        return JsonRes::err("验证码错误");
+        login_status = false;
+        login_message = String::from("验证码错误");
     }
 
-    // 验证成功后删除缓存中的验证码，防止重复使用
-    let _ = cache.remove(params.captcha_id.as_str()).await;
-
-    let info = match services::auth::login(&ctx.db, params).await {
-        Ok(res) => res,
-        Err(err) => {
-            return JsonRes::err(err.to_string());
+    if login_status {
+        // 验证成功后删除缓存中的验证码，防止重复使用
+        let _ = cache.remove(params.captcha_id.as_str()).await;
+    
+        info = match services::auth::login(&ctx.db, params).await {
+            Ok(res) => res,
+            Err(err) => {
+                login_status = false;
+                login_message = err.to_string();
+                LoginResponse::default()
+            }
+        };
+    
+        let cache_key = format!("session-{}", info.token);
+        let duration = if remember {
+            // 7 days
+            Duration::from_secs(60 * 60 * 24 * 7)
+        } else {
+            Duration::from_secs(60 * 60 * 24)
+        };
+        
+        if login_status {
+            if let Err(err) = cache.insert_with_expiry(cache_key.as_str(), &info, duration).await {
+                login_status = false;
+                login_message = err.to_string();
+            }
         }
-    };
-
-    let cache_key = format!("session-{}", info.token);
-    let duration = if remember {
-        // 7 days
-        Duration::from_secs(60 * 60 * 24 * 7)
-    } else {
-        Duration::from_secs(60 * 60 * 24)
-    };
-
-    if let Err(err) = cache.insert_with_expiry(cache_key.as_str(), &info, duration).await {
-        return JsonRes::err(err);
     }
 
-    let _ = UserModel::update_last_login_info(&ctx.db, info.uid, headers).await;
+    let log_login_message = String::from(login_message.as_str());
+    
+    tokio::spawn(async move {
+        let client = match ClientInfo::from_headers(&ctx, &headers).await {
+            Ok(client) => client,
+            Err(_err) => ClientInfo::default(),
+        };
+        let _ = UserModel::update_last_login_info(&ctx.db, info.uid, headers).await;
 
-    JsonRes::ok(info)
+        if let Err(e) = add_user_login_log(
+            &ctx.db,
+            client,
+            log_email,
+            login_status,
+            log_login_message,
+            String::from("auth/login"),
+        ).await {
+            println!("add_user_login_log error: {:?}", e);
+        }
+    });
+
+    if login_status {
+        JsonRes::ok(info)
+    } else {
+        JsonRes::err(login_message)
+    }
 }
 
 /// Creates a user login and returns a token
@@ -136,16 +177,46 @@ async fn access_token(
     State(ctx): State<AppContext>,
     Json(params): Json<LoginParams>,
 ) -> JsonRes<LoginResponse> {
+    let log_email = String::from(params.email.as_str());
+
+    let mut login_status = true;
+    let mut login_message = String::from("登陆成功");
+
     let info = match services::auth::access_token(&ctx.db, &ctx.config, params).await {
         Ok(res) => res,
         Err(err) => {
-            return JsonRes::err(err.to_string());
+            login_status = false;
+            login_message = err.to_string();
+            LoginResponse::default()
         }
     };
 
-    let _ = UserModel::update_last_login_info(&ctx.db, info.uid, headers).await;
+    let log_login_message = String::from(login_message.as_str());
+    
+    tokio::spawn(async move {
+        let client = match ClientInfo::from_headers(&ctx, &headers).await {
+            Ok(client) => client,
+            Err(_err) => ClientInfo::default(),
+        };
+        let _ = UserModel::update_last_login_info(&ctx.db, info.uid, headers).await;
 
-    JsonRes::ok(info)
+        if let Err(e) = add_user_login_log(
+            &ctx.db,
+            client,
+            log_email,
+            login_status,
+            log_login_message,
+            String::from("auth/access_token"),
+        ).await {
+            println!("add_user_login_log error: {:?}", e);
+        }
+    });
+
+    if login_status {
+        JsonRes::ok(info)
+    } else {
+        JsonRes::err(login_message)
+    }
 }
 
 #[debug_handler]

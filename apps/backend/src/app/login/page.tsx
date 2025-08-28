@@ -5,8 +5,12 @@ import { useRouter } from 'next/navigation';
 import { Form, Input, Button, Checkbox } from 'antd';
 import { CLASS_PREFIX } from '@/constants';
 import cls from 'clsx';
-import { loginAction } from './loginAction';
-import { useFetchCaptcha, AuthCaptcha } from '@/services';
+import { setSession } from './loginAction';
+import {
+  useFetchCaptcha,
+  AuthCaptcha,
+  DescribeAuthLogin,
+} from '@/services';
 import { useMemoizedFn } from 'ahooks';
 import Image from 'next/image';
 import { useAppStore } from '@/stores/useAppStore';
@@ -43,7 +47,7 @@ export default function Login() {
     setErrorInfo('');
     const values = form.getFieldsValue();
 
-    const res = await loginAction({
+    const res = await DescribeAuthLogin({
       email: values?.email,
       password: values?.password,
       remember: Boolean(values?.remember),
@@ -57,6 +61,7 @@ export default function Login() {
       setErrorInfo(res?.message || '用户名或密码不正确');
       refreshCaptcha();
     } else {
+      await setSession(res?.token || '');
       setAppState({
         updateToken: Date.now().toString(),
       });

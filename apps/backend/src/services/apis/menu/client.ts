@@ -14,6 +14,8 @@ import {
   DescribeUpdateMenuResponseData,
   DescribeMenuPermissionsResponseData,
   DescribeMenuPermissionsRequestParams,
+  DescribeMenuTreeRequestParams,
+  DescribeMenuTreeResponseData,
 } from './types';
 
 export const DescribeMenuList = createService<
@@ -45,3 +47,11 @@ export const DescribeMenuPermissions = createService<
 DescribeMenuPermissionsRequestParams,
 DescribeMenuPermissionsResponseData
 >('/menu/permissions', 'post');
+
+/**
+ * 获取菜单树
+ */
+export const DescribeMenuTree = createService<
+DescribeMenuTreeRequestParams,
+DescribeMenuTreeResponseData
+>('/menu/tree', 'post');

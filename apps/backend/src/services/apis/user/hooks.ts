@@ -10,7 +10,7 @@ import {
   DescribeUserRoles,
   DescribeUserDetail,
 } from "./client";
-import { getUserData } from './action';
+import { DescribeAuthInfo } from './client';
 
 /**
  * 获取用户角色列表
@@ -84,4 +84,12 @@ export function useGetCurrentUser() {
   return {
     getCurrentUser,
   };
+}
+
+/**
+ * 根据cookie获取用户登陆信息
+ */
+export async function getUserData() {
+  const res = await DescribeAuthInfo({});
+  return res?.user;
 }
