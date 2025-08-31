@@ -65,7 +65,7 @@ axiosInstance.interceptors.response.use(
     }
 
     if (!ignoreError && code !== '200' && message) {
-      console.error(message);
+      console.log(message);
       useAppStore.setState({
         loading: false,
         errors: [{
@@ -139,7 +139,17 @@ export function createService<TRequest, TResponse> (
         };
 
         axiosInstance.post<TRequest, BaseResponseData<TResponse>>(url, data, newConfig).then((res) => {
-          resolve(res?.data);
+          if ((res?.code || '200') === '200') {
+            resolve(res?.data);
+          } else {
+            resolve(res as unknown as TResponse);
+          }
+        }).catch(err => {
+          resolve({
+            code: '500',
+            data: null,
+            message: err?.toString(),
+          } as unknown as TResponse);
         });
       } else {
         axiosInstance.get<TRequest, BaseResponseData<TResponse>>(url, {

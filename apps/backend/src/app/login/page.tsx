@@ -57,7 +57,7 @@ export default function Login() {
     
     const code = res?.code || '200';
 
-    if (code !== '200') {
+    if (!res || code !== '200') {
       setErrorInfo(res?.message || '用户名或密码不正确');
       refreshCaptcha();
     } else {

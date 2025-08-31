@@ -53,7 +53,6 @@ impl ClientInfo {
         let user_agent = headers.get("user-agent").unwrap().to_str().unwrap();
         let ip = get_remote_ip(headers.clone());
         let ua = get_user_agent_info(user_agent, user_agent_parser.as_str());
-        println!("user_agent-------------: {}, {:?}", user_agent, ua);
         let net = match get_net_info(&ctx.db, ip.as_str()).await {
             Ok(x) => x,
             Err(_) => ClientNetInfo::default()
