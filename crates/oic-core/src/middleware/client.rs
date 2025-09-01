@@ -28,7 +28,7 @@ use user_agent_parser::UserAgentParser;
 
 // Define a struct to represent user authentication information serialized
 // to/from JSON
-#[derive(Debug, Deserialize, Serialize, Default)]
+#[derive(Debug, Deserialize, Serialize, Default, Clone)]
 pub struct ClientInfo {
     pub ip: String,
     pub location: String,

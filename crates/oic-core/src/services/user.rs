@@ -6,6 +6,8 @@ use sea_orm::{
     FromQueryResult,
     QuerySelect,
 };
+use chrono::prelude::*;
+use std::time::Duration;
 use sea_orm::query::Condition;
 use crate::{
     entities::{prelude::*, role},
@@ -15,8 +17,9 @@ use crate::{
     },
     middleware::ClientInfo,
     utils::utc_now,
-    constants::DATE_TIME_FORMAT,
+    constants::{LOGIN_EXPIRE_TIME, LOGIN_REMEMBER_EXPIRE_TIME, DATE_TIME_FORMAT},
 };
+use super::auth::LoginResponse;
 
 #[derive(Debug, FromQueryResult)]
 pub struct UserRoleRes {
@@ -122,7 +125,6 @@ pub async fn add_user_login_log(
     message: String,
     module: String,
 ) -> Result<()> {
-
     let status_str = if status {
         "1"
     } else {
@@ -143,6 +145,49 @@ pub async fn add_user_login_log(
         login_at: Some(utc_now().format(DATE_TIME_FORMAT).to_string()),
         ..Default::default()
     }).await?;
+
+    Ok(())
+}
+
+/**
+ * 更新用户在线信息
+ */
+pub async fn update_user_online_log(
+    db: &DatabaseConnection,
+    info: ClientInfo,
+    login_response: LoginResponse,
+) -> Result<()> {
+    let user = UserModel::find_by_uid(db, login_response.uid).await?;
+
+    let dpt = match DepartmentEntity::find()
+        .filter(DepartmentColumn::Id.eq(user.dpt_id))
+        .one(db)
+        .await?
+    {
+        Some(dpt) => dpt,
+        None => DepartmentModel::default(),
+    };
+
+    let token_expire = if login_response.remember {
+        Utc::now() + Duration::from_secs(LOGIN_REMEMBER_EXPIRE_TIME)
+    } else {
+        Utc::now() + Duration::from_secs(LOGIN_EXPIRE_TIME)
+    };
+
+    let _ = UserOnlineModel::upsert(db, &UserOnlineModel {
+        uid: user.uid,
+        token_id: String::from(login_response.token.as_str()),
+        token_expire: token_expire.timestamp(),
+        login_at: utc_now(),
+        username: user.username.to_string(),
+        dpt_name: dpt.name.to_string(),
+        net: String::from(info.network.as_str()),
+        ip: String::from(info.ip.as_str()),
+        location: String::from(info.location.as_str()),
+        device: String::from(info.device.as_str()),
+        browser: String::from(info.browser.as_str()),
+        os: String::from(info.os.as_str()),
+    }).await;
 
     Ok(())
 }

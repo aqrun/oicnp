@@ -33,8 +33,6 @@ export default function CategoryList(): JSX.Element {
     return convertCategoryListToTree(data?.categories || []);
   }, [data]);
 
-  console.log('dataSource', dataSource);
-
   /**
    * 创建操作
    */

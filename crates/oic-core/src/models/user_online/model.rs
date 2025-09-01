@@ -1,5 +1,5 @@
 use loco_rs::prelude::*;
-use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, TransactionTrait, Condition};
+use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, TransactionTrait, Condition, Order};
 use crate::{
     entities::prelude::*,
     utils::{catch_err, utc_now},
@@ -52,8 +52,10 @@ impl ModelCrudHandler for UserOnlineModel {
     async fn find_list(db: &DatabaseConnection, params: &Self::FilterParams) -> ModelResult<(Vec<Self>, u64)> {
         let page = params.get_page();
         let page_size = params.get_page_size();
-        let order = params.get_order();
+        let mut order = params.get_order();
         let order_by_str = params.get_order_by();
+
+        order = Order::Desc;
 
         let mut q = UserOnlineEntity::find();
 

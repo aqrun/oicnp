@@ -12,6 +12,7 @@ use oic_core::{
     services::cache::OicCache,
     middleware::{JWTWithUser, ClientInfo},
     auth::UserClaims,
+    constants::{LOGIN_EXPIRE_TIME, LOGIN_REMEMBER_EXPIRE_TIME},
 };
 use oic_core::services::{
     self,
@@ -21,7 +22,7 @@ use oic_core::services::{
         ResetParams,
         LoginResponse,
     },
-    user::add_user_login_log,
+    user::{add_user_login_log, update_user_online_log},
 };
 use serde_json::Value;
 
@@ -81,7 +82,6 @@ async fn login(
     State(ctx): State<AppContext>,
     Json(params): Json<LoginParams>,
 ) -> JsonRes<LoginResponse> {
-    println!("login-------------: {:?}", headers.clone());
     let log_email = String::from(params.email.as_str());
     let mut login_status = true;
     let mut login_message = String::from("登陆成功");
@@ -129,9 +129,9 @@ async fn login(
         let cache_key = format!("session-{}", info.token);
         let duration = if remember {
             // 7 days
-            Duration::from_secs(60 * 60 * 24 * 7)
+            Duration::from_secs(LOGIN_REMEMBER_EXPIRE_TIME)
         } else {
-            Duration::from_secs(60 * 60 * 24)
+            Duration::from_secs(LOGIN_EXPIRE_TIME)
         };
         
         if login_status {
@@ -143,6 +143,7 @@ async fn login(
     }
 
     let log_login_message = String::from(login_message.as_str());
+    let log_login_response = info.clone();
     
     tokio::spawn(async move {
         let client = match ClientInfo::from_headers(&ctx, &headers).await {
@@ -151,15 +152,25 @@ async fn login(
         };
         let _ = UserModel::update_last_login_info(&ctx.db, info.uid, headers).await;
 
+        // 添加登陆日志
         if let Err(e) = add_user_login_log(
             &ctx.db,
-            client,
+            client.clone(),
             log_email,
             login_status,
             log_login_message,
             String::from("auth/login"),
         ).await {
             println!("add_user_login_log error: {:?}", e);
+        }
+
+        // 更新用户在线日志
+        if let Err(e) = update_user_online_log(
+            &ctx.db,
+            client,
+            log_login_response,
+        ).await {
+            println!("update_user_online_log error: {:?}", e);
         }
     });
 
@@ -192,6 +203,7 @@ async fn access_token(
     };
 
     let log_login_message = String::from(login_message.as_str());
+    let log_login_response = info.clone();
     
     tokio::spawn(async move {
         let client = match ClientInfo::from_headers(&ctx, &headers).await {
@@ -202,13 +214,22 @@ async fn access_token(
 
         if let Err(e) = add_user_login_log(
             &ctx.db,
-            client,
+            client.clone(),
             log_email,
             login_status,
             log_login_message,
             String::from("auth/access_token"),
         ).await {
             println!("add_user_login_log error: {:?}", e);
+        }
+
+        // 更新用户在线日志
+        if let Err(e) = update_user_online_log(
+            &ctx.db,
+            client,
+            log_login_response,
+        ).await {
+            println!("update_user_online_log error: {:?}", e);
         }
     });
 

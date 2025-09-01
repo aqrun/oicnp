@@ -24,7 +24,7 @@ pub struct ResetParams {
     pub password: String,
 }
 
-#[derive(Debug, Deserialize, Serialize, Default)]
+#[derive(Debug, Deserialize, Serialize, Default, Clone)]
 pub struct LoginResponse {
     pub token: String,
     pub uid: i64,
@@ -179,30 +179,6 @@ pub async fn login(
 
     let mut login_res = LoginResponse::new(&user, session_id.as_str());
     login_res.remember = params.remember;
-
-    let dpt = match DepartmentEntity::find()
-        .filter(DepartmentColumn::Id.eq(user.dpt_id))
-        .one(db)
-        .await?
-    {
-        Some(dpt) => dpt,
-        None => DepartmentModel::default(),
-    };
-
-    let _ = UserOnlineModel::upsert(db, &UserOnlineModel {
-        uid: user.uid,
-        token_id: session_id.to_string(),
-        token_expire: params.remember as i64,
-        login_at: utc_now(),
-        username: user.username.to_string(),
-        dpt_name: dpt.name.to_string(),
-        net: String::from(""),
-        ip: String::from(""),
-        location: String::from(""),
-        device: String::from(""),
-        browser: String::from(""),
-        os: String::from(""),
-    }).await;
 
     Ok(login_res)
 }
