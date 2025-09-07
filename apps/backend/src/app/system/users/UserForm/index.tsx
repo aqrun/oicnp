@@ -1,58 +1,53 @@
 'use client';
 
-import React from 'react';
-import { Button, Form, Input, Checkbox, Select } from 'antd';
+import { Button, Form, Input, FormInstance, Checkbox, Select } from 'antd';
 import type { FormProps } from 'antd';
-import {
-  FieldType,
-} from '../types';
-import { UserModel } from '@/services';
-import { useCreateStore } from './useCreateStore';
-import {
-  UserFormContainer,
-} from './index.styled';
+import { RoleModel, UserModel } from '@/services';
+import { FieldType } from '../types';
+import { Container } from './index.styled';
 
-export interface UserFormProps {
-  onFinish: FormProps<FieldType>['onFinish'];
+export interface DepartmentFormProps {
+  onFinish?: FormProps<FieldType>['onFinish'];
   isEdit?: boolean;
   user?: UserModel;
   loading?: boolean;
+  showSubmit?: boolean;
+  form?: FormInstance<UserModel>;
+  disabled?: boolean;
+  roleList?: Array<RoleModel>;
   roleIds?: Array<number>;
 }
 
-export default function UserForm({
+export default function DepartmentForm({
   onFinish,
+  loading,
   isEdit,
   user,
-  loading,
+  showSubmit,
+  form,
+  disabled,
+  roleList,
   roleIds,
-}: UserFormProps): JSX.Element {
-  const roleList = useCreateStore(state => state.roleList);
-
-  let initialValues: Partial<FieldType> = {
-    remember: true,
+}: DepartmentFormProps): JSX.Element {
+  const initialValues: FieldType = {
+    username: user?.username,
+    nickname: user?.nickname,
+    email: user?.email,
+    status: user?.status,
+    isAdmin: user?.isAdmin,
+    roleIds,
   };
 
-  if (isEdit) {
-    initialValues = {
-      username: user?.username,
-      nickname: user?.nickname,
-      email: user?.email,
-      status: user?.status,
-      isAdmin: user?.isAdmin,
-      roleIds: roleIds,
-    };
-  }
-
   return (
-    <UserFormContainer>
+    <Container>
       <Form
         name="basic"
-        wrapperCol={{ span: 10 }}
         initialValues={initialValues}
         onFinish={onFinish}
         autoComplete="off"
         layout="vertical"
+        form={form}
+        disabled={disabled}
       >
         <Form.Item<FieldType>
           label="用户名"
@@ -117,16 +112,18 @@ export default function UserForm({
           </Select>
         </Form.Item>
 
-        <Form.Item label={null}>
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={loading}
-          >
-            {isEdit ? '更新' : '创建'}
-          </Button>
-        </Form.Item>
+        {showSubmit && (
+          <Form.Item label={null}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+            >
+              {isEdit ? '更新' : '创建'}
+            </Button>
+          </Form.Item>
+        )}
       </Form>
-    </UserFormContainer>
+    </Container>
   );
 }

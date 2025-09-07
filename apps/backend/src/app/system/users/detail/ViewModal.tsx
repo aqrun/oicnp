@@ -5,9 +5,9 @@ import { useViewStore } from './useViewStore';
 import { useMemoizedFn } from 'ahooks';
 import useDescriptions from './useDescriptions';
 import {
-  DepartmentModel,
-  DescribeDepartmentDetail,
-  DescribeDepartmentDetailRequestParams,
+  UserModel,
+  DescribeUserDetail,
+  DescribeUserDetailRequestParams,
 } from '@/services';
 
 /**
@@ -15,27 +15,27 @@ import {
  */
 export default function ViewModal() {
   const visible = useViewStore(state => state.visible);
-  const departmentId = useViewStore(state => state.departmentId);
+  const uid = useViewStore(state => state.uid);
   const setState = useViewStore(state => state.setState);
 
   const [loading, setLoading] = useState(false);
   const [items] = useDescriptions();
 
-  const [form] = Form.useForm<DepartmentModel>();
+  const [form] = Form.useForm<UserModel>();
 
   const handleCancel = useMemoizedFn(() => {
     form.resetFields();
     setState({
       visible: false,
-      department: undefined,
+      user: undefined,
     });
   });
 
   const fetchNote = useMemoizedFn(async () => {
-    const params: DescribeDepartmentDetailRequestParams = {
-      id: departmentId,
+    const params: DescribeUserDetailRequestParams = {
+      uid,
     };
-    const res = await DescribeDepartmentDetail(params);
+    const res = await DescribeUserDetail(params);
 
     return res;
   });
@@ -46,7 +46,7 @@ export default function ViewModal() {
     const res = await fetchNote();
 
     setState({
-      department: res?.department,
+      user: res?.user,
     });
     setLoading(false);
   });
@@ -59,7 +59,7 @@ export default function ViewModal() {
 
   return (
     <Modal
-      title="查看部门"
+      title="查看用户"
       open={visible}
       onCancel={handleCancel}
       confirmLoading={false}

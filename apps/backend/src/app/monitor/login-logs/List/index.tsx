@@ -15,7 +15,7 @@ import { useList } from './useList';
 import { LoginLogModel } from '@/services';
 import { Container } from './index.styled';
 /**
- * 职位列表
+ * 登录日志列表
  */
 export default function PositionList(): JSX.Element {
   const pager = useListStore((state) => state.pager);
@@ -104,7 +104,7 @@ export default function PositionList(): JSX.Element {
   return (
     <Container>
       <PageTitle
-        title='操作日志'
+        title='登录日志'
       />
       <Filters
         onRefresh={handleRefresh}

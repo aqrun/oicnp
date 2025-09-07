@@ -152,6 +152,13 @@ async fn add_operation_log(
     req_params: String,
     res_string: String,
 ) -> Result<()> {
+    let uri = String::from(parts.uri.path());
+    
+    // 日志列表操作不记录
+    if uri.starts_with("/v1/operation-log") {
+        return Ok(());
+    }
+
     let ctx: AppContext = AppContext::from_ref(&state);
     let default_settings = std::sync::Arc::new(Settings::default());
     let _settings = match ctx.shared_store.get::<Arc<Settings>>() {
@@ -161,12 +168,7 @@ async fn add_operation_log(
 
     let jwt = JWTWithUser::<UserModel>::from_request_parts(&mut parts, &state).await?;
     let client = ClientInfo::from_request_parts(&mut parts, &state).await?;
-    let uri = String::from(parts.uri.path());
     let method = String::from(parts.method.as_str());
-
-    if uri.eq("/v1/operation-log/one") {
-        return Ok(());
-    }
 
     // 获取用户信息
     let user = match UserModel::find_by_id(&ctx.db, jwt.user.uid).await {

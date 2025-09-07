@@ -2,18 +2,21 @@
 
 import { create } from 'zustand';
 import type { BaseState, BaseListState } from '@/stores/types';
+import { DescribeUserListResponseData } from '@/services';
 
-export type BaseUserState = BaseListState & {
+export type BaseListPageState = BaseListState & {
+  listRes: DescribeUserListResponseData | undefined;
   refreshToken: string;
   _name?: string;
 };
 
-export type UserState = BaseUserState & BaseState<BaseUserState>;
+export type ListState = BaseListPageState & BaseState<BaseListPageState>;
 
 /**
  *  筛选数据
  */
-export const useUserStore = create<UserState>()((set) => ({
+export const useListStore = create<ListState>()((set) => ({
+  listRes: undefined,
   pager: {
     page: 1,
     pageSize: 10,

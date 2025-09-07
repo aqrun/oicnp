@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from "react";
 import { useMemoizedFn } from "ahooks";
 import {
+  DescribeUserListRequestParams,
   DescribeUserRolesRequestParams,
   DescribeUserDetailRequestParams,
 } from './types';
@@ -9,8 +11,32 @@ import { useAppStore } from '@/stores/useAppStore';
 import {
   DescribeUserRoles,
   DescribeUserDetail,
+  DescribeUserList,
 } from "./client";
 import { DescribeAuthInfo } from './client';
+
+/**
+ * 获取用户列表
+ */
+export function useFetchUserList() {
+  const [loading, setLoading] = useState(false);
+
+  const fetchUserList = useMemoizedFn(async (params: DescribeUserListRequestParams) => {
+    setLoading(true);
+    const res = await DescribeUserList({
+      page: params.page || 1,
+      pageSize: params.pageSize || 10,
+    });
+    setLoading(false);
+    return res;
+  })
+
+  return {
+    loading,
+    fetchUserList,
+  };
+}
+
 
 /**
  * 获取用户角色列表

@@ -23,7 +23,6 @@ import { Container } from './index.styled';
  * 菜单列表
  */
 export default function MenuList(): JSX.Element {
-  const pager = useListStore((state) => state.pager);
   const setState = useListStore((state) => state.setState);
   const refreshToken = useListStore((state) => state.refreshToken);
   const setCreateState = useCreateStore(state => state.setState);
@@ -115,21 +114,6 @@ export default function MenuList(): JSX.Element {
    */
   const handleTableExpandChange = useMemoizedFn((keys: readonly React.Key[]) => {
     setTableExpandKeys(keys as unknown as Array<string>);
-  });
-
-  /**
-   * 页码数据变化
-   */
-  const handlePagerChange = useMemoizedFn(async (page: number, pageSize: number) => {
-    setState({
-      pager: {
-        ...pager,
-        page,
-        pageSize,
-      }
-    });
-    await nextTick();
-    refresh();
   });
 
   useEffect(() => {

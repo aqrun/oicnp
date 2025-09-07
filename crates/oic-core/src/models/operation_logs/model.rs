@@ -5,7 +5,7 @@ use crate::{
     ModelCrudHandler,
 };
 use loco_rs::model::{ModelError, ModelResult};
-use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, TransactionTrait};
+use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, TransactionTrait, Order};
 use validator::Validate;
 use super::{CreateOperationLogReqParams, OperationLogFilters, UpdateOperationLogReqParams, DeleteOperationLogReqParams};
 
@@ -52,8 +52,10 @@ impl ModelCrudHandler for OperationLogModel {
     async fn find_list(db: &DatabaseConnection, params: &Self::FilterParams) -> ModelResult<(Vec<Self>, u64)> {
         let page = params.get_page();
         let page_size = params.get_page_size();
-        let order = params.get_order();
+        let mut order = params.get_order();
         let order_by_str = params.get_order_by();
+
+        order = Order::Desc;
 
         let mut q = OperationLogEntity::find();
 
@@ -69,7 +71,7 @@ impl ModelCrudHandler for OperationLogModel {
             }
         }
 
-        let mut order_by = OperationLogColumn::Id;
+        let mut order_by = OperationLogColumn::CreatedAt;
 
         if order_by_str.eq("title") {
             order_by = OperationLogColumn::Title;

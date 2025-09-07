@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { Table } from 'antd';
-import { useRouter } from 'next/navigation';
 import {
   PageTitle,
   Filters,
@@ -10,35 +9,34 @@ import {
 import { useMemoizedFn } from 'ahooks';
 import { FilterValues, EnumFilterTrigger } from '@/types';
 import useColumns from './useColumns';
+import { useListStore } from './useListStore';
+import { useCreateStore } from '../create/useCreateStore';
+import { nextTick } from '@/utils';
+import { useList } from './useList';
 import { UserModel } from '@/services';
-import { useUserStore } from './useUserStore';
-import { nextTick, r } from '@/utils';
-import { useQueryUserList } from './useQueryUserList';
 import { Container } from './index.styled';
-
 /**
- * 仪表盘
+ * 用户列表
  */
 export default function UserList(): JSX.Element {
-  const router = useRouter();
-  const pager = useUserStore((state) => state.pager);
-  const setState = useUserStore((state) => state.setState);
-  const refreshToken = useUserStore((state) => state.refreshToken);
+  const pager = useListStore((state) => state.pager);
+  const setState = useListStore((state) => state.setState);
+  const refreshToken = useListStore((state) => state.refreshToken);
+  const setCreateState = useCreateStore((state) => state.setState);
   const columns = useColumns();
 
-  const {data, loading, refresh} = useQueryUserList();
+  const {
+    listRes,
+    loading,
+    refresh,
+    fetchListPageData,
+  } = useList();
 
   const getDataSource = () => {
-    return data?.users || [];
+    const list = listRes?.users || [];
+    return list;
   };
   const dataSource = getDataSource();
-
-  /**
-   * 创建操作
-   */
-  const handleCreate = useMemoizedFn(() => {
-    router.push(r('/system/users/create'));
-  });
 
   const handleRefresh = useMemoizedFn(() => {
     refresh();
@@ -66,6 +64,14 @@ export default function UserList(): JSX.Element {
       refresh();
     }
   });
+  /**
+   * 创建操作
+   */
+  const handleCreate = useMemoizedFn(() => {
+    setCreateState({
+      visible: true,
+    });
+  });
 
   /**
    * 页码数据变化
@@ -84,11 +90,15 @@ export default function UserList(): JSX.Element {
 
   useEffect(() => {
     if (refreshToken) {
-      refresh();
+      fetchListPageData();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshToken]);
-
+  useEffect(() => {
+    refresh();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+ 
   return (
     <Container>
       <PageTitle

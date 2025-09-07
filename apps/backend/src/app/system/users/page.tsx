@@ -1,10 +1,18 @@
 'use client';
 
-import UserList from './UserList';
+import UserList from './List';
+import CreateModal from './create/CreateModal';
+import ViewModal from './detail/ViewModal';
+import EditModal from './edit/EditModal';
+import { Container } from './index.styled';
 
-export default function UserPage() {
-
+export default function DepartmentsPage() {
   return (
-    <UserList />
+    <Container>
+      <UserList />
+      <CreateModal />
+      <ViewModal />
+      <EditModal />
+    </Container>
   );
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useMemoizedFn } from 'ahooks';
 import { Button, Divider } from 'antd';
 import {
@@ -7,10 +8,10 @@ import {
   DescribeDeleteUser,
   DescribeDeleteUserRequestParams,
 } from '@/services';
-import { useUserStore } from './useUserStore';
-import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import { r } from '@/utils';
+import { useListStore } from './useListStore';
+import { useViewStore } from '../detail/useViewStore';
+import { useEditStore } from '../edit/useEditStore';
+import { useGlobalState } from '@/context';
 import { useConfirmDelete } from '@/hooks/modals';
 import { TableActionContainer } from '@/styles/app.styled';
 
@@ -21,44 +22,57 @@ export interface TableActionsProps {
 export default function TableActions({
   record,
 }: TableActionsProps): JSX.Element {
+  const { message } = useGlobalState();
   const confirmDelete = useConfirmDelete();
-  const router = useRouter();
-  const setState = useUserStore((state) => state.setState);
+  const setState = useListStore((state) => state.setState);
+  const setViewState = useViewStore(state => state.setState);
+  const setEditState = useEditStore(state => state.setState);
 
-  const m = useMutation({
-    mutationFn: (params: DescribeDeleteUserRequestParams) => {
-      return DescribeDeleteUser(params);
-    },
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const deleteRole = useMemoizedFn(async () => {
+    setDeleteLoading(true);
+    const params: DescribeDeleteUserRequestParams = {
+      uid: record?.uid,
+    };
+    // 删除
+    const res = await DescribeDeleteUser(params);
+
+    console.log('res-----', res);
+
+    // 更新列表
+    setState({
+      refreshToken: Date.now().toString(),
+    });
+    message.open({
+      type: 'success',
+      content: '删除成功',
+    });
+    setDeleteLoading(false);
   });
-
-  const deleteUser = m.mutateAsync;
-  const deleteLoading = m.status === 'pending';
 
   const handleDelete = useMemoizedFn(() => {
     confirmDelete({
       title: '删除用户',
       content: `确定删除用户: ${record?.username}?`,
-      onOk: async () => {
-        const params: DescribeDeleteUserRequestParams = {
-          uid: record?.uid,
-        };
-        // 删除用户
-        await deleteUser(params);
-        // 更新列表
-        setState({
-          refreshToken: Date.now().toString(),
-        });
-      },
+      onOk: deleteRole,
       loading: deleteLoading,
     });
   });
 
   const handleView = useMemoizedFn(() => {
-    router.push(r(`/system/users/detail?uid=${record?.uid}`));
+    // router.push(r(`/system/roles/detail?id=${record?.roleId}`));
+    setViewState({
+      visible: true,
+      uid: record?.uid,
+    });
   });
 
   const handleEdit = useMemoizedFn(() => {
-    router.push(r(`/system/users/edit?uid=${record?.uid}`));
+    setEditState({
+      visible: true,
+      uid: record?.uid,
+    });
   });
 
   return (

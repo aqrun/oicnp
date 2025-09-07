@@ -6,7 +6,7 @@ import {
 import { RoleModel } from '../role/types';
 
 export interface UserModel {
-  uid?: string;
+  uid?: number;
   uuid?: string;
   username?: string;
   nickname?: string;
@@ -64,7 +64,7 @@ export interface DescribeUserDetailResponseData extends BaseResponse {
 }
 
 export interface DescribeUserListRequestParams extends BaseFilterParams {
-  uid?: string;
+  uid?: number;
   uuid?: string;
   username?: string;
   nickname?: string;
@@ -101,7 +101,7 @@ export interface DescribeCreateUserRequestParams extends UserModel {
 }
 
 export interface DescribeCreateUserResponseData {
-  uid?: string;
+  uid?: number;
   uuid?: string;
   nickname?: string;
   _name?: string;
