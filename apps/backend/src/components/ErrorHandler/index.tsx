@@ -28,6 +28,7 @@ export function ErrorHandler(): JSX.Element {
   const handleLogout = useMemoizedFn(async () => {
     setState({
       errors: [],
+      initComplete: true,
     });
     
     if (instanceRef.current) {
@@ -96,6 +97,7 @@ export function ErrorHandler(): JSX.Element {
 
       setState({
         errors: [],
+        initComplete: true,
       });
     }
   });

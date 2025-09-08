@@ -1,0 +1,46 @@
+---
+- id: 1
+  pid: 0
+  name: 水果集团
+  weight: 1
+  leader: 水果负责人
+  phone: 13800138001
+  email: fruit@test.com
+  status: 1
+  createdAt: 2021-01-01 00:00:01
+- id: 2
+  pid: 1
+  name: 苹果公司
+  weight: 1
+  leader: 苹果负责人
+  phone: 13800138001
+  email: apple@test.com
+  status: 1
+  createdAt: 2021-01-01 00:00:02
+- id: 3
+  pid: 1
+  name: 香蕉公司
+  weight: 2
+  leader: 香蕉负责人
+  phone: 13800138002
+  email: banana@test.com
+  status: 1
+  createdAt: 2021-01-01 00:00:03
+- id: 4
+  pid: 2
+  name: 研发部门
+  weight: 1
+  leader: 研发负责人
+  phone: 13800138003
+  email: dev@test.com
+  status: 1
+  createdAt: 2021-01-01 00:00:04
+- id: 5
+  pid: 2
+  name: 市场部门
+  weight: 1
+  leader: 市场负责人
+  phone: 13800138004
+  email: market@test.com
+  status: 1
+  createdAt: 2021-01-01 00:00:05

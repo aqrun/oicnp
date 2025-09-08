@@ -85,6 +85,7 @@ export function useGetCurrentUser() {
           code: 'UserNeedLogin',
           message: '用户未登录',
         }],
+        user: undefined,
       });
       return undefined;
     }

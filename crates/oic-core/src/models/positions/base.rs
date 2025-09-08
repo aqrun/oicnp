@@ -13,6 +13,7 @@ use crate::{
 #[derive(FilterParams, Deserialize, Serialize, Debug, Default, Clone)]
 #[serde(default)]
 pub struct PositionFilters {
+    #[serde(rename(deserialize = "positionId", serialize = "positionId"))]
     pub position_id: Option<i32>,
     pub vid: Option<String>,
     pub name: Option<String>,
@@ -35,6 +36,7 @@ pub struct PositionFilters {
 #[derive(Deserialize, Serialize, Debug, Validate, Default, Clone)]
 #[serde(default)]
 pub struct PositionReqParams {
+    #[serde(rename(deserialize = "positionId", serialize = "positionId"))]
     pub position_id: Option<i32>,
     pub vid: Option<String>,
     #[validate(required(message = "必须指定 name"), length(min = 2, message = "name 最少2个字符"))]
@@ -60,6 +62,9 @@ impl RequestParamsUpdater for PositionReqParams {
     fn update(&self, item: &mut Self::ActiveModel) {
         if let Some(x) = &self.position_id {
             item.position_id = Set(*x);
+        }
+        if let Some(x) = &self.vid {
+            item.vid = Set(String::from(x));
         }
         if let Some(x) = &self.name {
             item.name = Set(String::from(x));

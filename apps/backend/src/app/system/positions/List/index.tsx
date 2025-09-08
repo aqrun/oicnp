@@ -15,7 +15,7 @@ import { useList } from './useList';
 import { PositionModel } from '@/services';
 import { Container } from './index.styled';
 /**
- * 职位列表
+ * 岗位列表
  */
 export default function PositionList(): JSX.Element {
   const pager = useListStore((state) => state.pager);
@@ -92,7 +92,7 @@ export default function PositionList(): JSX.Element {
   return (
     <Container>
       <PageTitle
-        title='职位'
+        title='岗位列表'
       />
       <Filters
         onRefresh={handleRefresh}

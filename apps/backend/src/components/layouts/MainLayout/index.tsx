@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Breadcrumb, Menu, Result } from 'antd';
+import { Breadcrumb, Menu, Result, Skeleton } from 'antd';
 import { SelectInfo } from 'rc-menu/lib/interface';
 import { CLASS_PREFIX } from '@/constants';
 import cls from 'clsx';
@@ -47,6 +47,7 @@ export function MainLayout({
 
   const user = useAppStore(state => state.user);
   const menuRes = useAppStore(state => state.menuRes);
+  const initComplete = useAppStore(state => state.initComplete);
   const updateToken = useAppStore(state => state.updateToken);
   const setAppState = useAppStore(state => state.setState);
 
@@ -55,6 +56,7 @@ export function MainLayout({
   const [selectedKeys, setSelectedKeys] = useState<Array<string> | undefined>(undefined);
   const [openKeys, setOpenKeys] = useState<Array<string> | undefined>(undefined);
   const navMenus = menuRes?.menus?.[0]?.children || [];
+  const loading = !initComplete || !user;
 
   const sideMenus = useMemo(() => {
     const items = navMenus?.map((item) => {
@@ -204,6 +206,14 @@ export function MainLayout({
           title="网络故障"
           subTitle="服务不可用，请稍后重试 ~_~"
         />
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="m-6">
+        <Skeleton active />
       </div>
     );
   }

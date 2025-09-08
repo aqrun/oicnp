@@ -21,6 +21,8 @@ pub async fn run(ctx: &AppContext) -> Result<()> {
     handle_seed::<FileModel>(ctx, "file").await?;
     handle_seed::<AttributeModel>(ctx, "attribute").await?;
     handle_seed::<AttributeValueModel>(ctx, "attribute_value").await?;
+    handle_seed::<DepartmentModel>(ctx, "department").await?;
+    handle_seed::<PositionModel>(ctx, "position").await?;
     Ok(())
 }
 

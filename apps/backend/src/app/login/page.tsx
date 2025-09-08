@@ -71,6 +71,9 @@ export default function Login() {
   });
 
   useEffect(() => {
+    setAppState({
+      initComplete: true,
+    });
     refreshCaptcha();
   }, []);
   

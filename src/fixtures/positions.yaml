@@ -1,0 +1,17 @@
+---
+- vid: ceo
+  name: 董事长
+  weight: 1
+  status: 1
+- vid: pm
+  name: 项目经理
+  weight: 2
+  status: 1
+- vid: hr
+  name: 人力资源
+  weight: 3
+  status: 1
+- vid: staff
+  name: 普通员工
+  weight: 4
+  status: 1
