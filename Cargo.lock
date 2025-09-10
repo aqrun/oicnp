@@ -3500,13 +3500,16 @@ dependencies = [
  "anyhow",
  "async-std",
  "axum",
+ "chrono",
  "clap",
  "dotenv",
  "gray_matter",
  "lazy_static",
  "loco-rs",
+ "log",
  "oic_core",
  "oic_web",
+ "once_cell",
  "rand 0.9.1",
  "regex",
  "reqwest",
@@ -3518,6 +3521,7 @@ dependencies = [
  "serde_yaml",
  "tokio",
  "tower-http",
+ "tracing",
 ]
 
 [[package]]
@@ -3567,6 +3571,7 @@ dependencies = [
  "tokio-util",
  "tower 0.4.13",
  "tracing",
+ "tracing-appender",
  "tracing-subscriber",
  "user-agent-parser",
  "uuid 1.10.0",

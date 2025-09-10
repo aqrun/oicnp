@@ -18,6 +18,8 @@ serde_json = { workspace = true }
 serde_yaml = { workspace = true }
 lazy_static = { workspace = true }
 tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+tracing-appender = { workspace = true }
 tokio = { workspace = true }
 chrono = { workspace = true }
 anyhow = { workspace = true }
@@ -30,7 +32,6 @@ slab = "^0"
 bson2 = "^2"
 rbson = "^2"
 fast_log = { version = "^1", features = ["lz4", "zip", "gzip"]}
-tracing-subscriber = "^0"
 slug = "0.1"
 regex = { workspace = true }
 once_cell = { workspace = true }

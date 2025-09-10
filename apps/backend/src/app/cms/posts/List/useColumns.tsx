@@ -11,8 +11,14 @@ export default function useColumns() {
       key: 'nid',
       title: 'ID',
       dataIndex: 'nid',
-      width: 80,
-    }, 
+      width: 60,
+    },
+    {
+      key: 'vid',
+      title: 'VID',
+      dataIndex: 'vid',
+      width: 200,
+    },
     {
       key: 'title',
       title: '标题',
@@ -32,6 +38,12 @@ export default function useColumns() {
       render: (value: string) => {
         return formatDate(value);
       }
+    },
+    {
+      key: 'createdBy',
+      title: '创建者',
+      dataIndex: 'createdBy',
+      width: 200,
     },
     {
       key: 'createdAt',

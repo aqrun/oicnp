@@ -1,5 +1,5 @@
 use crate::models::Category;
-use oic_core::prelude::once_cell::sync::Lazy;
+use once_cell::sync::Lazy;
 
 /// 阅读 VID
 pub const VID_READING: &str = "reading";

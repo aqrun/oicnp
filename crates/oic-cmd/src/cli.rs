@@ -1,6 +1,10 @@
 use clap::{Parser, Subcommand};
 use crate::cmd;
-use oic_core::app::{create_context, get_environment};
+use oic_core::{
+    app::{create_context, get_environment},
+    utils::logger,
+};
+use loco_rs::environment::Environment;
 
 #[derive(Parser)]
 #[clap(version, author, about)]
@@ -23,10 +27,10 @@ pub enum Command {
         #[clap(short = 'p', long, default_value = "")]
         password: String,
     },
-    // FindAllBlogs {
-    //     #[clap(default_value = "json")]
-    //     format: String,
-    // },
+    FindAllBlogs {
+        #[clap(default_value = "json")]
+        format: String,
+    },
     // SaveBlogs,
     MyTest,
     // TruncateTables,
@@ -48,13 +52,23 @@ pub async fn init_cmd() {
     let environment = get_environment();
     let app_ctx = create_context(&environment).await.expect("Context 创建失败");
 
+    logger::init(&app_ctx.config.logger).expect("Logger 初始化失败");
+    let task_span = create_root_span(&environment);
+    let _guard = task_span.enter();
+
     let cli = Cli::parse();
 
     match cli.command {
-        // Command::FindAllBlogs { format } => {
-        //     let blog_base = get_env_config("BLOG_BASE");
-        //     blog_run(&format, blog_base.as_str(), &cli.dist_file).await;
-        // },
+        Command::FindAllBlogs { format } => {
+            let blog_base = dotenv::var("BLOG_BASE").expect("BLOG_BASE 环境变量未设置");
+            if let Err(err) = cmd::find_all_blog::run(
+                format.as_str(),
+                blog_base.as_str(),
+                &cli.dist_file
+            ).await {
+                log::error!("FindAllBlogs: {:?}", err);
+            }
+        },
         // Command::SaveBlogs => {
         //     save_blogs(&cli).await;
         // },
@@ -66,28 +80,32 @@ pub async fn init_cmd() {
         // },
         Command::MyTest => {
             if let Err(err) = cmd::my_test::run(&app_ctx).await {
-                println!("MyTest: {:?}", err);
+                log::error!("MyTest: {:?}", err);
             }
         },
 
         Command::Hash { password } => {
             if let Err(err) = cmd::hash_pass::hash(password.as_str()).await {
-                println!("HashPassErr: {:?}", err);
+                log::error!("HashPassErr: {:?}", err);
             }
         },
 
         Command::InitSeed => {
             if let Err(err) = cmd::init_seed::run(&app_ctx).await {
-                println!("InitSeedErr: {}", err);
+                log::error!("InitSeedErr: {}", err);
             }
         },
         Command::SeedData => {
             if let Err(err) = cmd::seed_data::run(&app_ctx).await {
-                println!("SeedDataErr: {}", err);
+                log::error!("SeedDataErr: {}", err);
             }
         },
         Command::Serve => {
             let _ = oic_web::app::run().await;
         },
     }
+}
+
+fn create_root_span(environment: &Environment) -> tracing::Span {
+    tracing::span!(tracing::Level::DEBUG, "app", environment = %environment)
 }

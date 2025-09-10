@@ -9,6 +9,7 @@ mod route;
 mod err;
 mod time;
 mod captcha;
+pub mod logger;
 
 pub use app_config::*;
 pub use uuid::*;

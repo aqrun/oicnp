@@ -3,36 +3,15 @@ use crate::models::{Blog, BlogMatter, Category, MatterTaxonomy};
 use gray_matter::engine::YAML;
 use gray_matter::Matter;
 use oic_core::utils::{generate_slug, is_valid_matter_content};
-use oic_core::prelude::{
-    anyhow::{anyhow, Result},
-    chrono::prelude::*,
-    fast_log::{
-        self,
-        consts::LogSize,
-        plugin::{file_split::RollingType, packer::LogPacker},
-    },
-    log::{error, info, warn},
-    serde_json,
-};
+use anyhow::{anyhow, Result};
+use chrono::prelude::*;
+use serde_json;
 use std::fs;
 use std::io::Read;
 use std::path::PathBuf;
 
-pub async fn run(_format: &str, blog_base: &str, dist_file: &str) {
-    fast_log::init(
-        fast_log::Config::new()
-            .console()
-            .chan_len(Some(100000))
-            .file_split(
-                "target/logs/",
-                LogSize::MB(1),
-                RollingType::All,
-                LogPacker {},
-            ),
-    )
-    .unwrap();
-
-    info!(
+pub async fn run(_format: &str, blog_base: &str, dist_file: &str) -> Result<()> {
+    log::info!(
         "\n\n\n[OICP] Blog handle start at {}",
         Local::now().format("%Y-%m-%d %H:%M:%S")
     );
@@ -40,23 +19,26 @@ pub async fn run(_format: &str, blog_base: &str, dist_file: &str) {
     // let db = DB.get_or_init(establish_connection).await;
     let categories = &CATEGORIES;
 
-    let all_blogs = find_all_blogs(categories, blog_base);
+    let all_blogs = find_all_blogs(categories, blog_base)?;
+    
     // println!("all_blogs {}", serde_json::to_string(&all_blogs[0..2]).unwrap());
     match save_to_file(&all_blogs, dist_file) {
         Err(err) => {
-            error!("[OICNP] Save to file failed, {:?}", err);
+            log::error!("[OICNP] Save to file failed, {:?}", err);
         }
         _ => {
-            info!(
+            log::info!(
                 "\n[OICNP] Blog save completed! total: {}",
                 &all_blogs.capacity()
             );
         }
     }
-    info!(
+    log::info!(
         "\n[OICNP] Blog handle end at: {}",
         Local::now().format("%Y-%m-%d %H:%M:%S")
     );
+
+    Ok(())
 }
 
 /// 保存到文件
@@ -73,7 +55,7 @@ fn generate_blog(
     category: String,
 ) -> Result<Blog> {
     if !is_valid_matter_content(&content) {
-        warn!(
+        log::warn!(
             "[OICNP] Not valid matter content: {}{}",
             &file_path, &file_name
         );
@@ -123,8 +105,13 @@ fn generate_blog(
 }
 
 /// 获取所有 blog 数据
-fn find_all_blogs(categories: &Vec<Category>, blog_base: &str) -> Vec<Blog> {
+fn find_all_blogs(categories: &Vec<Category>, blog_base: &str) -> Result<Vec<Blog>> {
     let base = PathBuf::from(blog_base);
+
+    if !base.exists() {
+        return Err(anyhow!("目录不存在: {}", blog_base));
+    }
+
     let mut all_blogs: Vec<Blog> = vec![];
 
     // 内容分类
@@ -173,6 +160,6 @@ fn find_all_blogs(categories: &Vec<Category>, blog_base: &str) -> Vec<Blog> {
         }
     }
 
-    all_blogs
+    Ok(all_blogs)
 }
 
