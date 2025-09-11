@@ -6,7 +6,7 @@ use crate::{
     models::tags::CreateTagReqParams,
 };
 use loco_rs::prelude::*;
-use sea_orm::{prelude::*, IntoActiveModel, QueryOrder};
+use sea_orm::{prelude::*, ActiveValue::NotSet, IntoActiveModel, QueryOrder};
 use validator::Validate;
 use super::{CreateNodeReqParams, NodeFilters, UpdateNodeReqParams, DeleteNodeReqParams};
 
@@ -104,29 +104,7 @@ impl ModelCrudHandler for NodeModel {
         catch_err(params.validate())?;
 
         for item in params.iter() {
-            let mut node = NodeActiveModel {
-                ..Default::default()
-            };
-    
-            item.update(&mut node);
-            item.update_by_create(&mut node);
-
-            if let Some(x) = &item.created_by_username {
-                let user = UserModel::find_by_username(db, x).await?;
-                node.created_by = Set(user.uid);
-            }
-
-            let node_model = node.insert(db).await?;
-
-            if let Some(x) = &item.category_vids {
-                Self::assign_categories(db, node_model.nid, x.as_slice()).await?;
-            }
-
-            if let Some(x) = &item.tag_vids {
-                Self::assign_tags(db, node_model.nid, x.as_slice()).await?;
-            }
-
-            Self::save_content(db, node_model.nid, item).await?;
+            let _ = Self::create(db, item).await?;
         }
 
         Ok(String::from("批量node添加完成"))
@@ -136,16 +114,31 @@ impl ModelCrudHandler for NodeModel {
     async fn create(db: &DatabaseConnection, params: &Self::CreateReqParams) -> ModelResult<i64> {
         catch_err(params.validate())?;
 
-        let mut item = NodeActiveModel {
+        let mut node = NodeActiveModel {
             ..Default::default()
         };
 
-        params.update(&mut item);
-        params.update_by_create(&mut item);
-    
-        let item = item.insert(db).await?;
+        params.update(&mut node);
+        params.update_by_create(&mut node);
 
-        Ok(item.nid)
+        if let Some(x) = &params.created_by_username {
+            let user = UserModel::find_by_username(db, x).await?;
+            node.created_by = Set(user.uid);
+        }
+
+        let node_model = node.insert(db).await?;
+
+        if let Some(x) = &params.category_vids {
+            Self::assign_categories(db, node_model.nid, x.as_slice()).await?;
+        }
+
+        if let Some(x) = &params.tag_vids {
+            Self::assign_tags(db, node_model.nid, x.as_slice()).await?;
+        }
+
+        Self::save_content(db, node_model.nid, params).await?;
+
+        Ok(node_model.nid)
     }
 
     /// 更新数据
@@ -157,15 +150,16 @@ impl ModelCrudHandler for NodeModel {
             return Err(ModelError::Any(format!("数据不存在,id: {}", nid).into()));
         }
 
-        let mut item = Self::find_by_id(db, nid)
+        let mut node = Self::find_by_id(db, nid)
             .await?
             .into_active_model();
 
-        params.update(&mut item);
+        params.update(&mut node);
+        node.uuid = NotSet;
     
-        let item = item.update(db).await?;
+        let node = node.update(db).await?;
 
-        Ok(item.nid)
+        Ok(node.nid)
     }
 
     /// 删除数据
@@ -308,4 +302,31 @@ impl NodeModel {
         })
     }
 
+    /// 根据vid创建或更新
+    pub async fn upsert_by_vid(db: &DatabaseConnection, params: &CreateNodeReqParams) -> ModelResult<String> {
+        let mut vid = String::from("");
+
+        if let Some(x) = &params.vid {
+            vid = String::from(x);
+        }
+
+        if vid.is_empty() {
+            return Err(ModelError::Message(format!("vid为空,vid: {}", vid).into()));
+        }
+
+        match Self::find_by_vid(db, vid.as_str()).await {
+            Ok(old_node) => {
+                let mut new_params = params.clone();
+                new_params.nid = Some(old_node.nid);
+
+                Self::update(db, &new_params).await?;
+               
+                Ok(old_node.vid)
+            }
+            Err(_) => {
+                let _ = Self::create(db, params).await?;
+                Ok(vid)
+            }
+        }
+    }
 }

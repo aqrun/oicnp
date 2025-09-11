@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use oic_core::{models::nodes::CreateNodeReqParams, prelude::*};
 
 #[derive(Debug)]
 pub struct Category<'a> {
@@ -20,6 +21,36 @@ pub struct Blog {
     pub excerpt: String,
     pub category: String,
     pub content: Option<String>,
+}
+
+impl Blog {
+    pub fn to_create_node_req_params(&self) -> CreateNodeReqParams {
+        let mut content = String::from("");
+
+        if let Some(x) = &self.content {
+            content = String::from(x);
+        }
+
+        let date = format!("{} 02:00:00", self.date);
+
+        CreateNodeReqParams {
+            nid: None,
+            vid: Some(String::from(self.slug.as_str())),
+            uuid: Some(uuid!()),
+            bundle: Some(String::from("blog")),
+            title: Some(String::from(self.title.as_str())),
+            body: Some(String::from(content.as_str())),
+            summary: Some(String::from(self.excerpt.as_str())),
+            summary_format: Some(String::from("markdown")),
+            body_format: Some(String::from("markdown")),
+            published_at: Some(String::from(date.as_str())),
+            created_at: Some(String::from(date.as_str())),
+            created_by_username: Some(String::from("aqrun")),
+            tag_vids: Some(self.tags.clone()),
+            category_vids: Some(vec![String::from(self.category.as_str())]),
+            ..Default::default()
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]

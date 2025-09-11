@@ -27,11 +27,13 @@ pub enum Command {
         #[clap(short = 'p', long, default_value = "")]
         password: String,
     },
+    /// 收集所有博客数据
     FindAllBlogs {
         #[clap(default_value = "json")]
         format: String,
     },
-    // SaveBlogs,
+    /// 保存博客数据到数据库
+    SaveBlogs,
     MyTest,
     // TruncateTables,
     // InitUser,
@@ -61,7 +63,7 @@ pub async fn init_cmd() {
     match cli.command {
         Command::FindAllBlogs { format } => {
             let blog_base = dotenv::var("BLOG_BASE").expect("BLOG_BASE 环境变量未设置");
-            if let Err(err) = cmd::find_all_blog::run(
+            if let Err(err) = cmd::blog::find_all_blog(
                 format.as_str(),
                 blog_base.as_str(),
                 &cli.dist_file
@@ -69,9 +71,14 @@ pub async fn init_cmd() {
                 log::error!("FindAllBlogs: {:?}", err);
             }
         },
-        // Command::SaveBlogs => {
-        //     save_blogs(&cli).await;
-        // },
+        Command::SaveBlogs => {
+            if let Err(err) = cmd::blog::save_blogs(
+                &app_ctx,
+                cli.dist_file.as_str()
+            ).await {
+                log::error!("SaveBlogs: {:?}", err);
+            }
+        },
         // Command::TruncateTables => {
         //   truncate_tables().await;
         // },
