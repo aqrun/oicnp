@@ -38,16 +38,19 @@ export default function TableActions({
     // 删除
     const res = await DescribeDeleteDepartment(params);
 
-    console.log('res-----', res);
+    const code = res?.code || '200';
 
-    // 更新列表
-    setState({
-      refreshToken: Date.now().toString(),
-    });
-    message.open({
-      type: 'success',
-      content: '删除成功',
-    });
+    if (code === '200') {
+      // 更新列表
+      setState({
+        refreshToken: Date.now().toString(),
+      });
+      message.open({
+        type: 'success',
+        content: '删除成功',
+      });
+    }
+
     setDeleteLoading(false);
   });
 

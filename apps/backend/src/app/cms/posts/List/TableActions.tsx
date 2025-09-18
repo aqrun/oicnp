@@ -40,15 +40,20 @@ export default function TableActions({
       nid: record?.nid,
     };
     // 删除
-    await DescribeDeleteNode(params);
-    // 更新列表
-    setState({
-      refreshToken: Date.now().toString(),
-    });
-    message.open({
-      type: 'success',
-      content: '删除成功',
-    });
+    const res = await DescribeDeleteNode(params);
+    const code = res?.code ?? '200';
+
+    if (code === '200') {
+      // 更新列表
+      setState({
+        refreshToken: Date.now().toString(),
+      });
+      message.open({
+        type: 'success',
+        content: '删除成功',
+      });
+    }
+    
     setDeleteLoading(false);
   });
 

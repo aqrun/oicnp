@@ -1,6 +1,7 @@
 import {
   BaseFilterParams,
   BaseListResponseData,
+  BaseResponse,
 } from '../../types';
 
 export interface PositionModel {
@@ -52,7 +53,7 @@ export interface DescribeCreatePositionRequestParams extends PositionModel {
   _name?: string;
 }
 
-export interface DescribeCreatePositionResponseData {
+export interface DescribeCreatePositionResponseData extends BaseResponse {
   _name?: string;
 }
 

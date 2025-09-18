@@ -6,6 +6,7 @@ use oic_core::{
     typings::JsonRes,
     AppContext,
     services::cache::OicCache,
+    services::common::ConsoleConfig,
 };
 use std::time::Duration;
 
@@ -14,6 +15,14 @@ pub async fn info(
     State(_ctx): State<AppContext>,
 ) -> JsonRes<String> {
     JsonRes::ok(String::from("Admin Api success"))
+}
+
+#[debug_handler]
+pub async fn console_config(
+    State(_ctx): State<AppContext>,
+) -> JsonRes<ConsoleConfig> {
+    let config = ConsoleConfig::new();
+    JsonRes::from((config, "config"))
 }
 
 #[debug_handler]
@@ -48,5 +57,6 @@ pub fn routes() -> Routes {
     Routes::new()
         .prefix(get_api_prefix(super::VERSION, "").as_str())
         .add("/info", get(info).post(info))
+        .add("/console-config", get(console_config).post(console_config))
         .add("/captcha", get(captcha))
 }

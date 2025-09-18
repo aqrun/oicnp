@@ -1,6 +1,7 @@
 import {
   BaseFilterParams,
   BaseListResponseData,
+  BaseResponse,
 } from '../../types';
 
 export interface TagModel {
@@ -40,7 +41,7 @@ export interface DescribeCreateTagRequestParams extends TagModel {
   _name?: string;
 }
 
-export interface DescribeCreateTagResponseData {
+export interface DescribeCreateTagResponseData extends BaseResponse {
   _name?: string;
 }
 

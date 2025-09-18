@@ -14,6 +14,7 @@ import {
 import { useMemoizedFn } from 'ahooks';
 import Image from 'next/image';
 import { useAppStore } from '@/stores/useAppStore';
+import { getConfig } from '@/utils';
 import { Container } from './index.styled';
 
 export interface FormValues {
@@ -46,11 +47,26 @@ export default function Login() {
     setLoading(true);
     setErrorInfo('');
     const values = form.getFieldsValue();
+    const remember = Boolean(values?.remember);
+
+    let expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    const {
+      loginExpireTime,
+      loginRememberExpireTime,
+    } = getConfig();
+
+    if (loginExpireTime) {
+      expires = new Date(Date.now() + loginExpireTime * 1000);
+    }
+
+    if (remember && loginRememberExpireTime) {
+      expires = new Date(Date.now() + loginRememberExpireTime * 1000);
+    }
 
     const res = await DescribeAuthLogin({
       email: values?.email,
       password: values?.password,
-      remember: Boolean(values?.remember),
+      remember,
       captchaId: captchaRes?.id,
       captcha: values?.captcha,
     });
@@ -61,7 +77,7 @@ export default function Login() {
       setErrorInfo(res?.message || '用户名或密码不正确');
       refreshCaptcha();
     } else {
-      await setSession(res?.token || '');
+      await setSession(res?.token || '', expires);
       setAppState({
         updateToken: Date.now().toString(),
       });

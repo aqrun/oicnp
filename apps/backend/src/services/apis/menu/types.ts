@@ -54,7 +54,7 @@ export interface DescribeCreateMenuRequestParams extends Partial<MenuModel> {
   _name?: string;
 }
 
-export interface DescribeCreateMenuResponseData {
+export interface DescribeCreateMenuResponseData extends BaseResponse {
   _name?: string;
 }
 

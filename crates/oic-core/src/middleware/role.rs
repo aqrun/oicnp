@@ -100,6 +100,7 @@ where
 
             let not_auth_uris = vec![
                 "/v1/info",
+                "/v1/console-config",
                 "/v1/captcha",
                 "/v1/auth/login",
                 "/v1/auth/register",

@@ -1,6 +1,7 @@
 import {
   BaseFilterParams,
   BaseListResponseData,
+  BaseResponse,
 } from '../../types';
 
 export interface PermissionModel {
@@ -60,7 +61,7 @@ export interface DescribeCreatePermissionRequestParams extends PermissionModel {
   _name?: string;
 }
 
-export interface DescribeCreatePermissionResponseData {
+export interface DescribeCreatePermissionResponseData extends BaseResponse {
   _name?: string;
 }
 

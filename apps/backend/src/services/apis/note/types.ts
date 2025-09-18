@@ -1,6 +1,7 @@
 import {
   BaseFilterParams,
   BaseListResponseData,
+  BaseResponse,
 } from '../../types';
 
 export interface NoteModel {
@@ -37,7 +38,7 @@ export interface DescribeCreateNoteRequestParams extends NoteModel {
   _name?: string;
 }
 
-export interface DescribeCreateNoteResponseData {
+export interface DescribeCreateNoteResponseData extends BaseResponse {
   _name?: string;
 }
 

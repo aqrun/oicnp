@@ -4,7 +4,7 @@ import { STATIC_URI, BACK_BASE_URI } from '@/constants';
 import { MenuItem, BreadItem } from '@/types';
 import { UrlState } from './UrlState';
 import dayjs from 'dayjs';
-import { BaseResponse } from '@/services';
+import { BaseResponse, ConsoleConfig } from '@/services';
 
 /**
  * 获取链接前缀
@@ -184,4 +184,12 @@ export function isNetworkErr(res: BaseResponse) {
   const code = res?.code ?? '200';
 
   return `${code}` === '500';
+}
+
+interface Global extends Window {
+  CONSOLE_CONFIG: ConsoleConfig;
+}
+
+export function getConfig(): ConsoleConfig {
+  return (window as unknown as Global).CONSOLE_CONFIG || {};
 }

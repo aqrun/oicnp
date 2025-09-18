@@ -73,7 +73,7 @@ export function useGetCurrentUser() {
   const stateUser = useAppStore(state => state.user);
   const setAppState = useAppStore(state => state.setState);
 
-  const getCurrentUser = useMemoizedFn(async (refresh = false) => {
+  const getCurrentUser = useMemoizedFn(async (refresh = false, ignoreError = false) => {
     let user = stateUser;
 
     // 获取 cookie 数据
@@ -81,7 +81,7 @@ export function useGetCurrentUser() {
     
     if (!userData || !userData?.uuid) {
       setAppState({
-        errors: [{
+        errors: ignoreError ? [] :[{
           code: 'UserNeedLogin',
           message: '用户未登录',
         }],

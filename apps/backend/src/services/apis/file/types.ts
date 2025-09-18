@@ -1,6 +1,7 @@
 import {
   BaseFilterParams,
   BaseListResponseData,
+  BaseResponse,
 } from '../../types';
 import { Dayjs } from 'dayjs';
 
@@ -60,7 +61,7 @@ export interface DescribeCreateFileRequestParams extends FileModel {
   _name?: string;
 }
 
-export interface DescribeCreateFileResponseData {
+export interface DescribeCreateFileResponseData extends BaseResponse {
   _name?: string;
 }
 

@@ -40,15 +40,19 @@ export default function TableActions({
       tagId: record?.tagId,
     };
     // 删除
-    await DescribeDeleteTag(params);
-    // 更新列表
-    setState({
-      refreshToken: Date.now().toString(),
-    });
-    message.open({
-      type: 'success',
-      content: '删除成功',
-    });
+    const res = await DescribeDeleteTag(params);
+    const code = res?.code ?? '200';
+
+    if (code === '200') {
+      // 更新列表
+      setState({
+        refreshToken: Date.now().toString(),
+      });
+      message.open({
+        type: 'success',
+        content: '删除成功',
+      });
+    }
     setDeleteLoading(false);
   });
 

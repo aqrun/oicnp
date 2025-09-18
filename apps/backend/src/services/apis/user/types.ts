@@ -100,7 +100,7 @@ export interface DescribeCreateUserRequestParams extends UserModel {
   _name?: string;
 }
 
-export interface DescribeCreateUserResponseData {
+export interface DescribeCreateUserResponseData extends BaseResponse {
   uid?: number;
   uuid?: string;
   nickname?: string;

@@ -36,11 +36,15 @@ export default function TableActions({
       permissionId: record?.permissionId,
     };
     // 删除
-    await DescribeDeletePermission(params);
-    // 更新列表
-    setState({
-      refreshToken: Date.now().toString(),
-    });
+    const res = await DescribeDeletePermission(params);
+    const code = res?.code ?? '200';
+
+    if (code === '200') {
+      // 更新列表
+      setState({
+        refreshToken: Date.now().toString(),
+      });
+    }
     setLoading(false);
   });
 

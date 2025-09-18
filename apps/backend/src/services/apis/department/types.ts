@@ -1,6 +1,7 @@
 import {
   BaseFilterParams,
   BaseListResponseData,
+  BaseResponse,
 } from '../../types';
 
 export interface DepartmentModel {
@@ -58,7 +59,7 @@ export interface DescribeCreateDepartmentRequestParams extends DepartmentModel {
   _name?: string;
 }
 
-export interface DescribeCreateDepartmentResponseData {
+export interface DescribeCreateDepartmentResponseData extends BaseResponse {
   _name?: string;
 }
 

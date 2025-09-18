@@ -35,11 +35,16 @@ export default function TableActions({
       id: record?.id,
     };
     // 删除
-    await DescribeDeleteMenu(params);
-    // 更新列表
-    setState({
-      refreshToken: Date.now().toString(),
-    });
+    const res = await DescribeDeleteMenu(params);
+    const code = res?.code ?? '200';
+
+    if (code === '200') {
+      // 更新列表
+      setState({
+        refreshToken: Date.now().toString(),
+      });
+    }
+
     setDelLoading(false);
   });
 

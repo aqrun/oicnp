@@ -171,7 +171,12 @@ export function MainLayout({
    */
   const fetchInitialData = async () => {
     const menuTreeRes = await DescribeMenuTree({ vid: 'backend' });
-    await getCurrentUser(true);
+    const userRes = await getCurrentUser(true, true);
+
+    if (!userRes) {
+      router.push('/login');
+      return;
+    }
 
     setAppState({
       menuRes: menuTreeRes,

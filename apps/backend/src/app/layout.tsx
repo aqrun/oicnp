@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { MainLayout, AppProvider } from '@/components/layouts';
 import FullLoading from '@/components/layouts/FullLoading';
+import { getConsoleConfig } from '@/services/apis/common/action';
 
 import "@/styles/globals.css";
 
@@ -15,9 +16,18 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // 获取全局配置参数
+  const res = await getConsoleConfig();
+
   return (
     <html lang="en">
       <body>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.CONSOLE_CONFIG = ${JSON.stringify(res?.config || {})};`,
+          }}
+        />
+        
         <FullLoading />
         <AppProvider>
           <MainLayout>

@@ -37,17 +37,18 @@ export default function TableActions({
     };
     // 删除
     const res = await DescribeDeletePosition(params);
+    const code = res?.code ?? '200';
 
-    console.log('res-----', res);
-
-    // 更新列表
-    setState({
-      refreshToken: Date.now().toString(),
-    });
-    message.open({
-      type: 'success',
-      content: '删除成功',
-    });
+    if (code === '200') {
+      // 更新列表
+      setState({
+        refreshToken: Date.now().toString(),
+      });
+      message.open({
+        type: 'success',
+        content: '删除成功',
+      });
+    }
     setDeleteLoading(false);
   });
 

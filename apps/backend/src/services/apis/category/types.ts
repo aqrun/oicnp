@@ -1,6 +1,7 @@
 import {
   BaseFilterParams,
   BaseListResponseData,
+  BaseResponse,
 } from '../../types';
 
 export interface CategoryModel {
@@ -46,7 +47,7 @@ export interface DescribeCreateCategoryRequestParams extends CategoryModel {
   _name?: string;
 }
 
-export interface DescribeCreateCategoryResponseData {
+export interface DescribeCreateCategoryResponseData extends BaseResponse {
   _name?: string;
 }
 

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useMemoizedFn } from 'ahooks';
-import { Button, Divider } from 'antd';
+import { Divider } from 'antd';
 import {
   NoteModel,
   DescribeDeleteNote,
@@ -40,15 +40,20 @@ export default function TableActions({
       id: record?.id,
     };
     // 删除
-    await DescribeDeleteNote(params);
-    // 更新列表
-    setState({
-      refreshToken: Date.now().toString(),
-    });
-    message.open({
-      type: 'success',
-      content: '删除成功',
-    });
+    const res = await DescribeDeleteNote(params);
+    const code = res?.code ?? '200';
+
+    if (code === '200') {
+      // 更新列表
+      setState({
+        refreshToken: Date.now().toString(),
+      });
+      message.open({
+        type: 'success',
+        content: '删除成功',
+      });
+    }
+
     setDeleteLoading(false);
   });
 

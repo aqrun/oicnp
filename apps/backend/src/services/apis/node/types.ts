@@ -1,6 +1,7 @@
 import {
   BaseFilterParams,
   BaseListResponseData,
+  BaseResponse,
 } from '../../types';
 import { TagModel } from '../tag/types';
 import { CategoryModel } from '../category/types';
@@ -72,7 +73,7 @@ export interface DescribeCreateNodeRequestParams extends NodeModel {
   _name?: string;
 }
 
-export interface DescribeCreateNodeResponseData {
+export interface DescribeCreateNodeResponseData extends BaseResponse {
   _name?: string;
 }
 
