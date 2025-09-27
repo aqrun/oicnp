@@ -20,16 +20,25 @@ import { Container } from './index.styled';
  */
 export default function TagList(): JSX.Element {
   const pager = useListStore((state) => state.pager);
+  const nodeRes = useListStore((state) => state.nodeRes);
   const setState = useListStore((state) => state.setState);
   const refreshToken = useListStore((state) => state.refreshToken);
   const setCreateState = useCreateStore(state => state.setState);
   const columns = useColumns();
 
-  const {data, loading, refresh} = useQueryNodeList();
+  const {loading, refresh} = useQueryNodeList();
 
   const getDataSource = () => {
-    const list = data?.nodes || [];
-    return list;
+    const list = nodeRes?.nodes || [];
+    const newList = list.map((item) => {
+      const data: NodeModel = {
+        ...item,
+        categories: [],
+        tags: [],
+      };
+      return data;
+    });
+    return newList;
   };
   const dataSource = getDataSource();
 

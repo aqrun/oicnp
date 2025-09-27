@@ -30,7 +30,7 @@ export default function useColumns() {
       key: 'empty',
       title: null,
       dataIndex: 'uid',
-      render: (value: string) => {
+      render: () => {
         return <></>;
       }
     },

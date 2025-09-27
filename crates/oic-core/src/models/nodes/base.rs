@@ -15,6 +15,7 @@ use crate::{
 #[serde(default)]
 pub struct NodeFilters {
     pub nid: Option<i64>,
+    pub nids: Option<String>,
     pub uuid: Option<String>,
     pub vid: Option<String>,
     pub bundle: Option<String>,
@@ -153,3 +154,37 @@ pub type CreateNodeReqParams = NodeReqParams;
 pub type UpdateNodeReqParams = NodeReqParams;
 /// 删除数据参数
 pub type DeleteNodeReqParams = NodeReqParams;
+
+#[derive(Deserialize, Serialize, Debug, Validate, Default, Clone)]
+#[serde(default)]
+pub struct NodeDetailModel {
+    pub nid: i64,
+    pub vid: String,
+    pub uuid: String,
+    pub bundle: String,
+    pub title: String,
+    pub viewed: i32,
+    pub deleted: String,
+    #[serde(rename(deserialize = "publishedAt", serialize = "publishedAt"))]
+    pub published_at: Option<DateTime>,
+    #[serde(rename(deserialize = "createdBy", serialize = "createdBy"))]
+    pub created_by: i64,
+    #[serde(rename(deserialize = "updatedBy", serialize = "updatedBy"))]
+    pub updated_by: i64,
+    #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
+    pub created_at: DateTime,
+    #[serde(rename(deserialize = "updatedAt", serialize = "updatedAt"))]
+    pub updated_at: Option<DateTime>,
+    #[serde(rename(deserialize = "deletedAt", serialize = "deletedAt"))]
+    pub deleted_at: Option<DateTime>,
+    #[serde(rename(deserialize = "summary", serialize = "summary"))]
+    pub summary: String,
+    #[serde(rename(deserialize = "summaryFormat", serialize = "summaryFormat"))]
+    pub summary_format: String,
+    #[serde(rename(deserialize = "body", serialize = "body"))]
+    pub body: String,
+    #[serde(rename(deserialize = "bodyFormat", serialize = "bodyFormat"))]
+    pub body_format: String,
+    pub categories: Vec<CategoryModel>,
+    pub tags: Vec<TagModel>,
+}

@@ -1,6 +1,7 @@
 import { DescriptionsProps, Tag } from 'antd';
 import { useViewStore } from './useViewStore';
 import { formatDate } from '@/utils';
+import MDEditor from '@uiw/react-md-editor';
 
 export default function useDescriptions() {
   const node = useViewStore(state => state.node);
@@ -85,8 +86,14 @@ export default function useDescriptions() {
       key: 'body',
       label: '内容',
       children: (
-        <div>
-          {body?.body}
+        <div className="oic-post-content">
+          <MDEditor.Markdown
+            source={body?.body}
+            style={{
+              whiteSpace: 'pre-wrap',
+              lineHeight: '1',
+            }}
+          />
         </div>
       ),
     },

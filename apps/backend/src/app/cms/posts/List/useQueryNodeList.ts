@@ -1,10 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import {
   DescribeNodeList,
   DescribeNodeListRequestParams,
+  DescribeMultiNodesCategories,
+  DescribeMultiNodesCategoriesRequestParams,
 } from '@/services';
-import { useQuery } from '@tanstack/react-query';
 import { useListStore } from './useListStore';
 import { useMemoizedFn } from 'ahooks';
 
@@ -13,38 +15,52 @@ export function useQueryNodeList() {
   const pager = useListStore((state) => state.pager);
   const setState = useListStore((state) => state.setState);
 
-  const { isFetching, data, refetch } = useQuery({
-    queryKey: ['nodeList'],
-    queryFn: async () => {
-      const params: DescribeNodeListRequestParams = {
-        page: pager?.page,
-        pageSize: pager?.pageSize,
-      };
+  const [loading, setLoading] = useState(false);
 
-      if (filters?.keyword) {
-        params._name = filters.keyword;
+  const fetchNodeListData = useMemoizedFn(async () => {
+    const params: DescribeNodeListRequestParams = {
+      page: pager?.page,
+      pageSize: pager?.pageSize,
+    };
+
+    if (filters?.keyword) {
+      params._name = filters.keyword;
+    }
+
+    const res = await DescribeNodeList(params);
+    return res;
+  });
+
+  const fetchNodeCategories = useMemoizedFn(async (ids: number[]) => {
+    const params: DescribeMultiNodesCategoriesRequestParams = {
+      nids: ids.join(','),
+    };
+    const res = await DescribeMultiNodesCategories(params);
+    return res;
+  });
+
+  const fetchListPageData = useMemoizedFn(async () => {
+    setLoading(true);
+    const nodeRes = await fetchNodeListData();
+    const categoriesRes = await fetchNodeCategories(nodeRes?.nodes?.map(item => item?.nid || 0) || []);
+
+    setState({
+      nodeRes,
+      categoryRes: categoriesRes,
+      pager: {
+        ...pager,
+        total: nodeRes?.total || 0,
       }
-
-      const res = await DescribeNodeList(params);
-
-      setState({
-        pager: {
-          ...pager,
-          total: res?.total || 0,
-        }
-      });
-
-      return res;
-    },
+    });
+    setLoading(false);
   });
 
   const refresh = useMemoizedFn(() => {
-    refetch();
+    fetchListPageData();
   });
 
   return {
-    data,
-    loading: isFetching,
+    loading,
     refresh,
   };
 }

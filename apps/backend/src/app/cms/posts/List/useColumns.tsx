@@ -23,6 +23,13 @@ export default function useColumns() {
       key: 'title',
       title: '标题',
       dataIndex: 'title',
+      width: 200,
+    },
+    {
+      key: 'category',
+      title: '分类',
+      dataIndex: 'categoryName',
+      width: 120,
     },
     {
       key: 'viewed',

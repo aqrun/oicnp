@@ -10,3 +10,11 @@ export const MdContainer = styled.div`
     margin: 0;
   }
 `;
+
+export const ModelContent = styled.div`
+  .oic-post-content {
+    max-height: 600px;
+    overflow-y: auto;
+    padding: 16px;
+  }
+`;

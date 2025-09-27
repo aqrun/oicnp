@@ -30,6 +30,8 @@ export interface NodeModel extends BaseNodeModel {
   publishedAt?: string;
   createdAt?: string;
   updatedAt?: string;
+  categories?: Array<CategoryModel>;
+  tags?: Array<TagModel>;
 }
 
 export interface NodeFieldType extends BaseNodeModel {
@@ -40,6 +42,7 @@ export interface NodeFieldType extends BaseNodeModel {
 
 export interface NodeFilters {
   nid?: number;
+  nids?: string;
   uuid?: string;
   vid?: string;
   bundle?: string;
@@ -88,6 +91,7 @@ export interface DescribeNodeTagsResponseData {
 }
 
 export type DescribeNodeCategoriesRequestParams = NodeFilters;
+
 export interface DescribeNodeCategoriesResponseData {
   categories: Array<CategoryModel>;
 }

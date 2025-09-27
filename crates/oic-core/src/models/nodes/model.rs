@@ -8,7 +8,13 @@ use crate::{
 use loco_rs::prelude::*;
 use sea_orm::{prelude::*, ActiveValue::NotSet, IntoActiveModel, QueryOrder};
 use validator::Validate;
-use super::{CreateNodeReqParams, NodeFilters, UpdateNodeReqParams, DeleteNodeReqParams};
+use super::{
+    CreateNodeReqParams,
+    NodeFilters,
+    UpdateNodeReqParams,
+    DeleteNodeReqParams,
+    NodeDetailModel,
+};
 
 #[async_trait::async_trait]
 impl ActiveModelBehavior for NodeActiveModel {}
@@ -280,6 +286,19 @@ impl NodeModel {
         Ok(categories)
     }
 
+    /// 获取多个node的分类
+    pub async fn find_multi_nodes_categories(
+        db: &DatabaseConnection,
+        nids: &[i64],
+    ) -> ModelResult<Vec<CategoryModel>> {
+        let categories = CategoryEntity::find()
+            .left_join(NodeCategoriesMapEntity)
+            .filter(NodeCategoriesMapColumn::Nid.is_in(nids.to_vec()))
+            .all(db)
+            .await?;
+        Ok(categories)
+    }
+
     /// 根据nid获取标签
     pub async fn find_tags(db: &DatabaseConnection, nid: i64) -> ModelResult<Vec<TagModel>> {
         let tags = TagEntity::find()
@@ -328,5 +347,30 @@ impl NodeModel {
                 Ok(vid)
             }
         }
+    }
+
+    /**
+     * 获取node详细列表
+     */
+    pub async fn find_node_list(db: &DatabaseConnection, params: &NodeFilters) -> ModelResult<Vec<NodeDetailModel>> {
+        let page = params.get_page();
+        let page_size = params.get_page_size();
+        let order = params.get_order();
+        let order_by_str = params.get_order_by();
+
+        let mut q = NodeEntity::find();
+
+        if let Some(x) = params.nid {
+            if x > 0 {
+                q = q.filter(NodeColumn::Nid.eq(x));
+            }
+        }
+        
+        let total = q.clone().count(db).await?;
+        let pager = q.order_by(order_by, order)
+            .paginate(db, page_size);
+        let list = pager.fetch_page(page - 1).await?;
+
+        Ok(list)
     }
 }

@@ -8,6 +8,9 @@ import {
   NodeFilters,
   useFetchNodeAll,
 } from '@/services';
+import {
+  ModelContent,
+} from './index.styled';
 
 /**
  * 查看弹框
@@ -69,17 +72,19 @@ export default function ViewModal() {
       confirmLoading={false}
       cancelText={'关闭'}
       destroyOnClose
-      width={840}
+      width={1200}
       hasOk={false}
     >
-      <Spin
-        spinning={loading}
-      >
-        <Descriptions
-          items={items}
-          column={2}
-        />
-      </Spin>
+      <ModelContent>
+        <Spin
+          spinning={loading}
+        >
+          <Descriptions
+            items={items}
+            column={2}
+          />
+        </Spin>
+      </ModelContent>
     </Modal>
   );
 }
