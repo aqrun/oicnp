@@ -6,7 +6,16 @@ use crate::{
     models::tags::CreateTagReqParams,
 };
 use loco_rs::prelude::*;
-use sea_orm::{prelude::*, ActiveValue::NotSet, IntoActiveModel, QueryOrder};
+use sea_orm::{
+    prelude::*,
+    ActiveValue::NotSet,
+    IntoActiveModel,
+    QueryOrder,
+    JoinType,
+    QuerySelect,
+    sea_query::Alias,
+    Order,
+};
 use validator::Validate;
 use super::{
     CreateNodeReqParams,
@@ -352,13 +361,107 @@ impl NodeModel {
     /**
      * 获取node详细列表
      */
-    pub async fn find_node_list(db: &DatabaseConnection, params: &NodeFilters) -> ModelResult<Vec<NodeDetailModel>> {
+    pub async fn find_node_list(
+        db: &DatabaseConnection,
+        params: &NodeFilters,
+    ) -> ModelResult<(Vec<NodeDetailModel>, u64)> {
         let page = params.get_page();
         let page_size = params.get_page_size();
-        let order = params.get_order();
+        let mut order = params.get_order();
         let order_by_str = params.get_order_by();
 
-        let mut q = NodeEntity::find();
+        let mut order_by = NodeColumn::CreatedAt;
+        order = Order::Desc;
+
+        if order_by_str.eq("title") {
+            order_by = NodeColumn::Title;
+        }
+
+        let mut q = NodeEntity::find()
+            .select_only()
+            .columns([
+                NodeColumn::Nid,
+                NodeColumn::Uuid,
+                NodeColumn::Vid,
+                NodeColumn::Bundle,
+                NodeColumn::Title,
+                NodeColumn::Viewed,
+                NodeColumn::Deleted,
+                NodeColumn::PublishedAt,
+                NodeColumn::CreatedBy,
+                NodeColumn::UpdatedBy,
+                NodeColumn::CreatedAt,
+                NodeColumn::UpdatedAt,
+                NodeColumn::DeletedAt,
+            ])
+            // 指定关联表字段
+            .column_as(NodeBodyColumn::Summary, "summary")
+            .column_as(NodeBodyColumn::SummaryFormat, "summary_format")
+            // .column_as(NodeBodyColumn::Body, "body")
+            // .column_as(NodeBodyColumn::BodyFormat, "body_format")
+            .column_as(CategoryColumn::CatId, "cat_id")
+            .column_as(CategoryColumn::CatVid, "cat_vid")
+            .column_as(CategoryColumn::CatName, "cat_name")
+            .column_as(
+                Expr::col((Alias::new("cu"), UserColumn::Uid)),
+                "author_uid"
+            )
+            .column_as(
+                Expr::col((Alias::new("cu"), UserColumn::Username)),
+                "author_username"
+            )
+            .column_as(
+                Expr::col((Alias::new("cu"), UserColumn::Nickname)),
+                "author_nickname"
+            )
+            .column_as(
+                Expr::col((Alias::new("uu"), UserColumn::Username)),
+                "updated_by_username"
+            )
+            .column_as(
+                Expr::col((Alias::new("uu"), UserColumn::Nickname)),
+                "updated_by_nickname"
+            )
+            .join(
+                JoinType::LeftJoin,
+                NodeEntity::belongs_to(NodeBodyEntity)
+                    .from(NodeColumn::Nid)
+                    .to(NodeBodyColumn::Nid)
+                    .into()
+            )
+            .join(
+                JoinType::LeftJoin,
+                NodeEntity::belongs_to(NodeCategoriesMapEntity)
+                    .from(NodeColumn::Nid)
+                    .to(NodeCategoriesMapColumn::Nid)
+                    .into()
+            )
+            .join(
+                JoinType::LeftJoin,
+                NodeCategoriesMapEntity::belongs_to(CategoryEntity)
+                    .from(NodeCategoriesMapColumn::CatId)
+                    .to(CategoryColumn::CatId)
+                    .into(),
+            )
+            // 关联用户表 指定别名 cu 创建者信息
+            .join_as(
+                JoinType::LeftJoin,
+                NodeEntity::belongs_to(UserEntity)
+                    .from(NodeColumn::CreatedBy)
+                    .to(UserColumn::Uid)
+                    .into(),
+                Alias::new("cu"),
+            )
+            // 关联用户表 指定别名 uu 更新者信息
+            .join_as(
+                JoinType::LeftJoin,
+                NodeEntity::belongs_to(UserEntity)
+                    .from(NodeColumn::UpdatedBy)
+                    .to(UserColumn::Uid)
+                    .into(),
+                Alias::new("uu"),
+            )
+            ;
 
         if let Some(x) = params.nid {
             if x > 0 {
@@ -368,9 +471,10 @@ impl NodeModel {
         
         let total = q.clone().count(db).await?;
         let pager = q.order_by(order_by, order)
+            .into_model::<NodeDetailModel>()
             .paginate(db, page_size);
         let list = pager.fetch_page(page - 1).await?;
 
-        Ok(list)
+        Ok((list, total))
     }
 }

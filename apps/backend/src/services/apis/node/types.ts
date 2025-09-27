@@ -30,6 +30,9 @@ export interface NodeModel extends BaseNodeModel {
   publishedAt?: string;
   createdAt?: string;
   updatedAt?: string;
+  catId?: number;
+  catVid?: string;
+  catName?: string;
   categories?: Array<CategoryModel>;
   tags?: Array<TagModel>;
 }

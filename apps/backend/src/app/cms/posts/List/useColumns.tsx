@@ -23,12 +23,12 @@ export default function useColumns() {
       key: 'title',
       title: '标题',
       dataIndex: 'title',
-      width: 200,
+      width: 260,
     },
     {
       key: 'category',
       title: '分类',
-      dataIndex: 'categoryName',
+      dataIndex: 'catName',
       width: 120,
     },
     {
@@ -49,7 +49,7 @@ export default function useColumns() {
     {
       key: 'createdBy',
       title: '创建者',
-      dataIndex: 'createdBy',
+      dataIndex: 'authorNickname',
       width: 200,
     },
     {

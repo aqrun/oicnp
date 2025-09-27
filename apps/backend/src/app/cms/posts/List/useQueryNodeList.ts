@@ -4,8 +4,6 @@ import { useState } from 'react';
 import {
   DescribeNodeList,
   DescribeNodeListRequestParams,
-  DescribeMultiNodesCategories,
-  DescribeMultiNodesCategoriesRequestParams,
 } from '@/services';
 import { useListStore } from './useListStore';
 import { useMemoizedFn } from 'ahooks';
@@ -31,22 +29,12 @@ export function useQueryNodeList() {
     return res;
   });
 
-  const fetchNodeCategories = useMemoizedFn(async (ids: number[]) => {
-    const params: DescribeMultiNodesCategoriesRequestParams = {
-      nids: ids.join(','),
-    };
-    const res = await DescribeMultiNodesCategories(params);
-    return res;
-  });
-
   const fetchListPageData = useMemoizedFn(async () => {
     setLoading(true);
     const nodeRes = await fetchNodeListData();
-    const categoriesRes = await fetchNodeCategories(nodeRes?.nodes?.map(item => item?.nid || 0) || []);
-
+    
     setState({
       nodeRes,
-      categoryRes: categoriesRes,
       pager: {
         ...pager,
         total: nodeRes?.total || 0,

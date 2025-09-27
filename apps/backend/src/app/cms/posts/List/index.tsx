@@ -94,6 +94,11 @@ export default function TagList(): JSX.Element {
   });
 
   useEffect(() => {
+    refresh();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     if (refreshToken) {
       refresh();
     }

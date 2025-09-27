@@ -1,3 +1,4 @@
+use sea_orm::FromQueryResult;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 use oic_derives::{add_filter_fields, FilterParams};
@@ -155,7 +156,7 @@ pub type UpdateNodeReqParams = NodeReqParams;
 /// 删除数据参数
 pub type DeleteNodeReqParams = NodeReqParams;
 
-#[derive(Deserialize, Serialize, Debug, Validate, Default, Clone)]
+#[derive(Deserialize, Serialize, Debug, Validate, Default, Clone, FromQueryResult)]
 #[serde(default)]
 pub struct NodeDetailModel {
     pub nid: i64,
@@ -182,9 +183,23 @@ pub struct NodeDetailModel {
     #[serde(rename(deserialize = "summaryFormat", serialize = "summaryFormat"))]
     pub summary_format: String,
     #[serde(rename(deserialize = "body", serialize = "body"))]
-    pub body: String,
+    pub body: Option<String>,
     #[serde(rename(deserialize = "bodyFormat", serialize = "bodyFormat"))]
-    pub body_format: String,
-    pub categories: Vec<CategoryModel>,
-    pub tags: Vec<TagModel>,
+    pub body_format: Option<String>,
+    #[serde(rename(deserialize = "catId", serialize = "catId"))]
+    pub cat_id: i64,
+    #[serde(rename(deserialize = "catVid", serialize = "catVid"))]
+    pub cat_vid: String,
+    #[serde(rename(deserialize = "catName", serialize = "catName"))]
+    pub cat_name: String,
+    #[serde(rename(deserialize = "authorUid", serialize = "authorUid"))]
+    pub author_uid: Option<i64>,
+    #[serde(rename(deserialize = "authorUsername", serialize = "authorUsername"))]
+    pub author_username: Option<String>,
+    #[serde(rename(deserialize = "authorNickname", serialize = "authorNickname"))]
+    pub author_nickname: Option<String>,
+    #[serde(rename(deserialize = "updatedByUsername", serialize = "updatedByUsername"))]
+    pub updated_by_username: Option<String>,
+    #[serde(rename(deserialize = "updatedByNickname", serialize = "updatedByNickname"))]
+    pub updated_by_nickname: Option<String>,
 }

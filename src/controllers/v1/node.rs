@@ -7,6 +7,7 @@ use oic_core::{
         UpdateNodeReqParams,
         DeleteNodeReqParams,
         NodeFilters,
+        NodeDetailModel,
     },
     utils::get_api_prefix,
     typings::{JsonRes, Pagination},
@@ -36,8 +37,8 @@ pub async fn get_one(
 pub async fn list(
     State(ctx): State<AppContext>,
     Json(params): Json<NodeFilters>,
-) -> JsonRes<Vec<NodeModel>> {
-    let (nodes, total) = match NodeModel::find_list(&ctx.db, &params).await {
+) -> JsonRes<Vec<NodeDetailModel>> {
+    let (nodes, total) = match NodeModel::find_node_list(&ctx.db, &params).await {
         Ok(res) => res,
         Err(err) => return JsonRes::err(err),
     };
@@ -112,25 +113,6 @@ pub async fn categories(
 }
 
 #[debug_handler]
-pub async fn get_multi_nodes_categories(
-    State(ctx): State<AppContext>,
-    Json(params): Json<NodeFilters>,
-) -> JsonRes<Vec<CategoryModel>> {
-    let nids = params.nids.unwrap_or(String::from(""));
-    let nids = nids.split(",").map(|x| x.parse::<i64>().unwrap()).collect::<Vec<i64>>();
-    let res = NodeModel::find_multi_nodes_categories(&ctx.db, nids.as_slice()).await;
-
-    match res {
-        Ok(data) => {
-            JsonRes::from((data, "categories"))
-        },
-        Err(err) => {
-            JsonRes::err(err)
-        }
-    }
-}
-
-#[debug_handler]
 pub async fn tags(
     State(ctx): State<AppContext>,
     Json(params): Json<NodeFilters>,
@@ -177,7 +159,6 @@ pub fn routes() -> Routes {
         .add("/update", post(update))
         .add("/remove", post(remove))
         .add("/categories", post(categories))
-        .add("/multi-nodes-categories", post(get_multi_nodes_categories))
         .add("/tags", post(tags))
         .add("/body", post(find_node_body))
 }
