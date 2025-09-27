@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use crate::{
     entities::prelude::*,
     utils::catch_err,
@@ -14,7 +15,6 @@ use sea_orm::{
     JoinType,
     QuerySelect,
     sea_query::Alias,
-    Order,
 };
 use validator::Validate;
 use super::{
@@ -295,18 +295,6 @@ impl NodeModel {
         Ok(categories)
     }
 
-    /// 获取多个node的分类
-    pub async fn find_multi_nodes_categories(
-        db: &DatabaseConnection,
-        nids: &[i64],
-    ) -> ModelResult<Vec<CategoryModel>> {
-        let categories = CategoryEntity::find()
-            .left_join(NodeCategoriesMapEntity)
-            .filter(NodeCategoriesMapColumn::Nid.is_in(nids.to_vec()))
-            .all(db)
-            .await?;
-        Ok(categories)
-    }
 
     /// 根据nid获取标签
     pub async fn find_tags(db: &DatabaseConnection, nid: i64) -> ModelResult<Vec<TagModel>> {
@@ -317,6 +305,76 @@ impl NodeModel {
             .await?;
 
         Ok(tags)
+    }
+
+    /// 批量获取多个node的分类
+    pub async fn find_multi_nodes_categories(
+        db: &DatabaseConnection,
+        nids: &[i64],
+    ) -> ModelResult<Vec<(i64, CategoryModel)>> {
+        if nids.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        let categories = CategoryEntity::find()
+            .left_join(NodeCategoriesMapEntity)
+            .filter(NodeCategoriesMapColumn::Nid.is_in(nids.to_vec()))
+            .select_also(NodeCategoriesMapEntity)
+            .all(db)
+            .await?;
+
+        let mut result = Vec::new();
+        for (category, map) in categories {
+            if let Some(map) = map {
+                result.push((map.nid, category));
+            }
+        }
+
+        Ok(result)
+    }
+
+    /// 批量获取多个node的标签
+    pub async fn find_multi_nodes_tags(
+        db: &DatabaseConnection,
+        nids: &[i64],
+    ) -> ModelResult<Vec<(i64, TagModel)>> {
+        if nids.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        let tags = TagEntity::find()
+            .left_join(NodeTagsMapEntity)
+            .filter(NodeTagsMapColumn::Nid.is_in(nids.to_vec()))
+            .select_also(NodeTagsMapEntity)
+            .all(db)
+            .await?;
+
+        let mut result = Vec::new();
+        for (tag, map) in tags {
+            if let Some(map) = map {
+                result.push((map.nid, tag));
+            }
+        }
+
+        Ok(result)
+    }
+
+    /// 批量获取多个node的内容
+    pub async fn find_multi_nodes_body(
+        db: &DatabaseConnection,
+        nids: &[i64],
+    ) -> ModelResult<Vec<(i64, NodeBodyModel)>> {
+        if nids.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        let node_bodies = NodeBodyEntity::find()
+            .filter(NodeBodyColumn::Nid.is_in(nids.to_vec()))
+            .all(db)
+            .await?;
+
+        let result = node_bodies.into_iter().map(|body| (body.nid, body)).collect();
+        Ok(result)
     }
 
     pub async fn find_node_body(db: &DatabaseConnection, nid: i64) -> ModelResult<NodeBodyModel> {
@@ -367,15 +425,16 @@ impl NodeModel {
     ) -> ModelResult<(Vec<NodeDetailModel>, u64)> {
         let page = params.get_page();
         let page_size = params.get_page_size();
-        let mut order = params.get_order();
         let order_by_str = params.get_order_by();
 
-        let mut order_by = NodeColumn::CreatedAt;
-        order = Order::Desc;
-
-        if order_by_str.eq("title") {
-            order_by = NodeColumn::Title;
-        }
+        // 设置排序字段和顺序
+        let order = params.get_order();
+        let order_by = match order_by_str.as_str() {
+            "title" => NodeColumn::Title,
+            "updated_at" => NodeColumn::UpdatedAt,
+            "viewed" => NodeColumn::Viewed,
+            _ => NodeColumn::CreatedAt, // 默认按创建时间
+        };
 
         let mut q = NodeEntity::find()
             .select_only()
@@ -397,11 +456,8 @@ impl NodeModel {
             // 指定关联表字段
             .column_as(NodeBodyColumn::Summary, "summary")
             .column_as(NodeBodyColumn::SummaryFormat, "summary_format")
-            // .column_as(NodeBodyColumn::Body, "body")
-            // .column_as(NodeBodyColumn::BodyFormat, "body_format")
-            .column_as(CategoryColumn::CatId, "cat_id")
-            .column_as(CategoryColumn::CatVid, "cat_vid")
-            .column_as(CategoryColumn::CatName, "cat_name")
+            .column_as(NodeBodyColumn::Body, "body")
+            .column_as(NodeBodyColumn::BodyFormat, "body_format")
             .column_as(
                 Expr::col((Alias::new("cu"), UserColumn::Uid)),
                 "author_uid"
@@ -429,20 +485,6 @@ impl NodeModel {
                     .to(NodeBodyColumn::Nid)
                     .into()
             )
-            .join(
-                JoinType::LeftJoin,
-                NodeEntity::belongs_to(NodeCategoriesMapEntity)
-                    .from(NodeColumn::Nid)
-                    .to(NodeCategoriesMapColumn::Nid)
-                    .into()
-            )
-            .join(
-                JoinType::LeftJoin,
-                NodeCategoriesMapEntity::belongs_to(CategoryEntity)
-                    .from(NodeCategoriesMapColumn::CatId)
-                    .to(CategoryColumn::CatId)
-                    .into(),
-            )
             // 关联用户表 指定别名 cu 创建者信息
             .join_as(
                 JoinType::LeftJoin,
@@ -463,18 +505,118 @@ impl NodeModel {
             )
             ;
 
+        // 应用过滤条件
         if let Some(x) = params.nid {
             if x > 0 {
                 q = q.filter(NodeColumn::Nid.eq(x));
             }
         }
+
+        if let Some(x) = &params.title {
+            if !x.is_empty() {
+                q = q.filter(NodeColumn::Title.contains(x));
+            }
+        }
+
+        if let Some(x) = &params.bundle {
+            if !x.is_empty() {
+                q = q.filter(NodeColumn::Bundle.eq(x));
+            }
+        }
+
+        if let Some(x) = &params.vid {
+            if !x.is_empty() {
+                q = q.filter(NodeColumn::Vid.eq(x));
+            }
+        }
+
+        if let Some(x) = &params.deleted {
+            if !x.is_empty() {
+                q = q.filter(NodeColumn::Deleted.eq(x));
+            }
+        }
+
+        if let Some(x) = params.created_by {
+            if x > 0 {
+                q = q.filter(NodeColumn::CreatedBy.eq(x));
+            }
+        }
         
         let total = q.clone().count(db).await?;
         let pager = q.order_by(order_by, order)
-            .into_model::<NodeDetailModel>()
             .paginate(db, page_size);
-        let list = pager.fetch_page(page - 1).await?;
+        let nodes: Vec<NodeModel> = pager.fetch_page(page - 1).await?;
 
-        Ok((list, total))
+        if nodes.is_empty() {
+            return Ok((Vec::new(), total));
+        }
+
+        // 收集所有 nid
+        let nids: Vec<i64> = nodes.iter().map(|node| node.nid).collect();
+
+        // 批量查询所有关联数据
+        let (node_bodies, categories, tags) = tokio::try_join!(
+            Self::find_multi_nodes_body(db, &nids),
+            Self::find_multi_nodes_categories(db, &nids),
+            Self::find_multi_nodes_tags(db, &nids)
+        )?;
+
+        // 将关联数据按 nid 分组，使用 HashMap 提高查找效率
+        
+        let body_map: HashMap<i64, NodeBodyModel> = node_bodies.into_iter().collect();
+        
+        let mut categories_map: HashMap<i64, Vec<CategoryModel>> = HashMap::new();
+        for (nid, category) in categories {
+            categories_map.entry(nid).or_insert_with(Vec::new).push(category);
+        }
+        
+        let mut tags_map: HashMap<i64, Vec<TagModel>> = HashMap::new();
+        for (nid, tag) in tags {
+            tags_map.entry(nid).or_insert_with(Vec::new).push(tag);
+        }
+
+        // 转换为 NodeDetailModel
+        let mut result = Vec::new();
+        for node in nodes {
+            let nid = node.nid;
+            
+            // 获取 node_body，如果没有则使用默认值
+            let node_body = body_map.get(&nid).cloned().unwrap_or_default();
+
+            // 获取分类和标签，如果没有则使用空数组
+            let node_categories = categories_map.get(&nid).cloned().unwrap_or_default();
+            let node_tags = tags_map.get(&nid).cloned().unwrap_or_default();
+
+            let node_detail = NodeDetailModel {
+                nid: node.nid,
+                vid: node.vid,
+                uuid: node.uuid,
+                bundle: node.bundle,
+                title: node.title,
+                viewed: node.viewed,
+                deleted: node.deleted,
+                published_at: node.published_at,
+                created_by: node.created_by,
+                updated_by: node.updated_by,
+                created_at: node.created_at,
+                updated_at: node.updated_at,
+                deleted_at: node.deleted_at,
+                summary: node_body.summary,
+                summary_format: node_body.summary_format,
+                body: Some(node_body.body),
+                body_format: Some(node_body.body_format),
+                author_uid: Some(node.created_by),
+                author_username: None, // 这些需要从用户表查询
+                author_nickname: None,
+                updated_by_username: None,
+                updated_by_nickname: None,
+                categories: node_categories,
+                tags: node_tags,
+            };
+
+            result.push(node_detail);
+        }
+
+        Ok((result, total))
     }
 }

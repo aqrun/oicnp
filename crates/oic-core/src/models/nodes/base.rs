@@ -1,4 +1,3 @@
-use sea_orm::FromQueryResult;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 use oic_derives::{add_filter_fields, FilterParams};
@@ -156,7 +155,7 @@ pub type UpdateNodeReqParams = NodeReqParams;
 /// 删除数据参数
 pub type DeleteNodeReqParams = NodeReqParams;
 
-#[derive(Deserialize, Serialize, Debug, Validate, Default, Clone, FromQueryResult)]
+#[derive(Deserialize, Serialize, Debug, Validate, Default, Clone)]
 #[serde(default)]
 pub struct NodeDetailModel {
     pub nid: i64,
@@ -186,12 +185,6 @@ pub struct NodeDetailModel {
     pub body: Option<String>,
     #[serde(rename(deserialize = "bodyFormat", serialize = "bodyFormat"))]
     pub body_format: Option<String>,
-    #[serde(rename(deserialize = "catId", serialize = "catId"))]
-    pub cat_id: i64,
-    #[serde(rename(deserialize = "catVid", serialize = "catVid"))]
-    pub cat_vid: String,
-    #[serde(rename(deserialize = "catName", serialize = "catName"))]
-    pub cat_name: String,
     #[serde(rename(deserialize = "authorUid", serialize = "authorUid"))]
     pub author_uid: Option<i64>,
     #[serde(rename(deserialize = "authorUsername", serialize = "authorUsername"))]
@@ -202,4 +195,7 @@ pub struct NodeDetailModel {
     pub updated_by_username: Option<String>,
     #[serde(rename(deserialize = "updatedByNickname", serialize = "updatedByNickname"))]
     pub updated_by_nickname: Option<String>,
+    // 分类和标签数组
+    pub categories: Vec<crate::entities::category::Model>,
+    pub tags: Vec<crate::entities::tag::Model>,
 }

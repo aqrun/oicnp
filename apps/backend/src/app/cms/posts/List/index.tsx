@@ -30,15 +30,8 @@ export default function TagList(): JSX.Element {
 
   const getDataSource = () => {
     const list = nodeRes?.nodes || [];
-    const newList = list.map((item) => {
-      const data: NodeModel = {
-        ...item,
-        categories: [],
-        tags: [],
-      };
-      return data;
-    });
-    return newList;
+
+    return list;
   };
   const dataSource = getDataSource();
 

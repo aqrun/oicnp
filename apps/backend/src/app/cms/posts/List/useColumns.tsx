@@ -1,8 +1,13 @@
 'use client';
 
+import { Tag } from 'antd';
 import type { TableProps} from 'antd';
 import TableActions from './TableActions';
-import { NodeModel } from '@/services';
+import {
+  NodeModel,
+  CategoryModel,
+  TagModel,
+} from '@/services';
 import { formatDate } from '@/utils';
 
 export default function useColumns() {
@@ -28,8 +33,28 @@ export default function useColumns() {
     {
       key: 'category',
       title: '分类',
-      dataIndex: 'catName',
+      dataIndex: 'categories',
       width: 120,
+      render: (value: CategoryModel[]) => {
+        return value?.[0]?.catName;
+      }
+    },
+    {
+      key: 'tags',
+      title: '标签',
+      dataIndex: 'tags',
+      width: 220,
+      render: (value: TagModel[]) => {
+        return (
+          <div>
+            {value?.map((tag) => (
+              <Tag key={tag.tagId}>
+                {tag.tagName}
+              </Tag>
+            ))}
+          </div>
+        );
+      }
     },
     {
       key: 'viewed',
