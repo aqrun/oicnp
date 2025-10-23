@@ -3,6 +3,7 @@
 import { Tag } from 'antd';
 import type { TableProps} from 'antd';
 import TableActions from './TableActions';
+import { CLASS_PREFIX } from '@/constants';
 import {
   NodeModel,
   CategoryModel,
@@ -48,7 +49,10 @@ export default function useColumns() {
         return (
           <div>
             {value?.map((tag) => (
-              <Tag key={tag.tagId}>
+              <Tag
+                key={tag.tagId}
+                className={`${CLASS_PREFIX}-list-tag`}
+              >
                 {tag.tagName}
               </Tag>
             ))}

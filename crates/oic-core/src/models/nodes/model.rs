@@ -15,6 +15,7 @@ use sea_orm::{
     JoinType,
     QuerySelect,
     sea_query::Alias,
+    Order,
 };
 use validator::Validate;
 use super::{
@@ -428,7 +429,8 @@ impl NodeModel {
         let order_by_str = params.get_order_by();
 
         // 设置排序字段和顺序
-        let order = params.get_order();
+        let mut order = params.get_order();
+        order = Order::Desc;
         let order_by = match order_by_str.as_str() {
             "title" => NodeColumn::Title,
             "updated_at" => NodeColumn::UpdatedAt,
@@ -456,8 +458,8 @@ impl NodeModel {
             // 指定关联表字段
             .column_as(NodeBodyColumn::Summary, "summary")
             .column_as(NodeBodyColumn::SummaryFormat, "summary_format")
-            .column_as(NodeBodyColumn::Body, "body")
-            .column_as(NodeBodyColumn::BodyFormat, "body_format")
+            // .column_as(NodeBodyColumn::Body, "body")
+            // .column_as(NodeBodyColumn::BodyFormat, "body_format")
             .column_as(
                 Expr::col((Alias::new("cu"), UserColumn::Uid)),
                 "author_uid"
@@ -539,6 +541,52 @@ impl NodeModel {
         if let Some(x) = params.created_by {
             if x > 0 {
                 q = q.filter(NodeColumn::CreatedBy.eq(x));
+            }
+        }
+
+        // 按分类查询
+        if let Some(category_vids) = &params.category_vids {
+            if !category_vids.is_empty() {
+                q = q
+                    .inner_join(NodeCategoriesMapEntity)
+                    .inner_join(CategoryEntity)
+                    .filter(CategoryColumn::CatVid.is_in(category_vids.clone()));
+            }
+        }
+
+        if let Some(category_ids) = &params.category_ids {
+            if !category_ids.is_empty() {
+                q = q
+                    .inner_join(NodeCategoriesMapEntity)
+                    .filter(NodeCategoriesMapColumn::CatId.is_in(category_ids.clone()));
+            }
+        }
+
+        // 按标签查询
+        if let Some(tag_vids) = &params.tag_vids {
+            if !tag_vids.is_empty() {
+                // 先通过标签表获取对应的 tag_ids
+                let tag_ids: Vec<i64> = TagEntity::find()
+                    .filter(TagColumn::TagVid.is_in(tag_vids.clone()))
+                    .select_only()
+                    .column(TagColumn::TagId)
+                    .into_tuple()
+                    .all(db)
+                    .await?;
+                
+                if !tag_ids.is_empty() {
+                    q = q
+                        .inner_join(NodeTagsMapEntity)
+                        .filter(NodeTagsMapColumn::TagId.is_in(tag_ids));
+                }
+            }
+        }
+
+        if let Some(tag_ids) = &params.tag_ids {
+            if !tag_ids.is_empty() {
+                q = q
+                    .inner_join(NodeTagsMapEntity)
+                    .filter(NodeTagsMapColumn::TagId.is_in(tag_ids.clone()));
             }
         }
         

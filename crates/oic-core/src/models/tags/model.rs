@@ -6,7 +6,7 @@ use crate::{
 };
 use loco_rs::prelude::*;
 use loco_rs::model::{ModelError, ModelResult};
-use sea_orm::{prelude::*, IntoActiveModel, QueryOrder};
+use sea_orm::{prelude::*, IntoActiveModel, QueryOrder, Order};
 use validator::Validate;
 use super::{CreateTagReqParams, TagFilters, UpdateTagReqParams, DeleteTagReqParams};
 
@@ -64,7 +64,7 @@ impl ModelCrudHandler for TagModel {
     async fn find_list(db: &DatabaseConnection, params: &Self::FilterParams) -> ModelResult<(Vec<Self>, u64)> {
         let page = params.get_page();
         let page_size = params.get_page_size();
-        let order = params.get_order();
+        let mut order = params.get_order();
         let order_by_str = params.get_order_by();
 
         let mut q = TagEntity::find();
@@ -81,7 +81,8 @@ impl ModelCrudHandler for TagModel {
             }
         }
 
-        let mut order_by = TagColumn::TagId;
+        let mut order_by = TagColumn::TagCount;
+        order = Order::Desc;
 
         if order_by_str.eq("tag_name") {
             order_by = TagColumn::TagName;  
