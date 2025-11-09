@@ -13,12 +13,12 @@ export default function useColumns() {
       dataIndex: 'id',
       width: 80,
     }, 
-    {
-      key: 'pid',
-      title: '父级',
-      dataIndex: 'pid',
-      width: 80,
-    },
+    // {
+    //   key: 'pid',
+    //   title: '父级',
+    //   dataIndex: 'pid',
+    //   width: 80,
+    // },
     {
       key: 'name',
       title: '名称',

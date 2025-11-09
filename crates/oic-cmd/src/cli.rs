@@ -42,7 +42,7 @@ pub enum Command {
     InitSeed,
 
     /// 初始化数据
-    SeedData,
+    /// SeedData,
 
     /// 启动接口服务
     ///
@@ -102,11 +102,11 @@ pub async fn init_cmd() {
                 log::error!("InitSeedErr: {}", err);
             }
         },
-        Command::SeedData => {
-            if let Err(err) = cmd::seed_data::run(&app_ctx).await {
-                log::error!("SeedDataErr: {}", err);
-            }
-        },
+        // Command::SeedData => {
+        //     if let Err(err) = cmd::seed_data::run(&app_ctx).await {
+        //         log::error!("SeedDataErr: {}", err);
+        //     }
+        // },
         Command::Serve => {
             let _ = oic_web::app::run().await;
         },
