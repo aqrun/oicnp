@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Form, Input, Button, Checkbox } from 'antd';
 import { CLASS_PREFIX } from '@/constants';
 import cls from 'clsx';
-import { setSession } from './loginAction';
+import { setSession } from '@/services/auth';
 import {
   useFetchCaptcha,
   AuthCaptcha,

@@ -17,14 +17,14 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   // 获取全局配置参数
-  const res = await getConsoleConfig();
+  const configRes = await getConsoleConfig();
 
   return (
     <html lang="en">
       <body>
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.CONSOLE_CONFIG = ${JSON.stringify(res?.config || {})};`,
+            __html: `window.CONSOLE_CONFIG = ${JSON.stringify(configRes?.config || {})};`,
           }}
         />
         

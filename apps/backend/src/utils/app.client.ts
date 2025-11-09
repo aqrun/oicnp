@@ -25,7 +25,7 @@ export function setHashState(payload: HashState = {}) {
     pathArr.push(subRoute);
   }
 
-  let hashStr = location.hash;
+  const hashStr = location.hash;
   const urlHash = new URLHash(hashStr);
   urlHash.setPathName(pathArr.join('/'))
     .addParams(params);
@@ -39,7 +39,7 @@ export function setHashState(payload: HashState = {}) {
 export function parseHashState(): HashState {
   if (typeof window === 'undefined') return {};
 
-  let hashStr = location.hash;
+  const hashStr = location.hash;
   const urlHash = new URLHash(hashStr);
 
   const pathArr = urlHash.pathName?.split('/');
