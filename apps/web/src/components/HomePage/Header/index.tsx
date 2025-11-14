@@ -14,16 +14,23 @@ export const Header = () => {
             <a
               href='/'
               aria-current='page'
-              className='relative bg-[#00000000] no-underline hover:outline-0 max-[991px]:mr-auto max-[767px]:pl-0 text-2xl lg:text-3xl font-bold text-gray-800'
+              className='relative bg-[#00000000] no-underline hover:outline-0 max-[991px]:mr-auto max-[767px]:pl-0 text-2xl lg:text-3xl font-bold text-gray-800 flex items-center hover:text-[var(--primary)]'
               aria-label='home'
             >
-              {/* <img
-                src='https://assets.website-files.com/6357722e2a5f19121d37f84d/6357722e2a5f198e9637f855_Group%2047874-2.png'
+              <img
+                src='/favicon/logo.png'
                 loading='lazy'
                 alt=''
-                className='inline-block max-h-6 max-w-full'
-              /> */}
-              光鹿跑冰
+                className='inline-block max-h-8 max-w-full'
+              />
+              <span className="flex flex-col ml-1">
+                <span className="">
+                  灵犀纪
+                </span>
+                {/* <span className='text-[12px] text-gray-400 font-normal'>
+                  LXAGE.COM
+                </span> */}
+              </span>
             </a>
             <div className='absolute right-4 top-7 lg:hidden'>
               <MenuToggleButton />

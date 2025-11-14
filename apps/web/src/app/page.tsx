@@ -7,7 +7,7 @@ import { getNodes } from '@/utils';
 import { HomePage as BaseHomePage } from './HomePage';
 
 export const metadata: Metadata = {
-  title: `子十个人博客 | ${siteConfig.title}`,
+  title: '灵犀纪 - 心有灵犀，专注技术分享', // `灵犀纪 | ${siteConfig.title}`,
   description: siteConfig.description,
 };
 

@@ -1,9 +1,9 @@
 export const siteConfig = {
-  title: '光鹿跑冰',
+  title: '灵犀纪',
   description:
-    '子十个人博客,光鹿跑冰,rust语言开发,服务器,html,css,js,nextjs,tailwindcss',
+    '灵犀纪,rust语言开发,服务器,html,css,js,nextjs,tailwindcss',
   /** Without additional '/' on the end*/
-  url: 'https://aqrun.com',
+  url: 'https://www.lxage.com',
 };
 
 /** 首页文章列表每页显示条数 */

@@ -1,3 +1,5 @@
+import { siteConfig } from '@/constant/config';
+
 export const Footer = () => {
   return (
     <section className='oic-page-footer overflow-x-hidden'>
@@ -8,7 +10,7 @@ export const Footer = () => {
           <div>
             {/* <!-- LOGO --> */}
             <a href='/' className='inline-block max-w-full font-bold text-2xl'>
-              光鹿跑冰
+              {siteConfig?.title}
             </a>
             <p className='font-inter mt-4 max-w-[350px] text-base font-light text-gray-500'>
               两个黄鹂鸣翠柳，一行白鹭上青天。窗含西岭千秋雪，门泊东吴万里船
@@ -130,7 +132,7 @@ export const Footer = () => {
         <div className='layout'>
           <p className='font-inter lg:text-center text-sm text-gray-500'>
             © Copyright 2014&nbsp;-&nbsp;{new Date().getFullYear()} &nbsp;
-            光鹿跑冰
+            {siteConfig?.title}
           </p>
           <nav className='font-inter lg:text-center text-sm text-gray-500'>
             <ul className='flex flex-row justify-start lg:justify-center items-center'>
