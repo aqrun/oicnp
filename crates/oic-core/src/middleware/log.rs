@@ -161,10 +161,16 @@ async fn add_operation_log(
 
     let ctx: AppContext = AppContext::from_ref(&state);
     let default_settings = std::sync::Arc::new(Settings::default());
-    let _settings = match ctx.shared_store.get::<Arc<Settings>>() {
+    let settings = match ctx.shared_store.get::<Arc<Settings>>() {
         Some(s) => s,
         None => default_settings,
     };
+    let not_auth_uris = settings.public_apis.clone();
+
+    // 白名单接口不记录日志
+    if not_auth_uris.contains(&uri) {
+        return Ok(());
+    }
 
     let jwt = JWTWithUser::<UserModel>::from_request_parts(&mut parts, &state).await?;
     let client = ClientInfo::from_request_parts(&mut parts, &state).await?;

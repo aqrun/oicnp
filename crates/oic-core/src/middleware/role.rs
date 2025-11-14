@@ -1,6 +1,7 @@
 use std::{
     convert::Infallible,
     task::{Context, Poll},
+    sync::Arc,
 };
 
 use axum::{
@@ -19,6 +20,7 @@ use tower::{Layer, Service};
 use crate::entities::prelude::*;
 use crate::typings::JsonRes;
 use crate::services::permission::check_is_public_api;
+use crate::services::settings::Settings;
 
 #[derive(Clone)]
 pub struct RoleRouteLayer {
@@ -92,26 +94,21 @@ where
         // take the service that was ready
         let mut inner = std::mem::replace(&mut self.inner, clone);
 
+        let default_settings = Arc::new(Settings::default());
+        let settings = match ctx.shared_store.get::<Arc<Settings>>() {
+            Some(s) => s,
+            None => default_settings,
+        };
+
         Box::pin(async move {
             // Example of extracting JWT and checking roles
             let (mut parts, body) = req.into_parts();
             // 当前 URL /v1/info
             let uri = String::from(parts.uri.path());
-
-            let not_auth_uris = vec![
-                "/v1/info",
-                "/v1/console-config",
-                "/v1/captcha",
-                "/v1/auth/login",
-                "/v1/auth/register",
-                "/v1/auth/info",
-                "/v1/user/one",
-                "/v1/menu/tree",
-            ];
-
+            let not_auth_uris = settings.public_apis.clone();
             let req = Request::from_parts(parts.clone(), body);
-
-            if not_auth_uris.contains(&uri.as_str()) {
+            
+            if not_auth_uris.contains(&uri) {
                 // 不需要权限检测
                 return inner.call(req).await;
             }

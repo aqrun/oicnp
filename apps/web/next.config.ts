@@ -5,8 +5,8 @@ const nextConfig = {
     dirs: ['src'],
   },
 
-  reactStrictMode: true,
-  swcMinify: true,
+  // reactStrictMode: true,
+  // swcMinify: true,
 
   // Uncoment to add domain whitelist
   images: {

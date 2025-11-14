@@ -1,0 +1,38 @@
+{
+  "name": "@repo/services",
+  "type": "module",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc"
+  },
+  "exports": {
+    "./consts": {
+      "types": "./src/consts.ts",
+      "default": "./dist/consts.js"
+    },
+    "./request": {
+      "types": "./src/request.ts",
+      "default": "./dist/request.js"
+    },
+    "./action_request": {
+      "types": "./src/action_request.ts",
+      "default": "./dist/action_request.js"
+    },
+    "./types": {
+      "types": "./src/types.ts",
+      "default": "./dist/types.js"
+    },
+    "./useFetchStore": {
+      "types": "./src/useFetchStore.ts",
+      "default": "./dist/useFetchStore.js"
+    }
+  },
+  "devDependencies": {
+    "zustand": "^5.0.2",
+    "@repo/config-typescript": "workspace:*",
+    "axios": "^1.7.7",
+    "js-cookie": "^3.0.5",
+    "@types/js-cookie": "^3.0.6",
+    "typescript": "latest"
+  }
+}

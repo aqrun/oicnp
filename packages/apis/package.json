@@ -1,0 +1,32 @@
+{
+  "name": "@repo/apis",
+  "type": "module",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc"
+  },
+  "exports": {
+    "./client": {
+      "types": "./src/client.ts",
+      "default": "./dist/client.js"
+    },
+    "./server": {
+      "types": "./src/server.ts",
+      "default": "./dist/server.js"
+    }
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.1",
+    "@repo/services": "workspace:*",
+    "@repo/config-typescript": "workspace:*",
+    "dayjs": "^1.11.13",
+    "ahooks": "^3.1.1",
+    "react": "^18.3.1",
+    "typescript": "latest"
+  },
+  "peerDependencies": {
+    "dayjs": "^1.11.13",
+    "react": "^18.3.1",
+    "ahooks": "^3.1.1"
+  }
+}

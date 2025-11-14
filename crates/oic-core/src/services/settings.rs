@@ -6,6 +6,8 @@ pub struct Settings {
     pub storage: StorageSettings,
     /// 正则路径
     pub user_agent_parser: String,
+    /// 白名单接口
+    pub public_apis: Vec<String>,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Default, Clone)]

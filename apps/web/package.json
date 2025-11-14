@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@repo/apis": "workspace:*",
+    "@repo/services": "workspace:*",
     "@heroicons/react": "^2.1.1",
     "@mdx-js/loader": "^3.0.0",
     "@mdx-js/react": "^3.0.0",

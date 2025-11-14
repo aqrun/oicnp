@@ -651,8 +651,8 @@ impl NodeModel {
                 deleted_at: node.deleted_at,
                 summary: node_body.summary,
                 summary_format: node_body.summary_format,
-                body: Some(node_body.body),
-                body_format: Some(node_body.body_format),
+                // body: Some(node_body.body),
+                // body_format: Some(node_body.body_format),
                 author_uid: Some(node.created_by),
                 author_username: None, // 这些需要从用户表查询
                 author_nickname: None,
@@ -660,6 +660,7 @@ impl NodeModel {
                 updated_by_nickname: None,
                 categories: node_categories,
                 tags: node_tags,
+                ..Default::default()
             };
 
             result.push(node_detail);

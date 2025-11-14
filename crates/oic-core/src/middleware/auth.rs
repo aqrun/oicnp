@@ -91,14 +91,14 @@ where
                 Ok(claims) => {
                     let user = T::find_by_claims_key(&ctx.db, claims.claims.uuid.as_str())
                         .await
-                        .map_err(|_| Error::Unauthorized("token is not valid".to_string()))?;
+                        .map_err(|_| Error::Unauthorized("01]token is not valid".to_string()))?;
                     Ok(Self {
                         claims: claims.claims,
                         user,
                     })
                 }
                 Err(_err) => {
-                    println!("token is not valid");
+                    println!("02]token is not valid");
                     Ok(empty_res)
                 }
             }
@@ -169,7 +169,7 @@ where
                 claims: claims.claims,
             }),
             Err(_err) => {
-                Err(Error::Unauthorized("token is not valid".to_string()))
+                Err(Error::Unauthorized("03]token is not valid".to_string()))
             }
         }
     }

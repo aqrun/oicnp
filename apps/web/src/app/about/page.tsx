@@ -15,11 +15,12 @@ export const metadata: Metadata = {
 export default async function AboutPage() {
   const file_data = fs.readFileSync(`${pages_path}/about.md`, 'utf-8');
 
-  const Content = await parseMdx(file_data);
+  // const Content = await parseMdx(file_data);
 
   return (
     <NodeDetailPage title='关于我'>
-      <Content />
+      {/* <Content /> */}
+      {file_data}
     </NodeDetailPage>
   );
 }

@@ -111,3 +111,15 @@ settings:
     uri: http://localhost/uploads
     path: /Users/aqrun/workspace/www/uploads
   user_agent_parser: config/regexes.yaml
+  public_apis:
+    - /v1/info
+    - /v1/console-config
+    - /v1/captcha
+    - /v1/auth/login
+    - /v1/auth/register
+    - /v1/auth/info
+    - /v1/user/one
+    - /v1/menu/tree
+    - /v1/node/list
+    - /v1/node/body
+    - /v1/node/one
