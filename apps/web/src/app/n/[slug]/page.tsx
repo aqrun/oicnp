@@ -65,7 +65,7 @@ export default async function NodeDetailPage(props: NodeDetailPageProps) {
       title={node?.data?.title || ''}
       categoryName={category?.name}
       categoryUrl={category?.href}
-      date={formatDate(node?.data?.date)}
+      date={formatDate(node?.createdAt)}
     >
       {/* <Content /> */}
       <div>

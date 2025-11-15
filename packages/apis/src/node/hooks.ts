@@ -9,12 +9,15 @@ import {
   DescribeNodeBodyResponseData,
   DescribeNodeTagsResponseData,
   DescribeNodeCategoriesResponseData,
+  DescribeNodeListRequestParams,
+  DescribeNodeListResponseData,
 } from './types';
 import {
   DescribeNodeDetail,
   DescribeNodeBody,
   DescribeNodeTags,
   DescribeNodeCategories,
+  DescribeNodeList,
 } from './client';
 
 export interface NodeAllRes {
@@ -71,5 +74,16 @@ export function useFetchNodeAll() {
     fetchNodeBody,
     fetchNodeTags,
     fetchNodeCategories,
+  };
+}
+
+export function useFetchNodeList() {
+  const fetchNodeList = useMemoizedFn(async (params: DescribeNodeListRequestParams) => {
+    const res = await DescribeNodeList(params);
+    return res;
+  });
+
+  return {
+    fetchNodeList,
   };
 }

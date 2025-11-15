@@ -8,23 +8,23 @@
   "exports": {
     "./consts": {
       "types": "./src/consts.ts",
-      "default": "./dist/consts.js"
+      "default": "./src/consts.ts"
     },
     "./request": {
       "types": "./src/request.ts",
-      "default": "./dist/request.js"
+      "default": "./src/request.ts"
     },
     "./action_request": {
       "types": "./src/action_request.ts",
-      "default": "./dist/action_request.js"
+      "default": "./src/action_request.ts"
     },
     "./types": {
       "types": "./src/types.ts",
-      "default": "./dist/types.js"
+      "default": "./src/types.ts"
     },
     "./useFetchStore": {
       "types": "./src/useFetchStore.ts",
-      "default": "./dist/useFetchStore.js"
+      "default": "./src/useFetchStore.ts"
     }
   },
   "devDependencies": {

@@ -174,6 +174,9 @@ importers:
       '@repo/services':
         specifier: workspace:*
         version: link:../../packages/services
+      '@repo/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
       '@tailwindcss/typography':
         specifier: ^0.5.10
         version: 0.5.19(tailwindcss@4.1.17)
@@ -183,6 +186,9 @@ importers:
       '@types/react-dom':
         specifier: ^18.2.18
         version: 18.3.5(@types/react@18.3.18)
+      '@types/styled-components':
+        specifier: ^5
+        version: 5.1.34
       '@vercel/analytics':
         specifier: ^1.2.2
         version: 1.5.0(next@15.1.5)(react@18.3.1)
@@ -243,12 +249,18 @@ importers:
       remark-rehype:
         specifier: ^11.1.0
         version: 11.1.2
+      styled-components:
+        specifier: ^6.1
+        version: 6.1.14(react-dom@18.3.1)(react@18.3.1)
       tailwind-merge:
         specifier: ^2.1.0
         version: 2.6.0
       unified:
         specifier: ^11.0.4
         version: 11.0.5
+      zustand:
+        specifier: ^5.0.2
+        version: 5.0.2(@types/react@18.3.18)(react@18.3.1)
     devDependencies:
       '@commitlint/cli':
         specifier: ^16.3.0
@@ -397,6 +409,27 @@ importers:
       zustand:
         specifier: ^5.0.2
         version: 5.0.2(@types/react@18.3.18)(react@18.3.1)
+
+  packages/utils:
+    devDependencies:
+      '@repo/config-typescript':
+        specifier: workspace:*
+        version: link:../config-typescript
+      '@types/react':
+        specifier: ^18.3.1
+        version: 18.3.18
+      ahooks:
+        specifier: ^3.1.1
+        version: 3.8.1(react@18.3.1)
+      dayjs:
+        specifier: ^1.11.13
+        version: 1.11.13
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      typescript:
+        specifier: latest
+        version: 5.9.3
 
 packages:
 
@@ -4796,7 +4829,6 @@ packages:
     dependencies:
       '@types/react': 18.3.18
       hoist-non-react-statics: 3.3.2
-    dev: true
 
   /@types/istanbul-lib-coverage@2.0.6:
     resolution: {integrity: sha512-2QF/t/auWm0lsy8XtKVPG19v3sSOQlJe/YHZgfjb/KBBHOGSV+J2q/S671rcq9uTBrLAXmZpqJiaQbMT+zNU1w==}
@@ -4924,7 +4956,6 @@ packages:
       '@types/hoist-non-react-statics': 3.3.5
       '@types/react': 18.3.18
       csstype: 3.1.3
-    dev: true
 
   /@types/stylis@4.2.5:
     resolution: {integrity: sha512-1Xve+NMN7FWjY14vLoY5tL3BVEQ/n42YLwaqJIPYhotZ9uBHt87VceMwWQpzmdEt2TNXIorIFG+YeCUUW7RInw==}
@@ -6351,6 +6382,7 @@ packages:
 
   /caniuse-lite@1.0.30001690:
     resolution: {integrity: sha512-5ExiE3qQN6oF8Clf8ifIDcMRCRE/dMGcETG/XGMD8/XiXm6HXQgQTh1yZYLXXpSOsEUlJm1Xr7kGULZTuGtP/w==}
+    dev: true
 
   /caniuse-lite@1.0.30001754:
     resolution: {integrity: sha512-x6OeBXueoAceOmotzx3PO4Zpt4rzpeIFsSr6AAePTZxSkXiYDUmpypEl7e2+8NCd9bD7bXjqyef8CJYPC1jfxg==}
@@ -9335,7 +9367,6 @@ packages:
     resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
     dependencies:
       react-is: 16.13.1
-    dev: true
 
   /hosted-git-info@2.8.9:
     resolution: {integrity: sha512-mxIDAb9Lsm6DoOJ7xH+5+X4y1LU/4Hi50L9C5sIswK3JzULS4bwk1FvjdBgvYR4bzT4tuUQiC15FE2f5HbLvYw==}
@@ -12191,7 +12222,7 @@ packages:
       '@swc/counter': 0.1.3
       '@swc/helpers': 0.5.15
       busboy: 1.6.0
-      caniuse-lite: 1.0.30001690
+      caniuse-lite: 1.0.30001754
       postcss: 8.4.31
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)

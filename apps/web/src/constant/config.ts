@@ -7,39 +7,67 @@ export const siteConfig = {
 };
 
 /** 首页文章列表每页显示条数 */
-export const HOME_PAGE_SIZE = 5;
+export const HOME_PAGE_SIZE = 10;
 /** 分类页面分页 */
 export const CATEGORY_PAGE_SIZE = 5;
 
 export const MAIN_MENUS = [
   {
+    name: '首页',
+    vid: 'home',
+    href: '/',
+  },
+  {
+    name: '常用工具',
+    vid: 'tool',
+    href: '/tool/',
+  },
+  {
+    name: '内容阅读',
+    vid: 'book',
+    href: '/book/',
+  },
+  {
+    name: 'IT技术',
+    vid: 'blog',
+    href: '/blog/',
+  },
+  {
     name: 'Rust语言',
     vid: 'rust',
-    href: '/category/rust/',
+    href: '/cat/rust/',
+  },
+];
+
+export const CATEGORIES = [
+  {
+    name: '综合',
+    vid: 'all',
+    href: '/blog/',
+  },
+  {
+    name: 'Rust语言',
+    vid: 'rust',
+    href: '/cat/rust/',
   },
   {
     name: '服务器',
     vid: 'server',
-    href: '/category/server/',
+    href: '/cat/server/',
   },
   {
     name: '后端开发',
     vid: 'backend',
-    href: '/category/backend/',
+    href: '/cat/backend/',
   },
   {
     name: '前端开发',
     vid: 'frontend',
-    href: '/category/frontend/',
+    href: '/cat/frontend/',
   },
   {
     name: '每日随笔',
     vid: 'diary',
-    href: '/category/diary/',
-  },
-  {
-    name: '阅读小记',
-    vid: 'reading',
-    href: '/reading/',
+    href: '/cat/diary/',
   },
 ];

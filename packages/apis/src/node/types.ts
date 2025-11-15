@@ -40,19 +40,29 @@ export interface NodeFieldType extends BaseNodeModel {
 }
 
 
-export interface NodeFilters {
+export interface NodeFilters extends BaseFilterParams {
   nid?: number;
-  nids?: string;
-  uuid?: string;
   vid?: string;
+  uuid?: string;
   bundle?: string;
   title?: string;
-  content?: string;
+  body?: string;
+  summary?: string;
+  summaryFormat?: string;
+  bodyFormat?: string;
   viewed?: number;
   deleted?: string;
   publishedAt?: string;
   createdBy?: number;
   updatedBy?: number;
+  createdAt?: string;
+  createdByUsername?: string;
+  updatedAt?: string;
+  deletedAt?: string;
+  tagVids?: string[];
+  categoryVids?: string[];
+  tagIds?: number[];
+  categoryIds?: number[];
 }
 
 export interface DescribeNodeDetailRequestParams extends NodeFilters {
@@ -63,7 +73,7 @@ export interface DescribeNodeDetailResponseData {
   _name?: string;
 }
 
-export interface DescribeNodeListRequestParams extends BaseFilterParams {
+export interface DescribeNodeListRequestParams extends NodeFilters {
   _name?: string;
 }
 

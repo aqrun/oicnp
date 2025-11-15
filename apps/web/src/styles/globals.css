@@ -35,16 +35,17 @@
   --color-primary-900: rgb(var(--tw-color-primary-900)); /* #0c4a6e */
   /* #endregion  /**======== Primary Color =========== */
 
-  --primary: rgb(88 28 135);
+  --primary: #764abc;
   --btn-plain-bg-active: rgb(216 180 254); /* #d8b4fe */
   --btn-content: rgb(88 28 135);
+  --bg-color: #f2f3f5;
+  --text-color: #333;
 
   --hue: 250;
 
-  --primary: rgb(88 28 135);
+  --color-very-light-purple: #f8f6fc;
   --page-bg: oklch(0.95 0.01 var(--hue));
   --card-bg: white;
-  --btn-content: rgb(88 28 135);
   --btn-regular-bg: oklch(0.95 0.025 var(--hue));
   --btn-regular-bg-hover: oklch(0.9 0.05 var(--hue));
   --btn-regular-bg-active: oklch(0.85 0.08 var(--hue));
@@ -204,6 +205,7 @@
     background-size: 0 2px, 100% 2px;
   }
 }
+
 
 pre {
   overflow-x: auto;

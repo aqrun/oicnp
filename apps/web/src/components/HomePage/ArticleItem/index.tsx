@@ -1,26 +1,32 @@
 import Image from 'next/image';
 
-import { getCategory, Node, formatDate } from '@/utils';
+import {
+  NodeModel,
+} from '@repo/apis/client';
+import {
+  formatDate,
+} from '@/utils';
 
 export interface ArticleItemProps {
-  node?: Node;
+  node?: NodeModel;
 }
 
 /**
  * 首页文章列表单个
  */
 export const ArticleItem: React.FC<ArticleItemProps> = ({ node }) => {
-  const category = getCategory(node?.data?.taxonomies?.categories?.[0] || '');
+  const category = node?.categories?.[0];
+
   return (
     <div className='w-full'>
       <div className='overflow-hidden rounded-lg hover:shadow-lg hover:shadow-violet-100 hover:border-violet-400 cursor-pointer border border-slate-200 border-solid'>
         <a
-          href={`/n/${node?.data?.slug}`}
+          href={`/n/${node?.vid}`}
           className='block w-full h-full md:flex'
         >
-          {Boolean(node?.data?.thumb) && (
+          {Boolean(0) && (
             <Image
-              alt={node?.data?.title || ''}
+              alt={node?.title || ''}
               src='/images/big-news1.jpeg'
               className='object-cover w-full max-h-40 bg-slate-100 md:w-80 md:max-h-full'
               width={180}
@@ -30,27 +36,27 @@ export const ArticleItem: React.FC<ArticleItemProps> = ({ node }) => {
           <div className='w-full p-4 bg-white dark:bg-gray-800'>
             <p className='font-light text-gray-400 text-md'>
               <i className='iconfont icon-benshubook122 mr-1' />
-              {category?.name}
+              {category?.catName}
               &nbsp;
               <span className="ml-2 text-gray-400 font-light">
                 <i className='iconfont icon-date mr-1' />
-                {formatDate(node?.data?.date)}
+                {formatDate(node?.createdAt)}
               </span>
             </p>
             <p className='mb-2 text-xl font-medium text-gray-800 dark:text-white'>
-              {node?.data?.title}
+              {node?.title}
             </p>
             <p className='font-light text-gray-400 dark:text-gray-300 text-md'>
-              {node?.data?.description}
+              {node?.summary}
             </p>
             <div className='flex flex-wrap items-center mt-4 justify-starts'>
-              {node?.data?.taxonomies?.tags?.map((item) => {
+              {node?.tags?.map((item) => {
                 return (
                   <div
-                    key={item}
+                    key={item?.tagId}
                     className='mb-1 text-xs mr-2 py-1.5 px-4 text-gray-600 bg-blue-100 rounded-2xl'
                   >
-                    {item}
+                    {item?.tagName}
                   </div>
                 );
               })}

@@ -5,8 +5,13 @@ const nextConfig = {
     dirs: ['src'],
   },
 
+  transpilePackages: ['@repo/apis', '@repo/services'],
+
   // reactStrictMode: true,
   // swcMinify: true,
+  compiler: {
+    styledComponents: true,
+  },
 
   // Uncoment to add domain whitelist
   images: {
@@ -20,9 +25,9 @@ const nextConfig = {
     ],
   },
 
-  webpack(config) {
+  webpack(config: any) {
     // Grab the existing rule that handles SVG imports
-    const fileLoaderRule = config.module.rules.find((rule) =>
+    const fileLoaderRule = config.module.rules.find((rule: any) =>
       rule.test?.test?.('.svg')
     );
 

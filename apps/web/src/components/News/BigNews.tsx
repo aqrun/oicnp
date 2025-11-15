@@ -1,31 +1,35 @@
 import Image from 'next/image';
 
-import { getCategory, getNewsList } from '@/utils';
+import {
+  NodeModel,
+} from '@repo/apis/client';
 
-export const BigNews = () => {
-  const news_list = getNewsList();
-  const node = news_list?.[0];
-  const category = getCategory(node?.data?.taxonomies?.categories?.[0] || '');
+export interface BigNewsProps {
+  node: NodeModel;
+}
+
+export const BigNews: React.FC<BigNewsProps> = ({ node }) => {
+  const category = node?.categories?.[0];
   return (
     <section className='oic-latest-news-section'>
       <div className='layout'>
         {/* <!-- Content --> */}
         <div className='grid justify-items-stretch'>
           <a
-            href={`/n/${node?.data?.slug}`}
+            href={`/n/${node?.vid}`}
             className='relative flex h-[500px] flex-col gap-4 rounded-md px-4 py-8 [grid-area:1/1/2/2] md:p-0 md:[grid-area:1/1/2/4] hover:text-violet-500'
           >
             <div className='absolute bottom-12 left-8 z-20 flex w-56 max-w-[464px] flex-col items-start rounded-md bg-white p-6 sm:w-full md:bottom-[10px] md:left-[10px]'>
               <div className='mb-4 rounded-md bg-[#f2f2f7] px-2 py-1.5'>
                 <p className='text-sm font-semibold text-[#6574f8]'>
-                  {category?.name}
+                  {category?.catName}
                 </p>
               </div>
               <p className='mb-4 max-w-xs text-xl font-bold md:text-2xl text-gray-800 hover:text-violet-500'>
-                {node?.data?.title}
+                {node?.title}
               </p>
               <p className='mb-4 text-base md:text-base text-gray-500'>
-                {node?.data?.description}
+                {node?.summary}
               </p>
               <div className='flex flex-col text-sm text-gray-500 lg:flex-row'>
                 <p>子十</p>

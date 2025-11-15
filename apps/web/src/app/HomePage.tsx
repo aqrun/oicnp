@@ -8,31 +8,25 @@ import {
   SideBar,
 } from '@/components/HomePage';
 import { BigNews, News1 } from '@/components/News';
-import { Pager1 } from '@/components/pagination';
-
-import { Node } from '@/utils';
+import {
+  NodeModel,
+} from '@repo/apis/client';
 
 export interface HomePageProps {
-  nodes: Node[];
-  page?: number;
-  pageSize?: number;
-  total?: number;
+  nodes: NodeModel[];
 }
 
 export const HomePage: React.FC<HomePageProps> = ({
   nodes,
-  page,
-  pageSize,
-  total,
 }) => {
   return (
     <main>
       <Header />
       <HeaderBg />
-      <BigNews />
+      <BigNews node={nodes?.[0]} />
       <section className='oic-news-section mt-4'>
         <div className='layout'>
-          <News1 />
+          <News1 nodes={nodes?.slice(1, 5)} />
         </div>
       </section>
 
@@ -40,16 +34,10 @@ export const HomePage: React.FC<HomePageProps> = ({
         <div className='layout py-12 flex flex-col lg:flex-row gap-8'>
           <div className='flex flex-col w-[calc(100% - 22rem)]'>
             <div className='relative flex flex-wrap flex-row gap-2'>
-              {nodes?.map((item) => {
-                return <ArticleItem key={item?.data?.title} node={item} />;
+              {nodes?.slice(5)?.map((item) => {
+                return <ArticleItem key={item?.nid} node={item} />;
               })}
             </div>
-            <Pager1
-              page={page || 1}
-              pageSize={pageSize || 0}
-              total={total || 0}
-              baseUrl='/page'
-            />
           </div>
           <div className='lg:w-80'>
             <SideBar />
