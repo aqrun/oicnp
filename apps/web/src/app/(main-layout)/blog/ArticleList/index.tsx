@@ -9,11 +9,13 @@ import {
 
 export interface ArticleListProps {
   catVid?: string;
+  tagVid?: string;
   nodeRes?: DescribeNodeListResponseData;
 }
 
 export default function ArticleList({
   catVid,
+  tagVid,
   nodeRes,
 }: ArticleListProps) {
 
@@ -28,6 +30,7 @@ export default function ArticleList({
 
         <LoadMore
           catVid={catVid}
+          tagVid={tagVid}
         />
       </div>
     </BlogLayout>

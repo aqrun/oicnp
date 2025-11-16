@@ -16,6 +16,7 @@ import { LoadMoreContainer } from './index.styled';
 
 export interface LoadMoreProps {
   catVid?: string;
+  tagVid?: string;
 }
 
 /**
@@ -23,6 +24,7 @@ export interface LoadMoreProps {
  */
 export const LoadMore = ({
   catVid,
+  tagVid,
 }: LoadMoreProps) => {
   const {
     fetchNodeList,
@@ -55,6 +57,10 @@ export const LoadMore = ({
       params.categoryVids = catVid;
     }
 
+    if (tagVid) {
+      params.tagVids = tagVid;
+    }
+
     const res = await fetchNodeList(params);
 
     if (res?.nodes?.length) {
@@ -66,6 +72,11 @@ export const LoadMore = ({
           total: res?.total || 0,
         },
         nodeResList: [...(nodeResList || []), res],
+      });
+    } else {
+      setState({
+        loading: false,
+        hasMore: false,
       });
     }
   });
@@ -103,6 +114,7 @@ export const LoadMore = ({
       },
       nodeResList: [],
     });
+    handleLoad();
   });
 
   useEffect(() => {
