@@ -1,10 +1,16 @@
 import { MAIN_MENUS } from '@/constant';
 
 import { MenuToggleButton } from './MenuToggleButton';
-import { HeaderNavHandler } from './HeaderNavHandler';
+import clsx from 'clsx';
 import { HeaderMenu } from './index.styled';
 
-export const Header = () => {
+export interface HeaderProps {
+  activeMenuId?: string;
+}
+
+export const Header = ({
+  activeMenuId = 'home',
+}: HeaderProps) => {
   return (
     <section className='oic-header-section mb-6 overflow-hidden transition-colors duration-500 lg:z-50 shadow-md shadow-indigo-100/[0.6] dark:shadow-slate-100/[0.6] bg-white/95 supports-backdrop-blur:bg-white/60 dark:bg-transparent'>
       <div className='oic-header-inner h-auto w-screen'>
@@ -44,7 +50,9 @@ export const Header = () => {
                     <a
                       key={item?.vid}
                       href={item?.href}
-                      className={`header-nav-item item-${item?.vid} font-inter text-center rounded-lg text-black lg:px-6 lg:py-4 lg:hover:bg-gray-50 lg:hover:text-gray-800`}
+                      className={clsx(`header-nav-item item-${item?.vid} font-inter text-center rounded-lg text-black lg:px-6 lg:py-4 lg:hover:bg-gray-50 lg:hover:text-gray-800`, {
+                        'active': activeMenuId === item?.vid,
+                      })}
                     >
                       {item?.name}
                     </a>
@@ -55,7 +63,6 @@ export const Header = () => {
           </div>
         </nav>
       </div>
-      <HeaderNavHandler />
     </section>
   );
 };

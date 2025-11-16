@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 
 import { siteConfig } from '@/constant/config';
+import BookList from './BookList';
+import { MainLayout } from '@/components/layouts';
 
 export const metadata: Metadata = {
   title: '书籍阅读|灵犀纪-心有灵犀，专注技术分享', // `灵犀纪 | ${siteConfig.title}`,
@@ -9,8 +11,10 @@ export const metadata: Metadata = {
 
 export default async function ToolsPage() {
   return (
-    <div>
-      <h1>书籍阅读</h1>
-    </div>
+    <MainLayout
+      activeMenuId='book'
+    >
+      <BookList />
+    </MainLayout>
   );
 }

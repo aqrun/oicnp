@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { siteConfig } from '@/constant/config';
 import ArticleList from '../../../blog/ArticleList';
 import { DescribeNodeList } from '@repo/apis/server';
+import { MainLayout } from '@/components/layouts';
 
 export const metadata: Metadata = {
   title: 'IT技术|灵犀纪-心有灵犀，专注技术分享', // `灵犀纪 | ${siteConfig.title}`,
@@ -31,9 +32,13 @@ export default async function BlogCategoryPage(props: BlogCategoryPageProps) {
   });
 
   return (
-    <ArticleList
-      catVid={catVid}
-      nodeRes={nodeRes}
-    />
+    <MainLayout
+      activeMenuId='blog'
+    >
+      <ArticleList
+        catVid={catVid}
+        nodeRes={nodeRes}
+      />
+    </MainLayout>
   );
 }

@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { DescribeNodeList } from '@repo/apis/server';
 import { siteConfig } from '@/constant/config';
 import ArticleList from './ArticleList';
+import { MainLayout } from '@/components/layouts';
 
 export const metadata: Metadata = {
   title: 'IT技术|灵犀纪-心有灵犀，专注技术分享', // `灵犀纪 | ${siteConfig.title}`,
@@ -19,9 +20,13 @@ export default async function BlogPage() {
   });
   
   return (
-    <ArticleList
-      catVid={catVid}
-      nodeRes={nodeRes}
-    />
+    <MainLayout
+      activeMenuId='blog'
+    >
+      <ArticleList
+        catVid={catVid}
+        nodeRes={nodeRes}
+      />
+    </MainLayout>
   );
 }
