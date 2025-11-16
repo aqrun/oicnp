@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use crate::{
     entities::prelude::*,
     utils::catch_err,
@@ -14,7 +14,7 @@ use sea_orm::{
     QueryOrder,
     JoinType,
     QuerySelect,
-    sea_query::Alias,
+    // sea_query::Alias,
     Order,
 };
 use validator::Validate;
@@ -439,7 +439,7 @@ impl NodeModel {
         };
 
         let mut q = NodeEntity::find()
-            .select_only()
+            // .select_only()
             .columns([
                 NodeColumn::Nid,
                 NodeColumn::Uuid,
@@ -455,11 +455,12 @@ impl NodeModel {
                 NodeColumn::UpdatedAt,
                 NodeColumn::DeletedAt,
             ])
+            /*
             // 指定关联表字段
             .column_as(NodeBodyColumn::Summary, "summary")
             .column_as(NodeBodyColumn::SummaryFormat, "summary_format")
-            // .column_as(NodeBodyColumn::Body, "body")
-            // .column_as(NodeBodyColumn::BodyFormat, "body_format")
+            .column_as(NodeBodyColumn::Body, "body")
+            .column_as(NodeBodyColumn::BodyFormat, "body_format")
             .column_as(
                 Expr::col((Alias::new("cu"), UserColumn::Uid)),
                 "author_uid"
@@ -505,6 +506,7 @@ impl NodeModel {
                     .into(),
                 Alias::new("uu"),
             )
+            */
             ;
 
         // 应用过滤条件
@@ -644,6 +646,29 @@ impl NodeModel {
         // 收集所有 nid
         let nids: Vec<i64> = nodes.iter().map(|node| node.nid).collect();
 
+        // 收集所有相关的用户ID（创建者与更新者），去重后一次性查询
+        let mut user_ids_set: HashSet<i64> = HashSet::new();
+        for node in nodes.iter() {
+            if node.created_by > 0 {
+                user_ids_set.insert(node.created_by);
+            }
+            if node.updated_by > 0 {
+                user_ids_set.insert(node.updated_by);
+            }
+        }
+        let user_ids: Vec<i64> = user_ids_set.into_iter().collect();
+
+        // 批量查询相关用户，构建 uid -> 用户 的映射表
+        let user_map: HashMap<i64, UserModel> = if !user_ids.is_empty() {
+            let users = UserEntity::find()
+                .filter(UserColumn::Uid.is_in(user_ids))
+                .all(db)
+                .await?;
+            users.into_iter().map(|u| (u.uid, u)).collect()
+        } else {
+            HashMap::new()
+        };
+
         // 批量查询所有关联数据
         let (node_bodies, categories, tags) = tokio::try_join!(
             Self::find_multi_nodes_body(db, &nids),
@@ -678,7 +703,11 @@ impl NodeModel {
             let node_categories = categories_map.get(&nid).cloned().unwrap_or_default();
             let node_tags = tags_map.get(&nid).cloned().unwrap_or_default();
 
-            let node_detail = NodeDetailModel {
+            // 从用户映射中取创建者与更新者信息
+            let author_user = user_map.get(&node.created_by);
+            let updated_user = user_map.get(&node.updated_by);
+
+            let mut node_detail = NodeDetailModel {
                 nid: node.nid,
                 vid: node.vid,
                 uuid: node.uuid,
@@ -697,7 +726,7 @@ impl NodeModel {
                 // body: Some(node_body.body),
                 // body_format: Some(node_body.body_format),
                 author_uid: Some(node.created_by),
-                author_username: None, // 这些需要从用户表查询
+                author_username: None,
                 author_nickname: None,
                 updated_by_username: None,
                 updated_by_nickname: None,
@@ -705,6 +734,16 @@ impl NodeModel {
                 tags: node_tags,
                 ..Default::default()
             };
+
+            // 使用 if let 在构建后设置作者与更新者的展示信息，更清晰
+            if let Some(u) = author_user {
+                node_detail.author_username = Some(u.username.clone());
+                node_detail.author_nickname = Some(u.nickname.clone());
+            }
+            if let Some(u) = updated_user {
+                node_detail.updated_by_username = Some(u.username.clone());
+                node_detail.updated_by_nickname = Some(u.nickname.clone());
+            }
 
             result.push(node_detail);
         }
