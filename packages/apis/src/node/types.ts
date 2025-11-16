@@ -59,16 +59,16 @@ export interface NodeFilters extends BaseFilterParams {
   createdByUsername?: string;
   updatedAt?: string;
   deletedAt?: string;
-  tagVids?: string[];
-  categoryVids?: string[];
-  tagIds?: number[];
-  categoryIds?: number[];
+  tagVids?: string;
+  categoryVids?: string;
+  tagIds?: string;
+  categoryIds?: string;
 }
 
 export interface DescribeNodeDetailRequestParams extends NodeFilters {
   _name?: string;
 }
-export interface DescribeNodeDetailResponseData {
+export interface DescribeNodeDetailResponseData extends BaseResponse {
   node: NodeModel;
   _name?: string;
 }

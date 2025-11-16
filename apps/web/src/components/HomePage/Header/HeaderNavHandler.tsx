@@ -28,6 +28,7 @@ export function HeaderNavHandler() {
     } else if (pathname === '/blog'
       || pathname?.indexOf('/cat/') === 0
       || pathname?.indexOf('/n/') === 0
+      || pathname?.indexOf('/p/') === 0
     ) {
       vid = 'blog';
     }

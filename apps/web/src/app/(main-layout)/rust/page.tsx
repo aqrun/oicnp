@@ -23,6 +23,7 @@ export default async function BlogPage() {
   const nodeRes = await DescribeNodeList({
     page,
     pageSize,
+    categoryVids: catVid,
   });
 
   return (

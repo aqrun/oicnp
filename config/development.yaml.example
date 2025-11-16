@@ -123,3 +123,7 @@ settings:
     - /v1/node/list
     - /v1/node/body
     - /v1/node/one
+    - /v1/category/list
+    - /v1/tag/list
+    - /v1/category/one
+    - /v1/tag/one

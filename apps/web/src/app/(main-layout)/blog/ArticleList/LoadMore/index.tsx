@@ -1,31 +1,36 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import { useEffect, useMemo } from 'react';
-import { useBlogStore } from '../useBlogStore';
+import { useBlogStore } from '../../useBlogStore';
 import { useFetchNodeList } from '@repo/apis/client';
 import { useMemoizedFn } from 'ahooks';
 import { nextTick } from '@repo/utils/client';
-import { NodeModel } from '@repo/apis/client';
+import {
+  NodeModel,
+  DescribeNodeListRequestParams,
+} from '@repo/apis/client';
+import {
+  ArticleItem,
+} from '@/components/HomePage/ArticleItem';
 import { LoadMoreContainer } from './index.styled';
 
-const ArticleItem = dynamic(() => import('../../../../components/HomePage/ArticleItem').then((mod) => mod.ArticleItem), {
-  ssr: false,
-});
-
 export interface LoadMoreProps {
-
+  catVid?: string;
 }
 
 /**
  * 加载更多组件
  */
-export const LoadMore = () => {
+export const LoadMore = ({
+  catVid,
+}: LoadMoreProps) => {
   const {
     fetchNodeList,
   } = useFetchNodeList();
   const pager = useBlogStore((state) => state.pager);
   const nodeResList = useBlogStore((state) => state.nodeResList);
+  const hasMore = useBlogStore((state) => state.hasMore);
+  const loading = useBlogStore((state) => state.loading);
   const setState = useBlogStore.setState;
 
   const allNodes = useMemo(() => {
@@ -41,10 +46,16 @@ export const LoadMore = () => {
       loading: true,
     });
 
-    const res = await fetchNodeList({
+    const params: DescribeNodeListRequestParams = {
       page,
       pageSize: pager.pageSize,
-    });
+    };
+
+    if (catVid && catVid !== 'all') {
+      params.categoryVids = catVid;
+    }
+
+    const res = await fetchNodeList(params);
 
     if (res?.nodes?.length) {
       setState({
@@ -60,11 +71,17 @@ export const LoadMore = () => {
   });
 
   const handleLoad = useMemoizedFn(async () => {
-    console.log('load9999')
+    if (loading) {
+      return;
+    }
+
     const page = (pager?.page || 1) + 1;
     const totalPage = Math.ceil((pager.total - pager?.pageSize) / pager.pageSize);
 
     if (pager.total && page > totalPage) {
+      setState({
+        hasMore: false,
+      });
       return;
     }
 
@@ -98,14 +115,16 @@ export const LoadMore = () => {
         return <ArticleItem key={item?.nid} node={item} />;
       })}
 
-      <LoadMoreContainer>
-        <div
-          className="text-center text-gray-500"
-          onClick={handleLoad}
-        >
-          加载更多...
-        </div>
-      </LoadMoreContainer>
+      {hasMore && (
+        <LoadMoreContainer className='w-full'>
+          <div
+            className="text-center text-gray-500 cursor-pointer hover:text-purple-700"
+            onClick={handleLoad}
+          >
+            点击加载更多...
+          </div>
+        </LoadMoreContainer>
+      )}
     </>
   );
 };

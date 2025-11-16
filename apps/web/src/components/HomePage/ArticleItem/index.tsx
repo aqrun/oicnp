@@ -5,7 +5,7 @@ import {
 } from '@repo/apis/client';
 import {
   formatDate,
-} from '@/utils';
+} from '@/utils/common';
 
 export interface ArticleItemProps {
   node?: NodeModel;
@@ -21,7 +21,7 @@ export const ArticleItem: React.FC<ArticleItemProps> = ({ node }) => {
     <div className='w-full'>
       <div className='overflow-hidden rounded-lg hover:shadow-lg hover:shadow-violet-100 hover:border-violet-400 cursor-pointer border border-slate-200 border-solid'>
         <a
-          href={`/n/${node?.vid}`}
+          href={`/p/${node?.vid}`}
           className='block w-full h-full md:flex'
         >
           {Boolean(0) && (

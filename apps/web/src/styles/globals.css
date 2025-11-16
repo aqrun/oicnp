@@ -100,9 +100,11 @@
 }
 
 @layer base {
+
   /* inter var - latin */
   @font-face {
     font-family: 'Inter';
+    font-size: 14px;
     font-style: normal;
     font-weight: 100 900;
     font-display: optional;
@@ -142,7 +144,7 @@
   }
 
   body,
-  .p {
+  .p, div {
     @apply font-primary text-sm md:text-base;
   }
   /* #endregion  /**======== Typography =========== */

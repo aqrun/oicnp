@@ -7,6 +7,7 @@ import {
 
 export interface BlogState {
   loading?: boolean;
+  hasMore?: boolean;
   nodeResList?: DescribeNodeListResponseData[];
   pager: {
     page: number;
@@ -20,6 +21,7 @@ export interface BlogState {
  */
 export const useBlogStore = create<BlogState>()((set) => ({
   loading: false,
+  hasMore: true,
   pager: {
     page: 1,
     pageSize: 10,

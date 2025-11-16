@@ -544,49 +544,91 @@ impl NodeModel {
             }
         }
 
-        // 按分类查询
-        if let Some(category_vids) = &params.category_vids {
-            if !category_vids.is_empty() {
-                q = q
-                    .inner_join(NodeCategoriesMapEntity)
-                    .inner_join(CategoryEntity)
-                    .filter(CategoryColumn::CatVid.is_in(category_vids.clone()));
-            }
-        }
+        // 按分类查询 - 合并处理避免重复连接
+        let has_category_vids = params.category_vids.as_ref()
+            .map(|x| !x.is_empty())
+            .unwrap_or(false);
+        let has_category_ids = params.category_ids.as_ref()
+            .map(|x| !x.is_empty())
+            .unwrap_or(false);
 
-        if let Some(category_ids) = &params.category_ids {
-            if !category_ids.is_empty() {
-                q = q
-                    .inner_join(NodeCategoriesMapEntity)
-                    .filter(NodeCategoriesMapColumn::CatId.is_in(category_ids.clone()));
+        if has_category_vids || has_category_ids {
+            // 使用关系定义连接，避免重复连接
+            q = q.join(JoinType::InnerJoin, NodeEntity::belongs_to(NodeCategoriesMapEntity)
+                .from(NodeColumn::Nid)
+                .to(NodeCategoriesMapColumn::Nid)
+                .into());
+            
+            // 如果使用 category_vids，需要连接 CategoryEntity
+            if has_category_vids {
+                if let Some(category_vids) = &params.category_vids {
+                    let vids = category_vids.split(",").collect::<Vec<&str>>();
+                    q = q.join(JoinType::InnerJoin, NodeCategoriesMapEntity::belongs_to(CategoryEntity)
+                        .from(NodeCategoriesMapColumn::CatId)
+                        .to(CategoryColumn::CatId)
+                        .into())
+                        .filter(CategoryColumn::CatVid.is_in(vids));
+                }
             }
-        }
-
-        // 按标签查询
-        if let Some(tag_vids) = &params.tag_vids {
-            if !tag_vids.is_empty() {
-                // 先通过标签表获取对应的 tag_ids
-                let tag_ids: Vec<i64> = TagEntity::find()
-                    .filter(TagColumn::TagVid.is_in(tag_vids.clone()))
-                    .select_only()
-                    .column(TagColumn::TagId)
-                    .into_tuple()
-                    .all(db)
-                    .await?;
-                
-                if !tag_ids.is_empty() {
-                    q = q
-                        .inner_join(NodeTagsMapEntity)
-                        .filter(NodeTagsMapColumn::TagId.is_in(tag_ids));
+            
+            // 如果使用 category_ids，添加过滤条件
+            if has_category_ids {
+                if let Some(category_ids) = &params.category_ids {
+                    let ids: Vec<i64> = category_ids
+                        .split(",")
+                        .filter_map(|x| x.trim().parse().ok())
+                        .collect();
+                    q = q.filter(NodeCategoriesMapColumn::CatId.is_in(ids));
                 }
             }
         }
 
-        if let Some(tag_ids) = &params.tag_ids {
-            if !tag_ids.is_empty() {
-                q = q
-                    .inner_join(NodeTagsMapEntity)
-                    .filter(NodeTagsMapColumn::TagId.is_in(tag_ids.clone()));
+        // 按标签查询 - 合并处理避免重复连接
+        let has_tag_vids = params.tag_vids.as_ref()
+            .map(|x| !x.is_empty())
+            .unwrap_or(false);
+        let has_tag_ids = params.tag_ids.as_ref()
+            .map(|x| !x.is_empty())
+            .unwrap_or(false);
+
+        if has_tag_vids || has_tag_ids {
+            let mut all_tag_ids: Vec<i64> = Vec::new();
+            
+            // 如果使用 tag_vids，先通过标签表获取对应的 tag_ids
+            if has_tag_vids {
+                if let Some(tag_vids) = &params.tag_vids {
+                    let vids = tag_vids.split(",").collect::<Vec<&str>>();
+                    let tag_ids_from_vids: Vec<i64> = TagEntity::find()
+                        .filter(TagColumn::TagVid.is_in(vids))
+                        .select_only()
+                        .column(TagColumn::TagId)
+                        .into_tuple()
+                        .all(db)
+                        .await?;
+                    all_tag_ids.extend(tag_ids_from_vids);
+                }
+            }
+            
+            // 如果使用 tag_ids，添加到列表中
+            if has_tag_ids {
+                if let Some(tag_ids) = &params.tag_ids {
+                    let ids: Vec<i64> = tag_ids
+                        .split(",")
+                        .filter_map(|x| x.trim().parse().ok())
+                        .collect();
+                    all_tag_ids.extend(ids);
+                }
+            }
+            
+            // 去重并连接一次 NodeTagsMapEntity
+            if !all_tag_ids.is_empty() {
+                all_tag_ids.sort();
+                all_tag_ids.dedup();
+                q = q.join(JoinType::InnerJoin, NodeEntity::belongs_to(NodeTagsMapEntity)
+                    .from(NodeColumn::Nid)
+                    .to(NodeTagsMapColumn::Nid)
+                    .into())
+                    .filter(NodeTagsMapColumn::TagId.is_in(all_tag_ids));
             }
         }
         
@@ -626,6 +668,7 @@ impl NodeModel {
         // 转换为 NodeDetailModel
         let mut result = Vec::new();
         for node in nodes {
+            println!("node----{:?}", node);
             let nid = node.nid;
             
             // 获取 node_body，如果没有则使用默认值
@@ -667,5 +710,19 @@ impl NodeModel {
         }
 
         Ok((result, total))
+    }
+
+    /**
+     * 获取node内容详情
+     * 
+     * 当前只实现使用 NodeFilters 中的 nid,vid 参数
+     * 
+     * 返回详细的node数据：包括categories tags body author 等字段
+     */
+    pub async fn find_node(
+        db: &DatabaseConnection,
+        params: &NodeFilters
+    ) -> ModelResult<Option<NodeDetailModel>> {
+        Ok(None)
     }
 }

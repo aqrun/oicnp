@@ -1,15 +1,8 @@
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { siteConfig } from '@/constant/config';
-import BlogLayout from '../../../blog/BlogLayout';
-import {
-  ArticleItem,
-  SideBar,
-} from '@/components/HomePage';
-import { Pager1 } from '@/components/pagination';
-import {
-  DescribeNodeList,
-} from '@repo/apis/server';
+import ArticleList from '../../../blog/ArticleList';
+import { DescribeNodeList } from '@repo/apis/server';
 
 export const metadata: Metadata = {
   title: 'IT技术|灵犀纪-心有灵犀，专注技术分享', // `灵犀纪 | ${siteConfig.title}`,
@@ -34,32 +27,13 @@ export default async function BlogCategoryPage(props: BlogCategoryPageProps) {
   const nodeRes = await DescribeNodeList({
     page,
     pageSize,
-    // categoryVids: [catVid],
+    categoryVids: catVid,
   });
 
   return (
-    <BlogLayout
+    <ArticleList
       catVid={catVid}
-    >
-      <div className='oic-layout-content flex flex-col'>
-        <div className='relative flex flex-wrap flex-row gap-2'>
-          {(nodeRes?.nodes || [])?.map((item) => {
-            return <ArticleItem key={item?.nid} node={item} />;
-          })}
-        </div>
-        <Pager1
-          page={page || 0}
-          pageSize={pageSize || 10}
-          total={nodeRes?.total || 0}
-          baseUrl={'/blog'}
-        />
-      </div>
-      <div className='lg:w-80'>
-        <SideBar
-          hasWeather
-          hasTags
-        />
-      </div>
-    </BlogLayout>
+      nodeRes={nodeRes}
+    />
   );
 }

@@ -40,7 +40,11 @@ export const HomePage: React.FC<HomePageProps> = ({
             </div>
           </div>
           <div className='lg:w-80'>
-            <SideBar />
+            <SideBar
+              hasWeather
+              hasCategories
+              hasTags
+            />
           </div>
         </div>
       </section>

@@ -35,13 +35,13 @@ pub struct NodeFilters {
     #[serde(rename(deserialize = "deletedAt", serialize = "deletedAt"))]
     pub deleted_at: Option<String>,
     #[serde(rename(deserialize = "categoryVids", serialize = "categoryVids"))]
-    pub category_vids: Option<Vec<String>>,
+    pub category_vids: Option<String>,
     #[serde(rename(deserialize = "categoryIds", serialize = "categoryIds"))]
-    pub category_ids: Option<Vec<i64>>,
+    pub category_ids: Option<String>,
     #[serde(rename(deserialize = "tagVids", serialize = "tagVids"))]
-    pub tag_vids: Option<Vec<String>>,
+    pub tag_vids: Option<String>,
     #[serde(rename(deserialize = "tagIds", serialize = "tagIds"))]
-    pub tag_ids: Option<Vec<i64>>,
+    pub tag_ids: Option<String>,
 }
 
 /// 创建 note 参数

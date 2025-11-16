@@ -25,7 +25,29 @@ const nextConfig = {
     ],
   },
 
-  webpack(config: any) {
+  webpack(config: any, { isServer }: { isServer: boolean }) {
+    // Ignore Node.js built-in modules in client-side bundles
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        module: false,
+        crypto: false,
+        os: false,
+        tty: false,
+        worker_threads: false,
+        'node:fs': false,
+        'node:fs/promises': false,
+        'node:path': false,
+        'node:module': false,
+        'node:crypto': false,
+        'node:os': false,
+        'node:tty': false,
+        'node:worker_threads': false,
+      };
+    }
+
     // Grab the existing rule that handles SVG imports
     const fileLoaderRule = config.module.rules.find((rule: any) =>
       rule.test?.test?.('.svg')
