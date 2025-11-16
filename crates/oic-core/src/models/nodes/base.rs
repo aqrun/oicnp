@@ -42,6 +42,9 @@ pub struct NodeFilters {
     pub tag_vids: Option<String>,
     #[serde(rename(deserialize = "tagIds", serialize = "tagIds"))]
     pub tag_ids: Option<String>,
+    /// 指定部分可选字段, 逗号分隔
+    #[serde(rename(deserialize = "fields", serialize = "fields"))]
+    pub fields: Option<String>,
 }
 
 /// 创建 note 参数

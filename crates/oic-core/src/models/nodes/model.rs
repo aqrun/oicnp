@@ -690,10 +690,16 @@ impl NodeModel {
             tags_map.entry(nid).or_insert_with(Vec::new).push(tag);
         }
 
+        // 可选字段
+        let mut fields: Vec<String> = Vec::new();
+
+        if let Some(x) = &params.fields {
+            fields = x.split(",").map(|x| x.trim().to_string()).collect();
+        }
+
         // 转换为 NodeDetailModel
         let mut result = Vec::new();
         for node in nodes {
-            println!("node----{:?}", node);
             let nid = node.nid;
             
             // 获取 node_body，如果没有则使用默认值
@@ -745,6 +751,11 @@ impl NodeModel {
                 node_detail.updated_by_nickname = Some(u.nickname.clone());
             }
 
+            if fields.contains(&String::from("body")) {
+                node_detail.body = Some(node_body.body);
+                node_detail.body_format = Some(node_body.body_format);
+            }
+
             result.push(node_detail);
         }
 
@@ -762,6 +773,13 @@ impl NodeModel {
         db: &DatabaseConnection,
         params: &NodeFilters
     ) -> ModelResult<Option<NodeDetailModel>> {
-        Ok(None)
+        let (nodes, _) = Self::find_node_list(db, params).await?;
+
+        if nodes.is_empty() {
+            return Ok(None);
+        }
+
+        let node = nodes.first().unwrap();
+        Ok(Some(node.clone()))
     }
 }

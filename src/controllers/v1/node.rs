@@ -18,14 +18,20 @@ use oic_core::{
 pub async fn get_one(
     State(ctx): State<AppContext>,
     Json(params): Json<NodeFilters>,
-) -> JsonRes<NodeModel> {
-    let nid = params.nid.unwrap_or(0);
-    let res = NodeModel::find_by_id(&ctx.db, nid).await;
+) -> JsonRes<NodeDetailModel> {
+    let mut filter = params;
+    filter.page = Some(1_u64);
+    filter.page_size = Some(1_u64);
+    let res = NodeModel::find_node(&ctx.db, &filter.clone()).await;
 
     match res {
         Ok(data) => {
+            if let Some(node) = data {
             // 使用两个数据的元组指定最终 JSON 数据 key
-            JsonRes::from((data, "node"))
+                JsonRes::from((node, "node"))
+            } else {
+                JsonRes::err(ModelError::Any(format!("数据不存在: {:?}", filter).into()))
+            }
         },
         Err(err) => {
             JsonRes::err(err)
