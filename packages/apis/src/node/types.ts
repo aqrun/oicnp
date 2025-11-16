@@ -63,6 +63,7 @@ export interface NodeFilters extends BaseFilterParams {
   categoryVids?: string;
   tagIds?: string;
   categoryIds?: string;
+  fields?: string;
 }
 
 export interface DescribeNodeDetailRequestParams extends NodeFilters {

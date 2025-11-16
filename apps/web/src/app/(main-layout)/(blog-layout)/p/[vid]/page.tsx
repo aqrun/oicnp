@@ -1,5 +1,6 @@
 import ArticleDetail from '../../../blog/ArticleDetail';
 import { DescribeNodeDetail } from '@repo/apis/server';
+import { parseMd } from '@/utils/md';
 
 export interface ArticleDetailPageProps {
   params: {
@@ -13,11 +14,15 @@ export default async function ArticleDetailPage({
   const { vid } = await params;
   const nodeRes = await DescribeNodeDetail({
     vid,
+    fields: 'body',
   });
-  console.log('nodeRes---', nodeRes)
+
+  const content = await parseMd(nodeRes?.node?.body || '');
+
   return (
     <ArticleDetail
       node={nodeRes?.node}
+      content={content}
     />
   );
 }

@@ -1,7 +1,4 @@
 import BlogLayout from '../ArticleList/BlogLayout';
-import {
-  NodeDetailPage
-} from '@/components/layouts';
 import { formatDate } from '@/utils/common';
 import {
   NodeModel,
@@ -10,6 +7,7 @@ import {
 export interface ArticleDetailProps {
   catVid?: string;
   node?: NodeModel;
+  content?: string;
   hasArticleMeta?: boolean;
 }
 
@@ -17,6 +15,7 @@ export default function ArticleDetail({
   catVid,
   node,
   hasArticleMeta = true,
+  content
 }: ArticleDetailProps) {
   return (
     <BlogLayout
@@ -46,9 +45,12 @@ export default function ArticleDetail({
               </span>
             </div>
           )}
-          <article className='oic-article-detail prose lg:prose-lg max-w-full break-words'>
-            {node?.body}
-          </article>
+          <article
+            className='oic-article-detail prose lg:prose-p max-w-full break-words'
+            dangerouslySetInnerHTML={{
+              __html: content || '',
+            }}
+          />
         </div>
         {/* <TableOfContent /> */}
       </>
