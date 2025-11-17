@@ -4,6 +4,10 @@ import {
 
 export const TOOL_CATEGORIES: ToolCategories[] = [
   {
+    id: 'all',
+    name: '全部',
+  },
+  {
     id: 'react-ui',
     name: 'React UI',
   },

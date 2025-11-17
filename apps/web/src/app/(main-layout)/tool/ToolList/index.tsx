@@ -2,6 +2,9 @@ import ToolLayout from './ToolLayout';
 import {
   DescribeNodeListResponseData,
 } from '@repo/apis/server';
+import { ALL_TOOLS } from '@/content/tools';
+import ToolItemWidget from './ToolItemWidget';
+import { ToolList } from './index.styled';
 
 export interface ArticleListProps {
   catVid?: string;
@@ -19,9 +22,16 @@ export default function ArticleList({
     <ToolLayout
       catVid={catVid}
     >
-      <div className='relative flex flex-wrap flex-row gap-2'>
-        常用工具列表
-      </div>
+      <ToolList className='relative flex flex-wrap flex-row'>
+        {ALL_TOOLS?.map((item) => {
+          return (
+            <ToolItemWidget
+              key={item?.name}
+              record={item}
+            />
+          );
+        })}
+      </ToolList>
     </ToolLayout>
   );
 }
