@@ -24,6 +24,8 @@ pub struct AuthorFilters {
     pub uuid: Option<String>,
     pub name: Option<String>,
     pub description: Option<String>,
+    #[serde(rename(deserialize = "shortDescription", serialize = "shortDescription"))]
+    pub short_description: Option<String>,
     #[serde(rename(deserialize = "birthAt"))]
     pub birth_at: Option<String>,
     #[serde(rename(deserialize = "deathAt"))]
@@ -44,6 +46,8 @@ pub struct AuthorReqParams {
     pub uuid: Option<String>,
     pub name: Option<String>,
     pub description: Option<String>,
+    #[serde(rename(deserialize = "shortDescription", serialize = "shortDescription"))]
+    pub short_description: Option<String>,
     #[serde(rename(deserialize = "birthAt"))]
     pub birth_at: Option<String>,
     #[serde(rename(deserialize = "deathAt"))]
@@ -77,15 +81,19 @@ impl RequestParamsUpdater for AuthorReqParams {
             author.description = Set(String::from(x));
         }
 
+        if let Some(x) = &self.short_description {
+            author.short_description = Set(String::from(x));
+        }
+
         if let Some(x) = &self.birth_at {
             if let Ok(x) = DateTime::parse_from_str(x, DATE_TIME_FORMAT) {
-                author.birth_at = Set(x);
+                author.birth_at = Set(Some(x));
             }
         }
 
         if let Some(x) = &self.death_at {
             if let Ok(x) = DateTime::parse_from_str(x, DATE_TIME_FORMAT) {
-                author.death_at = Set(x);
+                author.death_at = Set(Some(x));
             }
         }
 
@@ -94,7 +102,7 @@ impl RequestParamsUpdater for AuthorReqParams {
         }
 
         if let Some(x) = &self.weight {
-            author.weight = Set(*x);
+            author.weight = Set(*x as i16);
         }
 
         if let Some(x) = &self.created_at {

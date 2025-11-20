@@ -14,10 +14,10 @@ pub struct Model {
     pub dynasty: String,
     pub weight: i32,
     #[serde(rename(deserialize = "hotWeight", serialize = "hotWeight"))]
-    pub hot_weight: i32,
+    pub hot_weight: i16,
     pub content: String,
     #[serde(rename(deserialize = "wordCount", serialize = "wordCount"))]
-    pub word_count: i32,
+    pub word_count: i16,
     pub tags: String,
     #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
     pub created_at: DateTime,

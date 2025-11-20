@@ -10,12 +10,15 @@ pub struct Model {
     pub uuid: String,
     pub name: String,
     pub description: String,
+    #[serde(rename(deserialize = "shortDescription", serialize = "shortDescription"))]
+    pub short_description: String,
     #[serde(rename(deserialize = "birthAt", serialize = "birthAt"))]
-    pub birth_at: DateTime,
+    pub birth_at: Option<DateTime>,
     #[serde(rename(deserialize = "deathAt", serialize = "deathAt"))]
-    pub death_at: DateTime,
+    pub death_at: Option<DateTime>,
     pub dynasty: String,
-    pub weight: i32,
+    // small integer
+    pub weight: i16,
     #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
     pub created_at: DateTime,
     #[serde(rename(deserialize = "updatedAt", serialize = "updatedAt"))]

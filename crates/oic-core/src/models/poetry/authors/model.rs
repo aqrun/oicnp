@@ -154,7 +154,30 @@ impl ModelCrudHandler for AuthorModel {
 }
 
 impl AuthorModel {
+    pub async fn upsert(db: &DatabaseConnection, params: &CreateAuthorReqParams) -> ModelResult<i32> {
+        let author = AuthorEntity::find()
+            .filter(AuthorColumn::Name.eq(params.name.as_ref().unwrap()))
+            .one(db)
+            .await?;
 
+        // 如果存在，则更新
+        if let Some(author) = author {
+            let mut author = author.into_active_model();
+            params.update(&mut author);
+            let a = author.update(db).await?;
+            return Ok(a.id);
+        }
+
+        // 如果不存在，则创建
+        match Self::create(db, params).await {
+            Ok(id) => {
+                Ok(id as i32)
+            },
+            Err(e) => {
+                Err(e)
+            }
+        }
+    }
 }
 
 impl AuthorActiveModel {

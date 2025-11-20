@@ -59,6 +59,8 @@ pub enum Command {
 pub enum PoetryCommand {
     /// 初始化诗词数据表
     Init,
+    /// 读取诗词数据到数据库
+    SyncData,
 }
 
 pub async fn init_cmd() {
@@ -128,6 +130,11 @@ pub async fn init_cmd() {
                 PoetryCommand::Init => {
                     if let Err(err) = cmd::poetry::init_poetry().await {
                         log::error!("InitPoetryErr: {}", err);
+                    }
+                },
+                PoetryCommand::SyncData => {
+                    if let Err(err) = cmd::poetry::sync_data().await {
+                        log::error!("SyncDataErr: {}", err);
                     }
                 },
             }

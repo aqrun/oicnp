@@ -89,7 +89,7 @@ impl RequestParamsUpdater for PoetryReqParams {
         }
 
         if let Some(x) = &self.hot_weight {
-            poetry.hot_weight = Set(*x);
+            poetry.hot_weight = Set(*x as i16);
         }
 
         if let Some(x) = &self.content {
@@ -97,7 +97,7 @@ impl RequestParamsUpdater for PoetryReqParams {
         }
 
         if let Some(x) = &self.word_count {
-            poetry.word_count = Set(*x);
+            poetry.word_count = Set(*x as i16);
         }
 
         if let Some(x) = &self.tags {

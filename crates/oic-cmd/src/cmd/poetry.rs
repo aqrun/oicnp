@@ -1,6 +1,10 @@
-use crate::poetry::create_tables;
+use crate::poetry;
 use anyhow::Result;
 
 pub async fn init_poetry() -> Result<()> {
-    create_tables().await
+    poetry::create_tables().await
+}
+
+pub async fn sync_data() -> Result<()> {
+    poetry::sync_data().await
 }
