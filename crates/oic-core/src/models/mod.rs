@@ -18,5 +18,6 @@ pub mod departments;
 pub mod positions;
 pub mod operation_logs;
 pub mod login_logs;
+pub mod poetry;
 
 pub use base::*;

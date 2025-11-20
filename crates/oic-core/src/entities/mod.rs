@@ -40,3 +40,4 @@ pub mod user;
 pub mod note;
 pub mod cache;
 pub mod ip;
+pub mod poetry;
