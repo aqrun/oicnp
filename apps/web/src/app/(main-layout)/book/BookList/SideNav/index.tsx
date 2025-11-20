@@ -1,7 +1,9 @@
-import {
-  CATEGORIES,
-} from '@/constant';
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { BOOK_CATEGORIES } from '@/content/books';
 import clsx from 'clsx';
+import { useBookStore } from '../../useBookStore';
 import {
   SideNavContainer
 } from './index.styled';
@@ -13,15 +15,17 @@ export interface SideNavProps {
 export default function SideNav({
   catVid = 'all',
 }: SideNavProps): JSX.Element {
+  const category = useBookStore((state) => state.category);
+
   return (
     <SideNavContainer>
       <ul>
-        {CATEGORIES?.map((item) => {
+        {BOOK_CATEGORIES?.map((item) => {
           return (
             <SideNavItem
-              key={item?.vid}
+              key={item?.id}
               item={item}
-              active={catVid === item?.vid}
+              active={category === item?.id}
             />
           );
         })}
@@ -31,7 +35,7 @@ export default function SideNav({
 }
 
 interface SideNavItemProps {
-  item: typeof CATEGORIES[0];
+  item: typeof BOOK_CATEGORIES[0];
   active?: boolean;
 }
 
@@ -39,9 +43,22 @@ function SideNavItem({
   item,
   active = false,
 }: SideNavItemProps): JSX.Element {
+  const router = useRouter();
+  const setBookState = useBookStore.setState;
+
   return (
     <li className={clsx("side-nav-item", active && "active")}>
-      <a href={`/cat/${item?.vid}`}>
+      <a
+        onClick={() => {
+          setBookState({ category: item?.id, title: '' });
+
+          if (item?.id === 'all') {
+            router.push(`/book`);
+          } else {
+            router.push(`/book#/category/${item?.id}`);
+          }
+        }}
+      >
         <span className="item-name">
           {item?.name}
         </span>

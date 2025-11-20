@@ -3,3 +3,4 @@ pub mod seed_data;
 pub mod hash_pass;
 pub mod init_seed;
 pub mod blog;
+pub mod poetry;

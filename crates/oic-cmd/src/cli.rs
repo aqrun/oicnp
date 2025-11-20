@@ -47,6 +47,18 @@ pub enum Command {
     /// 启动接口服务
     ///
     Serve,
+
+    /// 诗词相关命令
+    Poetry {
+        #[clap(subcommand)]
+        command: PoetryCommand,
+    },
+}
+
+#[derive(Subcommand)]
+pub enum PoetryCommand {
+    /// 初始化诗词数据表
+    Init,
 }
 
 pub async fn init_cmd() {
@@ -109,6 +121,16 @@ pub async fn init_cmd() {
         // },
         Command::Serve => {
             let _ = oic_web::app::run().await;
+        },
+
+        Command::Poetry { command } => {
+            match command {
+                PoetryCommand::Init => {
+                    if let Err(err) = cmd::poetry::init_poetry().await {
+                        log::error!("InitPoetryErr: {}", err);
+                    }
+                },
+            }
         },
     }
 }

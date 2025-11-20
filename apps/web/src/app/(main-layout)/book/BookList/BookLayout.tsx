@@ -1,4 +1,7 @@
 import SideNav from './SideNav';
+import {
+  SideBar,
+} from '@/components/HomePage';
 import { HeroContainer } from './index.styled';
 
 export interface BookLayout extends React.PropsWithChildren {
@@ -12,6 +15,7 @@ export default function BookLayout({
   children,
   hasBlogHero = true,
   hasSideNav = true,
+  hasSideBar = true,
   catVid,
 }: BookLayout): JSX.Element {
   return (
@@ -29,9 +33,17 @@ export default function BookLayout({
       )}
       <div className="flex gap-4 mb-8">
         {hasSideNav && <SideNav catVid={catVid} />}
-        <div className='oic-layout-content flex flex-col'>
+        <div className='oic-layout-content1 flex flex-col'>
           {children}
         </div>
+        {hasSideBar && (
+          <div className='lg:w-80'>
+            <SideBar
+              hasWeather
+              hasTags
+            />
+          </div>
+        )}
       </div>
     </div>
   );

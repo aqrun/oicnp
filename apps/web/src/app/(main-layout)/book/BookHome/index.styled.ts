@@ -7,7 +7,7 @@ export const HeroContainer = styled.div`
   height: 200px;
 `;
 
-export const BookListContainer = styled.div`
+export const BookHomeContainer = styled.div`
   .book-item {
     margin-bottom: 8px;
     font-size: 12px;
@@ -21,13 +21,6 @@ export const BookListContainer = styled.div`
       &:hover {
         color: var(--primary);
       }
-    }
-    .book-item-title {
-      font-size: 14px;
-    }
-    .book-item-author {
-      color: #999;
-      font-size: 12px;
     }
   }
 `;
