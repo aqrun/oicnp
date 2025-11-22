@@ -23,10 +23,11 @@ pub struct ChapterFilters {
     #[serde(rename(deserialize = "poetryId"))]
     pub poetry_id: Option<i32>,
     pub title: Option<String>,
+    pub description: Option<String>,
     pub content: Option<String>,
     #[serde(rename(deserialize = "wordCount"))]
-    pub word_count: Option<i32>,
-    pub weight: Option<i32>,
+    pub word_count: Option<i16>,
+    pub weight: Option<i16>,
     #[serde(rename(deserialize = "createdAt"))]
     pub created_at: Option<String>,
     #[serde(rename(deserialize = "updatedAt"))]
@@ -43,10 +44,11 @@ pub struct ChapterReqParams {
     #[serde(rename(deserialize = "poetryId"))]
     pub poetry_id: Option<i32>,
     pub title: Option<String>,
+    pub description: Option<String>,
     pub content: Option<String>,
     #[serde(rename(deserialize = "wordCount"))]
-    pub word_count: Option<i32>,
-    pub weight: Option<i32>,
+    pub word_count: Option<i16>,
+    pub weight: Option<i16>,
     #[serde(rename(deserialize = "createdAt"))]
     pub created_at: Option<String>,
     #[serde(rename(deserialize = "updatedAt"))]
@@ -76,6 +78,9 @@ impl RequestParamsUpdater for ChapterReqParams {
 
         if let Some(x) = &self.title {
             chapter.title = Set(String::from(x));
+        }
+        if let Some(x) = &self.description {
+            chapter.description = Set(String::from(x));
         }
 
         if let Some(x) = &self.content {

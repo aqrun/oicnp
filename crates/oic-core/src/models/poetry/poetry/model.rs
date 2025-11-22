@@ -1,10 +1,11 @@
 use async_trait::async_trait;
 use loco_rs::prelude::*;
 use loco_rs::model::{ModelError, ModelResult};
+use super::{PoetryAnalysisView, CountDataModel};
 use crate::utils::catch_err;
 use crate::entities::poetry::*;
 use crate::{RequestParamsUpdater, ModelCrudHandler};
-use sea_orm::{prelude::*, QueryOrder};
+use sea_orm::{prelude::*, QueryOrder, Condition, Order, QuerySelect};
 
 use super::{
     PoetryFilters,
@@ -213,7 +214,127 @@ impl ModelCrudHandler for PoetryModel {
 }
 
 impl PoetryModel {
+    /// 根据标题和作者更新诗词搜索排名
+    pub async fn update_hot_weight(
+        db: &DatabaseConnection,
+        params: PoetryFilters,
+        hot_weight: i16,
+    ) -> ModelResult<i64> {
+        let mut cdt = Condition::all();
 
+        if let Some(x) = &params.id {
+            if *x > 0 {
+                cdt = cdt.add(PoetryColumn::Id.eq(*x));
+            }
+        }
+
+        if let Some(x) = &params.uuid {
+            if !x.is_empty() {
+                cdt = cdt.add(PoetryColumn::Uuid.eq(x));
+            }
+        }
+
+        if let Some(x) = &params.title {
+            if !x.is_empty() {
+                cdt = cdt.add(PoetryColumn::Title.like(format!("%{}%", x)));
+            }
+        }
+
+        if let Some(x) = &params.author_id {
+            if *x > 0 {
+                cdt = cdt.add(PoetryColumn::AuthorId.eq(*x));
+            }
+        }
+
+        PoetryEntity::update_many()
+            .col_expr(PoetryColumn::HotWeight, Expr::value(hot_weight))
+            .filter(cdt)
+            .exec(db)
+            .await?;
+
+        Ok(0)
+    }
+    
+    /// 获取诗词所有章节
+    pub async fn find_all_chapters(db: &DatabaseConnection, poetry_id: i32) -> ModelResult<Vec<ChapterModel>> {
+        let chapters = ChapterEntity::find()
+            .filter(ChapterColumn::PoetryId.eq(poetry_id))
+            .order_by(ChapterColumn::Weight, Order::Asc)
+            .all(db)
+            .await?;
+        Ok(chapters)
+    }
+
+    pub async fn upsert(db: &DatabaseConnection, params: &CreatePoetryReqParams) -> ModelResult<(i32, String)> {
+        let mut update_or_create = String::from("");
+        let mut cdt = Condition::all();
+
+        if let Some(x) = &params.title {
+            if !x.is_empty() {
+                cdt = cdt.add(PoetryColumn::Title.like(format!("%{}%", x)));
+            }
+        }
+        if let Some(x) = &params.author_id {
+            if *x > 0 {
+                cdt = cdt.add(PoetryColumn::AuthorId.eq(*x));
+            }
+        }
+        if let Some(x) = &params.dynasty {
+            if !x.is_empty() {
+                cdt = cdt.add(PoetryColumn::Dynasty.eq(x));
+            }
+        }
+
+        let poetry = PoetryEntity::find()
+            .filter(cdt)
+            .one(db)
+            .await?;
+
+        if let Some(poetry) = poetry {
+            let mut poetry = poetry.into_active_model();
+            params.update(&mut poetry);
+            let p = poetry.update(db).await?;
+            update_or_create = String::from("update");
+            return Ok((p.id as i32, update_or_create));
+        }
+        
+        match Self::create(db, params).await {
+            Ok(id) => {
+                update_or_create = String::from("create");
+                Ok((id as i32, update_or_create))
+            },
+            Err(e) => {
+                Err(e)
+            }
+        }
+    }
+
+    pub async fn get_analysis_view(db: &DatabaseConnection) -> ModelResult<PoetryAnalysisView> {
+        let total_poetry = PoetryEntity::find().count(db).await?;
+        let total_author = AuthorEntity::find().count(db).await?;
+        
+        let total_wen_yan_wen = PoetryEntity::find()
+            .filter(PoetryColumn::Tags.like(format!("%{}%", "文言文")))
+            .count(db)
+            .await?;
+
+        // sum(word_count)
+        let res = PoetryEntity::find()
+            .select_only()
+            .column_as(PoetryColumn::WordCount.sum(), "total_word_count")
+            .into_model::<CountDataModel>()
+            // .into_tuple::<(u64)>()
+            .one(db)
+            .await?
+            .unwrap_or_default();
+
+        Ok(PoetryAnalysisView {
+            total_poetry,
+            total_author,
+            total_wen_yan_wen,
+            total_word_count: res.total_word_count as u64,
+        })
+    }
 }
 
 impl PoetryActiveModel {

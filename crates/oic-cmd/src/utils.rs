@@ -1,3 +1,4 @@
+use std::time::Duration;
 use reqwest::Client;
 use loco_rs::{
     Result,
@@ -47,4 +48,26 @@ pub async fn post(url: &str, params: &impl Serialize) -> Result<JsonRes<Value>> 
     };
 
     Ok(res)
+}
+
+
+/**
+ * 格式化时间耗时
+ * 秒级直接显示 1秒
+ * 分钟级显示 1分钟1秒
+ * 小时级显示 1小时1分钟1秒
+ */
+pub fn format_duration(duration: Duration) -> String {
+    if duration.as_secs() < 60 {
+        return format!("{}秒", duration.as_secs());
+    } else if duration.as_secs() < 3600 {
+        let minutes = duration.as_secs() / 60;
+        let seconds = duration.as_secs() % 60;
+        return format!("{}分钟{}秒", minutes, seconds);
+    } else {
+        let hours = duration.as_secs() / 3600;
+        let minutes = (duration.as_secs() % 3600) / 60;
+        let seconds = duration.as_secs() % 60;
+        return format!("{}小时{}分钟{}秒", hours, minutes, seconds);
+    }
 }

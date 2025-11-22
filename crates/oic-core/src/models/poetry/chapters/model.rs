@@ -199,7 +199,7 @@ impl ModelCrudHandler for ChapterModel {
 }
 
 impl ChapterModel {
-
+    
 }
 
 impl ChapterActiveModel {

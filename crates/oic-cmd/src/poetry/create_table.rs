@@ -3,7 +3,7 @@
 ///
 use anyhow::Result;
 use sea_orm_migration::{prelude::*, schema::*};
-use super::db::{db_conn, DB};
+use super::{db_conn, DB};
 
 #[derive(DeriveIden)]
 #[allow(dead_code)]
@@ -18,6 +18,7 @@ enum Authors {
     DeathAt,
     Dynasty,
     Weight,
+    Count,
     CreatedAt,
     UpdatedAt,
 }
@@ -35,6 +36,8 @@ enum Poetry {
     Content,
     WordCount,
     Tags,
+    /// 诗词说明
+    Description,
     CreatedAt,
     UpdatedAt,
 }
@@ -61,6 +64,7 @@ enum Chapters {
     Pid,
     PoetryId,
     Title,
+    Description,
     /// 章节总内容
     Content,
     WordCount,
@@ -106,19 +110,33 @@ pub async fn create_tables() -> Result<()> {
                 .if_not_exists()
                 .col(pk_auto(Authors::Id))
                 .col(string_len_uniq(Authors::Uuid, 32))
-                .col(string_len_uniq(Authors::Name, 100))
+                .col(string_len(Authors::Name, 100))
                 .col(text(Authors::Description).default(""))
                 .col(text(Authors::ShortDescription).default(""))
                 .col(date_time_null(Authors::BirthAt))
                 .col(date_time_null(Authors::DeathAt))
                 .col(string_len(Authors::Dynasty, 20).default(""))
                 .col(small_integer(Authors::Weight).default(0))
+                .col(small_integer(Authors::Count).default(0))
                 .col(date_time(Authors::CreatedAt).default(Expr::current_timestamp()))
                 .col(date_time_null(Authors::UpdatedAt).default(Expr::current_timestamp()))
                 .to_owned(),
         )
         .await
         .map_err(|e| anyhow::anyhow!("创建 authors 表失败: {}", e))?;
+
+    // 创建 name dynasty 联合索引
+    manager
+        .create_index(
+            Index::create()
+                .name("idx-authors-name-dynasty-unique")
+                .table(Authors::Table)
+                .col(Authors::Name)
+                .col(Authors::Dynasty)
+                .to_owned(),
+        )
+        .await
+        .map_err(|e| anyhow::anyhow!("创建 name dynasty 联合索引失败: {}", e))?;
 
     println!("authors 表创建成功");
 
@@ -134,10 +152,11 @@ pub async fn create_tables() -> Result<()> {
                 .col(integer(Poetry::AuthorId).default(0))
                 .col(string_len(Poetry::Dynasty, 20).default(""))
                 .col(integer(Poetry::Weight).default(0))
-                .col(small_integer(Poetry::HotWeight).default(0))
+                .col(integer(Poetry::HotWeight).default(0))
                 .col(text(Poetry::Content))
-                .col(small_integer(Poetry::WordCount).default(0))
+                .col(integer(Poetry::WordCount).default(0))
                 .col(string_len(Poetry::Tags, 255).default(""))
+                .col(text(Poetry::Description).default(""))
                 .col(date_time(Poetry::CreatedAt).default(Expr::current_timestamp()))
                 .col(date_time_null(Poetry::UpdatedAt).default(Expr::current_timestamp()))
                 .to_owned(),
@@ -180,6 +199,7 @@ pub async fn create_tables() -> Result<()> {
                 .col(integer(Chapters::Pid).default(0))
                 .col(integer(Chapters::PoetryId).default(0))
                 .col(string_len(Chapters::Title, 255))
+                .col(text(Chapters::Description).default(""))
                 .col(text(Chapters::Content).default(""))
                 .col(small_integer(Chapters::WordCount).default(0))
                 .col(small_integer(Chapters::Weight).default(0))

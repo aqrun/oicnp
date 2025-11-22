@@ -1,4 +1,5 @@
 use loco_rs::prelude::*;
+use sea_orm::FromQueryResult;
 use serde::{Deserialize, Serialize};
 use oic_derives::{FilterParams, add_filter_fields};
 use validator::Validate;
@@ -53,6 +54,8 @@ pub struct PoetryReqParams {
     #[serde(rename(deserialize = "wordCount"))]
     pub word_count: Option<i32>,
     pub tags: Option<String>,
+    /// 诗词说明
+    pub description: Option<String>,
     #[serde(rename(deserialize = "createdAt"))]
     pub created_at: Option<String>,
     #[serde(rename(deserialize = "updatedAt"))]
@@ -89,7 +92,7 @@ impl RequestParamsUpdater for PoetryReqParams {
         }
 
         if let Some(x) = &self.hot_weight {
-            poetry.hot_weight = Set(*x as i16);
+            poetry.hot_weight = Set(*x);
         }
 
         if let Some(x) = &self.content {
@@ -97,11 +100,15 @@ impl RequestParamsUpdater for PoetryReqParams {
         }
 
         if let Some(x) = &self.word_count {
-            poetry.word_count = Set(*x as i16);
+            poetry.word_count = Set(*x);
         }
 
         if let Some(x) = &self.tags {
             poetry.tags = Set(String::from(x));
+        }
+
+        if let Some(x) = &self.description {
+            poetry.description = Set(String::from(x));
         }
 
         if let Some(x) = &self.created_at {
@@ -143,3 +150,40 @@ pub type UpdatePoetryReqParams = PoetryReqParams;
 /// 删除数据参数
 /// 
 pub type DeletePoetryReqParams = PoetryReqParams;
+
+///
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
+#[serde(default)]
+pub struct PoetryAnalysisView {
+    /// 总诗词数量
+    pub total_poetry: u64,
+    /// 总作者数量
+    pub total_author: u64,
+    /// 总文言文数量
+    pub total_wen_yan_wen: u64,
+    /// 总字数
+    pub total_word_count: u64,
+}
+
+impl std::fmt::Display for PoetryAnalysisView {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            r#"诗词数量:    {}
+作者数量:    {}
+文言文数量:  {}
+总文字数量:  {}
+"#,
+            self.total_poetry,
+            self.total_author,
+            self.total_wen_yan_wen,
+            self.total_word_count
+        )
+    }
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone, Default, FromQueryResult)]
+#[serde(default)]
+pub struct CountDataModel {
+    pub total_word_count: i64,
+}

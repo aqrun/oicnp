@@ -1,0 +1,90 @@
+[
+  {
+    "name": "五代-花间集",
+    "id": 0,
+    "path": "五代诗词/huajianji/",
+    "excludes": ["README.md"],
+    "dynasty": "五代",
+    "data_key": "paragraphs",
+    "tags": "花间集"
+  },
+  {
+    "name": "五代-南唐",
+    "id": 1,
+    "path": "五代诗词/nantang/poetrys.json",
+    "dynasty": "五代",
+    "tags": "南唐",
+    "data_key": "paragraphs"
+  },
+  {
+    "name": "元曲",
+    "id": 2,
+    "path": "元曲/yuanqu.json",
+    "dynasty": "元",
+    "tags": "元曲",
+    "data_key": "paragraphs"
+  },
+  {
+    "name": "全唐诗全宋诗",
+    "id": 3,
+    "path": "全唐诗/",
+    "excludes": [
+      "README.md",
+      "表面结构字.json",
+      "error",
+      "authors.song.json",
+      "authors.tang.json"
+    ],
+    "dynasty": "check_by_file_name",
+    "tags": "全唐诗,全宋诗",
+    "data_key": "paragraphs"
+  },
+  {
+    "name": "宋词",
+    "id": 5,
+    "path": "宋词/",
+    "excludes": [
+      "author.song.json",
+      "ci.db",
+      "main.py",
+      "README.md",
+      "UpdateCi.py"
+    ],
+    "dynasty": "宋",
+    "tags": "宋词",
+    "data_key": "paragraphs"
+  },
+  {
+    "name": "曹操诗集",
+    "id": 8,
+    "path": "曹操诗集/caocao.json",
+    "dynasty": "三国",
+    "author": "曹操",
+    "tags": "曹操诗集",
+    "data_key": "paragraphs"
+  },
+  {
+    "name": "楚辞",
+    "id": 9,
+    "path": "楚辞/chuci.json",
+    "dynasty": "先秦",
+    "tags": "楚辞",
+    "data_key": "content"
+  },
+  {
+    "name": "水墨唐诗",
+    "id": 10,
+    "path": "水墨唐诗/shuimotangshi.json",
+    "dynasty": "唐",
+    "tags": "水墨唐诗",
+    "data_key": "paragraphs"
+  },
+  {
+    "name": "纳兰性德",
+    "id": 11,
+    "path": "纳兰性德/纳兰性德诗集.json",
+    "dynasty": "清",
+    "tags": "纳兰性德诗集",
+    "data_key": "para"
+  }
+]

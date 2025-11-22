@@ -1,0 +1,24 @@
+{
+  "mengzi": {
+    "name": "四书五经-孟子", 
+    "id": 4,
+    "path": "四书五经/mengzi.json",
+    "data_key": "paragraphs"
+  },
+  "shijing": {
+      "name": "诗经",
+      "id": 13,
+      "path": "诗经/shijing.json",
+      "dynasty": "先秦",
+      "data_key": "content"
+  },
+  "lunyu": {
+    "name": "论语",
+    "id": 12,
+    "path": "论语/lunyu.json",
+    "dynasty": "先秦",
+    "author": "孔子",
+    "tags": "论语",
+    "data_key": "paragraphs"
+  }
+}

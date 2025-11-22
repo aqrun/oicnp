@@ -7,6 +7,7 @@ use crate::{
     RequestParamsUpdater, uuid,
     constants::DATE_TIME_FORMAT,
 };
+use sea_orm::FromQueryResult;
 
 pub use crate::entities::poetry::{
   AuthorActiveModel,
@@ -36,6 +37,8 @@ pub struct AuthorFilters {
     pub created_at: Option<String>,
     #[serde(rename(deserialize = "updatedAt"))]
     pub updated_at: Option<String>,
+    /// 指定部分可选字段, 逗号分隔
+    pub fields: Option<String>,
 }
 
 /// 创建 author 参数
@@ -54,6 +57,7 @@ pub struct AuthorReqParams {
     pub death_at: Option<String>,
     pub dynasty: Option<String>,
     pub weight: Option<i32>,
+    pub count: Option<i32>,
     #[serde(rename(deserialize = "createdAt"))]
     pub created_at: Option<String>,
     #[serde(rename(deserialize = "updatedAt"))]
@@ -103,6 +107,10 @@ impl RequestParamsUpdater for AuthorReqParams {
 
         if let Some(x) = &self.weight {
             author.weight = Set(*x as i16);
+        }
+
+        if let Some(x) = &self.count {
+            author.count = Set(*x as i16);
         }
 
         if let Some(x) = &self.created_at {

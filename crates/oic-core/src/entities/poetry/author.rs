@@ -19,6 +19,8 @@ pub struct Model {
     pub dynasty: String,
     // small integer
     pub weight: i16,
+    // 作品数量
+    pub count: i16,
     #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
     pub created_at: DateTime,
     #[serde(rename(deserialize = "updatedAt", serialize = "updatedAt"))]

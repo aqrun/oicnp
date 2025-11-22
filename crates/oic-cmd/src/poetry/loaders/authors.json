@@ -1,0 +1,18 @@
+[
+  {
+    "path": "五代诗词/nantang/authors.json",
+    "dynasty": "五代"
+  },
+  {
+    "path": "全唐诗/authors.song.json",
+    "dynasty": "宋"
+  },
+  {
+    "path": "全唐诗/authors.tang.json",
+    "dynasty": "唐"
+  },
+  {
+    "path": "宋词/author.song.json",
+    "dynasty": "宋"
+  }
+]

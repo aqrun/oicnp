@@ -4,7 +4,7 @@ use crate::entities::poetry::*;
 use loco_rs::prelude::*;
 use loco_rs::model::{ModelError, ModelResult};
 use crate::{RequestParamsUpdater, ModelCrudHandler};
-use sea_orm::{prelude::*, QueryOrder};
+use sea_orm::{prelude::*, QueryOrder, QueryFilter, Condition};
 use validator::Validate;
 
 use super::{
@@ -63,6 +63,12 @@ impl ModelCrudHandler for AuthorModel {
             }
         }
 
+        if let Some(x) = &params.name {
+            if !x.is_empty() {
+                q = q.filter(AuthorColumn::Name.contains(x));
+            }
+        }
+
         let mut order_by = AuthorColumn::Id;
 
         if order_by_str.eq("created_at") {
@@ -75,6 +81,45 @@ impl ModelCrudHandler for AuthorModel {
         let pager = q.order_by(order_by, order)
             .paginate(db, page_size);
         let list = pager.fetch_page(page - 1).await?;
+
+        let fields = match &params.fields {
+            Some(x) => String::from(x),
+            None => String::from(""),
+        };
+
+        let list = list.into_iter().map(|x| {
+            let mut author = AuthorModel {
+                id: x.id,
+                name: String::from(x.name.as_str()),
+                count: x.count,
+                dynasty: String::from(x.dynasty.as_str()),
+                ..Default::default()
+            };
+
+            if fields.contains("description") {
+                author.description = String::from(x.description.as_str());
+            }
+            if fields.contains("short_description") {
+                author.short_description = String::from(x.short_description.as_str());
+            }
+            if fields.contains("birth_at") {
+                author.birth_at = x.birth_at;
+            }
+            if fields.contains("death_at") {
+                author.death_at = x.death_at;
+            }
+            if fields.contains("weight") {
+                author.weight = x.weight;
+            }
+            if fields.contains("created_at") {
+                author.created_at = x.created_at;
+            }
+            if fields.contains("updated_at") {
+                author.updated_at = x.updated_at;
+            }
+
+            author
+        }).collect();
 
         Ok((list, total))
     }
@@ -156,7 +201,9 @@ impl ModelCrudHandler for AuthorModel {
 impl AuthorModel {
     pub async fn upsert(db: &DatabaseConnection, params: &CreateAuthorReqParams) -> ModelResult<i32> {
         let author = AuthorEntity::find()
+            // 同时使用 name 和 dynasty 查询
             .filter(AuthorColumn::Name.eq(params.name.as_ref().unwrap()))
+            .filter(AuthorColumn::Dynasty.eq(params.dynasty.as_ref().unwrap()))
             .one(db)
             .await?;
 
@@ -177,6 +224,32 @@ impl AuthorModel {
                 Err(e)
             }
         }
+    }
+
+    /// 更新作者作品计数 + 1
+    pub async fn update_count_by_id(db: &DatabaseConnection, id: i32) -> ModelResult<()> {
+        if id <= 0 {
+            return Ok(());
+        }
+
+        let author_model = match Self::find_by_id(db, id as i64)
+            .await {
+                Ok(author) => author,
+                Err(_e) => {
+                    return Ok(());
+                }
+            };
+        let count = author_model.count;
+        let mut author = author_model.into_active_model();
+        author.count = Set(count + 1);
+        let _ = match author.update(db).await {
+            Ok(data) => data,
+            Err(_e) => {
+                return Ok(());
+            }
+        };
+
+        Ok(())
     }
 }
 
