@@ -1,4 +1,4 @@
-import { TOOL_CATEGORIES } from '@/content/tools';
+import { ToolCategories } from '@/content/tools';
 import clsx from 'clsx';
 import {
   SideNavContainer
@@ -6,15 +6,17 @@ import {
 
 export interface SideNavProps {
   catVid?: string;
+  toolCategories?: ToolCategories[];
 }
 
 export default function SideNav({
   catVid = 'all',
+  toolCategories,
 }: SideNavProps): JSX.Element {
   return (
     <SideNavContainer>
       <ul>
-        {TOOL_CATEGORIES?.map((item) => {
+        {toolCategories?.map((item) => {
           return (
             <SideNavItem
               key={item?.id}
@@ -29,7 +31,7 @@ export default function SideNav({
 }
 
 interface SideNavItemProps {
-  item: typeof TOOL_CATEGORIES[0];
+  item: ToolCategories;
   active?: boolean;
 }
 
@@ -39,7 +41,7 @@ function SideNavItem({
 }: SideNavItemProps): JSX.Element {
   return (
     <li className={clsx("side-nav-item", active && "active")}>
-      <a href={`/tool/${item?.id}`}>
+      <a href={`/tool/t/${item?.id}`}>
         <span className="item-name">
           {item?.name}
         </span>

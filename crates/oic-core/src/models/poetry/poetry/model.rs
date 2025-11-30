@@ -266,7 +266,6 @@ impl PoetryModel {
     }
 
     pub async fn upsert(db: &DatabaseConnection, params: &CreatePoetryReqParams) -> ModelResult<(i32, String)> {
-        let mut update_or_create = String::from("");
         let mut cdt = Condition::all();
 
         if let Some(x) = &params.title {
@@ -294,13 +293,13 @@ impl PoetryModel {
             let mut poetry = poetry.into_active_model();
             params.update(&mut poetry);
             let p = poetry.update(db).await?;
-            update_or_create = String::from("update");
+            let update_or_create = String::from("update");
             return Ok((p.id as i32, update_or_create));
         }
         
         match Self::create(db, params).await {
             Ok(id) => {
-                update_or_create = String::from("create");
+                let update_or_create = String::from("create");
                 Ok((id as i32, update_or_create))
             },
             Err(e) => {

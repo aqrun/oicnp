@@ -64,7 +64,7 @@ impl ModelCrudHandler for TagModel {
     async fn find_list(db: &DatabaseConnection, params: &Self::FilterParams) -> ModelResult<(Vec<Self>, u64)> {
         let page = params.get_page();
         let page_size = params.get_page_size();
-        let mut order = params.get_order();
+        // let mut order = params.get_order();
         let order_by_str = params.get_order_by();
 
         let mut q = TagEntity::find();
@@ -82,7 +82,7 @@ impl ModelCrudHandler for TagModel {
         }
 
         let mut order_by = TagColumn::TagCount;
-        order = Order::Desc;
+        let order = Order::Desc;
 
         if order_by_str.eq("tag_name") {
             order_by = TagColumn::TagName;  

@@ -12,7 +12,7 @@ export default function ToolItemWidget({
       <a
         className="item-inner"
         target="_blank"
-        href={record?.url}
+        href={`/tool/view?target=${encodeURIComponent(record?.url || '')}`}
       >
         <div className="item-logo-w">
           {record?.logo ? (

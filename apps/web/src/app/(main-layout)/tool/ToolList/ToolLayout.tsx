@@ -1,22 +1,25 @@
 import SideNav from './SideNav';
+import { ToolCategories } from '@/content/tools';
 import { HeroContainer } from './index.styled';
 
 export interface BlogLayoutProps extends React.PropsWithChildren {
-  hasBlogHero?: boolean;
+  hasHero?: boolean;
   hasSideNav?: boolean;
   catVid?: string;
   hasSideBar?: boolean;
+  toolCategories?: ToolCategories[];
 }
 
 export default function ToolLayout({
   children,
-  hasBlogHero = true,
+  hasHero = true,
   hasSideNav = true,
   catVid,
+  toolCategories,
 }: BlogLayoutProps): JSX.Element {
   return (
     <div className="layout">
-      {hasBlogHero && (
+      {hasHero && (
         <HeroContainer
           id="blog-hero"
           className="flex flex-col items-center justify-center bg-center bg-cover bg-no-repeat py-0 px-1 text-white rounded-md mb-6"
@@ -28,7 +31,7 @@ export default function ToolLayout({
         </HeroContainer>
       )}
       <div className="flex gap-4 mb-8">
-        {hasSideNav && <SideNav catVid={catVid} />}
+        {hasSideNav && <SideNav catVid={catVid} toolCategories={toolCategories} />}
         <div className='oic-layout-content1 flex flex-col'>
           {children}
         </div>

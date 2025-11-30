@@ -4,7 +4,6 @@ use validator::Validate;
 use oic_derives::{add_filter_fields, FilterParams};
 use crate::{
     models::RequestParamsUpdater,
-    utils::utc_now,
     entities::prelude::*,
     constants::DATE_TIME_FORMAT,
 };

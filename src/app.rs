@@ -17,7 +17,10 @@ use migration::Migrator;
 use oic_core::{
     entities::prelude::*,
     services::cache::OicCache,
-    prelude::Settings,
+    prelude::{
+        Settings,
+        get_poetry_db,
+    },
     middleware::{
         RoleRouteLayer,
         OperationLogLayer,
@@ -54,6 +57,8 @@ impl Hooks for App {
     }
 
     async fn initializers(_ctx: &AppContext) -> Result<Vec<Box<dyn Initializer>>> {
+        // 初始化诗词数据库
+        let _ = get_poetry_db().await;
         Ok(vec![Box::new(
             initializers::view_engine::ViewEngineInitializer,
         )])
@@ -67,7 +72,7 @@ impl Hooks for App {
         app_routes
     }
 
-    async fn after_routes(router: AxumRouter, ctx: &AppContext) -> Result<AxumRouter> {
+    async fn after_routes(router: AxumRouter, _ctx: &AppContext) -> Result<AxumRouter> {
         let router = router.fallback(fallback);
         Ok(router)
     }

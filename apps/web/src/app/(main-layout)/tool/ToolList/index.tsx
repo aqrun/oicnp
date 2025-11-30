@@ -1,29 +1,35 @@
 import ToolLayout from './ToolLayout';
-import {
-  DescribeNodeListResponseData,
-} from '@repo/apis/server';
-import { ALL_TOOLS } from '@/content/tools';
+import { ToolItem, ToolCategories } from '@/content/tools';
 import ToolItemWidget from './ToolItemWidget';
+import {
+  ListBlockTitle,
+} from '@/components';
 import { ToolList } from './index.styled';
 
 export interface ArticleListProps {
   catVid?: string;
-  tagVid?: string;
-  nodeRes?: DescribeNodeListResponseData;
+  title?: string;
+  toolList?: ToolItem[];
+  toolCategories?: ToolCategories[];
 }
 
 export default function ArticleList({
   catVid,
-  tagVid,
-  nodeRes,
+  title,
+  toolList,
+  toolCategories,
 }: ArticleListProps) {
 
   return (
     <ToolLayout
       catVid={catVid}
+      toolCategories={toolCategories}
     >
+      <ListBlockTitle
+        title={title || ''}
+      />
       <ToolList className='relative flex flex-wrap flex-row'>
-        {ALL_TOOLS?.map((item) => {
+        {toolList?.map((item) => {
           return (
             <ToolItemWidget
               key={item?.name}

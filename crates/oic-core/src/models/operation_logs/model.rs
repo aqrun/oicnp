@@ -52,10 +52,10 @@ impl ModelCrudHandler for OperationLogModel {
     async fn find_list(db: &DatabaseConnection, params: &Self::FilterParams) -> ModelResult<(Vec<Self>, u64)> {
         let page = params.get_page();
         let page_size = params.get_page_size();
-        let mut order = params.get_order();
+        // let mut order = params.get_order();
         let order_by_str = params.get_order_by();
 
-        order = Order::Desc;
+        let order = Order::Desc;
 
         let mut q = OperationLogEntity::find();
 

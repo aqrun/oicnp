@@ -4,7 +4,7 @@ use crate::entities::poetry::*;
 use loco_rs::prelude::*;
 use loco_rs::model::{ModelError, ModelResult};
 use crate::{RequestParamsUpdater, ModelCrudHandler};
-use sea_orm::{prelude::*, QueryOrder, QueryFilter, Condition};
+use sea_orm::{prelude::*, QueryOrder, QueryFilter};
 use validator::Validate;
 
 use super::{

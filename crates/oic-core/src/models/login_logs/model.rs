@@ -58,7 +58,7 @@ impl ModelCrudHandler for LoginLogModel {
     async fn find_list(db: &DatabaseConnection, params: &Self::FilterParams) -> ModelResult<(Vec<Self>, u64)> {
         let page = params.get_page();
         let page_size = params.get_page_size();
-        let mut order = params.get_order();
+        // let mut order = params.get_order();
         let order_by_str = params.get_order_by();
 
         let mut q = LoginLogEntity::find();
@@ -76,7 +76,7 @@ impl ModelCrudHandler for LoginLogModel {
         }
 
         let mut order_by = LoginLogColumn::LoginAt;
-        order = Order::Desc;
+        let order = Order::Desc;
 
         if order_by_str.eq("login_name") {
             order_by = LoginLogColumn::LoginName;

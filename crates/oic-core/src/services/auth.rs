@@ -5,7 +5,7 @@ use crate::entities::prelude::*;
 use crate::models::users::{LoginParams, RegisterParams};
 use serde_json::{json, Value};
 use anyhow::{Result, anyhow};
-use crate::utils::{verify_password, catch_err, utc_now};
+use crate::utils::{verify_password, catch_err};
 use crate::uuid;
 
 #[derive(Debug, Deserialize, Serialize)]

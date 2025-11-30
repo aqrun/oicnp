@@ -3,7 +3,8 @@ export const siteConfig = {
   description:
     '灵犀纪,rust语言开发,服务器,html,css,js,nextjs,tailwindcss',
   /** Without additional '/' on the end*/
-  url: 'https://www.lxage.com',
+  // url: 'https://www.lxage.com',
+  url: 'http://localhost:3000',
 };
 
 /** 首页文章列表每页显示条数 */

@@ -7,7 +7,6 @@ use crate::{
     RequestParamsUpdater, uuid,
     constants::DATE_TIME_FORMAT,
 };
-use sea_orm::FromQueryResult;
 
 pub use crate::entities::poetry::{
   AuthorActiveModel,

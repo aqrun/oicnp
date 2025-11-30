@@ -2,6 +2,7 @@ import { MAIN_MENUS } from '@/constant';
 
 import { MenuToggleButton } from './MenuToggleButton';
 import clsx from 'clsx';
+
 import { HeaderMenu } from './index.styled';
 
 export interface HeaderProps {
@@ -24,13 +25,26 @@ export const Header = ({
               className='relative bg-[#00000000] no-underline hover:outline-0 max-[991px]:mr-auto max-[767px]:pl-0 text-xl lg:text-2xl font-bold text-gray-800 flex items-center hover:text-[var(--primary)]'
               aria-label='home'
             >
-              <img
-                src='/favicon/logo.png'
+              {/* <img
+                src='/favicon/logo112501.svg'
                 loading='lazy'
                 alt=''
                 className='inline-block max-h-9 max-w-full'
+              /> */}
+              <span
+                className='inline-block max-h-9 max-w-full h-11'
+                dangerouslySetInnerHTML={{
+                  __html: `<svg height="45" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" baseProfile="full" fill="currentColor">
+    <g transform="scale(1,-1) translate(0,-500)">
+        <path d="M 1.235852 486.524607 L 337.874486 486.524607 L 283.577932 374.311729 L 500.764148 1.475393 L 149.646433 1.475393 L 211.182527 110.068500 Z" transform="scale(1.000000,1.000000) translate(-1.000000,6.000000)" opacity="1.000000"></path>
+        <path d="M 114.926122 211.338204 L 145.162852 157.004964 L 61.602733 1.475393 L 1.235852 1.475393 Z" transform="scale(1.000000,1.000000) translate(-1.000000,6.000000)" opacity="1.000000"></path>
+        <path d="M 86.144257 210.524607 L 1.203135 55.144015 L 31.166850 1.913660 L 145.764148 210.524607 Z" transform="scale(1.000000,1.000000) translate(354.000000,282.000000)" opacity="1.000000"></path>
+    </g>
+</svg>`,
+                }}
               />
-              <span className="flex flex-col ml-1">
+            
+              <span className="flex flex-col ml-1 min-w-24">
                 <span className="">
                   灵犀纪
                 </span>

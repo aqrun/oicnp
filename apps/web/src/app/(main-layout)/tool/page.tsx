@@ -1,8 +1,9 @@
 import { Metadata } from 'next';
 
 import { siteConfig } from '@/constant/config';
-import ToolList from './ToolList';
+import ToolHome from './ToolHome';
 import { MainLayout } from '@/components/layouts';
+import { ALL_TOOLS, TOOL_CATEGORIES } from '@/content/tools';
 
 export const metadata: Metadata = {
   title: '常用工具|灵犀纪-心有灵犀，专注技术分享', // `灵犀纪 | ${siteConfig.title}`,
@@ -14,7 +15,10 @@ export default async function ToolsPage() {
     <MainLayout
       activeMenuId='tool'
     >
-      <ToolList />
+      <ToolHome
+        allTools={ALL_TOOLS}
+        toolCategories={TOOL_CATEGORIES}
+      />
     </MainLayout>
   );
 }

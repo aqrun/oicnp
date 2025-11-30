@@ -3,7 +3,8 @@
 import styled from 'styled-components';
 
 export const HeroContainer = styled.div`
-  background-image: url('/images/blog/blog-hero.png');
+  background-color: var(--color-very-light-purple);
+  background-image: url('/images/heros/books.png');
   height: 200px;
 `;
 

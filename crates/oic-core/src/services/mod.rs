@@ -6,3 +6,4 @@ pub mod cache;
 pub mod settings;
 pub mod file;
 pub mod common;
+pub mod poetry;

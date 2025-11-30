@@ -18,6 +18,7 @@ mod operation_log;
 mod position;
 mod department;
 mod login_log;
+mod poetry;
 
 pub const VERSION: &str = "v1";
 
@@ -43,6 +44,7 @@ pub fn routes(_ctx: &AppContext) -> Vec<Routes> {
         position::routes(),
         department::routes(),
         login_log::routes(),
+        poetry::routes(),
     ];
     routes.extend(need_role_routes);
 

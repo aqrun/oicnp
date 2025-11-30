@@ -429,8 +429,8 @@ impl NodeModel {
         let order_by_str = params.get_order_by();
 
         // 设置排序字段和顺序
-        let mut order = params.get_order();
-        order = Order::Desc;
+        // let mut order = params.get_order();
+        let order = Order::Desc;
         let order_by = match order_by_str.as_str() {
             "title" => NodeColumn::Title,
             "updated_at" => NodeColumn::UpdatedAt,

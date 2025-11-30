@@ -42,8 +42,8 @@ pub async fn store_file_local(
 
 /// 存储文件到OSS
 pub async fn store_file_oss(
-    mut body_reader: impl tokio::io::AsyncRead + Unpin,
-    storage_cfg: &StorageSettings,
+    _body_reader: impl tokio::io::AsyncRead + Unpin,
+    _storage_cfg: &StorageSettings,
     params: &CreateFileReqParams,
 ) -> Result<String, Box<dyn std::error::Error>> {
     let filename = match &params.filename {
@@ -56,7 +56,7 @@ pub async fn store_file_oss(
     let ext = filename.split('.').last().unwrap_or("");
     let real_file_name = format!("{}.{}", uuid!(), ext);
 
-    let file_path = format!("{}/{}", storage_cfg.path, date_path);
+    // let file_path = format!("{}/{}", storage_cfg.path, date_path);
     
     let uri = format!("{}/{}", date_path.as_str(), real_file_name.as_str());
     Ok(uri)
