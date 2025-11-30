@@ -7,6 +7,7 @@ use oic_core::{
         UpdatePoetryReqParams,
         DeletePoetryReqParams,
         PoetryModel,
+        PoetryListPageDataResponse,
     },
     utils::get_api_prefix,
     typings::{JsonRes, Pagination},
@@ -100,6 +101,23 @@ pub async fn remove(
     JsonRes::from(res)
 }
 
+pub async fn get_list_page_data(
+    Json(params): Json<PoetryFilters>,
+) -> JsonRes<PoetryListPageDataResponse> {
+    let db = get_poetry_db().await;
+    let res = PoetryModel::get_list_page_data(db, params).await;
+
+    match res {
+        Ok(data) => {
+            // 返回 poetry 列表作为 entries，chapters 数据包含在响应中但前端目前只使用 entries
+            JsonRes::from((data, "entry"))
+        },
+        Err(err) => {
+            JsonRes::err(err)
+        }
+    }
+}
+
 pub fn routes() -> Routes {
     Routes::new()
         .prefix(get_api_prefix(super::VERSION, "poetry").as_str())
@@ -109,4 +127,5 @@ pub fn routes() -> Routes {
         .add("/add-multi", post(add_multi))
         .add("/update", post(update))
         .add("/remove", post(remove))
+        .add("/list-page-data", post(get_list_page_data))
 }

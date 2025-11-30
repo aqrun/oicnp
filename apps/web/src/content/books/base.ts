@@ -8,27 +8,33 @@ export const BOOK_CATEGORIES: BookCategories[] = [
     name: '全部',
   },
   {
-    id: 'chu_ci',
-    name: '楚辞',
+    id: 'wu_dai_shi_ci',
+    name: '五代诗词',
+    tags: ['花间集', '南唐'],
   },
   {
-    id: 'lun_yu',
-    name: '论语',
+    id: 'tang_shi',
+    name: '唐诗',
+    tags: ['全唐诗'],
+  },
+  {
+    id: 'song_ci',
+    name: '宋词',
+    tags: ['全宋诗'],
+  },
+  {
+    id: 'chu_ci',
+    name: '楚辞',
+    tags: ['楚辞'],
   },
   {
     id: 'meng_xue',
     name: '蒙学',
-  },
-  {
-    id: 'shi_jing',
-    name: '诗经',
-  },
-  {
-    id: 'shui_mo_tang_shi',
-    name: '水墨唐诗',
+    tags: ['蒙学'],
   },
   {
     id: 'si_shu_wu_jing',
     name: '四书五经',
+    tags: ['四书五经', '诗经', '论语'],
   },
 ];

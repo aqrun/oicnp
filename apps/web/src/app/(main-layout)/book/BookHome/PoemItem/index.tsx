@@ -1,23 +1,42 @@
 import Image from 'next/image';
-
-import { BookItem } from '@/content/books';
-import { BOOK_CATEGORIES } from '@/content/books/base';
+import { PoetryListPageDataModel, ChapterModel } from '@repo/apis/server';
+import {
+  Container,
+} from './index.styled';
 
 export interface PoemItemProps {
-  record?: BookItem;
+  category?: string;
+  record?: PoetryListPageDataModel;
+  chapters?: ChapterModel[];
 }
 
 /**
  * 诗词列表单个
  */
-export const PoemItem: React.FC<PoemItemProps> = ({ record }) => {
-  const category = BOOK_CATEGORIES?.find((item) => {
-    return item?.id === record?.category;
-  });
+export function PoemItem({
+  category,
+  record,
+  chapters,
+}: PoemItemProps) {
+  let contents = record?.content?.split('\n')?.slice(0, 2);
+
+  if ((record?.content?.length || 0) > 100) {
+    contents = [record?.content?.slice(0, 40)?.replace(/\n/g, '') || ''];
+  }
+
+  if (record?.content === 'book') {
+    if (record?.description) {
+      contents = [record?.description?.slice(0, 40)?.replace(/\n/g, '') || ''];
+    } else if (record?.isBook) {
+      contents = [chapters?.[0]?.content?.slice(0, 40)?.replace(/\n/g, ' ') || ''];
+    } else {
+      contents = ['暂无内容'];
+    }
+  }
 
   return (
-    <div className='w-full'>
-      <div className='overflow-hidden rounded-lg hover:shadow-lg hover:shadow-violet-100 hover:border-violet-400 cursor-pointer border border-slate-200 border-solid'>
+    <Container className='poem-list-item-w w-1/2 mb-4'>
+      <div className='poem-list-item overflow-hidden rounded-lg hover:shadow-lg hover:shadow-violet-100 hover:border-violet-400 cursor-pointer border border-slate-200 border-solid'>
         <a
           href={`/p/${record?.title}`}
           className='block w-full h-full md:flex'
@@ -31,29 +50,31 @@ export const PoemItem: React.FC<PoemItemProps> = ({ record }) => {
               height={180}
             />
           )}
-          <div className='w-full p-4 bg-white dark:bg-gray-800'>
+          <div className='w-full p-4 bg-white dark:bg-gray-800 min-h-40'>
             <p className='font-light text-gray-400 text-md'>
               <i className='iconfont icon-benshubook122 mr-1' />
-              {category?.name}
+              {category}
               &nbsp;
 
-              <span className="ml-2 text-gray-400 font-light">
-                <i className='iconfont icon-date mr-1' />
-                {record?.author}
-              </span>
+              {Boolean(record?.authorName) && (
+                <span className="ml-2 text-gray-400 font-light">
+                  <i className='iconfont icon-date mr-1' />
+                  {record?.authorName}
+                </span>
+              )}
             </p>
             <p className='mb-2 text-xl font-medium text-gray-800 dark:text-white'>
               {record?.title}
             </p>
-            <p className='font-light text-gray-800 dark:text-gray-300 text-md'>
-              {record?.content?.slice(0, 2)?.map((n, index) => {
+            <div className='font-light text-gray-800 dark:text-gray-300 text-md'>
+              {contents?.map((n, index) => {
                 return (
                   <p key={index}>{n}</p>
                 );
               })}
-            </p>
-            <div className='flex flex-wrap items-center mt-4 justify-starts'>
-              {record?.tags?.split(',')?.map((item) => {
+            </div>
+            <div className='flex flex-wrap items-center mt-4 justify-starts hidden'>
+              {record?.tags?.split(',')?.slice(0, 3)?.map((item) => {
                 return (
                   <div
                     key={item}
@@ -67,7 +88,7 @@ export const PoemItem: React.FC<PoemItemProps> = ({ record }) => {
           </div>
         </a>
       </div>
-    </div>
+    </Container>
   );
 };
 

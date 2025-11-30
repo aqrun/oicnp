@@ -1,11 +1,17 @@
 use async_trait::async_trait;
 use loco_rs::prelude::*;
 use loco_rs::model::{ModelError, ModelResult};
-use super::{PoetryAnalysisView, CountDataModel};
+use super::{
+    PoetryAnalysisView,
+    CountDataModel,
+    PoetryListDataModel,
+    PoetryListPageDataResponse,
+};
 use crate::utils::catch_err;
 use crate::entities::poetry::*;
 use crate::{RequestParamsUpdater, ModelCrudHandler};
-use sea_orm::{prelude::*, QueryOrder, Condition, Order, QuerySelect};
+use sea_orm::{prelude::*, QueryOrder, Condition, Order, QuerySelect, JoinType};
+use futures::future::try_join_all;
 
 use super::{
     PoetryFilters,
@@ -333,6 +339,107 @@ impl PoetryModel {
             total_wen_yan_wen,
             total_word_count: res.total_word_count as u64,
         })
+    }
+
+    pub async fn get_list_page_data(
+        db: &DatabaseConnection,
+        params: PoetryFilters,
+    ) -> ModelResult<PoetryListPageDataResponse> {
+        let poetry_amount = params.poetry_amount.unwrap_or(6);
+        let chapter_amount = params.chapter_amount.unwrap_or(3);
+        let mut home_categories: Vec<String> = vec![];
+
+        if let Some(tags) = &params.tags {
+            home_categories = tags.split(',').map(|s| s.to_string()).collect();
+        }
+        
+        // 为每个分类创建查询任务，并行执行
+        let queries: Vec<_> = home_categories
+            .into_iter()
+            .map(|category| {
+                PoetryEntity::find()
+                    .select_only()
+                    // 选择 poetry 表的所有字段
+                    .column(PoetryColumn::Id)
+                    .column(PoetryColumn::Uuid)
+                    .column(PoetryColumn::Title)
+                    .column(PoetryColumn::AuthorId)
+                    .column(PoetryColumn::Dynasty)
+                    .column(PoetryColumn::Weight)
+                    .column(PoetryColumn::HotWeight)
+                    .column(PoetryColumn::Content)
+                    .column(PoetryColumn::WordCount)
+                    .column(PoetryColumn::Tags)
+                    .column(PoetryColumn::Description)
+                    // .column(PoetryColumn::CreatedAt)
+                    // .column(PoetryColumn::UpdatedAt)
+                    // 使用 column_as 选择作者信息并设置别名
+                    .column_as(AuthorColumn::Uuid, "author_uuid")
+                    .column_as(AuthorColumn::Name, "author_name")
+                    // Left Join 作者表
+                    .join(
+                        JoinType::LeftJoin, 
+                        PoetryEntity::belongs_to(AuthorEntity)
+                        .from(PoetryColumn::AuthorId)
+                        .to(AuthorColumn::Id)
+                        .into()
+                    )
+                    .filter(PoetryColumn::Tags.contains(category))
+                    .order_by(PoetryColumn::Weight, Order::Asc)
+                    .limit(poetry_amount)
+                    .into_model::<PoetryListDataModel>()
+                    .all(db)
+            })
+            .collect();
+        
+        // 并行执行所有查询
+        let results = try_join_all(queries).await?;
+        
+        // 将所有结果合并到一个向量中，同时设置 is_book 字段
+        let mut all_poetry: Vec<PoetryListDataModel> = Vec::new();
+        let mut book_poetry_ids: Vec<i32> = Vec::new();
+        
+        // content 是 book 时需要获取全部章节数据 并设置 is_book 为 true
+        for poetry_list in results {
+            for mut poetry in poetry_list {
+                // 在合并时直接判断并设置 is_book 字段
+                if poetry.content == "book" {
+                    poetry.is_book = Some(String::from("1"));
+                    book_poetry_ids.push(poetry.id);
+                } else {
+                    poetry.is_book = Some(String::from("0"));
+                }
+                all_poetry.push(poetry);
+            }
+        }
+
+        // 为每个书籍创建并发查询任务，每个书籍只获取3个章节
+        let chapter_queries: Vec<_> = book_poetry_ids
+            .iter()
+            .map(|&poetry_id| {
+                ChapterEntity::find()
+                    .filter(ChapterColumn::PoetryId.eq(poetry_id))
+                    .order_by(ChapterColumn::Weight, Order::Asc)
+                    .limit(chapter_amount)
+                    .all(db)
+            })
+            .collect();
+
+        // 并发执行所有章节查询
+        let chapter_results = try_join_all(chapter_queries).await?;
+
+        // 收集所有章节数据
+        let mut all_chapters: Vec<ChapterModel> = Vec::new();
+        for chapters in chapter_results {
+            all_chapters.extend(chapters);
+        }
+
+        let res_data = PoetryListPageDataResponse {
+            poetry_list: all_poetry,
+            chapter_list: all_chapters,
+        };
+        
+        Ok(res_data)
     }
 }
 

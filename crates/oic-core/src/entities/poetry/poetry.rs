@@ -33,6 +33,12 @@ pub enum Relation {
     PoetryLine,
     #[sea_orm(has_many = "super::chapter::Entity")]
     Chapter,
+    #[sea_orm(
+        belongs_to = "super::author::Entity",
+        from = "Column::AuthorId",
+        to = "super::author::Column::Id"
+    )]
+    Author,
 }
 
 impl Related<super::poetry_line::Entity> for Entity {
@@ -44,6 +50,12 @@ impl Related<super::poetry_line::Entity> for Entity {
 impl Related<super::chapter::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Chapter.def()
+    }
+}
+
+impl Related<super::author::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Author.def()
     }
 }
 

@@ -1,4 +1,6 @@
 export interface BookItem {
+  id?: number;
+  uuid?: string;
   title?: string;
   section?: string;
   author?: string;
@@ -12,4 +14,5 @@ export interface BookItem {
 export interface BookCategories {
   id: string;
   name: string;
+  tags?: string[];
 }

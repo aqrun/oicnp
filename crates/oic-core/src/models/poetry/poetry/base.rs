@@ -5,6 +5,7 @@ use oic_derives::{FilterParams, add_filter_fields};
 use validator::Validate;
 use crate::utils::utc_now;
 use crate::{RequestParamsUpdater, uuid, constants::DATE_TIME_FORMAT};
+use crate::entities::poetry::ChapterModel;
 
 pub use crate::entities::poetry::{
   PoetryActiveModel,
@@ -21,20 +22,24 @@ pub struct PoetryFilters {
     pub id: Option<i32>,
     pub uuid: Option<String>,
     pub title: Option<String>,
-    #[serde(rename(deserialize = "authorId"))]
+    #[serde(rename(serialize = "authorId", deserialize = "authorId"))]
     pub author_id: Option<i32>,
     pub dynasty: Option<String>,
     pub weight: Option<i32>,
-    #[serde(rename(deserialize = "hotWeight"))]
+    #[serde(rename(serialize = "hotWeight", deserialize = "hotWeight"))]
     pub hot_weight: Option<i32>,
     pub content: Option<String>,
-    #[serde(rename(deserialize = "wordCount"))]
+    #[serde(rename(serialize = "wordCount", deserialize = "wordCount"))]
     pub word_count: Option<i32>,
     pub tags: Option<String>,
-    #[serde(rename(deserialize = "createdAt"))]
+    #[serde(rename(serialize = "createdAt", deserialize = "createdAt"))]
     pub created_at: Option<String>,
-    #[serde(rename(deserialize = "updatedAt"))]
+    #[serde(rename(serialize = "updatedAt", deserialize = "updatedAt"))]
     pub updated_at: Option<String>,
+    #[serde(rename(serialize = "poetryAmount", deserialize = "poetryAmount"))]
+    pub poetry_amount: Option<u64>,
+    #[serde(rename(serialize = "chapterAmount", deserialize = "chapterAmount"))]
+    pub chapter_amount: Option<u64>,
 }
 
 /// 创建 poetry 参数
@@ -44,21 +49,21 @@ pub struct PoetryReqParams {
     pub id: Option<i32>,
     pub uuid: Option<String>,
     pub title: Option<String>,
-    #[serde(rename(deserialize = "authorId"))]
+    #[serde(rename(serialize = "authorId", deserialize = "authorId"))]
     pub author_id: Option<i32>,
     pub dynasty: Option<String>,
     pub weight: Option<i32>,
-    #[serde(rename(deserialize = "hotWeight"))]
+    #[serde(rename(serialize = "hotWeight", deserialize = "hotWeight"))]
     pub hot_weight: Option<i32>,
     pub content: Option<String>,
-    #[serde(rename(deserialize = "wordCount"))]
+    #[serde(rename(serialize = "wordCount", deserialize = "wordCount"))]
     pub word_count: Option<i32>,
     pub tags: Option<String>,
     /// 诗词说明
     pub description: Option<String>,
-    #[serde(rename(deserialize = "createdAt"))]
+    #[serde(rename(serialize = "createdAt", deserialize = "createdAt"))]
     pub created_at: Option<String>,
-    #[serde(rename(deserialize = "updatedAt"))]
+    #[serde(rename(serialize = "updatedAt", deserialize = "updatedAt"))]
     pub updated_at: Option<String>,
 }
 
@@ -186,4 +191,41 @@ impl std::fmt::Display for PoetryAnalysisView {
 #[serde(default)]
 pub struct CountDataModel {
     pub total_word_count: i64,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone, Default, FromQueryResult)]
+#[serde(default)]
+pub struct PoetryListDataModel {
+    pub id: i32,
+    pub uuid: String,
+    pub title: String,
+    #[serde(rename(deserialize = "authorId", serialize = "authorId"))]
+    pub author_id: i32,
+    pub dynasty: String,
+    pub weight: i32,
+    #[serde(rename(deserialize = "hotWeight", serialize = "hotWeight"))]
+    pub hot_weight: i32,
+    pub content: String,
+    #[serde(rename(deserialize = "wordCount", serialize = "wordCount"))]
+    pub word_count: i32,
+    pub tags: String,
+    /// 诗词说明
+    pub description: String,
+    #[serde(rename(deserialize = "createdAt", serialize = "createdAt"))]
+    pub created_at: Option<String>,
+    #[serde(rename(deserialize = "updatedAt", serialize = "updatedAt"))]
+    pub updated_at: Option<String>,
+    #[serde(rename(deserialize = "authorUuid", serialize = "authorUuid"))]
+    pub author_uuid: Option<String>,
+    #[serde(rename(deserialize = "authorName", serialize = "authorName"))]
+    pub author_name: Option<String>,
+    #[serde(rename(deserialize = "isBook", serialize = "isBook"))]
+    pub is_book: Option<String>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
+#[serde(default)]
+pub struct PoetryListPageDataResponse {
+    pub poetry_list: Vec<PoetryListDataModel>,
+    pub chapter_list: Vec<ChapterModel>,
 }

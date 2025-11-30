@@ -27,7 +27,7 @@ export default function BookLayout({
         >
           <h1 className="blog-hero-title">内容阅读</h1>
           <div className="blog-hero-description">
-            专注IT技术分享，包括但不限于前端、后端、数据库、操作系统、网络、安全等。
+            在线内容阅读，包括但不限于诗词、技术文档等。
           </div>
         </HeroContainer>
       )}
