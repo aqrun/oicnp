@@ -24,9 +24,9 @@ export const MAIN_MENUS = [
     href: '/tool/',
   },
   {
-    name: '内容阅读',
-    vid: 'book',
-    href: '/book/',
+    name: '诗词鉴赏',
+    vid: 'poetry',
+    href: '/poetry/',
   },
   {
     name: 'IT技术',

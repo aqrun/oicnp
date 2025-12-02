@@ -127,3 +127,7 @@ settings:
     - /v1/tag/list
     - /v1/category/one
     - /v1/tag/one
+    - /v1/poetry/list
+    - /v1/poetry/one
+    - /v1/poetry/list-page-data
+    - /v1/poetry/list-with-chapters

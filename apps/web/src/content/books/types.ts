@@ -15,4 +15,5 @@ export interface BookCategories {
   id: string;
   name: string;
   tags?: string[];
+  dynasty?: string;
 }

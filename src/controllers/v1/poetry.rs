@@ -118,6 +118,22 @@ pub async fn get_list_page_data(
     }
 }
 
+pub async fn get_list_with_chapters(
+    Json(params): Json<PoetryFilters>,
+) -> JsonRes<PoetryListPageDataResponse> {
+    let db = get_poetry_db().await;
+    let res = PoetryModel::find_list_with_chapters(db, &params).await;
+
+    match res {
+        Ok(data) => {
+            JsonRes::from((data, "entry"))
+        },
+        Err(err) => {
+            JsonRes::err(err)
+        }
+    }
+}
+
 pub fn routes() -> Routes {
     Routes::new()
         .prefix(get_api_prefix(super::VERSION, "poetry").as_str())
@@ -128,4 +144,5 @@ pub fn routes() -> Routes {
         .add("/update", post(update))
         .add("/remove", post(remove))
         .add("/list-page-data", post(get_list_page_data))
+        .add("/list-with-chapters", post(get_list_with_chapters))
 }

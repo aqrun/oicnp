@@ -33,7 +33,7 @@ export default function BookHome({
           <div key={category?.id}>
             <ListBlockTitle
               title={category?.name}
-              moreLink="/book/c/chu_ci"
+              moreLink={`/poetry/category/${category?.id}`}
             />
             <BookHomeContainer className='relative flex flex-wrap flex-row'>
               {poetry?.map((item) => {

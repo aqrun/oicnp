@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { BOOK_CATEGORIES } from '@/content/books';
 import clsx from 'clsx';
-import { useBookStore } from '../../useBookStore';
+import { useBookStore, defaultState } from '../../useBookStore';
 import {
   SideNavContainer
 } from './index.styled';
@@ -15,8 +15,6 @@ export interface SideNavProps {
 export default function SideNav({
   catVid = 'all',
 }: SideNavProps): JSX.Element {
-  const category = useBookStore((state) => state.category);
-
   return (
     <SideNavContainer>
       <ul>
@@ -25,7 +23,7 @@ export default function SideNav({
             <SideNavItem
               key={item?.id}
               item={item}
-              active={category === item?.id}
+              active={catVid === item?.id}
             />
           );
         })}
@@ -44,18 +42,20 @@ function SideNavItem({
   active = false,
 }: SideNavItemProps): JSX.Element {
   const router = useRouter();
-  const setBookState = useBookStore.setState;
+  const setState = useBookStore.setState;
 
   return (
     <li className={clsx("side-nav-item", active && "active")}>
       <a
         onClick={() => {
-          setBookState({ category: item?.id, title: '' });
+          setState({
+            ...defaultState,
+          });
 
           if (item?.id === 'all') {
-            router.push(`/book`);
+            router.push(`/poetry`);
           } else {
-            router.push(`/book#/category/${item?.id}`);
+            router.push(`/poetry/category/${item?.id}`);
           }
         }}
       >

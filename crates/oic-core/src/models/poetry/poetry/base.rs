@@ -228,4 +228,8 @@ pub struct PoetryListDataModel {
 pub struct PoetryListPageDataResponse {
     pub poetry_list: Vec<PoetryListDataModel>,
     pub chapter_list: Vec<ChapterModel>,
+    pub total: u64,
+    pub page: u64,
+    #[serde(rename(deserialize = "pageSize", serialize = "pageSize"))]
+    pub page_size: u64,
 }

@@ -103,3 +103,17 @@ export interface DescribePoetryListPageDataResponseData extends BaseResponse {
     chapter_list: Array<ChapterModel>;
   };
 }
+
+export interface DescribePoetryListWithChaptersRequestParams extends PoetryFilters {
+  _name?: string;
+}
+
+export interface DescribePoetryListWithChaptersResponseData extends BaseResponse {
+  entry: {
+    poetry_list: Array<PoetryListPageDataModel>;
+    chapter_list: Array<ChapterModel>;
+    total: number;
+    page: number;
+    pageSize: number;
+  };
+}

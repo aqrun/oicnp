@@ -6,11 +6,11 @@ import BookHome from './BookHome';
 import { DescribePoetryListPageData } from '@repo/apis/server'
 
 export const metadata: Metadata = {
-  title: '书籍阅读|灵犀纪-心有灵犀，专注技术分享', // `灵犀纪 | ${siteConfig.title}`,
+  title: '诗词鉴赏|灵犀纪-心有灵犀，专注技术分享', // `灵犀纪 | ${siteConfig.title}`,
   description: siteConfig.description,
 };
 
-export default async function ToolsPage() {
+export default async function PoetryPage() {
   const filterTags = [
     '花间集',
     '南唐',
@@ -32,7 +32,7 @@ export default async function ToolsPage() {
 
   return (
     <MainLayout
-      activeMenuId='book'
+      activeMenuId='poetry'
     >
       <BookHome
         books={poetryRes?.entry?.poetry_list}

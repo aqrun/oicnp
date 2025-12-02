@@ -38,7 +38,7 @@ export function PoemItem({
     <Container className='poem-list-item-w w-1/2 mb-4'>
       <div className='poem-list-item overflow-hidden rounded-lg hover:shadow-lg hover:shadow-violet-100 hover:border-violet-400 cursor-pointer border border-slate-200 border-solid'>
         <a
-          href={`/p/${record?.title}`}
+          href={`/poetry/n/${record?.uuid}`}
           className='block w-full h-full md:flex'
         >
           {Boolean(0) && (

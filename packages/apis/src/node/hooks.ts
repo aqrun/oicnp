@@ -10,7 +10,6 @@ import {
   DescribeNodeTagsResponseData,
   DescribeNodeCategoriesResponseData,
   DescribeNodeListRequestParams,
-  DescribeNodeListResponseData,
 } from './types';
 import {
   DescribeNodeDetail,
