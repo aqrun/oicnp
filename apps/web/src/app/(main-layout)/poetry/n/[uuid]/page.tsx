@@ -2,7 +2,11 @@ import { Metadata } from 'next';
 
 import { siteConfig } from '@/constant/config';
 import { MainLayout } from '@/components/layouts';
-import { DescribePoetryListPageData } from '@repo/apis/server'
+import {
+  DescribePoetryListWithChapters,
+  DescribePoetryListWithChaptersRequestParams,
+} from '@repo/apis/server'
+import PoetryDetail from '../../PoetryDetail';
 
 export const metadata: Metadata = {
   title: '诗词鉴赏|灵犀纪-心有灵犀，专注技术分享', // `灵犀纪 | ${siteConfig.title}`,
@@ -11,17 +15,25 @@ export const metadata: Metadata = {
 
 export default async function PoetryDetailPage({ params }: { params: { uuid: string } }) {
   const { uuid } = await params;
-  const poetryRes = await DescribePoetryListPageData({
-    poetryAmount: 1,
-    chapterAmount: 100,
+  const requestParams: DescribePoetryListWithChaptersRequestParams = {
     uuid,
-  });
-  console.log('poetryRes---', poetryRes)
+    chapterAmount: 100,
+    page: 1,
+    pageSize: 1,
+    order: 'asc',
+    orderBy: 'id',
+  };
+  
+  const poetryRes = await DescribePoetryListWithChapters(requestParams);
+
   return (
     <MainLayout
       activeMenuId='poetry'
     >
-      {uuid}
+      <PoetryDetail
+        poetry={poetryRes?.entry?.poetry_list?.[0]}
+        chapters={poetryRes?.entry?.chapter_list}
+      />
     </MainLayout>
   );
 }

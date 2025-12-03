@@ -58,7 +58,7 @@ export function PoemItem({
 
               {Boolean(record?.authorName) && (
                 <span className="ml-2 text-gray-400 font-light">
-                  <i className='iconfont icon-date mr-1' />
+                  <i className='iconfont icon-OOjs_UI_icon_userAvatar mr-1' />
                   {record?.authorName}
                 </span>
               )}

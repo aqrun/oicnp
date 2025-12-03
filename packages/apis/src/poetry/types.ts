@@ -87,6 +87,7 @@ export interface ChapterModel {
   updatedAt?: string;
   description?: string;
   content?: string;
+  children?: ChapterModel[];
 }
 
 export interface DescribePoetryBodyRequestParams extends PoetryFilters {

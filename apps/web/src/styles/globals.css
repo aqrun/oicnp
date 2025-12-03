@@ -36,6 +36,7 @@
   /* #endregion  /**======== Primary Color =========== */
 
   --primary: #764abc;
+  --color-primary: #764abc;
   --btn-plain-bg-active: rgb(216 180 254); /* #d8b4fe */
   --btn-content: rgb(88 28 135);
   --bg-color: #f2f3f5;
