@@ -39,9 +39,8 @@ export const HomePage: React.FC<HomePageProps> = ({
               })}
             </div>
           </div>
-          <div className='lg:w-80'>
+          <div className='lg:w-80 lg:min-w-80'>
             <SideBar
-              hasWeather
               hasCategories
               hasTags
             />

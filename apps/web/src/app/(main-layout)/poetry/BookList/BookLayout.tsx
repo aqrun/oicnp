@@ -39,7 +39,6 @@ export default function BookLayout({
         {hasSideBar && (
           <div className='lg:w-80'>
             <SideBar
-              hasWeather
               hasTags
             />
           </div>

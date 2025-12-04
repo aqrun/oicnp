@@ -7,8 +7,16 @@
   },
   "exports": {
     "./calendar": {
-      "types": "./src/index.ts",
-      "default": "./src/index.ts"
+      "types": "./src/Calendar.tsx",
+      "default": "./src/Calendar.tsx"
+    },
+    "./SolarMonthCalendar": {
+      "types": "./src/SolarMonthCalendar/index.tsx",
+      "default": "./src/SolarMonthCalendar/index.tsx"
+    },
+    "./tyme": {
+      "types": "./src/vendor/tyme.ts",
+      "default": "./src/vendor/tyme.ts"
     }
   },
   "devDependencies": {
@@ -17,11 +25,13 @@
     "dayjs": "^1.11.13",
     "ahooks": "^3.1.1",
     "react": "^18.3.1",
+    "styled-components": "^6.1",
     "typescript": "latest"
   },
   "peerDependencies": {
     "dayjs": "^1.11.13",
     "react": "^18.3.1",
+    "styled-components": "^6",
     "ahooks": "^3.1.1"
   }
 }

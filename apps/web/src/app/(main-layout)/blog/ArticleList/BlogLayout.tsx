@@ -29,7 +29,6 @@ export default function BlogLayout({
         {hasSideBar && (
           <div className='lg:w-80'>
             <SideBar
-              hasWeather
               hasTags
             />
           </div>
