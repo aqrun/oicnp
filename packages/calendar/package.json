@@ -1,0 +1,27 @@
+{
+  "name": "@repo/calendar",
+  "type": "module",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc"
+  },
+  "exports": {
+    "./calendar": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.1",
+    "@repo/config-typescript": "workspace:*",
+    "dayjs": "^1.11.13",
+    "ahooks": "^3.1.1",
+    "react": "^18.3.1",
+    "typescript": "latest"
+  },
+  "peerDependencies": {
+    "dayjs": "^1.11.13",
+    "react": "^18.3.1",
+    "ahooks": "^3.1.1"
+  }
+}

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Solar Month Calendar Demo - 独立提取的月历模块</title>
+  <!-- 引入样式文件 -->
+  <link rel="stylesheet" href="tyme.css">
+  <style>
+    /* 确保日历容器可见 */
+    #demo-solar-month {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h1>Vue 数据绑定说明</h1>
+  <p>这个文件展示了如何将 demo-solar-month 模块独立提取出来。</p>
+  
+  <!-- ============================================ -->
+  <!-- HTML 模板部分 - Vue 模板语法 -->
+  <!-- ============================================ -->
+  <div id="demo-solar-month" class="month-calendar">
+    <!-- 
+      Vue 数据绑定说明：
+      1. {{ month.name }} - 双大括号插值，显示月份名称
+         - 当 Vue 实例中的 data.month.name 改变时，这里会自动更新
+    -->
+    <div class="month">{{ month.name }}</div>
+    
+    <!-- 
+      2. v-for="w in weeks" - 列表渲染指令
+         - 遍历 data.weeks 数组，为每个元素创建一个 <li>
+         - w 是当前循环项
+    -->
+    <ul class="week">
+      <!-- 
+        3. :class="{'weekend': w.isWeekend}" - 动态 class 绑定
+           - :class 是 v-bind:class 的简写
+           - 当 w.isWeekend 为 true 时，添加 'weekend' 类
+      -->
+      <li v-for="w in weeks" :class="{'weekend': w.isWeekend}">{{ w.name }}</li>
+    </ul>
+    
+    <!-- 
+      4. v-for="week in month.weeks" - 嵌套循环
+         - 外层循环：遍历 data.month.weeks 数组（每一周）
+         - 内层循环：遍历 week.days 数组（每一天）
+    -->
+    <ul v-for="week in month.weeks">
+      <!-- 
+        5. 复杂的动态 class 绑定
+           - 根据多个条件动态添加不同的 CSS 类
+           - 'holiday': d.holiday 存在时添加
+           - 'holiday-work': d.holiday 存在且 d.holiday.isWork 为 true 时添加
+           - 'weekend': d.isWeekend 为 true 时添加
+           - 'gray': !d.isCurrentMonth 为 true 时添加（非当前月）
+           - 'today': d.isToday 为 true 时添加（今天）
+           - 'moon': d.moon 为 true 时添加
+           - 'moon-0' 到 'moon-7': 根据 moonIndex 添加不同的月相类
+      -->
+      <li v-for="d in week.days" :class="{
+        'holiday': d.holiday, 
+        'holiday-work': d.holiday && d.holiday.isWork, 
+        'weekend': d.isWeekend, 
+        'gray': !d.isCurrentMonth, 
+        'today': d.isToday, 
+        'moon': d.moon, 
+        'moon-0': d.moon && d.moonIndex === 0, 
+        'moon-1': d.moon && d.moonIndex === 1, 
+        'moon-2': d.moon && d.moonIndex === 2, 
+        'moon-3': d.moon && d.moonIndex === 3, 
+        'moon-4': d.moon && d.moonIndex === 4, 
+        'moon-5': d.moon && d.moonIndex === 5, 
+        'moon-6': d.moon && d.moonIndex === 6, 
+        'moon-7': d.moon && d.moonIndex === 7
+      }">
+        <div>
+          <!-- 显示日期数字 -->
+          <b>{{ d.day }}</b>
+          <!-- 显示农历、节气等信息 -->
+          <i>{{ d.text }}</i>
+          <!-- 
+            6. v-if 和 v-else-if - 条件渲染
+               - v-if="d.holiday": 如果 d.holiday 存在，显示这个 <u>
+               - v-else-if="d.isToday": 否则如果 d.isToday 为 true，显示这个 <u>
+               - 三元运算符：d.holiday.isWork ? '班' : '休'
+          -->
+          <u v-if="d.holiday">{{ d.holiday.isWork ? '班' : '休' }}</u>
+          <u v-else-if="d.isToday">今</u>
+        </div>
+      </li>
+    </ul>
+    
+    <!-- 
+      7. @click="prevMonth" - 事件绑定
+         - @click 是 v-on:click 的简写
+         - 点击时调用 Vue 实例的 prevMonth 方法
+    -->
+    <div href="javascript:void(0);" class="prev" @click="prevMonth" title="上月"></div>
+    <div href="javascript:void(0);" class="next" @click="nextMonth" title="下月"></div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- JavaScript 部分 - Vue 实例 -->
+  <!-- ============================================ -->
+  <!-- 引入必要的库 -->
+  <script src="tyme.min.js"></script>
+  <script src="vue.min.js"></script>
+  
+  <script>
+    (function(W, D){
+      // 设置周的开始日期（1 = 周一）
+      var weekStart = 1;
+      var now = new Date();
+
+      // 准备星期表头数据
+      var weekHeads = [];
+      var w = Week.fromIndex(weekStart);
+      for (var i = 0; i < 7; i++) {
+        weekHeads.push({
+          isWeekend: w.getIndex() === 6 || w.getIndex() === 0,  // 周六或周日
+          name: w.getName()  // 星期名称（如"周一"）
+        });
+        w = w.next(1);
+      }
+
+      // 获取当前月份
+      var currentMonth = SolarMonth.fromYm(now.getFullYear(), now.getMonth() + 1);
+      var month = currentMonth.next(0);
+
+      // ============================================
+      // 创建 Vue 实例
+      // ============================================
+      new Vue({
+        // el: 指定 Vue 实例要挂载的 DOM 元素
+        // '#demo-solar-month' 表示 id 为 demo-solar-month 的元素
+        el: '#demo-solar-month',
+        
+        // data: Vue 的响应式数据
+        // 当这些数据改变时，模板会自动更新
+        data: {
+          // month 对象包含月份信息
+          month: {
+            name: '',      // 月份名称，会在 compute() 中计算
+            weeks: []      // 周数组，每周围包含一个 days 数组
+          },
+          // weeks 数组包含星期表头信息
+          weeks: weekHeads
+        },
+        
+        // mounted: Vue 生命周期钩子
+        // 当 Vue 实例挂载到 DOM 后会自动调用
+        mounted: function() {
+          this.compute();  // 初始化计算月份数据
+        },
+        
+        // methods: 定义 Vue 实例的方法
+        methods: {
+          // compute: 计算并更新月份数据
+          compute: function() {
+            var that = this;  // 保存 Vue 实例的引用
+            
+            // 更新月份名称
+            // 当 this.month.name 改变时，模板中的 {{ month.name }} 会自动更新
+            that.month.name = month.toString();
+            
+            // 计算每一周的数据
+            var weeks = [];
+            var monthWeeks = month.getWeeks(weekStart);
+            
+            // 遍历每一周
+            for (var i = 0, j = monthWeeks.length; i < j; i++) {
+              var days = [];
+              var weekDays = monthWeeks[i].getDays();
+              
+              // 遍历每一天
+              for (var x = 0, y = weekDays.length; x < y; x++) {
+                var solarDay = weekDays[x];
+                var lunarDay = solarDay.getLunarDay();
+                var holiday = solarDay.getLegalHoliday();
+                var weekIndex = solarDay.getWeek().getIndex();
+                var weekend = weekIndex === 6 || weekIndex === 0;
+                
+                if (holiday && holiday.isWork()) {
+                  weekend = false;
+                }
+
+                // 计算显示文本（农历、节气等）
+                var text = null;
+                var f = solarDay.getFestival();
+                if (f) {
+                  text = f.getName();
+                }
+
+                f = lunarDay.getFestival();
+                if (f) {
+                  text = f.getName();
+                }
+
+                if (1 === lunarDay.getDay()) {
+                  var lunarMonth = lunarDay.getLunarMonth();
+                  text = lunarMonth.getName();
+                  if (1 === lunarMonth.getMonthWithLeap()) {
+                    text = lunarMonth.getLunarYear().getSixtyCycle().getName() + '年' + text;
+                  }
+                }
+
+                var jq = solarDay.getTerm();
+                if(jq && jq.getSolarDay().equals(solarDay)){
+                  text = jq.getName();
+                  if (jq.isJie()) {
+                    text += ' ' + lunarDay.getMonthSixtyCycle() + '月';
+                  }
+                }
+
+                if (!text) {
+                  text = lunarDay.getName() + ' ' + lunarDay.getSixtyCycle();
+                }
+
+                var phaseDay = solarDay.getPhaseDay();
+
+                // 构建每一天的数据对象
+                // 这个对象会被绑定到模板中的 d 变量
+                days.push({
+                  day: solarDay.getDay(),                    // 日期数字
+                  holiday: holiday ? { isWork: holiday.isWork() } : null,  // 节假日信息
+                  isCurrentMonth: solarDay.getSolarMonth().equals(month),  // 是否当前月
+                  isToday: solarDay.getDay() === now.getDate() && solarDay.getSolarMonth().equals(currentMonth),  // 是否今天
+                  isWeekend: weekend,                        // 是否周末
+                  text: text,                                // 显示文本
+                  moon: phaseDay.getDayIndex() === 0,        // 是否月相
+                  moonIndex: phaseDay.getPhase().getIndex()  // 月相索引
+                });
+              }
+              
+              // 将这一周的数据添加到 weeks 数组
+              weeks.push({
+                days: days
+              });
+              
+              // 更新 Vue 的响应式数据
+              // 当 this.month.weeks 改变时，模板中的 v-for="week in month.weeks" 会自动重新渲染
+              that.month.weeks = weeks;
+            }
+          },
+          
+          // prevMonth: 切换到上一个月
+          prevMonth: function() {
+            month = month.next(-1);  // 使用 Tyme 库的方法获取上一个月
+            this.compute();           // 重新计算并更新数据
+            // 由于 this.compute() 更新了 this.month.weeks 和 this.month.name
+            // Vue 会自动检测到变化并更新模板
+          },
+          
+          // nextMonth: 切换到下一个月
+          nextMonth: function() {
+            month = month.next(1);    // 使用 Tyme 库的方法获取下一个月
+            this.compute();           // 重新计算并更新数据
+          }
+        }
+      });
+    })(window, document);
+  </script>
+</body>
+</html>
+
