@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Week,
   SolarMonth,
-} from '../vendor/tyme';
+} from 'tyme4ts';
 import {
   Container,
   MonthLabel,
