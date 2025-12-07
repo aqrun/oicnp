@@ -31,7 +31,7 @@ export default function BookLayout({
           </div>
         </HeroContainer>
       )}
-      <div className="flex gap-4 mb-8">
+      <div className="flex lg:flex-row flex-col gap-4 mb-8">
         {hasSideNav && <SideNav catVid={catVid} />}
         <div className='oic-layout-content1 flex flex-col flex-1'>
           {children}

@@ -41,7 +41,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           </div>
           <div className='lg:w-80 lg:min-w-80'>
             <SideBar
-              hasCategories
+              // hasCategories
               hasTags
             />
           </div>

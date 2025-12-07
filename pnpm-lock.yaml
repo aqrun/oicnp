@@ -174,6 +174,9 @@ importers:
       '@repo/calendar':
         specifier: workspace:*
         version: link:../../packages/calendar
+      '@repo/image':
+        specifier: workspace:*
+        version: link:../../packages/Image
       '@repo/services':
         specifier: workspace:*
         version: link:../../packages/services
@@ -217,7 +220,7 @@ importers:
         specifier: ^10.0.1
         version: 10.1.1(esbuild@0.20.2)
       next:
-        specifier: 15.1.5
+        specifier: ^15
         version: 15.1.5(@babel/core@7.26.0)(babel-plugin-react-compiler@1.0.0)(react-dom@18.3.1)(react@18.3.1)
       next-mdx-remote:
         specifier: ^4.4.1
@@ -352,6 +355,36 @@ importers:
       typescript:
         specifier: ^5
         version: 5.6.3
+
+  packages/Image:
+    devDependencies:
+      '@repo/config-typescript':
+        specifier: workspace:*
+        version: link:../config-typescript
+      '@repo/utils':
+        specifier: workspace:*
+        version: link:../utils
+      '@types/react':
+        specifier: ^18.3.1
+        version: 18.3.18
+      ahooks:
+        specifier: ^3.1.1
+        version: 3.8.1(react@18.3.1)
+      dayjs:
+        specifier: ^1.11.13
+        version: 1.11.13
+      next:
+        specifier: ^15
+        version: 15.1.5(react-dom@18.3.1)(react@18.3.1)(sass@1.83.4)
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      styled-components:
+        specifier: ^6.1
+        version: 6.1.14(react-dom@18.3.1)(react@18.3.1)
+      typescript:
+        specifier: latest
+        version: 5.9.3
 
   packages/apis:
     devDependencies:
@@ -7877,7 +7910,7 @@ packages:
       debug: 3.2.7
       eslint: 9.17.0
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@5.62.0)(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.31.0)(eslint@9.17.0)
+      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@5.62.0)(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.32.0)(eslint@9.17.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -12180,6 +12213,7 @@ packages:
   /next@15.1.5(@babel/core@7.26.0)(babel-plugin-react-compiler@1.0.0)(react-dom@18.3.1)(react@18.3.1):
     resolution: {integrity: sha512-Cf/TEegnt01hn3Hoywh6N8fvkhbOuChO4wFje24+a86wKOubgVaWkDqxGVgoWlz2Hp9luMJ9zw3epftujdnUOg==}
     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
+    deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/CVE-2025-66478 for more details.
     hasBin: true
     peerDependencies:
       '@opentelemetry/api': ^1.1.0
@@ -12225,6 +12259,7 @@ packages:
   /next@15.1.5(react-dom@18.3.1)(react@18.3.1)(sass@1.83.4):
     resolution: {integrity: sha512-Cf/TEegnt01hn3Hoywh6N8fvkhbOuChO4wFje24+a86wKOubgVaWkDqxGVgoWlz2Hp9luMJ9zw3epftujdnUOg==}
     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
+    deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/CVE-2025-66478 for more details.
     hasBin: true
     peerDependencies:
       '@opentelemetry/api': ^1.1.0
@@ -12266,7 +12301,6 @@ packages:
     transitivePeerDependencies:
       - '@babel/core'
       - babel-plugin-macros
-    dev: false
 
   /no-case@3.0.4:
     resolution: {integrity: sha512-fgAN3jGAh+RoxUGZHTSOLJIqUc2wmoBwGR4tbpNAKmmovFoWq0OdRkb0VkldReO2a2iBT/OEulG9XSUc10r3zg==}

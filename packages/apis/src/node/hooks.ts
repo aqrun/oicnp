@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import { useMemoizedFn } from 'ahooks';
 import {
   NodeFilters,
@@ -77,12 +80,16 @@ export function useFetchNodeAll() {
 }
 
 export function useFetchNodeList() {
+  const [loading, setLoading] = useState(false);
   const fetchNodeList = useMemoizedFn(async (params: DescribeNodeListRequestParams) => {
+    setLoading(true);
     const res = await DescribeNodeList(params);
+    setLoading(false);
     return res;
   });
 
   return {
     fetchNodeList,
+    loading,
   };
 }

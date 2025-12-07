@@ -17,7 +17,7 @@ export default function SideNav({
 }: SideNavProps): JSX.Element {
   return (
     <SideNavContainer>
-      <ul>
+      <ul className="flex flex-row lg:flex lg:flex-col">
         {BOOK_CATEGORIES?.map((item) => {
           return (
             <SideNavItem

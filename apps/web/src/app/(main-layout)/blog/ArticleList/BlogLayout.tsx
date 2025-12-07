@@ -21,7 +21,7 @@ export default function BlogLayout({
   return (
     <div className="layout">
       {hasBlogHero && <BlogHero />}
-      <div className="flex gap-4 mb-8">
+      <div className="flex lg:flex-row flex-col gap-4 mb-8">
         {hasSideNav && <SideNav catVid={catVid} />}
         <div className='oic-layout-content flex flex-col'>
           {children}

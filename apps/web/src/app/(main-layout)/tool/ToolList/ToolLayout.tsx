@@ -30,7 +30,7 @@ export default function ToolLayout({
           </div>
         </HeroContainer>
       )}
-      <div className="flex gap-4 mb-8">
+      <div className="flex lg:flex-row flex-col gap-4 mb-8">
         {hasSideNav && <SideNav catVid={catVid} toolCategories={toolCategories} />}
         <div className='oic-layout-content1 flex flex-col'>
           {children}

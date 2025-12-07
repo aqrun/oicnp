@@ -8,7 +8,7 @@ export const siteConfig = {
 };
 
 /** 首页文章列表每页显示条数 */
-export const HOME_PAGE_SIZE = 10;
+export const HOME_PAGE_SIZE = 11;
 /** 分类页面分页 */
 export const CATEGORY_PAGE_SIZE = 5;
 
