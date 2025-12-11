@@ -52,7 +52,7 @@ export const News1: React.FC<News1Props> = ({ nodes }) => {
               <h2 className='z-10 p-5'>
                 <a
                   rel='noopener noreferrer'
-                  href={`/n/${item?.vid}`}
+                  href={`/p/${item?.vid}`}
                   className='font-medium text-md hover:underline text-gray-100 hover:text-violet-500'
                 >
                   {item?.title}

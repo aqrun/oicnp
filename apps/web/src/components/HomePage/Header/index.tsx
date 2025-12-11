@@ -58,13 +58,13 @@ export const Header = ({
             </div>
             {/* <!-- MENU CONTENT 1 --> */}
             <HeaderMenu className='oic-header-menu hidden lg:block'>
-              <div className='mt-14 flex flex-col space-y-8 lg:mt-0 lg:flex lg:flex-row lg:space-x-1 lg:space-y-0'>
+              <div className='mt-14 flex flex-col lg:mt-0 lg:flex lg:flex-row lg:space-x-1 lg:space-y-0'>
                 {MAIN_MENUS?.map((item) => {
                   return (
                     <a
                       key={item?.vid}
                       href={item?.href}
-                      className={clsx(`header-nav-item item-${item?.vid} font-inter text-center rounded-lg text-black lg:px-6 lg:py-4 lg:hover:bg-gray-50 lg:hover:text-gray-800`, {
+                      className={clsx(`header-nav-item item-${item?.vid} py-4 font-inter text-center rounded-lg text-black lg:px-6 lg:py-4 hover:bg-gray-50 lg:hover:text-gray-800`, {
                         'active': activeMenuId === item?.vid,
                       })}
                     >

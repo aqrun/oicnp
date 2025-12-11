@@ -16,7 +16,7 @@ export const BigNews: React.FC<BigNewsProps> = ({ node }) => {
         {/* <!-- Content --> */}
         <div className='grid justify-items-stretch'>
           <a
-            href={`/n/${node?.vid}`}
+            href={`/p/${node?.vid}`}
             className='relative flex h-[500px] flex-col gap-4 rounded-md px-4 py-8 [grid-area:1/1/2/2] md:p-0 md:[grid-area:1/1/2/4] hover:text-violet-500'
           >
             <div className='absolute bottom-12 left-8 z-20 flex w-56 max-w-[464px] flex-col items-start rounded-md bg-white p-6 sm:w-full md:bottom-[10px] md:left-[10px]'>
@@ -28,7 +28,7 @@ export const BigNews: React.FC<BigNewsProps> = ({ node }) => {
               <p className='mb-4 max-w-xs text-xl font-bold md:text-2xl text-gray-800 hover:text-violet-500'>
                 {node?.title}
               </p>
-              <p className='mb-4 text-base md:text-base text-gray-500'>
+              <p className='mb-4 text-base md:text-base text-gray-500 max-h-19 overflow-hidden lg:max-h-none'>
                 {node?.summary}
               </p>
               <div className='flex flex-col text-sm text-gray-500 lg:flex-row'>

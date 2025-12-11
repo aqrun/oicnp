@@ -285,3 +285,9 @@ article {
     }
   }
 }
+
+@media (min-width: 64rem) {
+  .oic-layout-content {
+    max-width: calc(100% - var(--spacing) * 80 - var(--spacing) * 4);
+  }
+}

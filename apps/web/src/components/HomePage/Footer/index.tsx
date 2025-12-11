@@ -13,7 +13,7 @@ export const Footer = () => {
               {siteConfig?.title}
             </a>
             <p className='font-inter mt-4 max-w-[350px] text-base font-light text-gray-500'>
-              两个黄鹂鸣翠柳，一行白鹭上青天。窗含西岭千秋雪，门泊东吴万里船
+              技术深处，自有灵犀。不只是代码的堆叠，更是思想的碰撞。在技术浪潮中，记录那些珍贵的“灵光一现”与“心有灵犀”。关注前沿洞察、深度解读与系统思考，致力于成为连接技术理性与人文感性的桥梁。
             </p>
             {/* <!-- SOCIAL MEDIA ICONS --> */}
             <div className='mb-8 mt-6 flex flex-row'>
@@ -68,59 +68,59 @@ export const Footer = () => {
           <div className='flex grow flex-row flex-wrap lg:mx-10 lg:flex-nowrap lg:justify-center'>
             {/* <!-- LINK BLOCK --> */}
             <div className='mb-5 mr-8 flex max-w-[200px] grow basis-[100px] flex-col space-y-5 lg:mx-10'>
-              <h2 className='font-inter font-normal text-xl'>三字经</h2>
-              <a href='' className='font-inter font-light text-gray-500'>
-                人之初
+              <h2 className='font-inter font-normal text-xl'>IT技术</h2>
+              <a href='/cat/rust' className='font-inter font-light text-gray-500'>
+                Rust语言
               </a>
-              <a href='' className='font-inter font-light text-gray-500'>
-                性本善
+              <a href='/cat/server' className='font-inter font-light text-gray-500'>
+                服务器
               </a>
-              <a href='' className='font-inter font-light text-gray-500'>
-                性相近
+              <a href='/cat/backend' className='font-inter font-light text-gray-500'>
+                后端开发
               </a>
-              <a href='' className='font-inter font-light text-gray-500'>
-                习相远
+              <a href='/cat/frontend' className='font-inter font-light text-gray-500'>
+                前端开发
               </a>
-              <a href='/climb' className='font-inter font-light text-gray-500'>
-                秦岭
-              </a>
-            </div>
-            {/* <!-- LINK BLOCK --> */}
-            <div className='mb-5 mr-8 flex max-w-[200px] grow basis-[100px] flex-col space-y-5 lg:mx-10'>
-              <h2 className='font-inter font-normal text-xl'>弟子规</h2>
-              <a href='' className='font-inter font-light text-gray-500'>
-                首孝悌
-              </a>
-              <a href='' className='font-inter font-light text-gray-500'>
-                次谨信
-              </a>
-              <a href='' className='font-inter font-light text-gray-500'>
-                泛爱众
-              </a>
-              <a href='' className='font-inter font-light text-gray-500'>
-                而亲仁
+              <a href='/cat/diary' className='font-inter font-light text-gray-500'>
+                每日随笔
               </a>
             </div>
             {/* <!-- LINK BLOCK --> */}
             <div className='mb-5 mr-8 flex max-w-[200px] grow basis-[100px] flex-col space-y-5 lg:mx-10'>
-              <h2 className='font-inter font-normal text-xl'>过故人庄</h2>
-              <a href='' className='font-inter font-light text-gray-500'>
-                故人具鸡黍
+              <h2 className='font-inter font-normal text-xl'>常用工具</h2>
+              <a href='/tool/t/react-ui' className='font-inter font-light text-gray-500'>
+                Rust UI
               </a>
-              <a href='' className='font-inter font-light text-gray-500'>
-                邀我至田家
+              <a href='/tool/t/static-site-generator' className='font-inter font-light text-gray-500'>
+                静态站点生成器
               </a>
-              <a href='' className='font-inter font-light text-gray-500'>
-                绿树村边合
+              <a href='/tool/t/charts' className='font-inter font-light text-gray-500'>
+                图表 / 可视化
               </a>
-              <a href='' className='font-inter font-light text-gray-500'>
-                青山郭外斜
+              <a href='/tool/t/ai-apps' className='font-inter font-light text-gray-500'>
+                AI 应用
               </a>
-              <a href='' className='font-inter font-light text-gray-500'>
-                开轩面场圃
+            </div>
+            {/* <!-- LINK BLOCK --> */}
+            <div className='mb-5 mr-8 flex max-w-[200px] grow basis-[100px] flex-col space-y-5 lg:mx-10'>
+              <h2 className='font-inter font-normal text-xl'>诗词鉴赏</h2>
+              <a href='/poetry/category/wu-dai-shi-ci' className='font-inter font-light text-gray-500'>
+                五代诗词
               </a>
-              <a href='' className='font-inter font-light text-gray-500'>
-                把酒话桑麻
+              <a href='/poetry/category/tang-shi' className='font-inter font-light text-gray-500'>
+                唐诗
+              </a>
+              <a href='/poetry/category/song-ci' className='font-inter font-light text-gray-500'>
+                宋词
+              </a>
+              <a href='/poetry/category/chu-ci' className='font-inter font-light text-gray-500'>
+                楚辞
+              </a>
+              <a href='/poetry/category/meng-xue' className='font-inter font-light text-gray-500'>
+                蒙学
+              </a>
+              <a href='/poetry/category/si-shu-wu-jing' className='font-inter font-light text-gray-500'>
+                四书五经
               </a>
             </div>
           </div>
@@ -153,13 +153,13 @@ export const Footer = () => {
                 </a>
               </li>
               <li className='s90'>
-                <a href='#' className='mr-2 py-1 block hover:text-violet-500'>
+                <a href='/about/' className='mr-2 py-1 block hover:text-violet-500'>
                   保护权益
                 </a>
               </li>
               <li className='s90'>
                 <a
-                  href='#'
+                  href='/about/'
                   target='_blank'
                   className='mr-2 py-1 block hover:text-violet-500'
                 >

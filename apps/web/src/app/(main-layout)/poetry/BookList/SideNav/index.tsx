@@ -1,9 +1,5 @@
-'use client';
-
-import { useRouter } from 'next/navigation';
 import { BOOK_CATEGORIES } from '@/content/books';
 import clsx from 'clsx';
-import { useBookStore, defaultState } from '../../useBookStore';
 import {
   SideNavContainer
 } from './index.styled';
@@ -41,23 +37,10 @@ function SideNavItem({
   item,
   active = false,
 }: SideNavItemProps): JSX.Element {
-  const router = useRouter();
-  const setState = useBookStore.setState;
-
   return (
     <li className={clsx("side-nav-item", active && "active")}>
       <a
-        onClick={() => {
-          setState({
-            ...defaultState,
-          });
-
-          if (item?.id === 'all') {
-            router.push(`/poetry`);
-          } else {
-            router.push(`/poetry/category/${item?.id}`);
-          }
-        }}
+        href={item?.id === 'all' ? '/poetry' : `/poetry/category/${item?.id}`}
       >
         <span className="item-name">
           {item?.name}

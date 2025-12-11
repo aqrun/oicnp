@@ -120,7 +120,7 @@ export const LoadMore = ({
       ...defaultState,
     });
     nextTick();
-    handleLoad();
+    // handleLoad();
   });
 
   useEffect(() => {

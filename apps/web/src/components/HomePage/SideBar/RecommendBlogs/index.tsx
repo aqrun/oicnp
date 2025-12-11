@@ -59,7 +59,7 @@ function BlogItem({ node }: BlogItemProps): JSX.Element {
 
   return (
     <a
-      href={`/blog/p/${node?.vid}`}
+      href={`/p/${node?.vid}`}
       className='hover:text-primary transition-colors flex items-center gap-2 mb-2 text-sm'
     >
       {showThumb && (
