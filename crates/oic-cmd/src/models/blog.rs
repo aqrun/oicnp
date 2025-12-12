@@ -59,7 +59,8 @@ pub struct MatterTaxonomy {
     pub tags: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
+#[serde(default)]
 pub struct BlogMatter {
     pub title: Option<String>,
     pub description: Option<String>,

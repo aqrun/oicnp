@@ -1,7 +1,7 @@
 use crate::constants::{CATEGORIES, VID_READING};
 use crate::models::{Blog, BlogMatter, Category, MatterTaxonomy};
 use gray_matter::engine::YAML;
-use gray_matter::Matter;
+use gray_matter::{Matter, ParsedEntity};
 use loco_rs::prelude::ModelError;
 use oic_core::{
     AppContext,
@@ -139,9 +139,9 @@ fn generate_blog(
     let (date, slug) = generate_slug(&file_name);
     // println!("Matter parse: {}", &file_name);
     let matter = Matter::<YAML>::new();
-    let res = match matter.parse_with_struct::<BlogMatter>(&content) {
-        Some(data) => data,
-        _ => {
+    let res: ParsedEntity<BlogMatter> = match matter.parse(&content) {
+        Ok(data) => data,
+        Err(err) => {
             println!("[OICNP]Matter parse failed: {}{}", &file_path, &file_name);
             return Err(anyhow!(
                 "[OICNP]Matter parse failed: {}{}",
@@ -151,7 +151,10 @@ fn generate_blog(
         }
     };
     // println!("{:?}", res.data);
-    let data = res.data;
+    let data = match res.data {
+        Some(data) => data,
+        None => BlogMatter::default(),
+    };
     let con = res.content;
 
     // let layout = &data["layout"].as_string().unwrap();

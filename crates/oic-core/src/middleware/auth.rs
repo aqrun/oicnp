@@ -31,7 +31,7 @@ use serde::{Deserialize, Serialize};
 
 use loco_rs::{
   app::AppContext,
-  config::JWT as JWTConfig,
+  config::{JWT as JWTConfig, JWTLocationConfig, JWTLocation},
   errors::Error,
   model::Authenticable,
   Result as LocoResult,
@@ -190,18 +190,41 @@ fn get_jwt_from_config(ctx: &AppContext) -> LocoResult<&JWTConfig> {
 }
 /// extract token from the configured jwt location settings
 fn extract_token(jwt_config: &JWTConfig, parts: &Parts) -> LocoResult<String> {
-    #[allow(clippy::match_wildcard_for_single_variants)]
-    match jwt_config
-        .location
-        .as_ref()
-        .unwrap_or(&loco_rs::config::JWTLocation::Bearer)
-    {
-        loco_rs::config::JWTLocation::Query { name } => extract_token_from_query(name, parts),
-        loco_rs::config::JWTLocation::Cookie { name } => extract_token_from_cookie(name, parts),
-        loco_rs::config::JWTLocation::Bearer => extract_token_from_header(&parts.headers)
-            .map_err(|e| Error::Unauthorized(e.to_string())),
+    let locations = get_jwt_locations(jwt_config.location.as_ref());
+
+    for location in &locations {
+        if let Ok(token) = extract_token_from_location(location, parts) {
+            return Ok(token);
+        }
+    }
+
+    // If we get here, none of the locations worked
+    Err(Error::Unauthorized("Token not found in any of the configured JWT locations. Please check your auth.jwt.location configuration.".to_string()))
+}
+
+/// Get the list of JWT locations to try, with Bearer as default
+fn get_jwt_locations(
+    config: Option<&JWTLocationConfig>,
+) -> Vec<&JWTLocation> {
+    match config {
+        Some(JWTLocationConfig::Single(location)) => vec![location],
+        Some(JWTLocationConfig::Multiple(locations)) => locations.iter().collect(),
+        None => vec![&JWTLocation::Bearer],
     }
 }
+
+/// Extract token from a specific location
+fn extract_token_from_location(
+    location: &JWTLocation,
+    parts: &Parts,
+) -> LocoResult<String> {
+    match location {
+        JWTLocation::Query { name } => extract_token_from_query(name, parts),
+        JWTLocation::Cookie { name } => extract_token_from_cookie(name, parts),
+        JWTLocation::Bearer => extract_token_from_header(&parts.headers),
+    }
+}
+
 /// Function to extract a token from the authorization header
 ///
 /// # Errors
