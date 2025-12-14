@@ -11,9 +11,9 @@ export const metadata: Metadata = {
 };
 
 export interface BlogTagPageProps {
-  params: {
+  params: Promise<{
     tagVid: string;
-  };
+  }>;
 }
 
 export default async function BlogTagPage(props: BlogTagPageProps) {

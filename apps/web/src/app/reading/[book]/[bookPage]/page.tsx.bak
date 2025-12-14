@@ -8,20 +8,19 @@ import { formatDate,parseMdx } from '@/utils';
 import { getBookList, getBookPages,getCategory } from '@/utils/blog';
 
 export interface MetaProps {
-  params: {
+  params: Promise<{
     // 书
     book: string;
     // 书页slug
     bookPage: string;
-  };
+  }>;
   searchParams: {
     [key: string]: string;
   };
 }
 
 export const generateMetadata = async (props: MetaProps): Promise<Metadata> => {
-  const book = props?.params?.book;
-  const bookPage = props?.params?.bookPage;
+  const { book, bookPage } = await props?.params;
   const all_nodes = getBookPages(book);
   const node = all_nodes?.find((item) => {
     return item?.data?.slug === bookPage;
@@ -35,7 +34,7 @@ export const generateMetadata = async (props: MetaProps): Promise<Metadata> => {
   return meta;
 };
 
-export const generateStaticParams = () => {
+export const generateStaticParams = async () => {
   const all_books = getBookList();
   const data: MetaProps['params'][] = [];
 

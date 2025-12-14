@@ -1,5 +1,7 @@
 * https://gitee.com/chenlunfu/qiluo_admin
 
 ```shell
-scp /home/aqrun/workspace/github.com/aqrun/oicnp/target/release/oic username@ip:/workspace/github.com/aqrun/oicnp/target/release
+scp /home/aqrun/workspace/github.com/aqrun/oicnp/target/release/oic $SERVER_USERNAME@$SERVER_IP:/workspace/github.com/aqrun/oicnp/target/release
+scp -r -v -o "StrictHostKeyChecking=no" /home/aqrun/workspace/github.com/aqrun/oicnp/apps/web/.next $SERVER_USERNAME@$SERVER_IP:/workspace/github.com/aqrun/oicnp/apps/web/
+scp -r -v -o "StrictHostKeyChecking=no" /home/aqrun/workspace/github.com/aqrun/oicnp/apps/backend/.next $SERVER_USERNAME@$SERVER_IP:/workspace/github.com/aqrun/oicnp/apps/backend/
 ```

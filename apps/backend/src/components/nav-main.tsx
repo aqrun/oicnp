@@ -17,7 +17,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import { MenuTreeItem } from '@/services/types';
+import { MenuTreeItem } from '@/services';
 import {
   Icon,
 } from '@/components';

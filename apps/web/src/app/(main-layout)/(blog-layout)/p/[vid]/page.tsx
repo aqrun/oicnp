@@ -4,9 +4,9 @@ import { parseMd } from '@/utils/md';
 import { MainLayout } from '@/components/layouts';
 
 export interface ArticleDetailPageProps {
-  params: {
+  params: Promise<{
     vid: string;
-  };
+  }>;
 }
 
 export default async function ArticleDetailPage({

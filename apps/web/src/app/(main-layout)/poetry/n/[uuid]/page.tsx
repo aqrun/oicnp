@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description: siteConfig.description,
 };
 
-export default async function PoetryDetailPage({ params }: { params: { uuid: string } }) {
+export default async function PoetryDetailPage({ params }: { params: Promise<{ uuid: string }> }) {
   const { uuid } = await params;
   const requestParams: DescribePoetryListWithChaptersRequestParams = {
     uuid,

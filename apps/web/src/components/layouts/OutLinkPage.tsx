@@ -25,7 +25,6 @@ export default function OutLinkPage({
     link = decodeURIComponent(url);
   }
   
-  console.log('target-->', target, params);
   return (
     <div className="w-screen h-screen flex justify-center bg-gray-200">
       <div className='out-link-page mt-24 ml-auto mr-auto max-w-xl'>

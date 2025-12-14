@@ -16,7 +16,7 @@ module.exports = {
     },
     {
       name: 'lxage-admin',
-      cwd: './apps/admin',
+      cwd: './apps/backend',
       script: 'node_modules/.bin/next',
       args: 'start -p 9001',
       instances: 1,

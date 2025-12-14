@@ -12,6 +12,7 @@ import { Pager1 } from '@/components/pagination';
 import { Node } from '@/utils/blog';
 
 import { BookItem } from '../reading';
+import type { NodeModel } from '@repo/apis/server';
 
 export interface ArticleListPageProps {
   nodes: Node[];
@@ -43,7 +44,7 @@ export const ArticleListPage: React.FC<ArticleListPageProps> = ({
                 if (isBook) {
                   return <BookItem key={item?.data?.title} node={item} />;
                 }
-                return <ArticleItem key={item?.data?.title} node={item} />;
+                return <ArticleItem key={item?.data?.title} node={item as NodeModel} />;
               })}
             </div>
             <Pager1

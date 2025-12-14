@@ -11,9 +11,9 @@ export const metadata: Metadata = {
 };
 
 export interface BlogCategoryPageProps {
-  params: {
+  params: Promise<{
     catVid: string;
-  };
+  }>;
 }
 
 export default async function BlogCategoryPage(props: BlogCategoryPageProps) {

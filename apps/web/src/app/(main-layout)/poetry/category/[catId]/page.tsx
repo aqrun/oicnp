@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   description: siteConfig.description,
 };
 
-export default async function PoetryCategoryPage({ params }: { params: { catId: string } }) {
+export default async function PoetryCategoryPage({ params }: { params: Promise<{ catId: string }> }) {
   const { catId } = await params;
   const category = BOOK_CATEGORIES.find((item) => item?.id === catId);
   const requestParams: DescribePoetryListWithChaptersRequestParams = {

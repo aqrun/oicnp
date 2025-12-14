@@ -11,9 +11,9 @@ export const metadata: Metadata = {
 };
 
 export interface ToolsListPageProps {
-  params: {
+  params: Promise<{
     catVid: string;
-  };
+  }>;
 }
 
 export default async function ToolsListPage({

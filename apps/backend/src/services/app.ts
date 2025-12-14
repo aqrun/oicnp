@@ -4,7 +4,7 @@ import { createService } from './request';
 import {
   DescribeLoginRequestParams,
   DescribeLoginResponseData,
-} from './types';
+} from './apis/user/types';
 
 export const DescribeLogin = createService<
 DescribeLoginRequestParams,

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { Suspense } from 'react';
 import { siteConfig } from '@/constant/config';
 import { OutLinkPage } from '@/components/layouts';
 
@@ -10,6 +11,8 @@ export const metadata: Metadata = {
 
 export default async function ToolsDetailPage() {
   return (
-    <OutLinkPage />
+    <Suspense fallback={<>Loading...</>}>
+      <OutLinkPage />
+    </Suspense>
   );
 }
