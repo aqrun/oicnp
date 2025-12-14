@@ -5,10 +5,12 @@ module.exports = {
     {
       name: 'lxage-web',
       cwd: '/workspace/github.com/aqrun/oicnp/apps/web',
-      script: 'node_modules/.bin/next',
-      args: 'start -p 9000',
+      script: 'node',
+      args: 'node_modules/.bin/next start -p 9000',
       instances: 1,
       exec_mode: 'fork',
+      interpreter: '/bin/sh',
+      autorestart: true,
       watch: false,
       max_memory_restart: '500M',
       env: {
@@ -26,10 +28,12 @@ module.exports = {
     {
       name: 'lxage-admin',
       cwd: '/workspace/github.com/aqrun/oicnp/apps/backend',
-      script: 'node_modules/.bin/next',
-      args: 'start -p 9001',
+      script: 'node',
+      args: 'node_modules/.bin/next start -p 9001',
+      interpreter: '/bin/sh',
       instances: 1,
       exec_mode: 'fork',
+      autorestart: true,
       watch: false,
       max_memory_restart: '500M',
       env: {
