@@ -193,6 +193,7 @@ export const Footer = () => {
             >
               TailwindCSS
             </a>
+            <a href="http://beian.miit.gov.cn" target="_blank" className='inline-block mx-1 hover:text-violet-500'>陕ICP备17021363号</a>
           </p>
         </div>
       </div>

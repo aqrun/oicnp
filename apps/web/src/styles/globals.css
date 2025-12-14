@@ -287,7 +287,10 @@ article {
 }
 
 @media (min-width: 64rem) {
+  .home-layout-content-w {
+    width: calc(100% - 22rem);
+  }
   .oic-layout-content {
-    max-width: calc(100% - var(--spacing) * 80 - var(--spacing) * 4);
+    width: calc(100% - var(--spacing) * 80 - var(--spacing) * 4);
   }
 }
