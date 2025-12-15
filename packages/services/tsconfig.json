@@ -1,6 +1,7 @@
 {
   "extends": "@repo/config-typescript/base.json",
   "compilerOptions": {
+    "types": ["node"],
     "outDir": "dist",
     "rootDir": "src",
     "target": "ES2017",

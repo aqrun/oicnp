@@ -394,6 +394,9 @@ importers:
       '@repo/services':
         specifier: workspace:*
         version: link:../services
+      '@types/node':
+        specifier: ^20
+        version: 20.11.24
       '@types/react':
         specifier: ^18.3.1
         version: 18.3.18
@@ -461,6 +464,9 @@ importers:
       '@types/js-cookie':
         specifier: ^3.0.6
         version: 3.0.6
+      '@types/node':
+        specifier: ^20
+        version: 20.11.24
       axios:
         specifier: ^1.7.7
         version: 1.7.7
@@ -14404,6 +14410,7 @@ packages:
 
   /shikiji-core@0.10.2:
     resolution: {integrity: sha512-9Of8HMlF96usXJHmCL3Gd0Fcf0EcyJUF9m8EoAKKd98mHXi0La2AZl1h6PegSFGtiYcBDK/fLuKbDa1l16r1fA==}
+    deprecated: Deprecated, use @shikijs/core instead
     dev: false
 
   /shikiji@0.10.2:

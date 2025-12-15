@@ -4,7 +4,7 @@ module.exports = {
   apps: [
     {
       name: 'lxage-web',
-      cwd: '/workspace/github.com/aqrun/oicnp/apps/web',
+      cwd: 'github.com/aqrun/oicnp/apps/web',
       script: 'npm',
       args: 'start',
       instances: 1,
@@ -16,7 +16,9 @@ module.exports = {
         NODE_ENV: 'production',
         PORT: 9000,
         HOSTNAME: '0.0.0.0',
-        NODE_OPTIONS: '--max-old-space-size=500'
+        NODE_OPTIONS: '--max-old-space-size=500',
+        NEXT_PUBLIC_OICNP_API_URI: 'http://localhost:5150',
+        NEXT_PUBLIC_OICNP_STATIC_URI: 'http://static.oicnp.my/',
       },
       error_file: '/var/log/pm2/lxage-web-error.log',
       out_file: '/var/log/pm2/lxage-web-out.log',
@@ -26,7 +28,7 @@ module.exports = {
     },
     {
       name: 'lxage-admin',
-      cwd: '/workspace/github.com/aqrun/oicnp/apps/backend',
+      cwd: 'github.com/aqrun/oicnp/apps/backend',
       script: 'npm',
       args: 'start',
       instances: 1,
@@ -39,6 +41,8 @@ module.exports = {
         PORT: 9001,
         HOSTNAME: '0.0.0.0',
         NODE_OPTIONS: '--max-old-space-size=1024',
+        NEXT_PUBLIC_OICNP_API_URI: 'http://localhost:5150',
+        NEXT_PUBLIC_OICNP_STATIC_URI: 'http://static.oicnp.my/',
       },
       error_file: '/var/log/pm2/lxage-admin-error.log',
       out_file: '/var/log/pm2/lxage-admin-out.log',
@@ -48,7 +52,7 @@ module.exports = {
     },
     {
       name: 'lxage-api',
-      cwd: '/workspace/github.com/aqrun/oicnp',
+      cwd: 'github.com/aqrun/oicnp',
       script: 'target/release/oic',
       args: 'start',
       instances: 1,
