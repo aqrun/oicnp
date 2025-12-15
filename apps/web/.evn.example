@@ -1,0 +1,2 @@
+export NEXT_PUBLIC_OICNP_API_URI="https://apom"
+export NEXT_PUBLIC_OICNP_STATIC_URI="http://staom/"
