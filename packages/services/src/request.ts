@@ -3,7 +3,7 @@
 import type { AxiosRequestConfig, Method } from 'axios';
 import axios from 'axios';
 import { useFetcherStore } from './useFetcherStore';
-import { API_URI, SESSION_ID } from './consts';
+import { SESSION_ID } from './consts';
 import cookies from 'js-cookie';
 
 export type RequestConfig = AxiosRequestConfig & {
@@ -118,7 +118,7 @@ export function createService<TRequest, TResponse> (
   method: Method,
   config: RequestConfig = {}
 ): (data?: TRequest) => Promise<TResponse> {
-  const url = `${API_URI}/v1${action}`;
+  const url = `/api/v1${action}`;
 
   return (data?: TRequest) => {
     return new Promise<TResponse>((resolve) => {

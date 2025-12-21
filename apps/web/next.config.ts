@@ -1,3 +1,5 @@
+import { getApiUri } from '@repo/services/url';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // output: 'export',
@@ -11,6 +13,17 @@ const nextConfig = {
   // swcMinify: true,
   compiler: {
     styledComponents: true,
+  },
+
+  // API 转发配置 - 将 /api/* 请求转发到后端
+  // 生产环境完全可用，这是 Next.js 的标准功能
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${getApiUri()}/:path*`, // 例如: /api/v1/xxx -> http://localhost:5150/v1/xxx
+      },
+    ];
   },
 
   // Uncoment to add domain whitelist

@@ -1,8 +1,8 @@
 import { BaseResponse } from './types';
-import { API_URI } from './consts';
+import { getApiUri } from './url';
 
 export function createActionService<TRequest, TResponse extends BaseResponse> (action: string, method?: string) {
-  const url = `${API_URI}/v1${action}`;
+  const url = `${getApiUri()}/v1${action}`;
 
   return async function(data?: TRequest): Promise<TResponse> {
     let json = {} as TResponse;

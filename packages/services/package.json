@@ -25,6 +25,10 @@
     "./useFetchStore": {
       "types": "./src/useFetchStore.ts",
       "default": "./src/useFetchStore.ts"
+    },
+    "./url": {
+      "types": "./src/url.ts",
+      "default": "./src/url.ts"
     }
   },
   "devDependencies": {
