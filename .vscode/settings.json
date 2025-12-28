@@ -4,7 +4,23 @@
   ],
   "eslint.workingDirectories": [
     {
-      "mode": "auto"
+      "pattern": "apps/web",
+      "cwd": "${workspaceFolder}/apps/web"
+    },
+    {
+      "pattern": "apps/backend",
+      "cwd": "${workspaceFolder}/apps/backend"
     }
-  ]
+  ],
+  "eslint.experimental.useFlatConfig": true,
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.nodePath": "",
+  "eslint.packageManager": "pnpm",
+  "eslint.run": "onType",
+  "eslint.enable": true
 }
