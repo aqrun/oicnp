@@ -49,8 +49,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html>
-      <body>
+    <html lang="zh-CN" suppressHydrationWarning>
+      <body suppressHydrationWarning>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', function() {
+                      document.documentElement.classList.add('loaded');
+                    });
+                  } else {
+                    document.documentElement.classList.add('loaded');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
         <Script src="/baidu.js?v1" strategy="beforeInteractive" />
         {children}
         <Analytics />
