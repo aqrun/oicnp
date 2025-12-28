@@ -14,13 +14,5 @@ export const LAYOUT_HEADER_HEIGHT = 64;
  */
 export const STATIC_URI = process.env.NEXT_PUBLIC_OICNP_STATIC_URI || 'http://static.oicnp.my/';
 
-export const API_URI = process.env.NEXT_PUBLIC_OICNP_API_URI || 'http://localhost:5150';
-
-/**
- * 后端URL路径前缀
- */
-export const BACK_BASE_URI = '/';
-
-
 export const SESSION_ID = 'SESSIONID';
 

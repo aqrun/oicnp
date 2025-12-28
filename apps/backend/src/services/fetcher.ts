@@ -1,13 +1,13 @@
-import { API_URI } from '@/constants';
 import { cookies } from 'next/headers';
 import { SESSION_ID } from '@/constants';
 import { BaseResponse } from './types';
+import { getApiUri } from '@repo/services/url';
 
 /**
  * server端接口创建
  */
 export function createFetcher<TRequest, TResponse extends BaseResponse> (action: string, method?: string) {
-  const url = `${API_URI}/v1${action}`;
+  const url = `${getApiUri()}/v1${action}`;
 
   return async function(data?: TRequest): Promise<TResponse> {
     const cookieStore = await cookies();
