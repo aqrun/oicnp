@@ -1,6 +1,7 @@
 'use client';
 
-import { STATIC_URI, BACK_BASE_URI } from '@/constants';
+import { STATIC_URI } from '@/constants';
+import { getApiUri } from '@repo/services/url';
 import { MenuItem, BreadItem } from '@/types';
 import { UrlState } from './UrlState';
 import dayjs from 'dayjs';
@@ -10,7 +11,7 @@ import { BaseResponse, ConsoleConfig } from '@/services';
  * 获取链接前缀
  */
 export function getBaseUri(isStatic = false) {
-  let baseUri = BACK_BASE_URI;
+  let baseUri = getApiUri();
 
   if (isStatic) {
     baseUri = STATIC_URI;

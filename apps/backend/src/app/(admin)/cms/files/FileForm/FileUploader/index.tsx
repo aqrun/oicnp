@@ -16,7 +16,7 @@ import type {
 import {
   Icon,
 } from '@/components';
-import { API_URI } from '@/constants';
+import { getApiUri } from '@repo/services/url';
 import { useMemoizedFn } from 'ahooks';
 import { Container } from './index.styled';
 
@@ -83,7 +83,7 @@ export default function FileUploader({
       <div className="oic-uploader-w">
         {!Boolean(file) && (
           <Upload
-            action={`${API_URI}/v1/file/upload`}
+            action={`${getApiUri()}/v1/file/upload`}
             onChange={handleChange}
             maxCount={1}
             listType="text"
