@@ -11,8 +11,6 @@ export interface ArticleListProps {
 
 export default function ArticleList({
   catVid,
-  tagVid,
-  nodeRes,
 }: ArticleListProps) {
 
   return (

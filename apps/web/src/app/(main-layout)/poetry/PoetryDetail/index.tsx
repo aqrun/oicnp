@@ -12,7 +12,7 @@ export interface PoetryDetailProps {
   chapters?: ChapterModel[];
 }
 
-export default function ArticleDetail({
+export default function PoetryDetail({
   catVid,
   poetry,
   chapters,

@@ -13,7 +13,7 @@ export interface TagsState {
 /**
  * 应用主状态数据
  */
-export const useTagsStore = create<TagsState>()((set) => ({
+export const useTagsStore = create<TagsState>()(() => ({
   loading: false,
   tagsRes: undefined,
 }));

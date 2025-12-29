@@ -30,6 +30,6 @@ export const defaultState: BookState = {
 /**
  * 书籍状态数据
  */
-export const useBookStore = create<BookState>()((set) => ({
+export const useBookStore = create<BookState>()(() => ({
   ...defaultState,
 }));

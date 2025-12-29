@@ -2,9 +2,7 @@ import {
   BlogHeroContainer
 } from './index.styled';
 
-export interface BlogHeroProps {}
-
-export default function BlogHero({}: BlogHeroProps): JSX.Element {
+export default function BlogHero(): JSX.Element {
   return (
     <BlogHeroContainer
       id="blog-hero"

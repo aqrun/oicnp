@@ -1,4 +1,5 @@
 import { ToolItem } from '@/content/tools';
+import Image from 'next/image';
 
 export interface ToolItemProps {
   record: ToolItem;
@@ -16,7 +17,7 @@ export default function ToolItemWidget({
       >
         <div className="item-logo-w">
           {record?.logo ? (
-            <img src={record?.logo} alt={record?.name} width="20" />
+            <Image src={record?.logo} alt={record?.name} width="20" />
           ) : (
             <div className="item-logo-text">{record?.name?.slice(0, 2)?.toUpperCase()}</div>
           )}

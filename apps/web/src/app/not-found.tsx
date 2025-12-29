@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Not Found',
@@ -19,13 +20,12 @@ export default function NotFound() {
             <p className='mt-4 mb-8 text-gray-400'>
               不用担心，巨量信息可以查看首页
             </p>
-            <a
-              rel='noopener noreferrer'
+            <Link
               href='/'
               className='px-8 py-3 font-semibold rounded bg-violet-700 text-violet-100'
             >
               返回首页
-            </a>
+            </Link>
           </div>
         </div>
       </section>

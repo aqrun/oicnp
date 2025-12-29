@@ -10,8 +10,12 @@ export interface BookItemProps {
 /**
  * 首页文章列表单个
  */
+interface Category {
+  name?: string;
+}
+
 export const BookItem: React.FC<BookItemProps> = ({ node }) => {
-  const category = {} as any; // getCategory(node?.data?.taxonomies?.categories?.[0] || '');
+  const category: Category = {}; // getCategory(node?.data?.taxonomies?.categories?.[0] || '');
 
   return (
     <div className='w-full'>

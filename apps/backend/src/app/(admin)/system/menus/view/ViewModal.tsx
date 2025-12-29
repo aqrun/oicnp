@@ -13,6 +13,8 @@ import {
   DescribeMenuDetailRequestParams,
   DescribeMenuPermissions,
   DescribeMenuPermissionsRequestParams,
+  DescribeMenuDetailResponseData,
+  DescribeMenuPermissionsResponseData,
 } from '@/services';
 
 /**
@@ -59,16 +61,16 @@ export default function ViewModal() {
 
   const fetchInitialData = useMemoizedFn(async () => {
     setLoading(true);
-    const requests: Array<Promise<any>> = [
+    const requests: Array<Promise<Response>> = [
       fetchPermissionTree(),
       fetchMenuPermissions(),
       fetchMenu(),
-    ];
+    ] as unknown as Array<Promise<Response>>;
     const allRes = await Promise.all(requests);
 
     setState({
-      menu: allRes?.[2]?.menu,
-      menuPermissions: allRes?.[1]?.permissions,
+      menu: (allRes?.[2] as unknown as DescribeMenuDetailResponseData)?.menu,
+      menuPermissions: (allRes?.[1] as unknown as DescribeMenuPermissionsResponseData)?.permissions,
     });
     setLoading(false);
   });

@@ -1,4 +1,5 @@
 import { MAIN_MENUS } from '@/constant';
+import Link from 'next/link';
 
 import { MenuToggleButton } from './MenuToggleButton';
 import clsx from 'clsx';
@@ -19,7 +20,7 @@ export const Header = ({
         <nav className='font-inter mx-auto h-auto w-full max-w-[1600px] lg:relative lg:top-0'>
           {/* <!-- CONTAINER --> */}
           <div className='relative px-6 py-6 items-center lg:flex lg:items-center lg:justify-between lg:px-10 lg:py-4 xl:px-20'>
-            <a
+            <Link
               href='/'
               aria-current='page'
               className='relative bg-[#00000000] no-underline hover:outline-0 max-[991px]:mr-auto max-[767px]:pl-0 text-xl lg:text-2xl font-bold text-gray-800 flex items-center hover:text-[var(--primary)]'
@@ -52,7 +53,7 @@ export const Header = ({
                   LXAGE.COM
                 </span> */}
               </span>
-            </a>
+            </Link>
             <div className='absolute right-4 top-7 lg:hidden'>
               <MenuToggleButton />
             </div>
@@ -61,7 +62,7 @@ export const Header = ({
               <div className='mt-14 flex flex-col lg:mt-0 lg:flex lg:flex-row lg:space-x-1 lg:space-y-0'>
                 {MAIN_MENUS?.map((item) => {
                   return (
-                    <a
+                    <Link
                       key={item?.vid}
                       href={item?.href}
                       className={clsx(`header-nav-item item-${item?.vid} py-4 font-inter text-center rounded-lg text-black lg:px-6 lg:py-4 hover:bg-gray-50 lg:hover:text-gray-800`, {
@@ -69,7 +70,7 @@ export const Header = ({
                       })}
                     >
                       {item?.name}
-                    </a>
+                    </Link>
                   );
                 })}
               </div>

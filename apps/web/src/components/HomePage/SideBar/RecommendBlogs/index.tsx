@@ -25,6 +25,7 @@ export function RecommendBlogs(): JSX.Element {
 
   useEffect(() => {
     init();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

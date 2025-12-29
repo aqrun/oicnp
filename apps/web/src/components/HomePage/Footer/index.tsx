@@ -1,4 +1,5 @@
 import { siteConfig } from '@/constant/config';
+import Link from 'next/link';
 
 export const Footer = () => {
   return (
@@ -9,9 +10,9 @@ export const Footer = () => {
           {/* <!-- LOGO DIV --> */}
           <div>
             {/* <!-- LOGO --> */}
-            <a href='/' className='inline-block max-w-full font-bold text-2xl'>
+            <Link href='/' className='inline-block max-w-full font-bold text-2xl'>
               {siteConfig?.title}
-            </a>
+            </Link>
             <p className='font-inter mt-4 max-w-[350px] text-base font-light text-gray-500'>
               技术深处，自有灵犀。不只是代码的堆叠，更是思想的碰撞。在技术浪潮中，记录那些珍贵的“灵光一现”与“心有灵犀”。关注前沿洞察、深度解读与系统思考，致力于成为连接技术理性与人文感性的桥梁。
             </p>
@@ -69,59 +70,59 @@ export const Footer = () => {
             {/* <!-- LINK BLOCK --> */}
             <div className='mb-5 mr-8 flex max-w-[200px] grow basis-[100px] flex-col space-y-5 lg:mx-10'>
               <h2 className='font-inter font-normal text-xl'>IT技术</h2>
-              <a href='/cat/rust' className='font-inter font-light text-gray-500'>
+              <Link href='/cat/rust' className='font-inter font-light text-gray-500'>
                 Rust语言
-              </a>
-              <a href='/cat/server' className='font-inter font-light text-gray-500'>
+              </Link>
+              <Link href='/cat/server' className='font-inter font-light text-gray-500'>
                 服务器
-              </a>
-              <a href='/cat/backend' className='font-inter font-light text-gray-500'>
+              </Link>
+              <Link href='/cat/backend' className='font-inter font-light text-gray-500'>
                 后端开发
-              </a>
-              <a href='/cat/frontend' className='font-inter font-light text-gray-500'>
+              </Link>
+              <Link href='/cat/frontend' className='font-inter font-light text-gray-500'>
                 前端开发
-              </a>
-              <a href='/cat/diary' className='font-inter font-light text-gray-500'>
+              </Link>
+              <Link href='/cat/diary' className='font-inter font-light text-gray-500'>
                 每日随笔
-              </a>
+              </Link>
             </div>
             {/* <!-- LINK BLOCK --> */}
             <div className='mb-5 mr-8 flex max-w-[200px] grow basis-[100px] flex-col space-y-5 lg:mx-10'>
               <h2 className='font-inter font-normal text-xl'>常用工具</h2>
-              <a href='/tool/t/react-ui' className='font-inter font-light text-gray-500'>
+              <Link href='/tool/t/react-ui' className='font-inter font-light text-gray-500'>
                 Rust UI
-              </a>
-              <a href='/tool/t/static-site-generator' className='font-inter font-light text-gray-500'>
+              </Link>
+              <Link href='/tool/t/static-site-generator' className='font-inter font-light text-gray-500'>
                 静态站点生成器
-              </a>
-              <a href='/tool/t/charts' className='font-inter font-light text-gray-500'>
+              </Link>
+              <Link href='/tool/t/charts' className='font-inter font-light text-gray-500'>
                 图表 / 可视化
-              </a>
-              <a href='/tool/t/ai-apps' className='font-inter font-light text-gray-500'>
+              </Link>
+              <Link href='/tool/t/ai-apps' className='font-inter font-light text-gray-500'>
                 AI 应用
-              </a>
+              </Link>
             </div>
             {/* <!-- LINK BLOCK --> */}
             <div className='mb-5 mr-8 flex max-w-[200px] grow basis-[100px] flex-col space-y-5 lg:mx-10'>
               <h2 className='font-inter font-normal text-xl'>诗词鉴赏</h2>
-              <a href='/poetry/category/wu-dai-shi-ci' className='font-inter font-light text-gray-500'>
+              <Link href='/poetry/category/wu-dai-shi-ci' className='font-inter font-light text-gray-500'>
                 五代诗词
-              </a>
-              <a href='/poetry/category/tang-shi' className='font-inter font-light text-gray-500'>
+              </Link>
+              <Link href='/poetry/category/tang-shi' className='font-inter font-light text-gray-500'>
                 唐诗
-              </a>
-              <a href='/poetry/category/song-ci' className='font-inter font-light text-gray-500'>
+              </Link>
+              <Link href='/poetry/category/song-ci' className='font-inter font-light text-gray-500'>
                 宋词
-              </a>
-              <a href='/poetry/category/chu-ci' className='font-inter font-light text-gray-500'>
+              </Link>
+              <Link href='/poetry/category/chu-ci' className='font-inter font-light text-gray-500'>
                 楚辞
-              </a>
-              <a href='/poetry/category/meng-xue' className='font-inter font-light text-gray-500'>
+              </Link>
+              <Link href='/poetry/category/meng-xue' className='font-inter font-light text-gray-500'>
                 蒙学
-              </a>
-              <a href='/poetry/category/si-shu-wu-jing' className='font-inter font-light text-gray-500'>
+              </Link>
+              <Link href='/poetry/category/si-shu-wu-jing' className='font-inter font-light text-gray-500'>
                 四书五经
-              </a>
+              </Link>
             </div>
           </div>
           {/* <!-- LOCATION & SUPPORT --> */}
@@ -137,34 +138,33 @@ export const Footer = () => {
           <nav className='font-inter lg:text-center text-sm text-gray-500'>
             <ul className='flex flex-row justify-start lg:justify-center items-center'>
               <li className='s90'>
-                <a
+                <Link
                   href='/about/'
                   className='mr-2 py-1 block hover:text-violet-500'
                 >
                   关于我
-                </a>
+                </Link>
               </li>
               <li className='s90'>
-                <a
+                <Link
                   href='/contact/'
                   className='mr-2 py-1 block hover:text-violet-500'
                 >
                   联系我
-                </a>
+                </Link>
               </li>
               <li className='s90'>
-                <a href='/about/' className='mr-2 py-1 block hover:text-violet-500'>
+                <Link href='/about/' className='mr-2 py-1 block hover:text-violet-500'>
                   保护权益
-                </a>
+                </Link>
               </li>
               <li className='s90'>
-                <a
+                <Link
                   href='/about/'
-                  target='_blank'
                   className='mr-2 py-1 block hover:text-violet-500'
                 >
                   网站地图
-                </a>
+                </Link>
               </li>
             </ul>
           </nav>

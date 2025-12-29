@@ -44,7 +44,7 @@ export default function MenuForm({
     { value: '0', label: '停用'}
   ];
 
-  const handleTreeCheck = useMemoizedFn((checkedKeys: Array<React.Key>, info: any) => {
+  const handleTreeCheck = useMemoizedFn((checkedKeys: Array<React.Key>) => {
     form?.setFieldsValue({
       permissionIds: checkedKeys as Array<number>,
     });

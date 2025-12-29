@@ -19,7 +19,7 @@ export interface BlogState {
 /**
  * 应用主状态数据
  */
-export const useBlogStore = create<BlogState>()((set) => ({
+export const useBlogStore = create<BlogState>()(() => ({
   loading: false,
   hasMore: true,
   pager: {

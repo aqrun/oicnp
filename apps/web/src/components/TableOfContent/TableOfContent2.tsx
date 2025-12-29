@@ -22,15 +22,15 @@ export const TableOfContent2: React.FC<TableOfContent2Props> = () => {
 
     if (!$article) return;
 
-    const headerData = Array.from($article?.querySelectorAll('h2, h3, h4'))?.map((item: any, index) => {
-
-      if (!item.id) {
-        item.setAttribute('id', `toc-header-${index}`);
+    const headerData = Array.from($article?.querySelectorAll('h2, h3, h4'))?.map((item: Element, index) => {
+      const headerElement = item as HTMLElement;
+      if (!headerElement.id) {
+        headerElement.setAttribute('id', `toc-header-${index}`);
       }
       return {
-        id: item?.id,
-        text: item?.innerText,
-        level: Number(item?.nodeName?.charAt(1)),
+        id: headerElement.id,
+        text: headerElement.innerText,
+        level: Number(headerElement.nodeName?.charAt(1)),
       };
     });
 

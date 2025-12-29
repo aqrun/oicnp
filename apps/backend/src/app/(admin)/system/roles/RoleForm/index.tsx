@@ -43,9 +43,9 @@ export default function RoleForm({
     { value: '0', label: '停用'}
   ];
 
-  const handleTreeCheck = useMemoizedFn((checkedKeys: Array<string>, info: any) => {
+  const handleTreeCheck = useMemoizedFn((checkedKeys: React.Key[]) => {
     form?.setFieldsValue({
-      permissionIds: checkedKeys,
+      permissionIds: checkedKeys as Array<string>,
     });
   });
 
@@ -102,7 +102,7 @@ export default function RoleForm({
           wrapperCol={{ span: 24 }}
         >
           <PermissionTree
-            onCheckChange={handleTreeCheck as any}
+            onCheckChange={handleTreeCheck}
           />
         </Form.Item>
 

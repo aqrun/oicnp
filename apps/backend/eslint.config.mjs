@@ -4,6 +4,7 @@ import nextTypeScript from "eslint-config-next/typescript";
 const eslintConfig = [
   ...nextCoreWebVitals,
   ...nextTypeScript,
+  "@typescript-eslint/no-explicit-any",
 ];
 
 export default eslintConfig;

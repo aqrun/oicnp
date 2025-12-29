@@ -13,7 +13,7 @@ export interface ChapterPoetryDetailProps {
 }
 
 export default function ChapterPoetryDetail({ chapters }: ChapterPoetryDetailProps) {
-  const [chapter, setChapter] = useState<ChapterModel>(chapters?.[0]!);
+  const [chapter, setChapter] = useState<ChapterModel | undefined>(chapters?.[0]);
 
   // 遍历数据 根据pid转为树状结构 添加 children 保存子节点
   const treeChapters = useMemo(() => {
@@ -71,7 +71,7 @@ export default function ChapterPoetryDetail({ chapters }: ChapterPoetryDetailPro
               <div key={item.id}>
                 <a
                   className={clsx("block p-2 hover:bg-gray-200 rounded-md mr-2 cursor-pointer", {
-                    'text-purple-700': chapter.id === item.id,
+                    'text-purple-700': chapter?.id === item.id,
                   })}
                   onClick={() => setChapter(item)}
                 >
@@ -83,7 +83,7 @@ export default function ChapterPoetryDetail({ chapters }: ChapterPoetryDetailPro
                     <div key={child.id}>
                       <a
                         className={clsx("block p-2 hover:bg-gray-200 rounded-md mr-2 cursor-pointer ml-4", {
-                          'text-purple-700': chapter.id === child.id,
+                          'text-purple-700': chapter?.id === child.id,
                         })}
                         onClick={() => setChapter(child)}
                       >

@@ -10,14 +10,16 @@ export const metadata: Metadata = {
   description: siteConfig.description,
 };
 
-export interface BlogCategoryPageProps {
+export interface BlogCategoryPageProps1 {
   params: Promise<{
     catVid: string;
   }>;
 }
 
-export default async function BlogCategoryPage(props: BlogCategoryPageProps) {
-  const { catVid } = await props.params;
+export default async function BlogCategoryPage({
+  params,
+}: BlogCategoryPageProps1) {
+  const { catVid } = await params;
 
   if (!catVid || catVid === 'all') {
     return redirect('/blog');
