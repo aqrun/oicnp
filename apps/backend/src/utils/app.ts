@@ -70,9 +70,9 @@ export function getRoutePathByKeyPath(menus: MenuItem[], keyPath: string[]) {
   }
 
   if (keyPath?.[2]) {    
-    sideMenu = sideOpenMenu?.children?.find((item) => {
+    sideMenu = (sideOpenMenu as MenuItem)?.children?.find((item: MenuItem) => {
       return item?.key === keyPath?.[2];
-    });
+    }) as MenuItem;
   }
 
   const keys: string[] = [];

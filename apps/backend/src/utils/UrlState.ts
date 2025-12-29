@@ -142,9 +142,9 @@ export class UrlState {
     this.sideMenuOpenKey = this.pathnames?.[1] || '';
 
     if (this.sideMenuOpenKey) {
-      this.sideOpenMenu = this.mainMenu?.children?.find((item) => {
+      this.sideOpenMenu = (this.mainMenu?.children || [])?.find((item) => {
         return item?.key === this.sideMenuOpenKey;
-      });
+      }) as MenuItem;
     } else {
       this.sideOpenMenu = sideMenuOpenMenus?.[0];
       this.sideMenuOpenKey = `${this.sideOpenMenu?.key || ''}`;

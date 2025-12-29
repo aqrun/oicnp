@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import { getApiUri } from '@repo/services/url';
 
 const nextConfig: NextConfig = {
+  transpilePackages: ['@repo/services'],
   sassOptions: {
     implementation: 'sass-embedded',
   },
