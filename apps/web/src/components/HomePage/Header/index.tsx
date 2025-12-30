@@ -33,9 +33,9 @@ export const Header = ({
                 className='inline-block max-h-9 max-w-full'
               /> */}
               <span
-                className='inline-block max-h-9 max-w-full h-11'
+                className='inline-block max-h-7 max-w-full h-11'
                 dangerouslySetInnerHTML={{
-                  __html: `<svg height="45" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" baseProfile="full" fill="currentColor">
+                  __html: `<svg height="32" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" baseProfile="full" fill="currentColor">
     <g transform="scale(1,-1) translate(0,-500)">
         <path d="M 1.235852 486.524607 L 337.874486 486.524607 L 283.577932 374.311729 L 500.764148 1.475393 L 149.646433 1.475393 L 211.182527 110.068500 Z" transform="scale(1.000000,1.000000) translate(-1.000000,6.000000)" opacity="1.000000"></path>
         <path d="M 114.926122 211.338204 L 145.162852 157.004964 L 61.602733 1.475393 L 1.235852 1.475393 Z" transform="scale(1.000000,1.000000) translate(-1.000000,6.000000)" opacity="1.000000"></path>

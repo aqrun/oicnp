@@ -81,11 +81,11 @@ export function getRoutePathByKeyPath(menus: MenuItem[], keyPath: string[]) {
     keys.push(`${mainMenu.key || ''}`);
   }
 
-  if (sideOpenMenu && !sideOpenMenu?.ignore) {
+  if (sideOpenMenu && !(sideOpenMenu as MenuItem)?.ignore) {
     keys.push(`${sideOpenMenu.key || ''}`);
   }
 
-  if (sideMenu && !sideMenu?.ignore) {
+  if (sideMenu && !(sideMenu as MenuItem)?.ignore) {
     keys.push(`${sideMenu.key || ''}`);
   }
 

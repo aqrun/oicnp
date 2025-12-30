@@ -50,7 +50,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
-      <body suppressHydrationWarning>
+      <body suppressHydrationWarning data-url={process.env.URL_API}>
         <script
           dangerouslySetInnerHTML={{
             __html: `

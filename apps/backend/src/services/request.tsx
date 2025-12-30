@@ -119,7 +119,7 @@ export function createService<TRequest, TResponse> (
   method: Method,
   config: RequestConfig = {}
 ): (data?: TRequest) => Promise<TResponse> {
-  const url = `${getApiUri()}/v1${action}`;
+  const url = `/api/v1${action}`;
 
   return (data?: TRequest) => {
     return new Promise<TResponse>((resolve) => {
