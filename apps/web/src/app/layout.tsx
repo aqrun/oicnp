@@ -54,13 +54,6 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              window.a = ${JSON.stringify(process.env)};
-            `,
-          }}
-        />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
               (function() {
                 try {
                   if (document.readyState === 'loading') {

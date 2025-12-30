@@ -1,1 +1,2 @@
-scp target/web.zip $SERVER_USERNAME@$SERVER_IP:$SERVER_PROJECT_PATH/target/ && scp target/backend.zip $SERVER_USERNAME@$SERVER_IP:$SERVER_PROJECT_PATH/target/
+scp target/web.zip $SERVER_USERNAME@$SERVER_IP:$SERVER_PROJECT_PATH/target/ \
+&& scp target/backend.zip $SERVER_USERNAME@$SERVER_IP:$SERVER_PROJECT_PATH/target/
