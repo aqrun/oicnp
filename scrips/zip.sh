@@ -2,8 +2,7 @@
 # sync.sh - 同步 .next 目录到服务器
 # 使用方法: ./sync.sh [服务器地址] [用户名] [目标路径]
 # 示例: ./sync.sh 192.168.1.100 root /path/to/project
-# rm -rf apps/web/.next && unzip -q -o target/web.zip -d apps/web/
-# rm -rf apps/backend/.next && unzip -q -o target/backend.zip -d apps/backend/
+# rm -rf apps/web/.next && unzip -q -o target/web.zip -d apps/web/ && rm -rf apps/backend/.next && unzip -q -o target/backend.zip -d apps/backend/
 
 set -e
 
