@@ -35,7 +35,7 @@ export function PoemItem({
   }
 
   return (
-    <Container className='poem-list-item-w w-1/2 mb-4'>
+    <Container className='poem-list-item-w w-full lg:w-1/2 mb-4'>
       <div className='poem-list-item overflow-hidden rounded-lg hover:shadow-lg hover:shadow-violet-100 hover:border-violet-400 cursor-pointer border border-slate-200 border-solid'>
         <a
           href={`/poetry/n/${record?.uuid}`}
@@ -50,7 +50,7 @@ export function PoemItem({
               height={180}
             />
           )}
-          <div className='w-full p-4 bg-white dark:bg-gray-800 min-h-40'>
+          <div className='w-full p-4 bg-white dark:bg-gray-800 lg:min-h-40'>
             <p className='font-light text-gray-400 text-md'>
               <i className='iconfont icon-benshubook122 mr-1' />
               {category}

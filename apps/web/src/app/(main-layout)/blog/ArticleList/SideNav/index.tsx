@@ -15,7 +15,7 @@ export default function SideNav({
 }: SideNavProps): JSX.Element {
   return (
     <SideNavContainer>
-      <ul className="flex flex-row lg:flex lg:flex-col">
+      <ul className="flex flex-row lg:flex lg:flex-col flex-wrap">
         {CATEGORIES?.map((item) => {
           return (
             <SideNavItem

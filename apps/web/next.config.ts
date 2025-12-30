@@ -34,8 +34,8 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'cdn.oicnp.com',
+        protocol: 'http',
+        hostname: 'static.lxage.com',
         port: '',
         pathname: '/**',
       },

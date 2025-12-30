@@ -9,7 +9,7 @@ export default function ToolItemWidget({
   record,
 }: ToolItemProps): JSX.Element {
   return (
-    <div className="tool-item-widget">
+    <div className="tool-item-widget lg:w-1/2">
       <a
         className="item-inner"
         target="_blank"
@@ -17,7 +17,7 @@ export default function ToolItemWidget({
       >
         <div className="item-logo-w">
           {record?.logo ? (
-            <Image src={record?.logo} alt={record?.name} width="20" />
+            <Image src={record?.logo} alt={record?.name} width="20" height="20" />
           ) : (
             <div className="item-logo-text">{record?.name?.slice(0, 2)?.toUpperCase()}</div>
           )}

@@ -58,7 +58,7 @@ export default function ChapterPoetryDetail({ chapters }: ChapterPoetryDetailPro
   }, [chapters]);
 
   return (
-    <div className="flex flex-row gap-4">
+    <div className="flex lg:flex-row flex-col gap-4">
       <div className="chapter-title-list min-w-52 border-r border-gray-200">
         <div
           className="p-2 mr-2 mb-4 rounded-md bg-gray-100"

@@ -9,18 +9,19 @@ export const HeroContainer = styled.div`
 
 export const ToolList = styled.div`
   .tool-item-widget {
-    width: 50%;
     margin-bottom: 24px;
 
-    &:nth-child(even) {
-      .item-inner {
-        margin-left: 8px;
+    @media (min-width: 64rem) {
+      &:nth-child(even) {
+        .item-inner {
+          margin-left: 8px;
+        }
       }
+      &:nth-child(odd) {
+        .item-inner {
+          margin-right: 8px;
+        }
     }
-    &:nth-child(odd) {
-      .item-inner {
-        margin-right: 8px;
-      }
     }
   }
   .item-inner {
