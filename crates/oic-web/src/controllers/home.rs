@@ -1,16 +1,30 @@
 use axum::{
     Router,
-    routing::{get, post},
-    response::{Html, Json},
+    response::IntoResponse,
+    routing::get,
+    extract::{Extension, State},
 };
-use serde_json::{json, Value};
 use oic_core::AppContext;
+use crate::models::HtmlTemplate;
+use crate::views::HomeTemplate;
+use std::sync::Arc;
+use std::collections::HashMap;
+use crate::models::{ManifestChunk, ViteAssets};
 
-async fn index() -> Html<&'static str> {
-    Html("<h1>Hello, World!</h1>")
+async fn index(
+    State(_ctx): State<AppContext>,
+    manifest: Extension<Arc<HashMap<String, ManifestChunk>>>
+) -> impl IntoResponse {
+    let m: HashMap<String, ManifestChunk> = (*manifest.0).clone();
+    let assets: ViteAssets = ManifestChunk::get_assets_by_name(m, "main");
+    let template = HomeTemplate {
+        name: "World".to_string(),
+        assets,
+    };
+    HtmlTemplate(template)
 }
 
-pub fn routes() -> Router<AppContext> {
+pub fn home_routes() -> Router<AppContext> {
     Router::new()
         //  "/" 与所有路由冲突
         .route("/", get(index))

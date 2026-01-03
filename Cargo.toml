@@ -118,6 +118,7 @@ bb8 = { version = "0.9" }
 futures = "0.3"
 user-agent-parser = "0.3"
 http-body-util = "0"
+askama = { version = "0.15.1", default-features = false, features = ["std", "derive"] }
 
 [workspace.dependencies.sea-orm]
 version = "^1"

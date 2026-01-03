@@ -25,3 +25,4 @@ loco-rs = { workspace = true, features = ["testing", 'with-db'] }
 axum = { workspace = true, features = ["json"] }
 tower-http = { workspace = true }
 anyhow = { workspace = true }
+askama = { workspace = true }

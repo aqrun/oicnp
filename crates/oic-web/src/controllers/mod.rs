@@ -1,3 +1,5 @@
 
-pub mod api;
-pub mod home;
+mod home;
+
+pub use home::*;
+
