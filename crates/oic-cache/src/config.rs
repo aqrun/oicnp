@@ -7,6 +7,9 @@ pub struct CacheConfig {
     pub index_capacity: usize,
     
     /// 默认 TTL（秒）
+    /// - `> 0`: 正常过期时间
+    /// - `= 0`: 永不过期
+    /// - `< 0`: 立即过期（不推荐）
     pub default_ttl_seconds: i64,
     
     /// 磁盘缓存根目录
@@ -86,7 +89,7 @@ impl Default for CacheConfig {
     fn default() -> Self {
         Self {
             index_capacity: 10_000,
-            default_ttl_seconds: 3600,
+            default_ttl_seconds: 360, // 默认缓存时间 10 分钟
             disk_path: "./target/.cache".to_string(),
             storage: StorageConfig {
                 inline_threshold: 4096,

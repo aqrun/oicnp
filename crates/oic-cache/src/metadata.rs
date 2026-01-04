@@ -174,7 +174,14 @@ pub struct StatsInfo {
 
 impl CacheMetadata {
     /// 检查是否过期
+    /// 
+    /// 注意：如果 `expires_at` 为 `i64::MAX`，表示永不过期，返回 `false`
     pub fn is_expired(&self) -> bool {
+        // i64::MAX 表示永不过期
+        if self.expires_at == i64::MAX {
+            return false;
+        }
+        
         let now = chrono::Utc::now().timestamp();
         now >= self.expires_at
     }

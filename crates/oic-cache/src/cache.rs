@@ -338,6 +338,11 @@ impl Cache {
     }
     
     /// 设置缓存（指定 TTL）
+    /// 
+    /// # TTL 说明
+    /// - `ttl_seconds > 0`: 正常过期时间
+    /// - `ttl_seconds = 0`: 永不过期（使用 i64::MAX）
+    /// - `ttl_seconds < 0`: 立即过期（使用 now - 1）
     pub async fn set_with_ttl(
         &self,
         key: String,
@@ -367,13 +372,24 @@ impl Cache {
             (StorageLocation::File(file_path), compression)
         };
         
+        // 计算过期时间
+        // ttl_seconds = 0 表示永不过期，使用 i64::MAX
+        // ttl_seconds < 0 表示立即过期，使用 now - 1
+        let expires_at = if ttl_seconds == 0 {
+            i64::MAX
+        } else if ttl_seconds < 0 {
+            now - 1
+        } else {
+            now + ttl_seconds
+        };
+        
         // 创建元数据
         let metadata = CacheMetadata {
             version: 1,
             key: key.clone(),
             size,
             created_at: now,
-            expires_at: now + ttl_seconds,
+            expires_at,
             fetch_status: FetchStatus::Success,
             last_fetch_attempt: now,
             storage: StorageInfo {
@@ -671,11 +687,35 @@ impl Cache {
     // ============ 维护操作 ============
     
     /// 清理过期缓存
+    /// 
+    /// 清理策略：
+    /// - 如果启用了 SWR：只清理过期且超过 max_stale_seconds 的数据
+    /// - 如果未启用 SWR：清理所有过期的数据
     pub async fn cleanup_expired(&self) -> Result<usize> {
         let expired_keys: Vec<String> = {
             let index = self.inner.index.read().await;
             index.iter()
-                .filter(|(_, metadata)| metadata.is_expired())
+                .filter(|(_, metadata)| {
+                    if !metadata.is_expired() {
+                        return false; // 未过期，不清理
+                    }
+                    
+                    // 如果启用了 SWR，需要检查是否超过 max_stale 时间
+                    if self.inner.config.swr.enabled {
+                        // 如果 max_stale_seconds = 0，表示不限制 stale 时间，不清理
+                        if self.inner.config.swr.max_stale_seconds == 0 {
+                            return false;
+                        }
+                        
+                        // 检查是否超过 max_stale 时间
+                        let now = chrono::Utc::now().timestamp();
+                        let stale_age = now - metadata.expires_at;
+                        stale_age > self.inner.config.swr.max_stale_seconds
+                    } else {
+                        // 未启用 SWR，清理所有过期数据
+                        true
+                    }
+                })
                 .map(|(key, _)| key.clone())
                 .collect()
         };
@@ -768,8 +808,24 @@ impl Cache {
         let mut expired_count = 0;
         
         for (key, metadata) in entries {
-            // 检查是否过期
-            if metadata.is_expired() {
+            // 检查是否过期且需要清理
+            // 如果启用了 SWR，只清理超过 max_stale_seconds 的数据
+            let should_skip = if !metadata.is_expired() {
+                false // 未过期，不跳过
+            } else if self.inner.config.swr.enabled {
+                // 如果启用了 SWR，检查是否超过 max_stale 时间
+                if self.inner.config.swr.max_stale_seconds == 0 {
+                    false // max_stale_seconds = 0 表示不限制，保留数据
+                } else {
+                    let now = chrono::Utc::now().timestamp();
+                    let stale_age = now - metadata.expires_at;
+                    stale_age > self.inner.config.swr.max_stale_seconds
+                }
+            } else {
+                true // 未启用 SWR，删除所有过期数据
+            };
+            
+            if should_skip {
                 expired_count += 1;
                 // 如果文件存在，删除文件
                 if let StorageLocation::File(file_path) = &metadata.storage.location {
