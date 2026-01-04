@@ -60,9 +60,9 @@ impl Default for CacheConfig {
         Self {
             index_capacity: 10_000,
             default_ttl_seconds: 3600,
-            disk_path: "./cache".to_string(),
+            disk_path: "./target/.cache".to_string(),
             storage: StorageConfig {
-                inline_threshold: 4096,
+                inline_threshold: 0, // 4096,
                 streaming_threshold: 10 * 1024 * 1024,
                 enable_persistence: true,
             },

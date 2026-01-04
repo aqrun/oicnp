@@ -18,7 +18,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     
     // 4. 失效缓存
-    cache.invalidate("user:123").await?;
+    // cache.invalidate("user:123").await?;
     
     // 5. 查看统计
     let stats = cache.statistics().await;
