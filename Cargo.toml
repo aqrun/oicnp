@@ -130,7 +130,7 @@ brotli = "3"          # Brotli（可选）
 # 哈希和加密
 sha2 = "0.10"
 # 性能监控（可选）
-prometheus = { version = "0.13", optional = true }
+prometheus = { version = "0.13" }
 criterion = "0.5"
 tempfile = "3"
 
