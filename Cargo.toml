@@ -119,6 +119,20 @@ futures = "0.3"
 user-agent-parser = "0.3"
 http-body-util = "0"
 askama = { version = "0.15.1", default-features = false, features = ["std", "derive"] }
+# cache
+bincode = "1"
+lru = "0.12"
+dashmap = "5"
+# 压缩算法
+flate2 = "1"          # Gzip
+zstd = "0.13"         # Zstd（推荐）
+brotli = "3"          # Brotli（可选）
+# 哈希和加密
+sha2 = "0.10"
+# 性能监控（可选）
+prometheus = { version = "0.13", optional = true }
+criterion = "0.5"
+tempfile = "3"
 
 [workspace.dependencies.sea-orm]
 version = "^1"

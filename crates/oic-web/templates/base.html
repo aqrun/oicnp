@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <title>{% block title %}{{ title }} - My Site{% endblock %}</title>
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    <div id="content">
+      {% block content %}<p>Placeholder content</p>{% endblock %}
+    </div>
+    {% block scripts %}script files{% endblock %}
+  </body>
+</html>

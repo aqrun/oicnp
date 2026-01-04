@@ -1,0 +1,49 @@
+[package]
+name = "oic_cache"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# 异步运行时
+tokio = { workspace = true, features = ["full"] }
+
+# 序列化
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+bincode = { workspace = true }
+
+# LRU 缓存
+lru = { workspace = true }
+
+# 并发数据结构
+dashmap = { workspace = true }
+
+# 压缩算法
+flate2 = { workspace = true }          # Gzip
+zstd = { workspace = true }         # Zstd（推荐）
+brotli = { workspace = true }          # Brotli（可选）
+
+# 哈希和加密
+sha2 = { workspace = true }
+
+# 时间处理
+chrono = { workspace = true }
+
+# 错误处理
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# 日志
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+# 性能监控（可选）
+prometheus = { version = "0.13", optional = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+tempfile = { workspace = true }
+
+[features]
+default = []
+metrics = ["prometheus"]
