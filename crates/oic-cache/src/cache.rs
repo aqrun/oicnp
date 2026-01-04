@@ -249,17 +249,45 @@ impl Cache {
         };
         
         // 检查是否过期
-        if metadata.is_expired() {
+        let is_expired = metadata.is_expired();
+        let is_stale_acceptable = if is_expired && self.inner.config.swr.enabled {
+            metadata.is_stale_acceptable(self.inner.config.swr.max_stale_seconds)
+        } else {
+            false
+        };
+        
+        if is_expired && !is_stale_acceptable {
+            // 过期且不能作为 stale 返回，删除并返回 None
             self.inner.stats.record_miss();
             // 异步删除过期项
             let _ = self.invalidate(key).await;
             return Ok(None);
         }
         
-        // 检查是否有效
-        if !metadata.is_valid() {
+        // 检查是否有效（未过期且状态为成功）
+        let is_valid = metadata.is_valid();
+        
+        if !is_valid && !is_stale_acceptable {
+            // 无效且不能作为 stale 返回
             self.inner.stats.record_miss();
             return Ok(None);
+        }
+        
+        // 如果使用 stale 数据，标记需要重新获取
+        if is_stale_acceptable && !is_valid {
+            // 标记为需要重新获取（但不阻塞返回）
+            let inner_clone = self.inner.clone();
+            let key_clone = key.to_string();
+            tokio::spawn(async move {
+                // 更新状态为 Fetching，表示正在重新获取
+                let mut index = inner_clone.index.write().await;
+                if let Some(metadata) = index.get_mut(&key_clone) {
+                    if metadata.fetch_status != FetchStatus::Fetching {
+                        metadata.fetch_status = FetchStatus::Fetching;
+                        metadata.last_fetch_attempt = chrono::Utc::now().timestamp();
+                    }
+                }
+            });
         }
         
         // 读取数据
@@ -412,10 +440,41 @@ impl Cache {
         Ok(())
     }
     
-    /// 检查键是否存在
+    /// 检查键是否存在（包括 stale 数据，如果启用了 SWR）
     pub async fn exists(&self, key: &str) -> bool {
-        let index = self.inner.index.read().await;
-        index.peek(key).map(|m| !m.is_expired()).unwrap_or(false)
+        let metadata = {
+            let index = self.inner.index.read().await;
+            index.peek(key).cloned()
+        };
+        
+        match metadata {
+            Some(m) => {
+                // 如果启用 SWR，stale 数据也算存在
+                if self.inner.config.swr.enabled {
+                    m.is_valid() || m.is_stale_acceptable(self.inner.config.swr.max_stale_seconds)
+                } else {
+                    m.is_valid()
+                }
+            }
+            None => false,
+        }
+    }
+    
+    /// 检查数据是否是 stale（过期但可接受）
+    pub async fn is_stale(&self, key: &str) -> bool {
+        if !self.inner.config.swr.enabled {
+            return false;
+        }
+        
+        let metadata = {
+            let index = self.inner.index.read().await;
+            index.peek(key).cloned()
+        };
+        
+        match metadata {
+            Some(m) => m.is_expired() && m.is_stale_acceptable(self.inner.config.swr.max_stale_seconds),
+            None => false,
+        }
     }
     
     // ============ 高级操作 ============

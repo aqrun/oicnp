@@ -20,6 +20,9 @@ pub struct CacheConfig {
     
     /// 并发配置
     pub concurrency: ConcurrencyConfig,
+    
+    /// SWR 配置（Stale-While-Revalidate）
+    pub swr: SwrConfig,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -45,6 +48,17 @@ pub struct StorageConfig {
     /// 更新后延迟保存的时间（毫秒），重置式 debounce
     /// 每次更新会重置计时器，只有在最后一次更新后等待此时间才保存
     pub auto_save_debounce_ms: u64,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub struct SwrConfig {
+    /// 是否启用 Stale-While-Revalidate (SWR) 功能
+    pub enabled: bool,
+    
+    /// Stale 数据的最大保留时间（秒）
+    /// 超过此时间后，即使启用 SWR 也不会返回过期数据
+    /// 0 表示不限制，只要数据存在就返回
+    pub max_stale_seconds: i64,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -91,6 +105,10 @@ impl Default for CacheConfig {
             concurrency: ConcurrencyConfig {
                 max_concurrent_writes: 1000,
                 fetch_timeout_seconds: 30,
+            },
+            swr: SwrConfig {
+                enabled: false,
+                max_stale_seconds: 3600, // 默认最多保留 1 小时的 stale 数据
             },
         }
     }

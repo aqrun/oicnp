@@ -183,5 +183,20 @@ impl CacheMetadata {
     pub fn is_valid(&self) -> bool {
         !self.is_expired() && self.fetch_status == FetchStatus::Success
     }
+    
+    /// 检查是否可以作为 stale 数据返回（过期但未超过 max_stale 时间）
+    pub fn is_stale_acceptable(&self, max_stale_seconds: i64) -> bool {
+        if !self.is_expired() {
+            return false; // 未过期，不是 stale
+        }
+        
+        if max_stale_seconds == 0 {
+            return true; // 不限制 stale 时间
+        }
+        
+        let now = chrono::Utc::now().timestamp();
+        let stale_age = now - self.expires_at;
+        stale_age <= max_stale_seconds
+    }
 }
 
