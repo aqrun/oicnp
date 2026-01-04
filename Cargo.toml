@@ -133,6 +133,8 @@ sha2 = "0.10"
 prometheus = { version = "0.13" }
 criterion = "0.5"
 tempfile = "3"
+toml = "0.8"
+hex = "0.4"
 
 [workspace.dependencies.sea-orm]
 version = "^1"

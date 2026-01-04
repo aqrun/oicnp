@@ -57,7 +57,7 @@ pub trait CacheExt {
     /// 
     /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
     /// let cache = Cache::new(CacheConfig::default());
-    /// let user: Option<User> = cache.get("user:1").await?;
+    /// let user: Option<User> = CacheExt::get(&cache, "user:1").await?;
     /// # Ok(())
     /// # }
     /// ```
@@ -221,7 +221,7 @@ pub trait CacheExt {
     /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
     /// let cache = Cache::new(CacheConfig::default());
     /// let user = User { id: 1, name: "Alice".to_string() };
-    /// cache.set_json("user:1", &user, 3600).await?;
+    /// cache.set_json("user:1".to_string(), &user, 3600).await?;
     /// # Ok(())
     /// # }
     /// ```
@@ -241,7 +241,7 @@ pub trait CacheExt {
     /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
     /// let cache = Cache::new(CacheConfig::default());
     /// let html = "<h1>Hello</h1>".to_string();
-    /// cache.set_html("page:home", &html, 3600).await?;
+    /// cache.set_html("page:home".to_string(), &html, 3600).await?;
     /// # Ok(())
     /// # }
     /// ```
