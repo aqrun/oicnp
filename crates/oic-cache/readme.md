@@ -17,6 +17,8 @@
 
 ## 快速开始
 
+### 基础使用
+
 ```rust
 use oic_cache::{Cache, CacheConfig};
 
@@ -40,6 +42,36 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 ```
+
+### 索引持久化和自动加载
+
+缓存支持将索引保存到磁盘，并在重启后自动恢复：
+
+```rust
+use oic_cache::{Cache, CacheConfig};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let mut config = CacheConfig::default();
+    config.storage.auto_load_index = true; // 启用自动加载
+    
+    // 创建缓存并自动加载索引（如果存在）
+    let cache = Cache::new_with_auto_load(config).await?;
+    
+    // 使用缓存...
+    cache.set("key".to_string(), b"value".to_vec(), "text/plain".to_string()).await?;
+    
+    // 保存索引到磁盘（通常在应用关闭时调用）
+    cache.save_index().await?;
+    
+    Ok(())
+}
+```
+
+**注意：**
+- `Cache::new()` 是同步的，不会自动加载索引
+- `Cache::new_with_auto_load()` 是异步的，会自动加载已保存的索引
+- `Cache::from_config_file()` 也会自动加载索引
 
 ## 更多示例
 

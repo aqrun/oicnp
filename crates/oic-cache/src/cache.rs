@@ -16,7 +16,9 @@ use lru::LruCache;
 use std::num::NonZeroUsize;
 use std::path::PathBuf;
 use std::sync::Arc;
+use std::sync::atomic::AtomicBool;
 use tokio::sync::RwLock;
+use tokio::sync::Notify;
 
 /// 缓存系统的公开 API
 pub struct Cache {
@@ -48,10 +50,19 @@ struct CacheInner {
     /// 回源保护
     #[allow(dead_code)]
     fetch_protection: FetchProtection,
+    
+    /// 自动保存通知器
+    save_notify: Arc<Notify>,
+    
+    /// 是否正在运行自动保存任务
+    auto_save_running: Arc<AtomicBool>,
 }
 
 impl Cache {
     /// 创建新的缓存实例
+    /// 
+    /// 注意：如果配置了 `auto_load_index`，请使用 `new_with_auto_load` 或 `from_config_file`
+    /// 来异步加载索引
     pub fn new(config: CacheConfig) -> Self {
         let capacity = NonZeroUsize::new(config.index_capacity).unwrap_or(NonZeroUsize::new(1000).unwrap());
         let disk_path = PathBuf::from(&config.disk_path);
@@ -61,18 +72,27 @@ impl Cache {
             tracing::warn!("Failed to create cache directory: {}", e);
         }
         
-        Self {
-            inner: Arc::new(CacheInner {
-                index: Arc::new(RwLock::new(LruCache::new(capacity))),
-                namespace_index: Arc::new(DashMap::new()),
-                tag_index: Arc::new(DashMap::new()),
-                vary_index: Arc::new(DashMap::new()),
-                config: config.clone(),
-                disk_path,
-                stats: Statistics::new(),
-                fetch_protection: FetchProtection::new(config.concurrency.fetch_timeout_seconds),
-            }),
+        let inner = Arc::new(CacheInner {
+            index: Arc::new(RwLock::new(LruCache::new(capacity))),
+            namespace_index: Arc::new(DashMap::new()),
+            tag_index: Arc::new(DashMap::new()),
+            vary_index: Arc::new(DashMap::new()),
+            config: config.clone(),
+            disk_path,
+            stats: Statistics::new(),
+            fetch_protection: FetchProtection::new(config.concurrency.fetch_timeout_seconds),
+            save_notify: Arc::new(Notify::new()),
+            auto_save_running: Arc::new(AtomicBool::new(false)),
+        });
+        
+        let cache = Self { inner: inner.clone() };
+        
+        // 如果启用了自动保存，启动后台任务
+        if config.storage.auto_save_index {
+            cache.start_auto_save_task();
         }
+        
+        cache
     }
     
     /// 从配置文件加载
@@ -82,7 +102,130 @@ impl Cache {
             .map_err(|e| CacheError::Io(e))?;
         let config: CacheConfig = toml::from_str(&content)
             .map_err(|e| CacheError::InvalidConfig(format!("Failed to parse config: {}", e)))?;
-        Ok(Self::new(config))
+        let cache = Self::new(config);
+        // 自动加载索引
+        cache.load_index().await?;
+        Ok(cache)
+    }
+    
+    /// 创建缓存实例并自动加载索引（如果存在）
+    pub async fn new_with_auto_load(config: CacheConfig) -> Result<Self> {
+        let cache = Self::new(config);
+        // 自动加载索引
+        cache.load_index().await?;
+        Ok(cache)
+    }
+    
+    /// 启动自动保存任务（使用重置式 debounce）
+    fn start_auto_save_task(&self) {
+        let inner = self.inner.clone();
+        let save_notify = self.inner.save_notify.clone();
+        let auto_save_running = self.inner.auto_save_running.clone();
+        let interval_seconds = self.inner.config.storage.auto_save_interval_seconds;
+        let debounce_ms = self.inner.config.storage.auto_save_debounce_ms;
+        
+        // 检查是否已经在运行
+        if auto_save_running.compare_exchange(false, true, std::sync::atomic::Ordering::Acquire, std::sync::atomic::Ordering::Relaxed).is_err() {
+            return; // 已经在运行
+        }
+        
+        tokio::spawn(async move {
+            use tokio::time::{Instant, Duration};
+            
+            // 定期保存计时器（如果启用）
+            let mut interval_timer = if interval_seconds > 0 {
+                Some(tokio::time::interval(Duration::from_secs(interval_seconds)))
+            } else {
+                None
+            };
+            
+            // Debounce 相关状态
+            let mut last_update_time: Option<Instant> = None;
+            let debounce_duration = Duration::from_millis(debounce_ms);
+            
+            loop {
+                // 检查是否需要立即保存（debounce 已超时）
+                if let Some(update_time) = last_update_time {
+                    if update_time.elapsed() >= debounce_duration {
+                        // 已经超时，立即保存
+                        if let Err(e) = Self::save_index_inner(&inner).await {
+                            tracing::warn!("Failed to auto-save index (debounced): {}", e);
+                        }
+                        last_update_time = None;
+                        continue; // 重新开始循环
+                    }
+                }
+                
+                // 计算下次 debounce 等待时间
+                let debounce_wait = last_update_time.and_then(|update_time| {
+                    let elapsed = update_time.elapsed();
+                    if elapsed < debounce_duration {
+                        Some(debounce_duration - elapsed)
+                    } else {
+                        None // 已经超时，会在下次循环处理
+                    }
+                });
+                
+                tokio::select! {
+                    // 定期保存（兜底机制）
+                    _ = interval_timer.as_mut().unwrap().tick(), if interval_timer.is_some() => {
+                        // 定期保存触发
+                        if let Err(e) = Self::save_index_inner(&inner).await {
+                            tracing::warn!("Failed to auto-save index (periodic): {}", e);
+                        }
+                        // 重置 debounce 状态（避免重复保存）
+                        last_update_time = None;
+                    }
+                    
+                    // Debounce 计时器到期（重置式 debounce）
+                    _ = tokio::time::sleep(debounce_wait.unwrap_or(Duration::from_secs(3600))), if debounce_wait.is_some() => {
+                        // 再次检查是否仍然需要保存（可能在等待期间又有更新）
+                        if let Some(update_time) = last_update_time {
+                            if update_time.elapsed() >= debounce_duration {
+                                // Debounce 时间到，执行保存
+                                if let Err(e) = Self::save_index_inner(&inner).await {
+                                    tracing::warn!("Failed to auto-save index (debounced): {}", e);
+                                }
+                                last_update_time = None;
+                            }
+                        }
+                    }
+                    
+                    // 收到更新通知
+                    _ = save_notify.notified() => {
+                        // 重置 debounce 计时器（重置式 debounce）
+                        last_update_time = Some(Instant::now());
+                    }
+                }
+            }
+        });
+    }
+    
+    /// 触发自动保存（异步，不阻塞）
+    fn trigger_auto_save(&self) {
+        if self.inner.config.storage.auto_save_index {
+            self.inner.save_notify.notify_one();
+        }
+    }
+    
+    /// 内部保存索引实现
+    async fn save_index_inner(inner: &CacheInner) -> Result<()> {
+        let index_path = inner.disk_path.join("index.bin");
+        let index = inner.index.read().await;
+        
+        // 序列化索引（收集为 Vec）
+        let entries: Vec<(String, CacheMetadata)> = index.iter()
+            .map(|(k, v)| (k.clone(), v.clone()))
+            .collect();
+        
+        let serialized = bincode::serialize(&entries)
+            .map_err(|e| CacheError::Serialization(format!("Failed to serialize index: {}", e)))?;
+        
+        tokio::fs::write(&index_path, serialized)
+            .await
+            .map_err(|e| CacheError::Io(e))?;
+        
+        Ok(())
     }
     
     // ============ 基础操作 ============
@@ -223,6 +366,9 @@ impl Cache {
             index.put(key.clone(), metadata);
         }
         
+        // 触发自动保存
+        self.trigger_auto_save();
+        
         Ok(())
     }
     
@@ -258,6 +404,9 @@ impl Cache {
             if metadata.extensions.vary.is_some() {
                 self.inner.vary_index.remove(key);
             }
+            
+            // 触发自动保存
+            self.trigger_auto_save();
         }
         
         Ok(())
@@ -303,6 +452,9 @@ impl Cache {
                 .or_insert_with(Vec::new)
                 .push(key.clone());
         }
+        
+        // 触发自动保存
+        self.trigger_auto_save();
         
         Ok(())
     }
@@ -397,6 +549,9 @@ impl Cache {
         
         // 更新 Vary 索引
         self.inner.vary_index.insert(key, vary_info);
+        
+        // 触发自动保存
+        self.trigger_auto_save();
         
         Ok(())
     }
@@ -503,6 +658,9 @@ impl Cache {
             .await
             .map_err(|e| CacheError::Io(e))?;
         
+        // 触发自动保存（清空后保存空索引）
+        self.trigger_auto_save();
+        
         Ok(())
     }
     
@@ -526,11 +684,12 @@ impl Cache {
         Ok(())
     }
     
-    /// 从磁盘加载索引
+    /// 从磁盘加载索引并重建所有辅助索引
     pub async fn load_index(&self) -> Result<()> {
         let index_path = self.inner.disk_path.join("index.bin");
         
         if !index_path.exists() {
+            tracing::info!("No index file found, starting with empty cache");
             return Ok(());
         }
         
@@ -542,9 +701,69 @@ impl Cache {
             .map_err(|e| CacheError::Serialization(format!("Failed to deserialize index: {}", e)))?;
         
         let mut index = self.inner.index.write().await;
+        let mut namespace_keys: std::collections::HashMap<String, Vec<String>> = std::collections::HashMap::new();
+        let mut tag_keys: std::collections::HashMap<String, Vec<String>> = std::collections::HashMap::new();
+        let mut vary_map: std::collections::HashMap<String, VaryInfo> = std::collections::HashMap::new();
+        
+        let mut loaded_count = 0;
+        let mut expired_count = 0;
+        
         for (key, metadata) in entries {
+            // 检查是否过期
+            if metadata.is_expired() {
+                expired_count += 1;
+                // 如果文件存在，删除文件
+                if let StorageLocation::File(file_path) = &metadata.storage.location {
+                    let _ = delete_file(&self.inner.disk_path, file_path).await;
+                }
+                continue;
+            }
+            
+            // 重建命名空间索引
+            if let Some(ref ns_info) = metadata.extensions.namespace {
+                namespace_keys
+                    .entry(ns_info.namespace.clone())
+                    .or_insert_with(Vec::new)
+                    .push(key.clone());
+                
+                // 重建标签索引
+                for tag in &ns_info.tags {
+                    tag_keys
+                        .entry(tag.clone())
+                        .or_insert_with(Vec::new)
+                        .push(key.clone());
+                }
+            }
+            
+            // 重建 Vary 索引
+            if let Some(ref vary_info) = metadata.extensions.vary {
+                // 从完整键中提取基础键（移除 variant_key 部分）
+                // 这里简化处理，假设基础键就是 key 本身
+                vary_map.insert(key.clone(), vary_info.clone());
+            }
+            
             index.put(key, metadata);
+            loaded_count += 1;
         }
+        
+        // 将重建的索引写入 DashMap
+        for (namespace, keys) in namespace_keys {
+            self.inner.namespace_index.insert(namespace, keys);
+        }
+        
+        for (tag, keys) in tag_keys {
+            self.inner.tag_index.insert(tag, keys);
+        }
+        
+        for (key, vary_info) in vary_map {
+            self.inner.vary_index.insert(key, vary_info);
+        }
+        
+        tracing::info!(
+            "Loaded {} cache entries from index ({} expired entries skipped)",
+            loaded_count,
+            expired_count
+        );
         
         Ok(())
     }

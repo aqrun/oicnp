@@ -32,6 +32,19 @@ pub struct StorageConfig {
     
     /// 是否启用磁盘持久化
     pub enable_persistence: bool,
+    
+    /// 是否在启动时自动加载索引
+    pub auto_load_index: bool,
+    
+    /// 是否启用自动保存索引
+    pub auto_save_index: bool,
+    
+    /// 自动保存索引的间隔（秒），定期保存的兜底机制
+    pub auto_save_interval_seconds: u64,
+    
+    /// 更新后延迟保存的时间（毫秒），重置式 debounce
+    /// 每次更新会重置计时器，只有在最后一次更新后等待此时间才保存
+    pub auto_save_debounce_ms: u64,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -65,6 +78,10 @@ impl Default for CacheConfig {
                 inline_threshold: 0, // 4096,
                 streaming_threshold: 10 * 1024 * 1024,
                 enable_persistence: true,
+                auto_load_index: true,
+                auto_save_index: true,
+                auto_save_interval_seconds: 30, // 每 30 秒定期保存一次（兜底）
+                auto_save_debounce_ms: 2000, // 更新后延迟 2 秒保存（重置式 debounce）
             },
             compression: CompressionConfig {
                 enabled: true,
