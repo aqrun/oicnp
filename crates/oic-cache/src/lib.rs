@@ -8,6 +8,8 @@ pub mod storage;
 pub mod utils;
 pub mod vary;
 
+pub mod ext;
+
 pub use cache::Cache;
 pub use config::CacheConfig;
 pub use error::{CacheError, Result};
@@ -18,4 +20,6 @@ pub use metadata::{
 };
 pub use stats::CacheStatistics;
 pub use vary::VaryValues;
+
+pub use ext::CacheExt;
 

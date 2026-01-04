@@ -230,7 +230,7 @@ impl Cache {
     
     // ============ 基础操作 ============
     
-    /// 获取缓存
+    /// 获取缓存（原始字节）
     pub async fn get(&self, key: &str) -> Result<Option<Vec<u8>>> {
         let start = std::time::Instant::now();
         
