@@ -3708,6 +3708,7 @@ name = "oic_cache"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "axum",
  "bincode",
  "brotli 3.5.0",
  "chrono",

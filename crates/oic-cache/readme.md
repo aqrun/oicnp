@@ -44,3 +44,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ## 更多示例
 
 查看 `examples/` 目录获取更多使用示例。
+
+## 运行测试
+
+```shell
+# 运行所有测试
+cargo test --package oic_cache
+
+# 运行集成测试
+cargo test --package oic_cache --test integration_test
+
+# 运行并发测试
+cargo test --package oic_cache --test concurrent_test
+
+# 运行 Axum 集成示例
+cargo run --package oic_cache --example axum_integration
+```
