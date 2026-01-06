@@ -5,11 +5,10 @@ use axum::{
     extract::{Extension, State},
 };
 use oic_core::AppContext;
-use crate::models::HtmlTemplate;
 use crate::views::render_home_index;
 use std::sync::Arc;
 use std::collections::HashMap;
-use crate::models::{ManifestChunk, ViteAssets};
+use crate::models::ManifestChunk;
 use oic_cache::{Cache, CacheExt};
 
 // 类型别名，帮助类型推导
@@ -41,7 +40,14 @@ async fn index(
     };
 
     // 将渲染后的 HTML 存入缓存
-    let html_string = html_template.0.to_string();
+    // 先渲染模板获取 HTML 字符串用于缓存
+    let html_string = match askama::Template::render(&html_template.0) {
+        Ok(html) => html,
+        Err(e) => {
+            eprintln!("Failed to render template: {}", e);
+            return html_template.into_response();
+        }
+    };
     
     // 在开发模式下使用短 TTL，生产环境使用长 TTL
     #[cfg(debug_assertions)]

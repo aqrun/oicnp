@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+{% block title %}灵犀纪 - 心有灵犀，专注技术分享{% endblock %}
+
+{% block head %}
+<meta name="description" content="灵犀纪,rust语言开发,服务器,html,css,js,nextjs,tailwindcss">
+{{ assets.css|safe }}
+{% endblock %}
+
+{% block content %}
+<main>
+  <!-- Header -->
+  <section class="oic-header-section mb-6 overflow-hidden transition-colors duration-500 lg:z-50 shadow-md shadow-indigo-100/[0.6] dark:shadow-slate-100/[0.6] bg-white/95 supports-backdrop-blur:bg-white/60 dark:bg-transparent">
+    <div class="oic-header-inner h-auto w-screen">
+      <nav class="font-inter mx-auto h-auto w-full max-w-[1600px] lg:relative lg:top-0">
+        <div class="relative px-6 py-6 items-center lg:flex lg:items-center lg:justify-between lg:px-10 lg:py-4 xl:px-20">
+          <a href="/" aria-current="page" class="relative bg-[#00000000] no-underline hover:outline-0 max-[991px]:mr-auto max-[767px]:pl-0 text-xl lg:text-2xl font-bold text-gray-800 flex items-center hover:text-[var(--primary)]" aria-label="home">
+            <span class="inline-block max-h-7 max-w-full h-11" style="fill: currentColor;">
+              <svg height="32" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" baseProfile="full" fill="currentColor">
+                <g transform="scale(1,-1) translate(0,-500)">
+                  <path d="M 1.235852 486.524607 L 337.874486 486.524607 L 283.577932 374.311729 L 500.764148 1.475393 L 149.646433 1.475393 L 211.182527 110.068500 Z" transform="scale(1.000000,1.000000) translate(-1.000000,6.000000)" opacity="1.000000"></path>
+                  <path d="M 114.926122 211.338204 L 145.162852 157.004964 L 61.602733 1.475393 L 1.235852 1.475393 Z" transform="scale(1.000000,1.000000) translate(-1.000000,6.000000)" opacity="1.000000"></path>
+                  <path d="M 86.144257 210.524607 L 1.203135 55.144015 L 31.166850 1.913660 L 145.764148 210.524607 Z" transform="scale(1.000000,1.000000) translate(354.000000,282.000000)" opacity="1.000000"></path>
+                </g>
+              </svg>
+            </span>
+            <span class="flex flex-col ml-1 min-w-24">
+              <span>灵犀纪</span>
+            </span>
+          </a>
+          <div class="hidden lg:block">
+            <div class="mt-14 flex flex-col lg:mt-0 lg:flex lg:flex-row lg:space-x-1 lg:space-y-0">
+              <a href="/" class="header-nav-item item-home py-4 font-inter text-center rounded-lg text-black lg:px-6 lg:py-4 hover:bg-gray-50 lg:hover:text-gray-800 active">首页</a>
+              <a href="/tool/" class="header-nav-item item-tool py-4 font-inter text-center rounded-lg text-black lg:px-6 lg:py-4 hover:bg-gray-50 lg:hover:text-gray-800">常用工具</a>
+              <a href="/poetry/" class="header-nav-item item-poetry py-4 font-inter text-center rounded-lg text-black lg:px-6 lg:py-4 hover:bg-gray-50 lg:hover:text-gray-800">诗词鉴赏</a>
+              <a href="/blog/" class="header-nav-item item-blog py-4 font-inter text-center rounded-lg text-black lg:px-6 lg:py-4 hover:bg-gray-50 lg:hover:text-gray-800">IT技术</a>
+              <a href="/cat/rust/" class="header-nav-item item-rust py-4 font-inter text-center rounded-lg text-black lg:px-6 lg:py-4 hover:bg-gray-50 lg:hover:text-gray-800">Rust语言</a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </section>
+
+  <!-- Header Background -->
+  <section class="oic-header-bg-section mb-6"></section>
+
+  <!-- Big News -->
+  {% if big_news %}
+  <section class="oic-latest-news-section">
+    <div class="layout">
+      <div class="grid justify-items-stretch">
+        <a href="/p/{{ big_news_vid.as_ref().unwrap_or(&"".to_string()) }}" class="relative flex h-[500px] flex-col gap-4 rounded-md px-4 py-8 [grid-area:1/1/2/2] md:p-0 md:[grid-area:1/1/2/4] hover:text-violet-500">
+          <div class="absolute bottom-12 left-8 z-20 flex w-56 max-w-[464px] flex-col items-start rounded-md bg-white p-6 sm:w-full md:bottom-[10px] md:left-[10px]">
+            {% if big_news_category.is_some() %}
+            <div class="mb-4 rounded-md bg-[#f2f2f7] px-2 py-1.5">
+              <p class="text-sm font-semibold text-[#6574f8]">
+                {{ big_news_category.as_ref().unwrap() }}
+              </p>
+            </div>
+            {% endif %}
+              <p class="mb-4 max-w-xs text-xl font-bold md:text-2xl text-gray-800 hover:text-violet-500">
+                {{ big_news_title.as_ref().unwrap_or(&"".to_string()) }}
+              </p>
+              <p class="mb-4 text-base md:text-base text-gray-500 max-h-19 overflow-hidden lg:max-h-none">
+                {{ big_news_summary.as_ref().unwrap_or(&"".to_string()) }}
+              </p>
+            <div class="flex flex-col text-sm text-gray-500 lg:flex-row">
+              <p>子十</p>
+              <p class="mx-2 hidden lg:block">-</p>
+              <p>阅读时间：6分钟</p>
+            </div>
+          </div>
+          <img src="/images/big-news1.jpeg" alt="" class="inline-block h-full w-full object-cover" />
+        </a>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- News Grid -->
+  {% if news_items.len() > 0 %}
+  <section class="oic-news-section mt-4">
+    <div class="layout">
+      <div class="oic-news1 max-w-screen-xl mx-auto dark:bg-gray-800 text-gray-100">
+        <div class="grid grid-cols-1 gap-4 lg:grid-cols-4 sm:grid-cols-2">
+          {% for (index, item) in news_items.iter().enumerate() %}
+          <div class="relative flex items-end justify-start w-full text-left bg-center bg-cover h-96 bg-gray-500" style="background-image: url('/images/big-news{{ index + 2 }}.jpeg');">
+            <div class="absolute top-0 bottom-0 left-0 right-0 bg-gradient-to-b via-transparent from-gray-900 to-gray-900"></div>
+            <div class="absolute top-0 left-0 right-0 flex items-center justify-between mx-5 mt-3">
+              {% if item.category_name.is_some() %}
+              <a rel="noopener noreferrer" href="/category/{{ item.category_id.as_ref().unwrap_or(&0) }}" class="px-3 py-2 text-xs font-semibold tracki uppercase text-gray-100 bgundefined">
+                {{ item.category_name.as_ref().unwrap() }}
+              </a>
+              {% endif %}
+              {% if item.created_at.is_some() %}
+              <div class="flex flex-col justify-start text-center text-gray-100" data-date="{{ item.created_at.as_ref().unwrap() }}">
+                {% set date_parts = item.created_at.as_ref().unwrap().split("-") %}
+                {% if date_parts.len() >= 3 %}
+                <span class="text-3xl font-semibold leadi tracki">{{ date_parts[1] }}/{{ date_parts[2] }}</span>
+                <span class="leadi uppercase">{{ date_parts[0] }}</span>
+                {% endif %}
+              </div>
+              {% endif %}
+            </div>
+            <h2 class="z-10 p-5">
+              <a rel="noopener noreferrer" href="/p/{{ item.vid.as_ref().unwrap_or(&"".to_string()) }}" class="font-medium text-md hover:underline text-gray-100 hover:text-violet-500">
+                {{ item.title.as_ref().unwrap_or(&"".to_string()) }}
+              </a>
+            </h2>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Article List -->
+  <section class="bg-white">
+    <div class="layout py-12 flex flex-col lg:flex-row gap-8">
+      <div class="home-layout-content-w flex flex-col lg:w-[calc(100% - 22rem)]">
+        <div class="relative flex flex-wrap flex-row gap-2">
+          {% for item in article_items %}
+          <div class="w-full">
+            <div class="overflow-hidden rounded-lg hover:shadow-lg hover:shadow-violet-100 hover:border-violet-400 cursor-pointer border border-slate-200 border-solid">
+              <a href="/p/{{ item.vid.as_ref().unwrap_or(&"".to_string()) }}" class="block w-full h-full md:flex">
+                <div class="w-full p-4 bg-white dark:bg-gray-800">
+                  <p class="font-light text-gray-400 text-md">
+                    <i class="iconfont icon-benshubook122 mr-1"></i>
+                    {% if item.category_name.is_some() %}
+                    {{ item.category_name.as_ref().unwrap() }}
+                    {% endif %}
+                    {% if item.created_at.is_some() %}
+                    &nbsp;
+                    <span class="ml-2 text-gray-400 font-light">
+                      <i class="iconfont icon-date mr-1"></i>
+                      {{ item.created_at.as_ref().unwrap() }}
+                    </span>
+                    {% endif %}
+                  </p>
+                  <p class="mb-2 text-xl font-medium text-gray-800 dark:text-white">
+                    {{ item.title.as_ref().unwrap_or(&"".to_string()) }}
+                  </p>
+                  <p class="font-light text-gray-400 dark:text-gray-300 text-md">
+                    {{ item.summary.as_ref().unwrap_or(&"".to_string()) }}
+                  </p>
+                  {% if item.tags.len() > 0 %}
+                  <div class="flex flex-wrap items-center mt-4 justify-starts">
+                    {% for tag in item.tags %}
+                    <div class="mb-1 text-xs mr-2 py-1.5 px-4 text-gray-600 bg-blue-100 rounded-2xl">
+                      {{ tag }}
+                    </div>
+                    {% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+              </a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="lg:w-80 lg:min-w-80">
+        <!-- Sidebar placeholder -->
+        <aside class="lg:w-80">
+          <!-- Sidebar content will be added later -->
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <section class="oic-page-footer overflow-x-hidden">
+    <div class="w-screen flex-col px-6 pt-20 pb-8 text-slate-700 lg:flex lg:px-10 xl:px-24 border-solid border border-gray-200">
+      <div class="layout lg:flex lg:flex-row lg:justify-between">
+        <div>
+          <a href="/" class="inline-block max-w-full font-bold text-2xl">灵犀纪</a>
+          <p class="font-inter mt-4 max-w-[350px] text-base font-light text-gray-500">
+            技术深处，自有灵犀。不只是代码的堆叠，更是思想的碰撞。在技术浪潮中，记录那些珍贵的"灵光一现"与"心有灵犀"。关注前沿洞察、深度解读与系统思考，致力于成为连接技术理性与人文感性的桥梁。
+          </p>
+          <div class="mb-8 mt-6 flex flex-row">
+            <a href="#" class="mr-4 transition hover:text-gray-400">
+              <svg class="fill-current" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2.25C9.4791 2.25005 7.05619 3.22647 5.23968 4.97439C3.42317 6.72231 2.35426 9.10586 2.25723 11.6249C2.1602 14.1439 3.0426 16.6026 4.71928 18.4851C6.39595 20.3676 8.73657 21.5275 11.25 21.7214V14.2501H9C8.80109 14.2501 8.61032 14.1711 8.46967 14.0304C8.32902 13.8898 8.25 13.699 8.25 13.5001C8.25 13.3012 8.32902 13.1104 8.46967 12.9698C8.61032 12.8291 8.80109 12.7501 9 12.7501H11.25V10.5001C11.2509 9.70472 11.5673 8.94218 12.1297 8.37977C12.6921 7.81736 13.4546 7.501 14.25 7.50009H15.75C15.9489 7.50009 16.1397 7.57911 16.2803 7.71976C16.421 7.86041 16.5 8.05118 16.5 8.25009C16.5 8.449 16.421 8.63977 16.2803 8.78042C16.1397 8.92107 15.9489 9.00009 15.75 9.00009H14.25C13.8523 9.00054 13.471 9.15872 13.1898 9.43993C12.9086 9.72114 12.7505 10.1024 12.75 10.5001V12.7501H15C15.1989 12.7501 15.3897 12.8291 15.5303 12.9698C15.671 13.1104 15.75 13.3012 15.75 13.5001C15.75 13.699 15.671 13.8898 15.5303 14.0304C15.3897 14.1711 15.1989 14.2501 15 14.2501H12.75V21.7214C15.2634 21.5275 17.604 20.3676 19.2807 18.4851C20.9574 16.6026 21.8398 14.1439 21.7427 11.6249C21.6457 9.10587 20.5768 6.72232 18.7603 4.9744C16.9438 3.22649 14.5209 2.25006 12 2.25Z"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div class="flex grow flex-row flex-wrap lg:mx-10 lg:flex-nowrap lg:justify-center">
+          <div class="mb-5 mr-8 flex max-w-[200px] grow basis-[100px] flex-col space-y-5 lg:mx-10">
+            <h2 class="font-inter font-normal text-xl">IT技术</h2>
+            <a href="/cat/rust" class="font-inter font-light text-gray-500">Rust语言</a>
+            <a href="/cat/server" class="font-inter font-light text-gray-500">服务器</a>
+            <a href="/cat/backend" class="font-inter font-light text-gray-500">后端开发</a>
+            <a href="/cat/frontend" class="font-inter font-light text-gray-500">前端开发</a>
+            <a href="/cat/diary" class="font-inter font-light text-gray-500">每日随笔</a>
+          </div>
+          <div class="mb-5 mr-8 flex max-w-[200px] grow basis-[100px] flex-col space-y-5 lg:mx-10">
+            <h2 class="font-inter font-normal text-xl">常用工具</h2>
+            <a href="/tool/t/react-ui" class="font-inter font-light text-gray-500">Rust UI</a>
+            <a href="/tool/t/static-site-generator" class="font-inter font-light text-gray-500">静态站点生成器</a>
+            <a href="/tool/t/charts" class="font-inter font-light text-gray-500">图表 / 可视化</a>
+            <a href="/tool/t/ai-apps" class="font-inter font-light text-gray-500">AI 应用</a>
+          </div>
+          <div class="mb-5 mr-8 flex max-w-[200px] grow basis-[100px] flex-col space-y-5 lg:mx-10">
+            <h2 class="font-inter font-normal text-xl">诗词鉴赏</h2>
+            <a href="/poetry/category/wu-dai-shi-ci" class="font-inter font-light text-gray-500">五代诗词</a>
+            <a href="/poetry/category/tang-shi" class="font-inter font-light text-gray-500">唐诗</a>
+            <a href="/poetry/category/song-ci" class="font-inter font-light text-gray-500">宋词</a>
+            <a href="/poetry/category/chu-ci" class="font-inter font-light text-gray-500">楚辞</a>
+            <a href="/poetry/category/meng-xue" class="font-inter font-light text-gray-500">蒙学</a>
+            <a href="/poetry/category/si-shu-wu-jing" class="font-inter font-light text-gray-500">四书五经</a>
+          </div>
+        </div>
+      </div>
+      <div class="layout mx-auto mt-12 mb-8 w-full border border-[#E4E4E7]"></div>
+      <div class="layout">
+        <p class="font-inter lg:text-center text-sm text-gray-500">
+          © Copyright 2014&nbsp;-&nbsp;2024 &nbsp;灵犀纪
+        </p>
+        <nav class="font-inter lg:text-center text-sm text-gray-500">
+          <ul class="flex flex-row justify-start lg:justify-center items-center">
+            <li class="s90">
+              <a href="/about/" class="mr-2 py-1 block hover:text-violet-500">关于我</a>
+            </li>
+            <li class="s90">
+              <a href="/contact/" class="mr-2 py-1 block hover:text-violet-500">联系我</a>
+            </li>
+            <li class="s90">
+              <a href="/about/" class="mr-2 py-1 block hover:text-violet-500">保护权益</a>
+            </li>
+            <li class="s90">
+              <a href="/about/" class="mr-2 py-1 block hover:text-violet-500">网站地图</a>
+            </li>
+          </ul>
+        </nav>
+        <p class="font-inter lg:text-center text-sm text-gray-500">
+          技术支持:
+          <a href="https://www.rust-lang.org/" target="_blank" class="inline-block mx-1 hover:text-violet-500">Rust</a>
+          &
+          <a href="https://nextjs.org/" target="_blank" class="inline-block mx-1 hover:text-violet-500">NextJS</a>
+          &
+          <a href="https://tailwindcss.com/" target="_blank" class="inline-block mx-1 hover:text-violet-500">TailwindCSS</a>
+          <a href="http://beian.miit.gov.cn" target="_blank" class="inline-block mx-1 hover:text-violet-500">陕ICP备17021363号</a>
+        </p>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+{{ assets.js|safe }}
+{% endblock %}
+

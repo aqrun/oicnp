@@ -30,6 +30,7 @@ pub async fn run() -> Result<()> {
 
     let app = Router::new()
         .merge(controllers::home_routes())
+        .merge(controllers::blog_routes())
         .nest_service("/assets", ServeDir::new(
             current_dir.join(web_assets_dir.as_str()).to_string_lossy().to_string())
         )

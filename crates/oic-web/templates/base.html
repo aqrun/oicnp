@@ -1,13 +1,26 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
   <head>
-    <title>{% block title %}{{ title }} - My Site{% endblock %}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}灵犀纪{% endblock %}</title>
     {% block head %}{% endblock %}
+    <script>
+      (function() {
+        try {
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+              document.documentElement.classList.add('loaded');
+            });
+          } else {
+            document.documentElement.classList.add('loaded');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
-    <div id="content">
-      {% block content %}<p>Placeholder content</p>{% endblock %}
-    </div>
-    {% block scripts %}script files{% endblock %}
+    {% block content %}<p>Placeholder content</p>{% endblock %}
+    {% block scripts %}{% endblock %}
   </body>
 </html>
