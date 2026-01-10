@@ -13,6 +13,7 @@ use oic_cache::Cache;
 use std::sync::Arc;
 use std::collections::HashMap;
 use crate::models::ManifestChunk;
+use bytes::Bytes;
 
 // 类型别名，帮助类型推导
 type CacheExtension = Arc<Cache>;
@@ -34,7 +35,7 @@ async fn blog_list(
                 let template = render_blog_list(None, manifest).await?;
                 let html_string = template.0.render()
                     .map_err(|e| anyhow::anyhow!("Failed to render template: {}", e))?;
-                Ok(html_string.into_bytes())
+                Ok(Bytes::from(html_string.into_bytes()))
             }
         },
         None,
@@ -68,7 +69,7 @@ async fn blog_list_by_category(
                 let template = render_blog_list(Some(cat_vid), manifest).await?;
                 let html_string = template.0.render()
                     .map_err(|e| anyhow::anyhow!("Failed to render template: {}", e))?;
-                Ok(html_string.into_bytes())
+                Ok(Bytes::from(html_string.into_bytes()))
             }
         },
         None,
@@ -102,7 +103,7 @@ async fn blog_detail(
                 let template = render_blog_detail(vid, manifest).await?;
                 let html_string = template.0.render()
                     .map_err(|e| anyhow::anyhow!("Failed to render template: {}", e))?;
-                Ok(html_string.into_bytes())
+                Ok(Bytes::from(html_string.into_bytes()))
             }
         },
         None,

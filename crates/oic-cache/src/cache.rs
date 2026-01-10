@@ -19,6 +19,7 @@ use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
 use tokio::sync::RwLock;
 use tokio::sync::Notify;
+use bytes::Bytes;
 
 /// 缓存系统的公开 API
 pub struct Cache {
@@ -231,7 +232,9 @@ impl Cache {
     // ============ 基础操作 ============
     
     /// 获取缓存（原始字节）
-    pub async fn get(&self, key: &str) -> Result<Option<Vec<u8>>> {
+    /// 
+    /// 返回 `Bytes` 类型，Clone 是零拷贝的（引用计数）
+    pub async fn get(&self, key: &str) -> Result<Option<Bytes>> {
         let start = std::time::Instant::now();
         
         // 从索引获取元数据
@@ -297,16 +300,16 @@ impl Cache {
                     .ok_or_else(|| CacheError::KeyNotFound(key.to_string()))?
             }
             StorageLocation::File(_) => {
-                let mut data = read_file(&metadata.storage.location, &self.inner.disk_path)
+                let file_data = read_file(&metadata.storage.location, &self.inner.disk_path)
                     .await?
                     .ok_or_else(|| CacheError::KeyNotFound(key.to_string()))?;
                 
                 // 解压数据
                 if let Some(ref compression) = metadata.storage.compression {
-                    data = decompress(&data, compression)?;
+                    decompress(file_data.as_ref(), compression)?
+                } else {
+                    file_data
                 }
-                
-                data
             }
         };
         
@@ -331,7 +334,7 @@ impl Cache {
     pub async fn set(
         &self,
         key: String,
-        data: Vec<u8>,
+        data: impl Into<Bytes>,
         content_type: String,
     ) -> Result<()> {
         self.set_with_ttl(key, data, content_type, self.inner.config.default_ttl_seconds).await
@@ -346,29 +349,30 @@ impl Cache {
     pub async fn set_with_ttl(
         &self,
         key: String,
-        data: Vec<u8>,
+        data: impl Into<Bytes>,
         content_type: String,
         ttl_seconds: i64,
     ) -> Result<()> {
+        let data = data.into();
         let now = chrono::Utc::now().timestamp();
         let size = data.len() as u64;
         
         // 决定存储策略
         let (storage_location, compression_info) = if size < self.inner.config.storage.inline_threshold {
-            // 内联存储
+            // 内联存储 - 零拷贝 Clone
             (StorageLocation::Inline(data.clone()), None)
         } else {
             // 文件存储
             let (final_data, compression) = if self.inner.config.compression.enabled
                 && size >= self.inner.config.compression.min_size
             {
-                let (compressed, comp_info) = compress(&data, self.inner.config.compression.default_algorithm)?;
+                let (compressed, comp_info) = compress(data.as_ref(), self.inner.config.compression.default_algorithm)?;
                 (compressed, Some(comp_info))
             } else {
                 (data.clone(), None)
             };
             
-            let file_path = write_file(&self.inner.disk_path, &key, &final_data).await?;
+            let file_path = write_file(&self.inner.disk_path, &key, final_data.as_ref()).await?;
             (StorageLocation::File(file_path), compression)
         };
         
@@ -499,7 +503,7 @@ impl Cache {
     pub async fn set_with_namespace(
         &self,
         key: String,
-        data: Vec<u8>,
+        data: impl Into<Bytes>,
         content_type: String,
         namespace: NamespaceInfo,
     ) -> Result<()> {
@@ -580,7 +584,7 @@ impl Cache {
     }
     
     /// 批量获取
-    pub async fn get_batch(&self, keys: &[String]) -> Vec<Option<Vec<u8>>> {
+    pub async fn get_batch(&self, keys: &[String]) -> Vec<Option<Bytes>> {
         let mut results = Vec::with_capacity(keys.len());
         for key in keys {
             results.push(self.get(key).await.ok().flatten());
@@ -594,7 +598,7 @@ impl Cache {
     pub async fn set_with_vary(
         &self,
         key: String,
-        data: Vec<u8>,
+        data: impl Into<Bytes>,
         content_type: String,
         vary_conditions: Vec<VaryCondition>,
     ) -> Result<()> {
@@ -636,7 +640,7 @@ impl Cache {
         &self,
         key: &str,
         vary_values: &VaryValues,
-    ) -> Result<Option<Vec<u8>>> {
+    ) -> Result<Option<Bytes>> {
         // 获取 Vary 信息
         let vary_info = self.inner.vary_index.get(key)
             .map(|entry| entry.value().clone())

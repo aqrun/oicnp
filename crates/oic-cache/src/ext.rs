@@ -331,7 +331,7 @@ impl CacheExt for Cache {
     async fn get<T: for<'de> Deserialize<'de>>(&self, key: &str) -> Result<Option<T>> {
         match Cache::get(self, key).await? {
             Some(bytes) => {
-                let value: T = serde_json::from_slice(&bytes)
+                let value: T = serde_json::from_slice(bytes.as_ref())
                     .map_err(|e| CacheError::Serialization(format!("Failed to deserialize JSON: {}", e)))?;
                 Ok(Some(value))
             }
@@ -425,10 +425,11 @@ impl CacheExt for Cache {
         html: &str,
         ttl_seconds: i64,
     ) -> Result<()> {
+        use bytes::Bytes;
         Cache::set_with_ttl(
             self,
             key,
-            html.as_bytes().to_vec(),
+            Bytes::copy_from_slice(html.as_bytes()),
             "text/html".to_string(),
             ttl_seconds,
         )
@@ -441,7 +442,7 @@ impl CacheExt for Cache {
     ) -> Result<Option<T>> {
         match Cache::get(self, key).await? {
             Some(bytes) => {
-                let value: T = serde_json::from_slice(&bytes)
+                let value: T = serde_json::from_slice(bytes.as_ref())
                     .map_err(|e| CacheError::Serialization(format!("Failed to deserialize JSON: {}", e)))?;
                 Ok(Some(value))
             }
@@ -452,7 +453,7 @@ impl CacheExt for Cache {
     async fn get_html(&self, key: &str) -> Result<Option<String>> {
         match Cache::get(self, key).await? {
             Some(bytes) => {
-                let html = String::from_utf8(bytes)
+                let html = String::from_utf8(bytes.to_vec())
                     .map_err(|e| CacheError::Serialization(format!("Invalid UTF-8 in HTML: {}", e)))?;
                 Ok(Some(html))
             }

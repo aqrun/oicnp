@@ -1,4 +1,5 @@
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, Deserializer, Serializer};
+use bytes::Bytes;
 
 // ============ 第一层：核心字段 ============
 
@@ -52,13 +53,81 @@ pub struct StorageInfo {
     pub compression: Option<CompressionInfo>,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
 pub enum StorageLocation {
     /// 内联存储（< 4KB）
-    Inline(Vec<u8>),
+    Inline(Bytes),
     
     /// 文件存储（>= 4KB）
     File(String),
+}
+
+// 自定义序列化：Bytes <-> Vec<u8>
+impl Serialize for StorageLocation {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            StorageLocation::Inline(bytes) => {
+                use serde::ser::SerializeTuple;
+                let mut tuple = serializer.serialize_tuple(2)?;
+                tuple.serialize_element("Inline")?;
+                tuple.serialize_element(bytes.as_ref())?;
+                tuple.end()
+            }
+            StorageLocation::File(path) => {
+                use serde::ser::SerializeTuple;
+                let mut tuple = serializer.serialize_tuple(2)?;
+                tuple.serialize_element("File")?;
+                tuple.serialize_element(path)?;
+                tuple.end()
+            }
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for StorageLocation {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        use serde::de::{self, Visitor, SeqAccess};
+        
+        struct StorageLocationVisitor;
+        
+        impl<'de> Visitor<'de> for StorageLocationVisitor {
+            type Value = StorageLocation;
+            
+            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                formatter.write_str("a StorageLocation enum")
+            }
+            
+            fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+            where
+                A: SeqAccess<'de>,
+            {
+                let tag: String = seq.next_element()?
+                    .ok_or_else(|| de::Error::invalid_length(0, &self))?;
+                
+                match tag.as_str() {
+                    "Inline" => {
+                        let data: Vec<u8> = seq.next_element()?
+                            .ok_or_else(|| de::Error::invalid_length(1, &self))?;
+                        Ok(StorageLocation::Inline(Bytes::from(data)))
+                    }
+                    "File" => {
+                        let path: String = seq.next_element()?
+                            .ok_or_else(|| de::Error::invalid_length(1, &self))?;
+                        Ok(StorageLocation::File(path))
+                    }
+                    _ => Err(de::Error::unknown_variant(&tag, &["Inline", "File"])),
+                }
+            }
+        }
+        
+        deserializer.deserialize_tuple(2, StorageLocationVisitor)
+    }
 }
 
 // ⭐ 优化：压缩信息使用 enum

@@ -27,3 +27,4 @@ axum = { workspace = true, features = ["json"] }
 tower-http = { workspace = true }
 anyhow = { workspace = true }
 askama = { workspace = true }
+bytes = { workspace = true }

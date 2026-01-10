@@ -1,5 +1,6 @@
 use oic_cache::{Cache, CacheConfig, VaryCondition, VaryValues};
 use std::collections::HashMap;
+use bytes::Bytes;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -9,7 +10,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     cache
         .set_with_vary(
             "page:home".to_string(),
-            b"<html lang='en'>Mobile Home</html>".to_vec(),
+            Bytes::copy_from_slice(b"<html lang='en'>Mobile Home</html>"),
             "text/html".to_string(),
             vec![VaryCondition::AcceptLanguage, VaryCondition::UserAgent],
         )
@@ -27,7 +28,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // 这个示例展示了 API 的使用方式
     match cache.get_vary("page:home", &vary_values).await {
         Ok(Some(data)) => {
-            println!("Got: {}", String::from_utf8_lossy(&data));
+            println!("Got: {}", String::from_utf8_lossy(data.as_ref()));
         }
         Ok(None) => {
             println!("Cache miss for vary key");

@@ -1,4 +1,5 @@
 use oic_cache::{Cache, CacheConfig};
+use bytes::Bytes;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -8,13 +9,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // 2. 设置缓存
     cache.set(
         "user:123".to_string(),
-        b"Alice".to_vec(),
+        Bytes::copy_from_slice(b"Alice"),
         "text/plain".to_string(),
     ).await?;
     
     // 3. 读取缓存
     if let Some(data) = cache.get("user:123").await? {
-        println!("User: {}", String::from_utf8_lossy(&data));
+        println!("User: {}", String::from_utf8_lossy(data.as_ref()));
     }
     
     // 4. 失效缓存

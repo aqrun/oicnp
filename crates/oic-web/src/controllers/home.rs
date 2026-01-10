@@ -13,6 +13,7 @@ use oic_cache::Cache;
 use std::sync::Arc;
 use std::collections::HashMap;
 use crate::models::ManifestChunk;
+use bytes::Bytes;
 
 // 类型别名，帮助类型推导
 type CacheExtension = Arc<Cache>;
@@ -31,11 +32,11 @@ async fn index(
         move || {
             let manifest = manifest_clone.clone();
             async move {
-                // 在 controller 层处理模板渲染，转换为 Vec<u8>
+                // 在 controller 层处理模板渲染，转换为 Bytes
                 let template = render_home_index(manifest).await?;
                 let html_string = template.0.render()
                     .map_err(|e| anyhow::anyhow!("Failed to render template: {}", e))?;
-                Ok(html_string.into_bytes())
+                Ok(Bytes::from(html_string.into_bytes()))
             }
         },
         None,

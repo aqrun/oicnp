@@ -92,7 +92,7 @@ async fn show_post(
         .cache
         .set_with_ttl(
             cache_key,
-            html.as_bytes().to_vec(),
+            bytes::Bytes::copy_from_slice(html.as_bytes()),
             "text/html".to_string(),
             3600,
         )

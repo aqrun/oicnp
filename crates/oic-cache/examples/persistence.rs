@@ -1,4 +1,5 @@
 use oic_cache::{Cache, CacheConfig};
+use bytes::Bytes;
 
 /// cargo run --package oic_cache --example persistence
 #[tokio::main]
@@ -30,7 +31,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     cache
         .set(
             "persist:key1".to_string(),
-            b"Value 1 - persisted".to_vec(),
+            Bytes::copy_from_slice(b"Value 1 - persisted"),
             "text/plain".to_string(),
         )
         .await?;
@@ -39,7 +40,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     cache
         .set(
             "persist:key2".to_string(),
-            b"Value 2 - persisted".to_vec(),
+            Bytes::copy_from_slice(b"Value 2 - persisted"),
             "text/plain".to_string(),
         )
         .await?;
@@ -78,8 +79,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Key1 value after reload: {:?}", value1_loaded);
     println!("Key2 value after reload: {:?}", value2_loaded);
 
-    assert_eq!(value1_loaded, Some(b"Value 1 - persisted".to_vec()));
-    assert_eq!(value2_loaded, Some(b"Value 2 - persisted".to_vec()));
+    assert_eq!(value1_loaded.as_ref().map(|b| b.as_ref()), Some(b"Value 1 - persisted" as &[u8]));
+    assert_eq!(value2_loaded.as_ref().map(|b| b.as_ref()), Some(b"Value 2 - persisted" as &[u8]));
 
     println!("\n✅ Index persistence test passed!");
 
@@ -88,7 +89,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     cache2
         .set(
             "persist:key3".to_string(),
-            b"Value 3 - auto-saved".to_vec(),
+            Bytes::copy_from_slice(b"Value 3 - auto-saved"),
             "text/plain".to_string(),
         )
         .await?;
@@ -184,7 +185,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     cache_reset
         .set(
             "reset:key1".to_string(),
-            b"value1".to_vec(),
+            Bytes::copy_from_slice(b"value1"),
             "text/plain".to_string(),
         )
         .await?;
@@ -196,7 +197,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     cache_reset
         .set(
             "reset:key2".to_string(),
-            b"value2".to_vec(),
+            Bytes::copy_from_slice(b"value2"),
             "text/plain".to_string(),
         )
         .await?;
@@ -208,7 +209,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     cache_reset
         .set(
             "reset:key3".to_string(),
-            b"value3".to_vec(),
+            Bytes::copy_from_slice(b"value3"),
             "text/plain".to_string(),
         )
         .await?;

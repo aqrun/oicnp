@@ -2,6 +2,7 @@ use oic_cache::{Cache, CacheConfig};
 use std::sync::Arc;
 use std::time::Instant;
 use tempfile::TempDir;
+use bytes::Bytes;
 
 fn create_test_cache() -> (Cache, TempDir) {
     let temp_dir = TempDir::new().unwrap();
@@ -30,7 +31,7 @@ async fn test_concurrent_reads() {
     cache
         .set(
             "concurrent:read".to_string(),
-            b"test value".to_vec(),
+            Bytes::copy_from_slice(b"test value"),
             "text/plain".to_string(),
         )
         .await
@@ -62,7 +63,7 @@ async fn test_concurrent_reads() {
             Ok(result) => {
                 match result {
                     Ok(data) => {
-                        if data == Some(b"test value".to_vec()) {
+                        if data.as_ref().map(|b| b.as_ref()) == Some(b"test value") {
                             success_count += 1;
                         } else {
                             error_count += 1;
@@ -206,7 +207,7 @@ async fn test_concurrent_mixed() {
     cache
         .set(
             "mixed:key".to_string(),
-            b"initial".to_vec(),
+            Bytes::copy_from_slice(b"initial"),
             "text/plain".to_string(),
         )
         .await

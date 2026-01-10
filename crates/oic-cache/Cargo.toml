@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 # 异步运行时
 tokio = { workspace = true, features = ["full"] }
-
+bytes = { workspace = true }
 # 序列化
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }

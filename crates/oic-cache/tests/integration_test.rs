@@ -3,6 +3,7 @@ use oic_cache::{
 };
 use std::collections::HashMap;
 use tempfile::TempDir;
+use bytes::Bytes;
 
 fn create_test_cache() -> (Cache, TempDir) {
     let temp_dir = TempDir::new().unwrap();
@@ -19,7 +20,7 @@ async fn test_basic_get_set() {
     cache
         .set(
             "test:key".to_string(),
-            b"test value".to_vec(),
+            Bytes::copy_from_slice(b"test value"),
             "text/plain".to_string(),
         )
         .await
@@ -27,7 +28,7 @@ async fn test_basic_get_set() {
 
     let result = cache.get("test:key").await.unwrap();
     assert!(result.is_some());
-    assert_eq!(result.unwrap(), b"test value");
+    assert_eq!(result.unwrap().as_ref(), b"test value");
 }
 
 #[tokio::test]
@@ -38,7 +39,7 @@ async fn test_expiration() {
     cache
         .set_with_ttl(
             "expire:key".to_string(),
-            b"expire value".to_vec(),
+            Bytes::copy_from_slice(b"expire value"),
             "text/plain".to_string(),
             1, // 1 秒
         )
@@ -60,7 +61,7 @@ async fn test_inline_storage() {
     let (cache, _temp_dir) = create_test_cache();
 
     // 设置小数据（应该内联存储）
-    let small_data = vec![0u8; 100]; // 100 字节，小于 4KB
+    let small_data = Bytes::from(vec![0u8; 100]); // 100 字节，小于 4KB
     cache
         .set(
             "small:key".to_string(),
@@ -71,7 +72,7 @@ async fn test_inline_storage() {
         .unwrap();
 
     let result = cache.get("small:key").await.unwrap();
-    assert_eq!(result.unwrap(), small_data);
+    assert_eq!(result.unwrap().as_ref(), small_data.as_ref());
 }
 
 #[tokio::test]
@@ -79,7 +80,7 @@ async fn test_file_storage() {
     let (cache, _temp_dir) = create_test_cache();
 
     // 设置大数据（应该文件存储）
-    let large_data = vec![0u8; 10 * 1024]; // 10KB，大于 4KB
+    let large_data = Bytes::from(vec![0u8; 10 * 1024]); // 10KB，大于 4KB
     cache
         .set(
             "large:key".to_string(),
@@ -90,7 +91,7 @@ async fn test_file_storage() {
         .unwrap();
 
     let result = cache.get("large:key").await.unwrap();
-    assert_eq!(result.unwrap(), large_data);
+    assert_eq!(result.unwrap().as_ref(), large_data.as_ref());
 }
 
 #[tokio::test]
@@ -100,7 +101,7 @@ async fn test_invalidate() {
     cache
         .set(
             "delete:key".to_string(),
-            b"delete me".to_vec(),
+            Bytes::copy_from_slice(b"delete me"),
             "text/plain".to_string(),
         )
         .await
@@ -122,7 +123,7 @@ async fn test_namespace_invalidation() {
     cache
         .set_with_namespace(
             "blog:post:1".to_string(),
-            b"Post 1".to_vec(),
+            Bytes::copy_from_slice(b"Post 1"),
             "text/html".to_string(),
             NamespaceInfo {
                 namespace: "blog".to_string(),
@@ -136,7 +137,7 @@ async fn test_namespace_invalidation() {
     cache
         .set_with_namespace(
             "blog:post:2".to_string(),
-            b"Post 2".to_vec(),
+            Bytes::copy_from_slice(b"Post 2"),
             "text/html".to_string(),
             NamespaceInfo {
                 namespace: "blog".to_string(),
@@ -163,7 +164,7 @@ async fn test_tag_invalidation() {
     cache
         .set_with_namespace(
             "post:1".to_string(),
-            b"Post 1".to_vec(),
+            Bytes::copy_from_slice(b"Post 1"),
             "text/html".to_string(),
             NamespaceInfo {
                 namespace: "blog".to_string(),
@@ -177,7 +178,7 @@ async fn test_tag_invalidation() {
     cache
         .set_with_namespace(
             "post:2".to_string(),
-            b"Post 2".to_vec(),
+            Bytes::copy_from_slice(b"Post 2"),
             "text/html".to_string(),
             NamespaceInfo {
                 namespace: "blog".to_string(),
@@ -204,7 +205,7 @@ async fn test_vary_cache() {
     cache
         .set_with_vary(
             "page:home".to_string(),
-            b"<html>Home</html>".to_vec(),
+            Bytes::copy_from_slice(b"<html>Home</html>"),
             "text/html".to_string(),
             vec![VaryCondition::AcceptLanguage, VaryCondition::UserAgent],
         )
@@ -232,7 +233,7 @@ async fn test_stats_tracking() {
     cache
         .set(
             "stats:1".to_string(),
-            b"value1".to_vec(),
+            Bytes::copy_from_slice(b"value1"),
             "text/plain".to_string(),
         )
         .await
@@ -241,7 +242,7 @@ async fn test_stats_tracking() {
     cache
         .set(
             "stats:2".to_string(),
-            b"value2".to_vec(),
+            Bytes::copy_from_slice(b"value2"),
             "text/plain".to_string(),
         )
         .await
@@ -297,7 +298,7 @@ async fn test_cleanup_expired() {
     cache
         .set_with_ttl(
             "expire:1".to_string(),
-            b"value1".to_vec(),
+            Bytes::copy_from_slice(b"value1"),
             "text/plain".to_string(),
             1,
         )
@@ -307,7 +308,7 @@ async fn test_cleanup_expired() {
     cache
         .set_with_ttl(
             "expire:2".to_string(),
-            b"value2".to_vec(),
+            Bytes::copy_from_slice(b"value2"),
             "text/plain".to_string(),
             1,
         )
@@ -338,7 +339,7 @@ async fn test_cleanup_expired_with_swr_disabled() {
     cache
         .set_with_ttl(
             "expire:1".to_string(),
-            b"value1".to_vec(),
+            Bytes::copy_from_slice(b"value1"),
             "text/plain".to_string(),
             1,
         )
@@ -348,7 +349,7 @@ async fn test_cleanup_expired_with_swr_disabled() {
     cache
         .set_with_ttl(
             "expire:2".to_string(),
-            b"value2".to_vec(),
+            Bytes::copy_from_slice(b"value2"),
             "text/plain".to_string(),
             1,
         )
@@ -380,7 +381,7 @@ async fn test_cleanup_expired_with_swr_enabled_max_stale_limited() {
     cache
         .set_with_ttl(
             "expire:1".to_string(),
-            b"value1".to_vec(),
+            Bytes::copy_from_slice(b"value1"),
             "text/plain".to_string(),
             1, // 1 秒后过期
         )
@@ -390,7 +391,7 @@ async fn test_cleanup_expired_with_swr_enabled_max_stale_limited() {
     cache
         .set_with_ttl(
             "expire:2".to_string(),
-            b"value2".to_vec(),
+            Bytes::copy_from_slice(b"value2"),
             "text/plain".to_string(),
             1, // 1 秒后过期
         )
@@ -433,7 +434,7 @@ async fn test_cleanup_expired_with_swr_enabled_max_stale_unlimited() {
     cache
         .set_with_ttl(
             "expire:1".to_string(),
-            b"value1".to_vec(),
+            Bytes::copy_from_slice(b"value1"),
             "text/plain".to_string(),
             1,
         )
@@ -443,7 +444,7 @@ async fn test_cleanup_expired_with_swr_enabled_max_stale_unlimited() {
     cache
         .set_with_ttl(
             "expire:2".to_string(),
-            b"value2".to_vec(),
+            Bytes::copy_from_slice(b"value2"),
             "text/plain".to_string(),
             1,
         )
@@ -480,7 +481,7 @@ async fn test_cleanup_expired_mixed_scenario() {
     cache
         .set_with_ttl(
             "expire:short".to_string(),
-            b"value1".to_vec(),
+            Bytes::copy_from_slice(b"value1"),
             "text/plain".to_string(),
             1,
         )
@@ -491,7 +492,7 @@ async fn test_cleanup_expired_mixed_scenario() {
     cache
         .set_with_ttl(
             "valid:key".to_string(),
-            b"value2".to_vec(),
+            Bytes::copy_from_slice(b"value2"),
             "text/plain".to_string(),
             3600, // 1 小时后过期
         )
@@ -529,7 +530,7 @@ async fn test_cleanup_expired_with_zero_ttl() {
     cache
         .set_with_ttl(
             "never:expire".to_string(),
-            b"value".to_vec(),
+            Bytes::copy_from_slice(b"value"),
             "text/plain".to_string(),
             0, // 永不过期
         )
@@ -540,7 +541,7 @@ async fn test_cleanup_expired_with_zero_ttl() {
     cache
         .set_with_ttl(
             "expire:normal".to_string(),
-            b"value2".to_vec(),
+            Bytes::copy_from_slice(b"value2"),
             "text/plain".to_string(),
             1,
         )
@@ -567,7 +568,7 @@ async fn test_index_persistence() {
     cache
         .set(
             "persist:1".to_string(),
-            b"value1".to_vec(),
+            Bytes::copy_from_slice(b"value1"),
             "text/plain".to_string(),
         )
         .await
@@ -576,7 +577,7 @@ async fn test_index_persistence() {
     cache
         .set(
             "persist:2".to_string(),
-            b"value2".to_vec(),
+            Bytes::copy_from_slice(b"value2"),
             "text/plain".to_string(),
         )
         .await
@@ -598,7 +599,7 @@ async fn test_clear() {
     cache
         .set(
             "clear:1".to_string(),
-            b"value1".to_vec(),
+            Bytes::copy_from_slice(b"value1"),
             "text/plain".to_string(),
         )
         .await
@@ -607,7 +608,7 @@ async fn test_clear() {
     cache
         .set(
             "clear:2".to_string(),
-            b"value2".to_vec(),
+            Bytes::copy_from_slice(b"value2"),
             "text/plain".to_string(),
         )
         .await

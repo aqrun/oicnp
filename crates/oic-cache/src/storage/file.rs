@@ -2,6 +2,7 @@ use crate::error::{CacheError, Result};
 use crate::metadata::StorageLocation;
 use std::path::{Path, PathBuf};
 use sha2::{Sha256, Digest};
+use bytes::Bytes;
 
 /// 生成文件路径
 pub fn generate_file_path(base_path: &Path, key: &str) -> PathBuf {
@@ -19,7 +20,9 @@ pub fn generate_file_path(base_path: &Path, key: &str) -> PathBuf {
 }
 
 /// 从文件存储读取数据
-pub async fn read_file(location: &StorageLocation, base_path: &Path) -> Result<Option<Vec<u8>>> {
+/// 
+/// 返回 `Bytes` 类型，Clone 是零拷贝的（引用计数）
+pub async fn read_file(location: &StorageLocation, base_path: &Path) -> Result<Option<Bytes>> {
     match location {
         StorageLocation::Inline(_) => Ok(None),
         StorageLocation::File(file_path) => {
@@ -31,7 +34,7 @@ pub async fn read_file(location: &StorageLocation, base_path: &Path) -> Result<O
             
             tokio::fs::read(&full_path)
                 .await
-                .map(Some)
+                .map(|data| Some(Bytes::from(data))) // 零成本转换：Vec<u8> -> Bytes
                 .map_err(|e| CacheError::Io(e))
         }
     }

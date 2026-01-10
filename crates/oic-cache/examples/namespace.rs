@@ -1,4 +1,5 @@
 use oic_cache::{Cache, CacheConfig, CachePriority, NamespaceInfo};
+use bytes::Bytes;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -8,7 +9,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     cache
         .set_with_namespace(
             "blog:post:123".to_string(),
-            b"<html>Post 123</html>".to_vec(),
+            Bytes::copy_from_slice(b"<html>Post 123</html>"),
             "text/html".to_string(),
             NamespaceInfo {
                 namespace: "blog".to_string(),
@@ -21,7 +22,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     cache
         .set_with_namespace(
             "blog:post:456".to_string(),
-            b"<html>Post 456</html>".to_vec(),
+            Bytes::copy_from_slice(b"<html>Post 456</html>"),
             "text/html".to_string(),
             NamespaceInfo {
                 namespace: "blog".to_string(),
@@ -39,7 +40,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     cache
         .set_with_namespace(
             "blog:post:123".to_string(),
-            b"<html>Post 123</html>".to_vec(),
+            Bytes::copy_from_slice(b"<html>Post 123</html>"),
             "text/html".to_string(),
             NamespaceInfo {
                 namespace: "blog".to_string(),
@@ -52,7 +53,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     cache
         .set_with_namespace(
             "blog:post:456".to_string(),
-            b"<html>Post 456</html>".to_vec(),
+            Bytes::copy_from_slice(b"<html>Post 456</html>"),
             "text/html".to_string(),
             NamespaceInfo {
                 namespace: "blog".to_string(),

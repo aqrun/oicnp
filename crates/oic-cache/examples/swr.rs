@@ -1,4 +1,5 @@
 use oic_cache::{Cache, CacheConfig};
+use bytes::Bytes;
 
 /// cargo run --package oic_cache --example swr
 /// 
@@ -36,7 +37,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     cache
         .set(
             "swr:key1".to_string(),
-            b"Fresh data".to_vec(),
+            Bytes::copy_from_slice(b"Fresh data"),
             "text/plain".to_string(),
         )
         .await?;
@@ -46,7 +47,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("\n=== Step 2: Getting cache immediately (should be fresh) ===");
     let value1 = cache.get("swr:key1").await?;
     println!("Value: {:?}", value1);
-    assert_eq!(value1, Some(b"Fresh data".to_vec()));
+    assert_eq!(value1.as_ref().map(|b| b.as_ref()), Some(b"Fresh data" as &[u8]));
     
     let is_stale1 = cache.is_stale("swr:key1").await;
     println!("Is stale: {}", is_stale1);
@@ -62,7 +63,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("\n=== Step 4: Getting expired cache (SWR should return stale data) ===");
     let value2 = cache.get("swr:key1").await?;
     println!("Value: {:?}", value2);
-    assert_eq!(value2, Some(b"Fresh data".to_vec()), "SWR should return stale data");
+    assert_eq!(value2.as_ref().map(|b| b.as_ref()), Some(b"Fresh data" as &[u8]), "SWR should return stale data");
     
     let is_stale2 = cache.is_stale("swr:key1").await;
     println!("Is stale: {}", is_stale2);
@@ -81,7 +82,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     cache
         .set(
             "swr:key1".to_string(),
-            b"Updated data".to_vec(),
+            Bytes::copy_from_slice(b"Updated data"),
             "text/plain".to_string(),
         )
         .await?;
@@ -91,7 +92,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("\n=== Step 7: Getting cache again (should return updated data) ===");
     let value3 = cache.get("swr:key1").await?;
     println!("Value: {:?}", value3);
-    assert_eq!(value3, Some(b"Updated data".to_vec()));
+    assert_eq!(value3.as_ref().map(|b| b.as_ref()), Some(b"Updated data" as &[u8]));
     
     let is_stale3 = cache.is_stale("swr:key1").await;
     println!("Is stale: {}", is_stale3);
@@ -103,7 +104,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     cache
         .set(
             "swr:key2".to_string(),
-            b"Test stale limit".to_vec(),
+            Bytes::copy_from_slice(b"Test stale limit"),
             "text/plain".to_string(),
         )
         .await?;
@@ -145,7 +146,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     cache_no_swr
         .set(
             "swr:key3".to_string(),
-            b"Test no SWR".to_vec(),
+            Bytes::copy_from_slice(b"Test no SWR"),
             "text/plain".to_string(),
         )
         .await?;

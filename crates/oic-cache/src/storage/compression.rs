@@ -1,11 +1,14 @@
 use crate::error::{CacheError, Result};
 use crate::metadata::{CompressionAlgorithm, CompressionInfo};
+use bytes::Bytes;
 
 /// 压缩数据
+/// 
+/// 返回 `Bytes` 类型，便于零拷贝 Clone
 pub fn compress(
     data: &[u8],
     algorithm: CompressionAlgorithm,
-) -> Result<(Vec<u8>, CompressionInfo)> {
+) -> Result<(Bytes, CompressionInfo)> {
     match algorithm {
         CompressionAlgorithm::Gzip => compress_gzip(data),
         CompressionAlgorithm::Zstd => compress_zstd(data),
@@ -14,21 +17,26 @@ pub fn compress(
 }
 
 /// 解压数据
+/// 
+/// 返回 `Bytes` 类型，便于零拷贝 Clone
 pub fn decompress(
     compressed_data: &[u8],
     compression_info: &CompressionInfo,
-) -> Result<Vec<u8>> {
+) -> Result<Bytes> {
     match compression_info {
-        CompressionInfo::None => Ok(compressed_data.to_vec()),
-        CompressionInfo::Compressed { algorithm, .. } => match algorithm {
-            CompressionAlgorithm::Gzip => decompress_gzip(compressed_data),
-            CompressionAlgorithm::Zstd => decompress_zstd(compressed_data),
-            CompressionAlgorithm::Brotli => decompress_brotli(compressed_data),
-        },
+        CompressionInfo::None => Ok(Bytes::copy_from_slice(compressed_data)),
+        CompressionInfo::Compressed { algorithm, .. } => {
+            let decompressed = match algorithm {
+                CompressionAlgorithm::Gzip => decompress_gzip(compressed_data)?,
+                CompressionAlgorithm::Zstd => decompress_zstd(compressed_data)?,
+                CompressionAlgorithm::Brotli => decompress_brotli(compressed_data)?,
+            };
+            Ok(Bytes::from(decompressed))
+        }
     }
 }
 
-fn compress_gzip(data: &[u8]) -> Result<(Vec<u8>, CompressionInfo)> {
+fn compress_gzip(data: &[u8]) -> Result<(Bytes, CompressionInfo)> {
     use flate2::write::GzEncoder;
     use flate2::Compression;
     use std::io::Write;
@@ -45,7 +53,7 @@ fn compress_gzip(data: &[u8]) -> Result<(Vec<u8>, CompressionInfo)> {
         algorithm: CompressionAlgorithm::Gzip,
     };
     
-    Ok((compressed, info))
+    Ok((Bytes::from(compressed), info))
 }
 
 fn decompress_gzip(compressed_data: &[u8]) -> Result<Vec<u8>> {
@@ -60,7 +68,7 @@ fn decompress_gzip(compressed_data: &[u8]) -> Result<Vec<u8>> {
     Ok(decompressed)
 }
 
-fn compress_zstd(data: &[u8]) -> Result<(Vec<u8>, CompressionInfo)> {
+fn compress_zstd(data: &[u8]) -> Result<(Bytes, CompressionInfo)> {
     let compressed = zstd::encode_all(data, 3)
         .map_err(|e| CacheError::Compression(format!("Zstd compression failed: {}", e)))?;
     
@@ -70,7 +78,7 @@ fn compress_zstd(data: &[u8]) -> Result<(Vec<u8>, CompressionInfo)> {
         algorithm: CompressionAlgorithm::Zstd,
     };
     
-    Ok((compressed, info))
+    Ok((Bytes::from(compressed), info))
 }
 
 fn decompress_zstd(compressed_data: &[u8]) -> Result<Vec<u8>> {
@@ -80,7 +88,7 @@ fn decompress_zstd(compressed_data: &[u8]) -> Result<Vec<u8>> {
     Ok(decompressed)
 }
 
-fn compress_brotli(data: &[u8]) -> Result<(Vec<u8>, CompressionInfo)> {
+fn compress_brotli(data: &[u8]) -> Result<(Bytes, CompressionInfo)> {
     use std::io::Write;
     
     let mut writer = brotli::CompressorWriter::new(Vec::new(), 4096, 6, 22);
@@ -94,7 +102,7 @@ fn compress_brotli(data: &[u8]) -> Result<(Vec<u8>, CompressionInfo)> {
         algorithm: CompressionAlgorithm::Brotli,
     };
     
-    Ok((compressed, info))
+    Ok((Bytes::from(compressed), info))
 }
 
 fn decompress_brotli(compressed_data: &[u8]) -> Result<Vec<u8>> {
