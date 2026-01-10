@@ -1,15 +1,18 @@
 use axum::{
     Router,
-    response::{IntoResponse, Html},
     routing::get,
     extract::{Extension, State},
+    response::{IntoResponse, Html},
+    http::StatusCode,
 };
 use oic_core::AppContext;
 use crate::views::render_home_index;
+use crate::services::get_cached_or_render;
+use askama::Template;
+use oic_cache::Cache;
 use std::sync::Arc;
 use std::collections::HashMap;
 use crate::models::ManifestChunk;
-use oic_cache::{Cache, CacheExt};
 
 // 类型别名，帮助类型推导
 type CacheExtension = Arc<Cache>;
@@ -20,50 +23,29 @@ async fn index(
     Extension(manifest): Extension<ManifestExtension>,
     Extension(cache): Extension<CacheExtension>,
 ) -> impl IntoResponse {
-    let cache_key = "home:index";
-
-    // 尝试从缓存获取 HTML
-    if let Ok(Some(html)) = cache.get_html(cache_key).await {
-        println!("缓存命中: {}", html);
-        return Html(html).into_response();
-    }
-
-    // 缓存未命中，生成 HTML
-    let html_template = match render_home_index(manifest.clone()).await {
-        Ok(template) => template,
-        Err(e) => {
-            return (
-                axum::http::StatusCode::INTERNAL_SERVER_ERROR,
-                format!("Failed to render template: {}", e)
-            ).into_response();
-        }
-    };
-
-    // 将渲染后的 HTML 存入缓存
-    // 先渲染模板获取 HTML 字符串用于缓存
-    let html_string = match askama::Template::render(&html_template.0) {
-        Ok(html) => html,
+    let manifest_clone = manifest.clone();
+    
+    match get_cached_or_render(
+        &*cache,
+        "home:index",
+        move || {
+            let manifest = manifest_clone.clone();
+            async move {
+                // 在 controller 层处理模板渲染，转换为 Vec<u8>
+                let template = render_home_index(manifest).await?;
+                let html_string = template.0.render()
+                    .map_err(|e| anyhow::anyhow!("Failed to render template: {}", e))?;
+                Ok(html_string.into_bytes())
+            }
+        },
+        None,
+    ).await {
+        Ok(html) => Html(html).into_response(),
         Err(e) => {
             eprintln!("Failed to render template: {}", e);
-            return html_template.into_response();
+            (StatusCode::INTERNAL_SERVER_ERROR, format!("Failed to render: {}", e)).into_response()
         }
-    };
-    
-    // 在开发模式下使用短 TTL，生产环境使用长 TTL
-    #[cfg(debug_assertions)]
-    let ttl_seconds = 1; // 开发模式：1 秒过期
-    #[cfg(not(debug_assertions))]
-    let ttl_seconds = 3600; // 生产环境：1 小时过期
-    
-    if let Err(e) = cache.set_html(
-        cache_key.to_string(),
-        html_string.as_str(),
-        ttl_seconds
-    ).await {
-        eprintln!("Failed to cache HTML: {}", e);
     }
-
-    html_template.into_response()
 }
 
 pub fn home_routes() -> Router<AppContext> {

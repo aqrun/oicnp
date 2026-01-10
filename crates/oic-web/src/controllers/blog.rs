@@ -1,15 +1,18 @@
 use axum::{
     Router,
-    response::{IntoResponse, Html},
     routing::get,
     extract::{Extension, State, Path},
+    response::{IntoResponse, Html},
+    http::StatusCode,
 };
 use oic_core::AppContext;
 use crate::views::{render_blog_list, render_blog_detail};
+use crate::services::get_cached_or_render;
+use askama::Template;
+use oic_cache::Cache;
 use std::sync::Arc;
 use std::collections::HashMap;
 use crate::models::ManifestChunk;
-use oic_cache::{Cache, CacheExt};
 
 // 类型别名，帮助类型推导
 type CacheExtension = Arc<Cache>;
@@ -21,48 +24,27 @@ async fn blog_list(
     Extension(manifest): Extension<ManifestExtension>,
     Extension(cache): Extension<CacheExtension>,
 ) -> impl IntoResponse {
-    let cache_key = "blog:list";
-
-    // 尝试从缓存获取 HTML
-    if let Ok(Some(html)) = cache.get_html(cache_key).await {
-        return Html(html).into_response();
-    }
-
-    // 缓存未命中，生成 HTML
-    let html_template = match render_blog_list(None, manifest.clone()).await {
-        Ok(template) => template,
-        Err(e) => {
-            return (
-                axum::http::StatusCode::INTERNAL_SERVER_ERROR,
-                format!("Failed to render template: {}", e)
-            ).into_response();
-        }
-    };
-
-    // 将渲染后的 HTML 存入缓存
-    // 先渲染模板获取 HTML 字符串用于缓存
-    let html_string = match askama::Template::render(&html_template.0) {
-        Ok(html) => html,
-        Err(e) => {
-            eprintln!("Failed to render template: {}", e);
-            return html_template.into_response();
-        }
-    };
-    
-    #[cfg(debug_assertions)]
-    let ttl_seconds = 1;
-    #[cfg(not(debug_assertions))]
-    let ttl_seconds = 3600;
-    
-    if let Err(e) = cache.set_html(
-        cache_key.to_string(),
-        html_string.as_str(),
-        ttl_seconds
+    let manifest_clone = manifest.clone();
+    match get_cached_or_render(
+        &*cache,
+        "blog:list",
+        move || {
+            let manifest = manifest_clone.clone();
+            async move {
+                let template = render_blog_list(None, manifest).await?;
+                let html_string = template.0.render()
+                    .map_err(|e| anyhow::anyhow!("Failed to render template: {}", e))?;
+                Ok(html_string.into_bytes())
+            }
+        },
+        None,
     ).await {
-        eprintln!("Failed to cache HTML: {}", e);
+        Ok(html) => Html(html).into_response(),
+        Err(e) => {
+            eprintln!("Failed to render: {}", e);
+            (StatusCode::INTERNAL_SERVER_ERROR, format!("Failed to render: {}", e)).into_response()
+        }
     }
-
-    html_template.into_response()
 }
 
 /// 分类博客列表页
@@ -73,40 +55,30 @@ async fn blog_list_by_category(
     Extension(cache): Extension<CacheExtension>,
 ) -> impl IntoResponse {
     let cache_key = format!("blog:list:cat:{}", cat_vid);
-
-    // 尝试从缓存获取 HTML
-    if let Ok(Some(html)) = cache.get_html(&cache_key).await {
-        return Html(html).into_response();
-    }
-
-    // 缓存未命中，生成 HTML
-    let html_template = match render_blog_list(Some(cat_vid.clone()), manifest.clone()).await {
-        Ok(template) => template,
-        Err(e) => {
-            return (
-                axum::http::StatusCode::INTERNAL_SERVER_ERROR,
-                format!("Failed to render template: {}", e)
-            ).into_response();
-        }
-    };
-
-    // 将渲染后的 HTML 存入缓存
-    let html_string = html_template.0.render().unwrap_or_default();
+    let cat_vid_clone = cat_vid.clone();
+    let manifest_clone = manifest.clone();
     
-    #[cfg(debug_assertions)]
-    let ttl_seconds = 1;
-    #[cfg(not(debug_assertions))]
-    let ttl_seconds = 3600;
-    
-    if let Err(e) = cache.set_html(
-        cache_key,
-        html_string.as_str(),
-        ttl_seconds
+    match get_cached_or_render(
+        &*cache,
+        &cache_key,
+        move || {
+            let cat_vid = cat_vid_clone.clone();
+            let manifest = manifest_clone.clone();
+            async move {
+                let template = render_blog_list(Some(cat_vid), manifest).await?;
+                let html_string = template.0.render()
+                    .map_err(|e| anyhow::anyhow!("Failed to render template: {}", e))?;
+                Ok(html_string.into_bytes())
+            }
+        },
+        None,
     ).await {
-        eprintln!("Failed to cache HTML: {}", e);
+        Ok(html) => Html(html).into_response(),
+        Err(e) => {
+            eprintln!("Failed to render: {}", e);
+            (StatusCode::INTERNAL_SERVER_ERROR, format!("Failed to render: {}", e)).into_response()
+        }
     }
-
-    html_template.into_response()
 }
 
 /// 博客详情页
@@ -117,40 +89,30 @@ async fn blog_detail(
     Extension(cache): Extension<CacheExtension>,
 ) -> impl IntoResponse {
     let cache_key = format!("blog:detail:{}", vid);
-
-    // 尝试从缓存获取 HTML
-    if let Ok(Some(html)) = cache.get_html(&cache_key).await {
-        return Html(html).into_response();
-    }
-
-    // 缓存未命中，生成 HTML
-    let html_template = match render_blog_detail(vid.clone(), manifest.clone()).await {
-        Ok(template) => template,
-        Err(e) => {
-            return (
-                axum::http::StatusCode::INTERNAL_SERVER_ERROR,
-                format!("Failed to render template: {}", e)
-            ).into_response();
-        }
-    };
-
-    // 将渲染后的 HTML 存入缓存
-    let html_string = html_template.0.render().unwrap_or_default();
+    let vid_clone = vid.clone();
+    let manifest_clone = manifest.clone();
     
-    #[cfg(debug_assertions)]
-    let ttl_seconds = 1;
-    #[cfg(not(debug_assertions))]
-    let ttl_seconds = 3600;
-    
-    if let Err(e) = cache.set_html(
-        cache_key,
-        html_string.as_str(),
-        ttl_seconds
+    match get_cached_or_render(
+        &*cache,
+        &cache_key,
+        move || {
+            let vid = vid_clone.clone();
+            let manifest = manifest_clone.clone();
+            async move {
+                let template = render_blog_detail(vid, manifest).await?;
+                let html_string = template.0.render()
+                    .map_err(|e| anyhow::anyhow!("Failed to render template: {}", e))?;
+                Ok(html_string.into_bytes())
+            }
+        },
+        None,
     ).await {
-        eprintln!("Failed to cache HTML: {}", e);
+        Ok(html) => Html(html).into_response(),
+        Err(e) => {
+            eprintln!("Failed to render: {}", e);
+            (StatusCode::INTERNAL_SERVER_ERROR, format!("Failed to render: {}", e)).into_response()
+        }
     }
-
-    html_template.into_response()
 }
 
 pub fn blog_routes() -> Router<AppContext> {

@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}{% if node.is_some() %}{{ node.as_ref().unwrap().title.as_ref().unwrap_or(&"文章详情".to_string()) }}{% else %}文章详情{% endif %} - 灵犀纪{% endblock %}
+{% block title %}{% if title.is_some() %}{{ title.as_ref().unwrap() }}{% else %}文章详情{% endif %} - 灵犀纪{% endblock %}
 
 {% block head %}
-<meta name="description" content="{{ node.as_ref().and_then(|n| n.summary.as_ref()).unwrap_or(&"".to_string()) }}">
+<meta name="description" content="{{ summary }}">
 {{ assets.css|safe }}
 {% endblock %}
 
@@ -46,21 +46,21 @@
   <section class="bg-white">
     <div class="layout py-12">
       <div class="flex flex-1 flex-col overflow-auto">
-        {% if node.is_some() %}
+        {% if title.is_some() %}
         <h1 class="text-[1.8rem] lg:text-[2.67rem] mb-[1.3rem] text-slate-800 lg:leading-[2.67rem] lg:text-center">
-          {{ node.as_ref().unwrap().title.as_ref().unwrap_or(&"".to_string()) }}
+          {{ title.as_ref().unwrap() }}
         </h1>
         <div class="node-metas mb-10 text-gray-400 lg:text-center">
-          {% if node.is_some() && node.as_ref().unwrap().categories.is_some() && node.as_ref().unwrap().categories.as_ref().unwrap().len() > 0 %}
-          <a href="/cat/{{ node.as_ref().unwrap().categories.as_ref().unwrap()[0].cat_vid.as_ref().unwrap_or(&"".to_string()) }}">
+          {% if category_name.is_some() %}
+          <a href="/cat/{{ category_vid.as_ref().unwrap_or(&"".to_string()) }}">
             <i class="iconfont icon-benshubook122 mr-1"></i>
-            {{ node.as_ref().unwrap().categories.as_ref().unwrap()[0].cat_name.as_ref().unwrap_or(&"".to_string()) }}
+            {{ category_name.as_ref().unwrap() }}
           </a>
           {% endif %}
-          {% if node.as_ref().unwrap().created_at.is_some() %}
+          {% if created_at.is_some() %}
           <span class="ml-4">
             <i class="iconfont icon-date mr-1"></i>
-            {{ node.as_ref().unwrap().created_at.as_ref().unwrap() }}
+            {{ created_at.as_ref().unwrap() }}
           </span>
           {% endif %}
         </div>

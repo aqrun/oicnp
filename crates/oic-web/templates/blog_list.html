@@ -53,32 +53,32 @@
           {% for item in nodes %}
           <div class="w-full">
             <div class="overflow-hidden rounded-lg hover:shadow-lg hover:shadow-violet-100 hover:border-violet-400 cursor-pointer border border-slate-200 border-solid">
-              <a href="/p/{{ item.vid.as_ref().unwrap_or(&"".to_string()) }}" class="block w-full h-full md:flex">
+              <a href="/p/{{ item.vid }}" class="block w-full h-full md:flex">
                 <div class="w-full p-4 bg-white dark:bg-gray-800">
                   <p class="font-light text-gray-400 text-md">
                     <i class="iconfont icon-benshubook122 mr-1"></i>
-                    {% if item.categories.is_some() && item.categories.as_ref().unwrap().len() > 0 %}
-                    {{ item.categories.as_ref().unwrap()[0].cat_name.as_ref().unwrap_or(&"".to_string()) }}
+                    {% if item.category_name.is_some() %}
+                    {{ item.category_name.as_ref().unwrap() }}
                     {% endif %}
-                    {% if item.created_at.is_some() %}
+                    {% if item.created_at.len() > 0 %}
                     &nbsp;
                     <span class="ml-2 text-gray-400 font-light">
                       <i class="iconfont icon-date mr-1"></i>
-                      {{ item.created_at.as_ref().unwrap() }}
+                      {{ item.created_at }}
                     </span>
                     {% endif %}
                   </p>
                   <p class="mb-2 text-xl font-medium text-gray-800 dark:text-white">
-                    {{ item.title.as_ref().unwrap_or(&"".to_string()) }}
+                    {{ item.title }}
                   </p>
                   <p class="font-light text-gray-400 dark:text-gray-300 text-md">
-                    {{ item.summary.as_ref().unwrap_or(&"".to_string()) }}
+                    {{ item.summary }}
                   </p>
-                  {% if item.tags.as_ref().is_some() && item.tags.as_ref().unwrap().len() > 0 %}
+                  {% if item.tags.len() > 0 %}
                   <div class="flex flex-wrap items-center mt-4 justify-starts">
-                    {% for tag in item.tags.as_ref().unwrap() %}
+                    {% for tag in item.tags %}
                     <div class="mb-1 text-xs mr-2 py-1.5 px-4 text-gray-600 bg-blue-100 rounded-2xl">
-                      {{ tag.tag_name.as_ref().unwrap_or(&"".to_string()) }}
+                      {{ tag }}
                     </div>
                     {% endfor %}
                   </div>

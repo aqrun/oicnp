@@ -313,6 +313,72 @@ crates/oic-web/
 
 ## 修复记录
 
+### 2024-12-XX - 统一缓存服务：合并渲染逻辑到 CacheService
+
+**修复内容**:
+- ✅ 创建 `src/services/cache.rs` - 统一的缓存服务
+  - 实现 `CacheService` 结构体，封装 `Arc<Cache>` 实例
+  - 提供底层缓存操作：
+    - `get_html_bytes` - 使用底层 `Cache::get` API，返回 `Option<Vec<u8>>`
+    - `set_html_bytes` - 使用底层 `Cache::set_with_ttl` API，接受 `Vec<u8>`
+  - 提供便捷方法：
+    - `get_html` / `set_html` - String 版本的便捷方法
+  - 提供缓存渲染方法：
+    - `get_cached_html_or_render` - 通用的 HTML 缓存渲染
+    - `get_cached_template_or_render` - Askama 模板专用的缓存渲染
+  - 添加 `CacheConfig` 结构体用于配置缓存 TTL（开发/生产环境）
+
+- ✅ 删除 `src/services/render.rs`
+  - 将所有渲染逻辑合并到 `CacheService` 中
+  - 统一在一个 service 中，不需要分开两部分
+
+- ✅ 更新 `src/app.rs`
+  - 创建 `CacheService` 实例并作为 Extension 传递
+  - 从 `Extension<Arc<Cache>>` 改为 `Extension<Arc<CacheService>>`
+
+- ✅ 更新所有 Controllers
+  - `src/controllers/home.rs` - 使用 `cache_service.get_cached_template_or_render()`
+  - `src/controllers/blog.rs` - 使用 `cache_service.get_cached_template_or_render()`
+  - 不再需要导入独立的 render 函数，直接调用 service 方法
+
+**解决的问题**:
+- ✅ 统一服务架构 - 所有缓存相关功能都在 `CacheService` 中
+- ✅ 简化架构 - 不需要分开 cache 和 render 两部分
+- ✅ 去掉泛型问题 - 直接使用 `Vec<u8>`，不需要 `CacheExt` trait
+- ✅ 更符合单一职责 - `CacheService` 负责所有缓存和缓存渲染相关操作
+- ✅ 消除重复代码 - Controller 层代码从 67 行减少到 40 行（home），163 行减少到 94 行（blog）
+
+**技术细节**:
+- `CacheService` 现在包含：
+  - 底层缓存操作：`get_html_bytes`, `set_html_bytes`
+  - 便捷方法：`get_html`, `set_html`
+  - 缓存渲染：`get_cached_html_or_render`, `get_cached_template_or_render`
+- 使用底层 API `Cache::get` 和 `Cache::set_with_ttl`，直接操作 `Vec<u8>`
+- Controller 调用方式：`cache_service.get_cached_template_or_render(...)`
+- 支持自定义缓存配置（可选），自动处理开发/生产环境的 TTL 差异
+
+**相关文件**:
+- `src/services/cache.rs` - **统一缓存服务**（合并了渲染逻辑）
+- `src/services/render.rs` - **已删除**
+- `src/services/mod.rs` - 移除 render 模块导出
+- `src/app.rs` - 创建并传递 CacheService
+- `src/controllers/home.rs` - 使用 `CacheService` 方法
+- `src/controllers/blog.rs` - 使用 `CacheService` 方法
+
+**测试结果**:
+- ✅ 编译通过
+- ✅ 类型检查通过
+- ✅ 代码更简洁统一
+- ✅ 架构更清晰
+
+**备注**:
+- 现在所有缓存相关功能都在 `CacheService` 中，架构更清晰
+- Controller 只需要调用 `cache_service.get_cached_template_or_render()` 即可
+- 未来如果需要其他缓存操作，继续在 `CacheService` 中添加
+- 缓存键格式保持一致：`home:index`, `blog:list`, `blog:list:cat:{cat_vid}`, `blog:detail:{vid}`
+
+---
+
 ### 2024-12-XX - 初始迁移
 
 **修复内容**:

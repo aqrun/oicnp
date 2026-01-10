@@ -1,6 +1,6 @@
 use askama::Template;
 use crate::models::ViteAssets;
-use crate::services::{describe_node_list, NodeListResponse};
+use crate::services::describe_node_list;
 use oic_core::models::nodes::{NodeFilters, NodeDetailModel};
 use std::sync::Arc;
 use std::collections::HashMap;
@@ -11,7 +11,6 @@ use anyhow::Result;
 #[derive(Template)]
 #[template(path = "home.html")]
 pub struct HomeTemplate {
-    pub big_news: Option<NodeDetailModel>,
     pub big_news_category: Option<String>,
     pub big_news_vid: Option<String>,
     pub big_news_title: Option<String>,
@@ -29,6 +28,10 @@ pub struct NewsItem {
     pub vid: Option<String>,
     pub title: Option<String>,
     pub created_at: Option<String>,
+    pub date_year: Option<String>,
+    pub date_month: Option<String>,
+    pub date_day: Option<String>,
+    pub image_index: usize,
 }
 
 #[derive(Clone)]
@@ -66,18 +69,33 @@ pub async fn render_home_index(
     let news_items: Vec<NewsItem> = nodes.iter()
         .skip(1)
         .take(4)
-        .map(|node| {
+        .enumerate()
+        .map(|(idx, node)| {
             let category_name = node.categories.first()
                 .map(|cat| cat.cat_name.clone());
             let category_id = node.categories.first()
                 .map(|cat| cat.cat_id);
+            let created_at_str = node.created_at.format(oic_core::constants::DATE_TIME_FORMAT).to_string();
+            // 解析日期部分：格式为 "YYYY-MM-DD HH:MM:SS"
+            let date_parts: Vec<&str> = created_at_str.split(' ').next()
+                .map(|date_part| date_part.split('-').collect::<Vec<&str>>())
+                .unwrap_or_default();
+            let (date_year, date_month, date_day) = if date_parts.len() >= 3 {
+                (Some(date_parts[0].to_string()), Some(date_parts[1].to_string()), Some(date_parts[2].to_string()))
+            } else {
+                (None, None, None)
+            };
             NewsItem {
                 node: node.clone(),
                 category_name,
                 category_id,
                 vid: Some(node.vid.clone()),
                 title: Some(node.title.clone()),
-                created_at: Some(node.created_at.format(oic_core::constants::DATE_TIME_FORMAT).to_string()),
+                created_at: Some(created_at_str),
+                date_year,
+                date_month,
+                date_day,
+                image_index: idx + 2, // 图片索引从 2 开始（big-news2.jpeg, big-news3.jpeg, ...）
             }
         })
         .collect();
@@ -107,7 +125,6 @@ pub async fn render_home_index(
     let assets: ViteAssets = ManifestChunk::get_assets_by_name(m, "main");
     
     let template = HomeTemplate {
-        big_news,
         big_news_category,
         big_news_vid,
         big_news_title,

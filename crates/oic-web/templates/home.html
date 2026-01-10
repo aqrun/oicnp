@@ -46,7 +46,7 @@
   <section class="oic-header-bg-section mb-6"></section>
 
   <!-- Big News -->
-  {% if big_news %}
+  {% if big_news_title.is_some() %}
   <section class="oic-latest-news-section">
     <div class="layout">
       <div class="grid justify-items-stretch">
@@ -84,8 +84,8 @@
     <div class="layout">
       <div class="oic-news1 max-w-screen-xl mx-auto dark:bg-gray-800 text-gray-100">
         <div class="grid grid-cols-1 gap-4 lg:grid-cols-4 sm:grid-cols-2">
-          {% for (index, item) in news_items.iter().enumerate() %}
-          <div class="relative flex items-end justify-start w-full text-left bg-center bg-cover h-96 bg-gray-500" style="background-image: url('/images/big-news{{ index + 2 }}.jpeg');">
+          {% for item in news_items %}
+          <div class="relative flex items-end justify-start w-full text-left bg-center bg-cover h-96 bg-gray-500" style="background-image: url('/images/big-news{{ item.image_index }}.jpeg');">
             <div class="absolute top-0 bottom-0 left-0 right-0 bg-gradient-to-b via-transparent from-gray-900 to-gray-900"></div>
             <div class="absolute top-0 left-0 right-0 flex items-center justify-between mx-5 mt-3">
               {% if item.category_name.is_some() %}
@@ -95,10 +95,9 @@
               {% endif %}
               {% if item.created_at.is_some() %}
               <div class="flex flex-col justify-start text-center text-gray-100" data-date="{{ item.created_at.as_ref().unwrap() }}">
-                {% set date_parts = item.created_at.as_ref().unwrap().split("-") %}
-                {% if date_parts.len() >= 3 %}
-                <span class="text-3xl font-semibold leadi tracki">{{ date_parts[1] }}/{{ date_parts[2] }}</span>
-                <span class="leadi uppercase">{{ date_parts[0] }}</span>
+                {% if item.date_year.is_some() && item.date_month.is_some() && item.date_day.is_some() %}
+                <span class="text-3xl font-semibold leadi tracki">{{ item.date_month.as_ref().unwrap() }}/{{ item.date_day.as_ref().unwrap() }}</span>
+                <span class="leadi uppercase">{{ item.date_year.as_ref().unwrap() }}</span>
                 {% endif %}
               </div>
               {% endif %}
