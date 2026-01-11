@@ -1,12 +1,12 @@
 use askama::Template;
-use crate::models::ViteAssets;
+use crate::models::{ViteAssets, RenderBytes};
 use crate::services::describe_node_list;
 use oic_core::models::nodes::{NodeFilters, NodeDetailModel};
 use std::sync::Arc;
 use std::collections::HashMap;
 use crate::models::ManifestChunk;
-use crate::models::HtmlTemplate;
 use anyhow::Result;
+use bytes::Bytes;
 
 #[derive(Template)]
 #[template(path = "home.html")]
@@ -47,7 +47,7 @@ pub struct ArticleItem {
 
 pub async fn render_home_index(
     manifest: Arc<HashMap<String, ManifestChunk>>
-) -> Result<HtmlTemplate<HomeTemplate>> {
+) -> Result<Bytes> {
     // 调用 API 获取节点列表
     let mut params = NodeFilters::default();
     params.page = Some(1);
@@ -133,5 +133,7 @@ pub async fn render_home_index(
         article_items,
         assets,
     };
-    Ok(HtmlTemplate(template))
+    
+    // 使用 RenderBytes trait 直接渲染为 Bytes
+    template.render_bytes()
 }

@@ -1,6 +1,6 @@
 use axum::{Router, Extension};
 use anyhow::Result;
-use crate::controllers;
+use crate::{app, controllers};
 use oic_core::app::{create_context, get_environment};
 use tower_http::services::ServeDir;
 use std::sync::Arc;
@@ -11,7 +11,7 @@ use oic_cache::{Cache, CacheConfig};
 pub async fn run() -> Result<()> {
     let environment = get_environment();
     let app_ctx = create_context(&environment).await?;
-
+    
     // 当前目录是工作空间目录
     let current_dir = std::env::current_dir().expect("当前目录获取失败");
     let web_assets_dir = std::env::var("WEB_ASSETS_DIR")

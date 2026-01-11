@@ -1,12 +1,12 @@
 use askama::Template;
-use crate::models::ViteAssets;
+use crate::models::{ViteAssets, RenderBytes};
 use crate::services::{describe_node_list, describe_node_detail};
-use oic_core::models::nodes::{NodeFilters, NodeDetailModel};
+use oic_core::models::nodes::NodeFilters;
 use std::sync::Arc;
 use std::collections::HashMap;
 use crate::models::ManifestChunk;
-use crate::models::HtmlTemplate;
 use anyhow::Result;
+use bytes::Bytes;
 
 #[derive(Clone)]
 pub struct BlogListItem {
@@ -42,7 +42,7 @@ pub struct BlogDetailTemplate {
 pub async fn render_blog_list(
     cat_vid: Option<String>,
     manifest: Arc<HashMap<String, ManifestChunk>>
-) -> Result<HtmlTemplate<BlogListTemplate>> {
+) -> Result<Bytes> {
     let mut params = NodeFilters::default();
     params.page = Some(1);
     params.page_size = Some(10);
@@ -78,13 +78,15 @@ pub async fn render_blog_list(
         nodes,
         assets,
     };
-    Ok(HtmlTemplate(template))
+    
+    // 使用 RenderBytes trait 直接渲染为 Bytes
+    template.render_bytes()
 }
 
 pub async fn render_blog_detail(
     vid: String,
     manifest: Arc<HashMap<String, ManifestChunk>>
-) -> Result<HtmlTemplate<BlogDetailTemplate>> {
+) -> Result<Bytes> {
     let mut params = NodeFilters::default();
     params.vid = Some(vid);
     
@@ -122,6 +124,8 @@ pub async fn render_blog_detail(
         content,
         assets,
     };
-    Ok(HtmlTemplate(template))
+    
+    // 使用 RenderBytes trait 直接渲染为 Bytes
+    template.render_bytes()
 }
 

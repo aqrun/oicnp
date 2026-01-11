@@ -2,18 +2,15 @@ use axum::{
     Router,
     routing::get,
     extract::{Extension, State},
-    response::{IntoResponse, Html},
-    http::StatusCode,
+    response::IntoResponse,
 };
 use oic_core::AppContext;
 use crate::views::render_home_index;
-use crate::services::get_cached_or_render;
-use askama::Template;
+use crate::cached;
 use oic_cache::Cache;
 use std::sync::Arc;
 use std::collections::HashMap;
 use crate::models::ManifestChunk;
-use bytes::Bytes;
 
 // 类型别名，帮助类型推导
 type CacheExtension = Arc<Cache>;
@@ -24,29 +21,7 @@ async fn index(
     Extension(manifest): Extension<ManifestExtension>,
     Extension(cache): Extension<CacheExtension>,
 ) -> impl IntoResponse {
-    let manifest_clone = manifest.clone();
-    
-    match get_cached_or_render(
-        &*cache,
-        "home:index",
-        move || {
-            let manifest = manifest_clone.clone();
-            async move {
-                // 在 controller 层处理模板渲染，转换为 Bytes
-                let template = render_home_index(manifest).await?;
-                let html_string = template.0.render()
-                    .map_err(|e| anyhow::anyhow!("Failed to render template: {}", e))?;
-                Ok(Bytes::from(html_string.into_bytes()))
-            }
-        },
-        None,
-    ).await {
-        Ok(html) => Html(html).into_response(),
-        Err(e) => {
-            eprintln!("Failed to render template: {}", e);
-            (StatusCode::INTERNAL_SERVER_ERROR, format!("Failed to render: {}", e)).into_response()
-        }
-    }
+    cached!(&*cache, "home:index", render_home_index(manifest.clone()))
 }
 
 pub fn home_routes() -> Router<AppContext> {
