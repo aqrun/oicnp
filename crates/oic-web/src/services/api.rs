@@ -1,10 +1,7 @@
 use anyhow::Result;
 use reqwest::Client;
 use serde_json::Value;
-use oic_core::{
-    models::nodes::{NodeFilters, NodeDetailModel},
-    typings::JsonRes,
-};
+use oic_core::models::nodes::{NodeFilters, NodeDetailModel};
 
 /// 获取 API 基础 URL
 fn get_api_base_url() -> String {
@@ -42,18 +39,22 @@ pub async fn describe_node_list(
         .send()
         .await?;
 
-    let json_res: JsonRes<Value> = response.json().await?;
+    let json_value: Value = response.json().await?;
 
-    if !json_res.is_success() {
-        return Err(anyhow::anyhow!(
-            "API error: {}",
-            json_res.get_msg()
-        ));
+    // 检查响应是否成功
+    let code = json_value.get("code")
+        .and_then(|v| v.as_str())
+        .unwrap_or("400");
+    
+    if code != "200" {
+        let message = json_value.get("message")
+            .and_then(|v| v.as_str())
+            .unwrap_or("API error");
+        return Err(anyhow::anyhow!("API error: {}", message));
     }
 
     // 解析响应数据
     // API 返回格式: { "code": "200", "data": { "nodes": [...], "page": 1, "pageSize": 10, "total": 100 }, "message": "success" }
-    let json_value = json_res.to_json();
     let data = json_value.get("data")
         .ok_or_else(|| anyhow::anyhow!("Missing 'data' field in API response"))?;
 
@@ -94,18 +95,22 @@ pub async fn describe_node_detail(
         .send()
         .await?;
 
-    let json_res: JsonRes<Value> = response.json().await?;
+    let json_value: Value = response.json().await?;
 
-    if !json_res.is_success() {
-        return Err(anyhow::anyhow!(
-            "API error: {}",
-            json_res.get_msg()
-        ));
+    // 检查响应是否成功
+    let code = json_value.get("code")
+        .and_then(|v| v.as_str())
+        .unwrap_or("400");
+    
+    if code != "200" {
+        let message = json_value.get("message")
+            .and_then(|v| v.as_str())
+            .unwrap_or("API error");
+        return Err(anyhow::anyhow!("API error: {}", message));
     }
 
     // 解析响应数据
     // API 返回格式: { "code": "200", "data": { "node": {...} }, "message": "success" }
-    let json_value = json_res.to_json();
     let data = json_value.get("data")
         .ok_or_else(|| anyhow::anyhow!("Missing 'data' field in API response"))?;
 

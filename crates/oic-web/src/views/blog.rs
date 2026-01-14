@@ -1,10 +1,7 @@
 use askama::Template;
-use crate::models::{ViteAssets, RenderBytes};
+use crate::models::{AssetFiles, RenderBytes};
 use crate::services::{describe_node_list, describe_node_detail};
 use oic_core::models::nodes::NodeFilters;
-use std::sync::Arc;
-use std::collections::HashMap;
-use crate::models::ManifestChunk;
 use anyhow::Result;
 use bytes::Bytes;
 
@@ -24,7 +21,7 @@ pub struct BlogListTemplate {
     #[allow(dead_code)]
     pub cat_vid: Option<String>,
     pub nodes: Vec<BlogListItem>,
-    pub assets: ViteAssets,
+    pub assets: AssetFiles,
 }
 
 #[derive(Template)]
@@ -36,12 +33,11 @@ pub struct BlogDetailTemplate {
     pub category_name: Option<String>,
     pub created_at: Option<String>,
     pub content: String,
-    pub assets: ViteAssets,
+    pub assets: AssetFiles,
 }
 
 pub async fn render_blog_list(
     cat_vid: Option<String>,
-    manifest: Arc<HashMap<String, ManifestChunk>>
 ) -> Result<Bytes> {
     let mut params = NodeFilters::default();
     params.page = Some(1);
@@ -70,8 +66,7 @@ pub async fn render_blog_list(
         })
         .collect();
     
-    let m: HashMap<String, ManifestChunk> = (*manifest).clone();
-    let assets: ViteAssets = ManifestChunk::get_assets_by_name(m, "main");
+    let assets = AssetFiles::default();
     
     let template = BlogListTemplate {
         cat_vid,
@@ -85,7 +80,6 @@ pub async fn render_blog_list(
 
 pub async fn render_blog_detail(
     vid: String,
-    manifest: Arc<HashMap<String, ManifestChunk>>
 ) -> Result<Bytes> {
     let mut params = NodeFilters::default();
     params.vid = Some(vid);
@@ -112,8 +106,7 @@ pub async fn render_blog_detail(
         .cloned()
         .unwrap_or_default();
     
-    let m: HashMap<String, ManifestChunk> = (*manifest).clone();
-    let assets: ViteAssets = ManifestChunk::get_assets_by_name(m, "main");
+    let assets = AssetFiles::default();
     
     let template = BlogDetailTemplate {
         title,

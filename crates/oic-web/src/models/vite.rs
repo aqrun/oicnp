@@ -214,7 +214,7 @@ impl Default for AssetFiles {
             // Vite dev server 会自动处理模块解析
             // CSS 通过 JS import 加载，不需要单独 <link>
             Self {
-                js_files: vec!["/main.js".to_string()],
+                js_files: vec!["/src/main.js".to_string()],
                 css_files: vec![], // CSS 通过 JS import 加载，不需要单独 <link>
             }
         }
@@ -457,8 +457,10 @@ fn is_static_asset(path: &str) -> bool {
         || path.starts_with("/@vite/")
         || path.starts_with("/node_modules/")
         || path == "/main.js"
+        || path == "/main.ts"
         || path == "/style.css"
         || path.ends_with(".js")
+        || path.ends_with("env.mjs")
         || path.ends_with(".css")
         || path.ends_with(".png")
         || path.ends_with(".jpg")

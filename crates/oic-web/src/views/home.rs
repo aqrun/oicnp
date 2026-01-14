@@ -1,10 +1,7 @@
 use askama::Template;
-use crate::models::{ViteAssets, RenderBytes};
+use crate::models::{AssetFiles, RenderBytes};
 use crate::services::describe_node_list;
 use oic_core::models::nodes::{NodeFilters, NodeDetailModel};
-use std::sync::Arc;
-use std::collections::HashMap;
-use crate::models::ManifestChunk;
 use anyhow::Result;
 use bytes::Bytes;
 
@@ -17,7 +14,7 @@ pub struct HomeTemplate {
     pub big_news_summary: Option<String>,
     pub news_items: Vec<NewsItem>,
     pub article_items: Vec<ArticleItem>,
-    pub assets: ViteAssets,
+    pub assets: AssetFiles,
 }
 
 #[derive(Clone)]
@@ -45,9 +42,7 @@ pub struct ArticleItem {
     pub tags: Vec<String>,
 }
 
-pub async fn render_home_index(
-    manifest: Arc<HashMap<String, ManifestChunk>>
-) -> Result<Bytes> {
+pub async fn render_home_index() -> Result<Bytes> {
     // 调用 API 获取节点列表
     let mut params = NodeFilters::default();
     params.page = Some(1);
@@ -121,8 +116,7 @@ pub async fn render_home_index(
         })
         .collect();
     
-    let m: HashMap<String, ManifestChunk> = (*manifest).clone();
-    let assets: ViteAssets = ManifestChunk::get_assets_by_name(m, "main");
+    let assets = AssetFiles::default();
     
     let template = HomeTemplate {
         big_news_category,

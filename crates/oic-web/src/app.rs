@@ -4,8 +4,7 @@ use crate::controllers;
 use oic_core::app::{create_context, get_environment};
 use tower_http::services::ServeDir;
 use std::sync::Arc;
-use std::collections::HashMap;
-use crate::models::{static_assets_router, ManifestChunk};
+use crate::models::static_assets_router;
 use oic_cache::{Cache, CacheConfig};
 
 #[derive(vite_rs::Embed)]

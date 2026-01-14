@@ -4,7 +4,9 @@
 
 {% block head %}
 <meta name="description" content="IT技术文章列表">
-{{ assets.css|safe }}
+{% for css_file in assets.css_files %}
+<link rel="stylesheet" href="{{ css_file }}" />
+{% endfor %}
 {% endblock %}
 
 {% block content %}
@@ -122,6 +124,8 @@
 {% endblock %}
 
 {% block scripts %}
-{{ assets.js|safe }}
+{% for js_file in assets.js_files %}
+<script type="module" src="{{ js_file }}"></script>
+{% endfor %}
 {% endblock %}
 
