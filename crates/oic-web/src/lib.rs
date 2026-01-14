@@ -4,3 +4,4 @@ mod controllers;
 mod models;
 mod views;
 mod services;
+mod consts;

@@ -2,11 +2,11 @@ use axum::{
     Router,
     routing::get,
     extract::{Extension, State},
-    response::IntoResponse,
+    response::{Html, IntoResponse},
 };
 use oic_core::AppContext;
 use crate::views::render_home_index;
-use crate::cached;
+use crate::{cached, consts::HANDLER_CACHE_TIME};
 use oic_cache::Cache;
 use std::sync::Arc;
 use std::collections::HashMap;
@@ -21,7 +21,14 @@ async fn index(
     Extension(manifest): Extension<ManifestExtension>,
     Extension(cache): Extension<CacheExtension>,
 ) -> impl IntoResponse {
-    cached!(&*cache, "home:index", render_home_index(manifest.clone()))
+    // let res = render_home_index(manifest.clone()).await.expect("渲染首页失败");
+    // return Html(res).into_response();
+    cached!(
+        &*cache,
+        "home:index",
+        render_home_index(manifest.clone()),
+        HANDLER_CACHE_TIME
+    )
 }
 
 pub fn home_routes() -> Router<AppContext> {

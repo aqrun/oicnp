@@ -4,6 +4,8 @@ use axum::{
     response::{Html, IntoResponse, Response},
 };
 use crate::models::HtmlTemplate;
+#[allow(unused_imports)]
+use tracing::error;
 
 #[derive(Template)]
 #[template(path = "error.html")]
@@ -99,15 +101,37 @@ pub fn fallback_error_response(status_code: StatusCode) -> impl IntoResponse {
 
 /// 统一的错误处理函数
 pub async fn handle_error(status_code: StatusCode, error: anyhow::Error) -> Response {
-    eprintln!("Application error ({}): {}", status_code, error);
+    // 使用 tracing 记录错误
+    error!(status = %status_code, error = %error, "Application error occurred");
+    
+    // 开发模式下输出详细错误信息
+    #[cfg(debug_assertions)]
+    {
+        eprintln!("\n⚠️  APPLICATION ERROR");
+        eprintln!("   Status: {}", status_code);
+        eprintln!("   Error: {}", error);
+        // 显示错误链
+        for cause in error.chain().skip(1) {
+            eprintln!("   Caused by: {}", cause);
+        }
+        // 显示完整的调试信息（包括 backtrace，如果可用）
+        eprintln!("   Debug info:\n{:?}", error);
+        eprintln!();
+    }
     
     match render_error_page(status_code).await {
         Ok(error_template) => {
             match error_template.0.render() {
                 Ok(html) => (status_code, Html(html)).into_response(),
-                Err(_) => fallback_error_response(status_code).into_response(),
+                Err(e) => {
+                    error!("Failed to render error template: {}", e);
+                    fallback_error_response(status_code).into_response()
+                }
             }
         }
-        Err(_) => fallback_error_response(status_code).into_response(),
+        Err(e) => {
+            error!("Failed to create error template: {}", e);
+            fallback_error_response(status_code).into_response()
+        }
     }
 }

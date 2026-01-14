@@ -80,6 +80,9 @@ where
 /// 该宏简化 `get_cached_or_render` 的调用，减少代码冗余。
 /// 宏直接返回 `Response`，包含错误处理逻辑。
 /// 
+/// **开发模式行为**：在开发模式下不使用缓存，直接渲染以便快速发现错误。
+/// **生产模式行为**：使用缓存提高性能。
+/// 
 /// # 使用示例
 /// 
 /// ```rust
@@ -96,37 +99,101 @@ where
 #[macro_export]
 macro_rules! cached {
     ($cache:expr, $key:expr, $render:expr) => {{
-        match crate::services::get_cached_or_render(
-            $cache,
-            $key,
-            move || async move { $render.await },
-            None,
-        ).await {
-            Ok(bytes) => axum::response::Html(bytes).into_response(),
-            Err(e) => crate::views::handle_error(
-                axum::http::StatusCode::INTERNAL_SERVER_ERROR,
-                e
-            ).await,
+        // 开发模式：不使用缓存，直接渲染以便快速发现错误
+        #[cfg(debug_assertions)]
+        {
+            match $render.await {
+                Ok(bytes) => axum::response::Html(bytes).into_response(),
+                Err(e) => {
+                    // 使用 tracing 记录错误
+                    tracing::error!(key = $key, error = %e, "Render failed in development mode");
+                    
+                    // 输出详细的错误信息到控制台
+                    eprintln!("\n❌ RENDER ERROR [{}]", $key);
+                    eprintln!("   Error: {}", e);
+                    // 显示错误链
+                    for cause in e.chain().skip(1) {
+                        eprintln!("   Caused by: {}", cause);
+                    }
+                    // 显示完整的调试信息（包括 backtrace，如果可用）
+                    eprintln!("   Debug info:\n{:?}", e);
+                    eprintln!();
+                    
+                    crate::views::handle_error(
+                        axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+                        e
+                    ).await
+                }
+            }
+        }
+        
+        // 生产模式：使用缓存
+        #[cfg(not(debug_assertions))]
+        {
+            match crate::services::get_cached_or_render(
+                $cache,
+                $key,
+                move || async move { $render.await },
+                None,
+            ).await {
+                Ok(bytes) => axum::response::Html(bytes).into_response(),
+                Err(e) => crate::views::handle_error(
+                    axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+                    e
+                ).await,
+            }
         }
     }};
     
     // 支持自定义 TTL
     ($cache:expr, $key:expr, $render:expr, $ttl:expr) => {{
-        let config = crate::services::CacheConfig {
-            dev_ttl: $ttl,
-            prod_ttl: $ttl,
-        };
-        match crate::services::get_cached_or_render(
-            $cache,
-            $key,
-            move || async move { $render.await },
-            Some(config),
-        ).await {
-            Ok(bytes) => axum::response::Html(bytes).into_response(),
-            Err(e) => crate::views::handle_error(
-                axum::http::StatusCode::INTERNAL_SERVER_ERROR,
-                e
-            ).await,
+        // 开发模式：不使用缓存，直接渲染以便快速发现错误
+        #[cfg(debug_assertions)]
+        {
+            match $render.await {
+                Ok(bytes) => axum::response::Html(bytes).into_response(),
+                Err(e) => {
+                    // 使用 tracing 记录错误
+                    tracing::error!(key = $key, ttl = $ttl, error = %e, "Render failed in development mode");
+                    
+                    // 输出详细的错误信息到控制台
+                    eprintln!("\n❌ RENDER ERROR [{}] (TTL: {})", $key, $ttl);
+                    eprintln!("   Error: {}", e);
+                    // 显示错误链
+                    for cause in e.chain().skip(1) {
+                        eprintln!("   Caused by: {}", cause);
+                    }
+                    // 显示完整的调试信息（包括 backtrace，如果可用）
+                    eprintln!("   Debug info:\n{:?}", e);
+                    eprintln!();
+                    
+                    crate::views::handle_error(
+                        axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+                        e
+                    ).await
+                }
+            }
+        }
+        
+        // 生产模式：使用缓存
+        #[cfg(not(debug_assertions))]
+        {
+            let config = crate::services::CacheConfig {
+                dev_ttl: $ttl,
+                prod_ttl: $ttl,
+            };
+            match crate::services::get_cached_or_render(
+                $cache,
+                $key,
+                move || async move { $render.await },
+                Some(config),
+            ).await {
+                Ok(bytes) => axum::response::Html(bytes).into_response(),
+                Err(e) => crate::views::handle_error(
+                    axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+                    e
+                ).await,
+            }
         }
     }};
 }
