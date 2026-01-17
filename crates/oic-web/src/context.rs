@@ -2,8 +2,10 @@ use std::sync::Arc;
 use serde::{Deserialize, Serialize};
 use anyhow::Result;
 use oic_cache::{Cache, CacheConfig};
+use crate::models::SiteConfig;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[serde(default)]
 pub struct WebConfig {
     pub host: String,
     pub port: u16,
@@ -11,19 +13,7 @@ pub struct WebConfig {
     pub default_cache_seconds: u64,
     pub dev_cache_seconds: u64,
     pub api_url: String,
-}
-
-impl Default for WebConfig {
-  fn default() -> Self {
-    Self {
-      host: "0.0.0.0".to_string(),
-      port: 9003,
-      public_dir: "public".to_string(),
-      default_cache_seconds: 3600,
-      dev_cache_seconds: 1,
-      api_url: "http://localhost:5150".to_string(),
-    }
-  }
+    pub site: SiteConfig,
 }
 
 /// Web 应用的上下文

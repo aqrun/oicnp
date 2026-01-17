@@ -1,0 +1,14 @@
+
+<script>
+  (function() {
+    try {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          document.documentElement.classList.add('loaded');
+        });
+      } else {
+        document.documentElement.classList.add('loaded');
+      }
+    } catch (e) {}
+  })();
+</script>

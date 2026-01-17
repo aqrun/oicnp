@@ -1,0 +1,36 @@
+{% import "macros/main-macros.html" as main %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}灵犀纪{% endblock %}</title>
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    {% include "widgets/dom-loading.html" %}
+
+    <main>
+      {{ main::header() }}
+      <!-- 首页内容布局 -->
+      {% block layout_content %}{% endblock %}
+      
+      <!-- Article List -->
+      <section class="bg-white">
+        <div class="layout py-12 flex flex-col lg:flex-row gap-8">
+          <div class="home-layout-content-w flex flex-col lg:w-[calc(100% - 22rem)]">
+            {% block content %}{% endblock %}
+          </div>
+          <aside class="lg:w-80 lg:min-w-80">
+            <!-- Sidebar placeholder -->
+            {% block sidebar %}{% endblock %}
+          </aside>
+        </div>
+      </section>
+    
+      {{ main::footer() }}
+    </main>
+    
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

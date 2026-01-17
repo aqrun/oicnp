@@ -1,0 +1,84 @@
+{% import "macros/main-macros.html" as main %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}灵犀纪{% endblock %}</title>
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    {% include "widgets/dom-loading.html" %}
+
+    <main>
+      {{ main::header() }}
+      <!-- 首页内容布局 -->
+      {% block layout_content %}{% endblock %}
+      
+    
+      <!-- Article List -->
+      <section class="bg-white">
+        <div class="layout">
+          {% block content_top %}{% endblock %}
+          {% block content %}{% endblock %}
+          {% block content_bottom %}{% endblock %}
+        </div>
+        <div class="layout py-12 flex flex-col lg:flex-row gap-8">
+          <div class="home-layout-content-w flex flex-col lg:w-[calc(100% - 22rem)]">
+            <div class="relative flex flex-wrap flex-row gap-2">
+              {% for item in article_items %}
+              <div class="w-full">
+                <div class="overflow-hidden rounded-lg hover:shadow-lg hover:shadow-violet-100 hover:border-violet-400 cursor-pointer border border-slate-200 border-solid">
+                  <a href="/p/{{ item.vid.as_ref().unwrap_or(&"".to_string()) }}" class="block w-full h-full md:flex">
+                    <div class="w-full p-4 bg-white dark:bg-gray-800">
+                      <p class="font-light text-gray-400 text-md">
+                        <i class="iconfont icon-benshubook122 mr-1"></i>
+                        {% if item.category_name.is_some() %}
+                        {{ item.category_name.as_ref().unwrap() }}
+                        {% endif %}
+                        {% if item.created_at.is_some() %}
+                        &nbsp;
+                        <span class="ml-2 text-gray-400 font-light">
+                          <i class="iconfont icon-date mr-1"></i>
+                          {{ item.created_at.as_ref().unwrap() }}
+                        </span>
+                        {% endif %}
+                      </p>
+                      <p class="mb-2 text-xl font-medium text-gray-800 dark:text-white">
+                        {{ item.title.as_ref().unwrap_or(&"".to_string()) }}
+                      </p>
+                      <p class="font-light text-gray-400 dark:text-gray-300 text-md">
+                        {{ item.summary.as_ref().unwrap_or(&"".to_string()) }}
+                      </p>
+                      {% if item.tags.len() > 0 %}
+                      <div class="flex flex-wrap items-center mt-4 justify-starts">
+                        {% for tag in item.tags %}
+                        <div class="mb-1 text-xs mr-2 py-1.5 px-4 text-gray-600 bg-blue-100 rounded-2xl">
+                          {{ tag }}
+                        </div>
+                        {% endfor %}
+                      </div>
+                      {% endif %}
+                    </div>
+                  </a>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="lg:w-80 lg:min-w-80">
+            <!-- Sidebar placeholder -->
+            <aside class="lg:w-80">
+              <!-- Sidebar content will be added later -->
+            </aside>
+          </div>
+        </div>
+      </section>
+    
+      {{ main::footer() }}
+    </main>
+    
+    {% block content %}<p>Placeholder content</p>{% endblock %}
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

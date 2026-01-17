@@ -1,5 +1,11 @@
 use anyhow::Result;
-use oic_core::models::nodes::{NodeFilters, NodeDetailModel};
+use oic_core::{
+    models::{
+        nodes::{NodeFilters, NodeDetailModel},
+        tags::TagFilters,
+    },
+    entities::prelude::*,
+};
 use oic_core::typings::JsonRes;
 use super::{call_api, parse_list_response, parse_single_response};
 use crate::WebAppContext;
@@ -24,3 +30,11 @@ pub async fn describe_node_detail(
     parse_single_response(json_value, "node")
 }
 
+pub async fn describe_tag_list(
+    ctx: &WebAppContext,
+    params: &TagFilters,
+) -> Result<JsonRes<Vec<TagModel>>> {
+    let url = format!("{}/v1/tag/list", ctx.config.api_url);
+    let json_value = call_api::<TagFilters>(&url, params).await?;
+    parse_list_response(json_value, "tags")
+}

@@ -31,3 +31,4 @@ bytes = { workspace = true }
 tracing = { workspace = true }
 vite-rs = { workspace = true }
 vite-rs-axum-0-8 = { workspace = true }
+chrono = { workspace = true }

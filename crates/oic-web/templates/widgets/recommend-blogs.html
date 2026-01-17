@@ -1,0 +1,37 @@
+{% extends "widgets/base.html" %}
+
+{% block content %}
+  <div class="w-full">
+    {% set show_thumb = false %}
+    {% for node in nodes %}
+      <a
+        href="/p/{{ node.vid }}"
+        class='hover:text-primary transition-colors flex items-center gap-2 mb-2 text-sm'
+      >
+        {% if show_thumb %}
+          <span
+            class="lx-img-w bg-gray-100 rounded-md p-2 flex items-center
+              justify-center h-12 w-12 border border-gray-200"
+          >
+            <img
+              src={''}
+              alt={node?.title || ''}
+              width="48px"
+              height="48px"
+              class='w-full h-full object-cover'
+            />
+          </span>
+        {% endif %}
+
+        <span class="flex flex-col flex-1 justify-between">
+          <span>
+            {{ node.title }}
+          </span>
+          <span class="text-xs text-gray-400">
+            {{ node.created_at }}
+          </span>
+        </span>
+      </a>
+    {% endfor %}
+  </div>
+{% endblock %}

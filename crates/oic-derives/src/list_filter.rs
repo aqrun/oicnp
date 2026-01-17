@@ -70,22 +70,23 @@ pub(crate) fn add_filter_fields(input: &mut DeriveInput) -> TokenStream {
 
                     let page_size_token: TokenStream = if has_deserialize {
                         quote! {
-                            #[serde(rename(deserialize = "pageSize"))]
+                            #[serde(rename(deserialize = "pageSize", serialize = "pageSize"))]
                             pub page_size: std::option::Option<u64>
                         }
                     } else {
                         quote! {
+                            #[serde(rename(deserialize = "pageSize", serialize = "pageSize"))]
                             pub page_size: std::option::Option<u64>
                         }
                     };
                     let order_by_token = if has_deserialize {
                         quote! {
-                            #[serde(rename(deserialize = "orderBy"))]
+                            #[serde(rename(deserialize = "orderBy", serialize = "orderBy"))]
                             pub order_by: std::option::Option<String>
                         }
                     } else {
                         quote! {
-                            pub order_by: std::option::Option<String>
+                            pub order: std::option::Option<String>
                         }
                     };
 

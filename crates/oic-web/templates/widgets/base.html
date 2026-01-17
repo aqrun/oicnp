@@ -1,0 +1,17 @@
+{# 基础组件模板 #}
+<div
+  id="{{ id }}"
+  class="side-bar-widget pb-4 card-base border border-slate-200 mb-4 rounded-lg hover:shadow-md
+  {% if class.len() > 0 %} {{ class }} {% endif %}"
+>
+  <div
+    class="transition before:absolute before:bg-[var(--primary)] 
+      before:rounded-md before:w-1 font-bold before:h-4 dark:text-neutral-100 relative 
+      text-lg text-neutral-900 before:left-[-16px] before:top-[8.5px] mb-2 ml-8 mt-4"
+    >
+    {{ title }}
+  </div>
+  <div class="overflow-hidden collapse-wrapper px-4">
+    {% block content %} Widget Content {% endblock %}
+  </div>
+</div>

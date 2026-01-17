@@ -1,0 +1,23 @@
+{% extends "widgets/base.html" %}
+
+{% block content %}
+  <div class="w-full overflow-hidden collapse-wrapper">
+    <div class="flex flex-wrap">
+      {% for tag in tags %}
+        <a
+          href="/tag/{{ tag.tag_vid }}"
+          class="text-sm w-[33.33%] text-[#333] block mb-[8px] break-all"
+          title="{{ tag.tag_name }}"
+        >
+          <span class="lx-tags-item truncate mx-[4px] block rounded-sm
+            text-center border border-solid border-gray-200 
+            px-[8px] h-[34px] leading-[34px]
+            "
+          >
+            {{ tag.tag_name }}
+          </span>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

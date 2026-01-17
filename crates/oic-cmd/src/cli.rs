@@ -66,7 +66,7 @@ pub enum PoetryCommand {
 pub async fn init_cmd() {
     dotenv::dotenv().ok();
     let environment = get_environment();
-    let app_ctx = create_context(&environment).await.expect("Context 创建失败");
+    let app_ctx = create_context(&environment).await.expect("oic-cmd]Context 创建失败");
 
     logger::init(&app_ctx.config.logger).expect("Logger 初始化失败");
     let task_span = create_root_span(&environment);

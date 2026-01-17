@@ -18,24 +18,23 @@ pub async fn run() -> Result<()> {
     #[cfg(debug_assertions)]
     tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
     let vite_serve = vite_rs_axum_0_8::ViteServe::new(Assets::boxed());
-    
-    // 当前目录是工作空间目录
-    let current_dir = std::env::current_dir().expect("当前目录获取失败");
-    let web_assets_dir = std::env::var("WEB_ASSETS_DIR")
-        .expect("WEB_ASSETS_DIR 环境变量未设置");
+
+    // 静态资源目录
+    let web_assets_dir = app_ctx.config.public_dir.as_str();
+    // 监听地址
+    let addr = format!("{}:{}", app_ctx.config.host.as_str(), app_ctx.config.port);
 
     let app = Router::new()
         .merge(controllers::home_routes())
         .merge(controllers::blog_routes())
-        // 静态资源路由配置
+        // 内联资源
         .merge(static_assets_router(vite_serve))
-        .nest_service("/public", ServeDir::new(
-            current_dir.join(web_assets_dir.as_str()).to_string_lossy().to_string())
-        )
+        // 静态资源路由配置
+        .nest_service("/public", ServeDir::new(web_assets_dir))
         .with_state(app_ctx);
 
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:9003").await.unwrap();
-    println!("API 服务启动 {}", listener.local_addr().unwrap());
+    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+    tracing::info!("Web 服务启动 {}", listener.local_addr().unwrap());
     axum::serve(listener, app).await.unwrap();
 
     Ok(())

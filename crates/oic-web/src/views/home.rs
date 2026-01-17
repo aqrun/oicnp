@@ -8,10 +8,13 @@ use oic_core::{
 };
 use anyhow::Result;
 use bytes::Bytes;
+use super::{CalendarWidget, RecommendBlogsWidget, RecommendTagsWidget};
 
 #[derive(Template)]
 #[template(path = "home.html")]
 pub struct HomeTemplate {
+    pub ctx: WebAppContext,
+    pub menu_vid: String,
     pub big_news_category: Option<String>,
     pub big_news_vid: Option<String>,
     pub big_news_title: Option<String>,
@@ -19,6 +22,7 @@ pub struct HomeTemplate {
     pub news_items: Vec<NewsItem>,
     pub article_items: Vec<ArticleItem>,
     pub assets: AssetFiles,
+    pub side_widgets: Vec<String>,
 }
 
 #[derive(Clone)]
@@ -130,6 +134,8 @@ pub async fn render_home_index(ctx: &WebAppContext) -> Result<Bytes> {
     let assets = AssetFiles::default();
     
     let template = HomeTemplate {
+        ctx: ctx.clone(),
+        menu_vid: String::from("home"),
         big_news_category,
         big_news_vid,
         big_news_title,
@@ -137,6 +143,11 @@ pub async fn render_home_index(ctx: &WebAppContext) -> Result<Bytes> {
         news_items,
         article_items,
         assets,
+        side_widgets: vec![
+            CalendarWidget::default().get_html(ctx).await,
+            RecommendBlogsWidget::init(ctx).await.get_html(ctx).await,
+            RecommendTagsWidget::init(ctx).await.get_html(ctx).await,
+        ],
     };
     
     // 使用 RenderBytes trait 直接渲染为 Bytes
