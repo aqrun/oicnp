@@ -1,27 +1,20 @@
 use axum::{
     Router,
     routing::get,
-    extract::{Extension, State, Path},
+    extract::{State, Path},
     response::IntoResponse,
 };
-use oic_core::AppContext;
 use crate::views::{render_blog_list, render_blog_detail};
-use crate::{cached, consts::HANDLER_CACHE_TIME};
-use oic_cache::Cache;
-use std::sync::Arc;
-
-// 类型别名，帮助类型推导
-type CacheExtension = Arc<Cache>;
+use crate::{cached, consts::HANDLER_CACHE_TIME, WebAppContext};
 
 /// 博客列表页
 async fn blog_list(
-    State(_ctx): State<AppContext>,
-    Extension(cache): Extension<CacheExtension>,
+    State(ctx): State<WebAppContext>,
 ) -> impl IntoResponse {
     cached!(
-        &*cache,
+        &ctx.cache,
         "blog:list",
-        render_blog_list(None),
+        render_blog_list(&ctx, None),
         HANDLER_CACHE_TIME
     )
 }
@@ -29,14 +22,13 @@ async fn blog_list(
 /// 分类博客列表页
 async fn blog_list_by_category(
     Path(cat_vid): Path<String>,
-    State(_ctx): State<AppContext>,
-    Extension(cache): Extension<CacheExtension>,
+    State(ctx): State<WebAppContext>,
 ) -> impl IntoResponse {
     let cache_key = format!("blog:list:cat:{}", cat_vid);
     cached!(
-        &*cache,
+        &ctx.cache,
         &cache_key,
-        render_blog_list(Some(cat_vid.clone())),
+        render_blog_list(&ctx, Some(cat_vid.clone())),
         HANDLER_CACHE_TIME
     )
 }
@@ -44,19 +36,18 @@ async fn blog_list_by_category(
 /// 博客详情页
 async fn blog_detail(
     Path(vid): Path<String>,
-    State(_ctx): State<AppContext>,
-    Extension(cache): Extension<CacheExtension>,
+    State(ctx): State<WebAppContext>,
 ) -> impl IntoResponse {
     let cache_key = format!("blog:detail:{}", vid);
     cached!(
-        &*cache,
+        &ctx.cache,
         &cache_key,
-        render_blog_detail(vid.clone()),
+        render_blog_detail(&ctx, vid.clone()),
         HANDLER_CACHE_TIME
     )
 }
 
-pub fn blog_routes() -> Router<AppContext> {
+pub fn blog_routes() -> Router<WebAppContext> {
     Router::new()
         .route("/blog/", get(blog_list))
         .route("/cat/{cat_vid}/", get(blog_list_by_category))

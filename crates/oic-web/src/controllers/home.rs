@@ -1,31 +1,24 @@
 use axum::{
     Router,
     routing::get,
-    extract::{Extension, State},
+    extract::State,
     response::IntoResponse,
 };
-use oic_core::AppContext;
 use crate::views::render_home_index;
-use crate::{cached, consts::HANDLER_CACHE_TIME};
-use oic_cache::Cache;
-use std::sync::Arc;
-
-// 类型别名，帮助类型推导
-type CacheExtension = Arc<Cache>;
+use crate::{cached, consts::HANDLER_CACHE_TIME, WebAppContext};
 
 async fn index(
-    State(_ctx): State<AppContext>,
-    Extension(cache): Extension<CacheExtension>,
+    State(ctx): State<WebAppContext>,
 ) -> impl IntoResponse {
     cached!(
-        &*cache,
+        &ctx.cache,
         "home:index",
-        render_home_index(),
+        render_home_index(&ctx),
         HANDLER_CACHE_TIME
     )
 }
 
-pub fn home_routes() -> Router<AppContext> {
+pub fn home_routes() -> Router<WebAppContext> {
     Router::new()
         //  "/" 与所有路由冲突
         .route("/", get(index))

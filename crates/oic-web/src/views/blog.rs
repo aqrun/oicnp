@@ -1,7 +1,11 @@
 use askama::Template;
 use crate::models::{AssetFiles, RenderBytes};
 use crate::services::{describe_node_list, describe_node_detail};
-use oic_core::models::nodes::NodeFilters;
+use oic_core::{
+    models::nodes::NodeFilters,
+    typings::JsonResPayload,
+};
+use crate::WebAppContext;
 use anyhow::Result;
 use bytes::Bytes;
 
@@ -37,6 +41,7 @@ pub struct BlogDetailTemplate {
 }
 
 pub async fn render_blog_list(
+    ctx: &WebAppContext,
     cat_vid: Option<String>,
 ) -> Result<Bytes> {
     let mut params = NodeFilters::default();
@@ -44,8 +49,15 @@ pub async fn render_blog_list(
     params.page_size = Some(10);
     params.category_vids = cat_vid.clone();
     
-    let response = describe_node_list(params).await?;
-    let node_models = response.nodes;
+    let json_res = describe_node_list(ctx, params).await?;
+    
+    // 从 JsonRes 中提取节点列表
+    let node_models = match json_res.data {
+        JsonResPayload::ListData { data, .. } => data,
+        _ => {
+            return Err(anyhow::anyhow!("Failed to get nodes from API response"));
+        }
+    };
     
     // Convert NodeDetailModel to BlogListItem
     let nodes: Vec<BlogListItem> = node_models.iter()
@@ -79,12 +91,19 @@ pub async fn render_blog_list(
 }
 
 pub async fn render_blog_detail(
+    ctx: &WebAppContext,
     vid: String,
 ) -> Result<Bytes> {
     let mut params = NodeFilters::default();
     params.vid = Some(vid);
     
-    let node = describe_node_detail(params).await?;
+    let json_res = describe_node_detail(ctx, params).await?;
+    
+    // 从 JsonRes 中提取节点
+    let node = match json_res.data {
+        JsonResPayload::Data(node) => Some(node),
+        _ => None,
+    };
     
     // 提取节点字段
     let title = node.as_ref().map(|n| n.title.clone());

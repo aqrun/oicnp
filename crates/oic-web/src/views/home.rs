@@ -1,7 +1,11 @@
 use askama::Template;
 use crate::models::{AssetFiles, RenderBytes};
 use crate::services::describe_node_list;
-use oic_core::models::nodes::{NodeFilters, NodeDetailModel};
+use crate::WebAppContext;
+use oic_core::{
+    models::nodes::{NodeFilters, NodeDetailModel},
+    typings::JsonResPayload,
+};
 use anyhow::Result;
 use bytes::Bytes;
 
@@ -42,14 +46,21 @@ pub struct ArticleItem {
     pub tags: Vec<String>,
 }
 
-pub async fn render_home_index() -> Result<Bytes> {
+pub async fn render_home_index(ctx: &WebAppContext) -> Result<Bytes> {
     // 调用 API 获取节点列表
     let mut params = NodeFilters::default();
     params.page = Some(1);
     params.page_size = Some(11);
     
-    let response = describe_node_list(params).await?;
-    let nodes = response.nodes;
+    let json_res = describe_node_list(ctx, params).await?;
+    
+    // 从 JsonRes 中提取节点列表
+    let nodes = match json_res.data {
+        JsonResPayload::ListData { data, .. } => data,
+        _ => {
+            return Err(anyhow::anyhow!("Failed to get nodes from API response"));
+        }
+    };
     
     // 第一个作为大新闻
     let big_news = nodes.first().cloned();

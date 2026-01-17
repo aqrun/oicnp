@@ -102,6 +102,14 @@ macro_rules! cached {
         // 开发模式：不使用缓存，直接渲染以便快速发现错误
         #[cfg(debug_assertions)]
         {
+            let _ = &$cache;
+            let _ = crate::services::get_cached_or_render(
+                $cache,
+                "dev:none",
+                move || async move { Ok(bytes::Bytes::from("")) },
+                None,
+            ).await;
+            
             match $render.await {
                 Ok(bytes) => axum::response::Html(bytes).into_response(),
                 Err(e) => {
@@ -150,6 +158,14 @@ macro_rules! cached {
         // 开发模式：不使用缓存，直接渲染以便快速发现错误
         #[cfg(debug_assertions)]
         {
+            let _ = &$cache;
+            let _ = crate::services::get_cached_or_render(
+                $cache,
+                "dev:none",
+                move || async move { Ok(bytes::Bytes::from("")) },
+                None,
+            ).await;
+
             match $render.await {
                 Ok(bytes) => axum::response::Html(bytes).into_response(),
                 Err(e) => {

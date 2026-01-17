@@ -140,7 +140,7 @@ use axum::{
 #[cfg(debug_assertions)]
 use axum::routing::any;
 use vite_rs_axum_0_8::ViteServe;
-use oic_core::AppContext;
+use crate::WebAppContext;
 
 // Vite Manifest 结构（根据 Vite 官方文档）
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
@@ -531,7 +531,7 @@ async fn handle_static_assets(
 ///
 /// - 此路由应该放在所有其他路由**之后**，作为最后的 fallback
 /// - Debug 模式下会使用 `/{*path}` 通配路由，但会智能判断是否为静态资源
-pub fn static_assets_router(vite_serve: ViteServe) -> Router<AppContext> {
+pub fn static_assets_router(vite_serve: ViteServe) -> Router<WebAppContext> {
     #[cfg(debug_assertions)]
     {
         // Debug 模式：使用智能处理器，只处理静态资源请求

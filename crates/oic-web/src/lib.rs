@@ -5,3 +5,6 @@ mod models;
 mod views;
 mod services;
 mod consts;
+mod context;
+
+use context::WebAppContext;
