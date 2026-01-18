@@ -1,0 +1,36 @@
+#side-bar-recommend-tags {
+  a {
+    &:hover {
+      .lx-tags-item {
+        border-color: var(--primary);
+        background-color: var(--color-very-light-purple);
+        color: var(--primary);
+      }
+    }
+    &:nth-child(3n+3) {
+      .lx-tags-item {
+        margin-right: 0;
+      }
+    }
+    &:nth-child(3n+1) {
+      .lx-tags-item {
+        margin-left: 0;
+      }
+    }
+  }
+}
+
+.side-nav-list {
+  .side-nav-item {
+    &.active {
+      a {
+        color: var(--primary);
+        background-color: var(--color-very-light-purple);
+        font-weight: 500;
+        border-left-color: var(--primary);
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+    }
+  }
+}

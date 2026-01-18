@@ -1,6 +1,7 @@
 import '@vitejs/plugin-react-swc/preamble';
 import { renderMonthCalendar } from './components/MonthCalendar';
 import './style.css';
+import './style.less';
 
 interface ILx {
   renderMonthCalendar: typeof renderMonthCalendar;

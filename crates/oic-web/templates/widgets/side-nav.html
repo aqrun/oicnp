@@ -1,0 +1,19 @@
+<ul
+  class="side-nav-list flex flex-row lg:flex lg:flex-col flex-wrap"
+>
+  {% for item in categories %}
+    <li
+      class="side-nav-item {% if item.vid == active_vid %}active{% endif %}"
+    >
+      <a
+        href="{{ item.href }}"
+        class="block px-[17px] py-[10px] rounded-[4px]
+          border-l-[3px] border-solid border-transparent"
+      >
+        <span class="item-name">
+          {{ item.name }}
+        </span>
+      </a>
+    </li>
+  {% endfor %}
+</ul>

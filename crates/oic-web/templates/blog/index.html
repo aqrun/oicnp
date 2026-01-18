@@ -19,6 +19,10 @@
 ) }}
 {% endblock %}
 
+{% block sidebar_left %}
+  {{ side_nav | safe }}
+{% endblock %}
+
 {% block content %}
   <div class="relative flex flex-wrap flex-row gap-2">
     {% for item in nodes %}

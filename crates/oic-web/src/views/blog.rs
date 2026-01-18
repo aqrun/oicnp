@@ -1,5 +1,5 @@
 use askama::Template;
-use crate::models::{AssetFiles, RenderBytes};
+use crate::models::{AssetFiles, RenderBytes, BLOG_CATEGORIES};
 use crate::services::{describe_node_list, describe_node_detail};
 use oic_core::{
     models::nodes::{NodeFilters, NodeDetailModel},
@@ -8,16 +8,16 @@ use oic_core::{
 use crate::WebAppContext;
 use anyhow::Result;
 use bytes::Bytes;
-use super::{CalendarWidget, RecommendBlogsWidget, RecommendTagsWidget};
+use super::{CalendarWidget, RecommendBlogsWidget, RecommendTagsWidget, SideNavWidget};
 
 #[derive(Template)]
 #[template(path = "blog/index.html")]
 pub struct BlogListTemplate {
     pub ctx: WebAppContext,
     pub menu_vid: String,
-    pub cat_vid: Option<String>,
     pub nodes: Vec<NodeDetailModel>,
     pub assets: AssetFiles,
+    pub side_nav: String,
     pub side_widgets: Vec<String>,
 }
 
@@ -43,7 +43,7 @@ pub async fn render_blog_list(
         category_vids: cat_vid.clone(),
         ..Default::default()
     };
-    
+
     let json_res = describe_node_list(ctx, node_filters).await?;
     
     // 从 JsonRes 中提取节点列表
@@ -54,7 +54,12 @@ pub async fn render_blog_list(
             vec![]
         }
     };
-    
+
+    let side_nav = SideNavWidget {
+        key: "blog".to_string(),
+        active_vid: cat_vid.clone().unwrap_or(String::from("all")),
+        categories: BLOG_CATEGORIES.clone(),
+    }.get_html(ctx).await;
     let side_widgets = vec![
         CalendarWidget::default().get_html(ctx).await,
         RecommendBlogsWidget::init(ctx).await.get_html(ctx).await,
@@ -64,9 +69,9 @@ pub async fn render_blog_list(
     let template = BlogListTemplate {
         ctx: ctx.clone(),
         menu_vid: String::from("blog"),
-        cat_vid,
         nodes,
         assets,
+        side_nav,
         side_widgets,
     };
     

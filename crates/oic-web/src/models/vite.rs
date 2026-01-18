@@ -465,6 +465,7 @@ fn is_static_asset(path: &str) -> bool {
         || path.ends_with(".tsx")
         || path.ends_with("env.mjs")
         || path.ends_with(".css")
+        || path.ends_with(".less")
         || path.ends_with(".png")
         || path.ends_with(".jpg")
         || path.ends_with(".jpeg")

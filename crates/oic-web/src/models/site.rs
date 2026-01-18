@@ -14,20 +14,11 @@ pub struct SiteConfig {
   pub keywords: String,
   pub url: String,
   pub menus: Vec<SiteMenu>,
-  pub blog_categories: Vec<BlogCategory>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(default)]
 pub struct SiteMenu {
-  pub name: String,
-  pub vid: String,
-  pub href: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
-#[serde(default)]
-pub struct BlogCategory {
   pub name: String,
   pub vid: String,
   pub href: String,
