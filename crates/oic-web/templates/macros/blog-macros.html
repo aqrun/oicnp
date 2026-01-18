@@ -1,0 +1,58 @@
+{% macro page_hero(
+  id = "page-hero",
+  title = "title",
+  description = "desc",
+  bg_image = "/public/images/heros/blog.png"
+) %}
+  <div
+    id="{{ id }}"
+    class="flex flex-col items-center justify-center bg-center
+      bg-cover bg-no-repeat py-0 px-1 text-white rounded-md mb-6
+      h-[200px]
+      "
+    style="background-image: url('{{ bg_image }}')"
+  >
+    <h1 class="blog-hero-title">{{ title }}</h1>
+    <div class="blog-hero-description">{{ description }}</div>
+  </div>
+{% endmacro %}
+
+{# node: NodeDetailModel #}
+{% macro render_node_list_item(node) %}
+  <div class="w-full">
+    <div class="overflow-hidden rounded-lg hover:shadow-lg hover:shadow-violet-100 hover:border-violet-400 cursor-pointer border border-slate-200 border-solid">
+      <a href="/p/{{ node.vid }}" class="block w-full h-full md:flex">
+        <div class="w-full p-4 bg-white dark:bg-gray-800">
+          <p class="font-light text-gray-400 text-md">
+            {% if let Some(category) = node.categories.first() %}
+              <i class="iconfont icon-benshubook122 mr-1"></i>
+              {{ category.cat_name }}
+              &nbsp;
+            {% endif %}
+
+            <span class="ml-2 text-gray-400 font-light">
+              <i class="iconfont icon-date mr-1"></i>
+              {{ node.created_at.format("%Y-%m-%d").to_string() }}
+            </span>
+          </p>
+          <p class="mb-2 text-xl font-medium text-gray-800 dark:text-white">
+            {{ node.title }}
+          </p>
+          <p class="font-light text-gray-400 dark:text-gray-300 text-md">
+            {{ node.summary }}
+          </p>
+
+          {% if node.tags.len() > 0 %}
+          <div class="flex flex-wrap items-center mt-4 justify-starts">
+            {% for tag in node.tags %}
+            <div class="mb-1 text-xs mr-2 py-1.5 px-4 text-gray-600 bg-blue-100 rounded-2xl">
+              {{ tag.tag_name }}
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </a>
+    </div>
+  </div>
+{% endmacro %}

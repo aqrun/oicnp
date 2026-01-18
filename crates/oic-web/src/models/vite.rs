@@ -459,7 +459,10 @@ fn is_static_asset(path: &str) -> bool {
         || path == "/main.js"
         || path == "/main.ts"
         || path == "/style.css"
+        || path == "/@react-refresh"
         || path.ends_with(".js")
+        || path.ends_with(".ts")
+        || path.ends_with(".tsx")
         || path.ends_with("env.mjs")
         || path.ends_with(".css")
         || path.ends_with(".png")
@@ -472,6 +475,7 @@ fn is_static_asset(path: &str) -> bool {
         || path.ends_with(".woff2")
         || path.ends_with(".ttf")
         || path.ends_with(".eot")
+        || path.contains("@vitejs")
 }
 
 /// 智能静态资源处理器

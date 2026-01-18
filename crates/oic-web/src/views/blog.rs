@@ -2,30 +2,23 @@ use askama::Template;
 use crate::models::{AssetFiles, RenderBytes};
 use crate::services::{describe_node_list, describe_node_detail};
 use oic_core::{
-    models::nodes::NodeFilters,
+    models::nodes::{NodeFilters, NodeDetailModel},
     typings::JsonResPayload,
 };
 use crate::WebAppContext;
 use anyhow::Result;
 use bytes::Bytes;
-
-#[derive(Clone)]
-pub struct BlogListItem {
-    pub vid: String,
-    pub title: String,
-    pub summary: String,
-    pub created_at: String,
-    pub category_name: Option<String>,
-    pub tags: Vec<String>,
-}
+use super::{CalendarWidget, RecommendBlogsWidget, RecommendTagsWidget};
 
 #[derive(Template)]
-#[template(path = "blog_list.html")]
+#[template(path = "blog/index.html")]
 pub struct BlogListTemplate {
-    #[allow(dead_code)]
+    pub ctx: WebAppContext,
+    pub menu_vid: String,
     pub cat_vid: Option<String>,
-    pub nodes: Vec<BlogListItem>,
+    pub nodes: Vec<NodeDetailModel>,
     pub assets: AssetFiles,
+    pub side_widgets: Vec<String>,
 }
 
 #[derive(Template)]
@@ -44,46 +37,37 @@ pub async fn render_blog_list(
     ctx: &WebAppContext,
     cat_vid: Option<String>,
 ) -> Result<Bytes> {
-    let mut params = NodeFilters::default();
-    params.page = Some(1);
-    params.page_size = Some(10);
-    params.category_vids = cat_vid.clone();
+    let node_filters = NodeFilters {
+        page: Some(1),
+        page_size: Some(10),
+        category_vids: cat_vid.clone(),
+        ..Default::default()
+    };
     
-    let json_res = describe_node_list(ctx, params).await?;
+    let json_res = describe_node_list(ctx, node_filters).await?;
     
     // 从 JsonRes 中提取节点列表
-    let node_models = match json_res.data {
+    let nodes = match json_res.data {
         JsonResPayload::ListData { data, .. } => data,
         _ => {
-            return Err(anyhow::anyhow!("Failed to get nodes from API response"));
+            tracing::error!("BlogIndex]Failed to get nodes from API response");
+            vec![]
         }
     };
     
-    // Convert NodeDetailModel to BlogListItem
-    let nodes: Vec<BlogListItem> = node_models.iter()
-        .map(|node| {
-            let category_name = node.categories.first()
-                .map(|cat| cat.cat_name.clone());
-            let tags: Vec<String> = node.tags.iter()
-                .map(|t| t.tag_name.clone())
-                .collect();
-            BlogListItem {
-                vid: node.vid.clone(),
-                title: node.title.clone(),
-                summary: node.summary.clone(),
-                created_at: node.created_at.format(oic_core::constants::DATE_TIME_FORMAT).to_string(),
-                category_name,
-                tags,
-            }
-        })
-        .collect();
-    
+    let side_widgets = vec![
+        CalendarWidget::default().get_html(ctx).await,
+        RecommendBlogsWidget::init(ctx).await.get_html(ctx).await,
+        RecommendTagsWidget::init(ctx).await.get_html(ctx).await,
+    ];
     let assets = AssetFiles::default();
-    
     let template = BlogListTemplate {
+        ctx: ctx.clone(),
+        menu_vid: String::from("blog"),
         cat_vid,
         nodes,
         assets,
+        side_widgets,
     };
     
     // 使用 RenderBytes trait 直接渲染为 Bytes

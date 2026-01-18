@@ -1,25 +1,20 @@
+import '@vitejs/plugin-react-swc/preamble';
+import { renderMonthCalendar } from './components/MonthCalendar';
 import './style.css';
 
-function a() {
-  return 1 + 2;
+interface ILx {
+  renderMonthCalendar: typeof renderMonthCalendar;
 }
 
-function b() {
-  console.log('this is b');
-}
-
-function c() {
-  console.log('this is c');
-}
-
-export interface ILx {
-  a: () => number;
-  b: () => void;
-  c: () => void;
+function init() {
+  const $s = document.getElementById('side-bar-calendar');
+  if ($s) {
+    renderMonthCalendar($s);
+  }
 }
 
 (window as Window & typeof globalThis & { lx: ILx }).lx = {
-  a,
-  b,
-  c,
+  renderMonthCalendar
 };
+
+init();

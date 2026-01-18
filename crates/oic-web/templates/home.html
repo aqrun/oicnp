@@ -3,37 +3,40 @@
 {% block title %}灵犀纪 - 心有灵犀，专注技术分享{% endblock %}
 
 {% block head %}
-<meta name="description" content="灵犀纪,rust语言开发,服务器,html,css,js,nextjs,tailwindcss">
-{% for css_file in assets.css_files %}
-<link rel="stylesheet" href="{{ css_file }}" />
-{% endfor %}
+  <meta name="description" content="灵犀纪,rust语言开发,服务器,html,css,js,nextjs,tailwindcss">
+  
+  {% for css_file in assets.css_files %}
+    <link rel="stylesheet" href="{{ css_file }}" />
+  {% endfor %}
 {% endblock %}
 
 {% block layout_content %}
   <!-- Big News -->
-  {% if big_news_title.is_some() %}
+  {% if let Some(big_news) = big_news %}
   <section class="oic-latest-news-section">
     <div class="layout">
       <div class="grid justify-items-stretch">
-        <a href="/p/{{ big_news_vid.as_ref().unwrap_or(&"".to_string()) }}" class="relative flex h-[500px] flex-col gap-4 rounded-md px-4 py-8 [grid-area:1/1/2/2] md:p-0 md:[grid-area:1/1/2/4] hover:text-violet-500">
+        <a href="/p/{{ big_news.vid }}" class="relative flex h-[500px] flex-col gap-4 rounded-md px-4 py-8 [grid-area:1/1/2/2] md:p-0 md:[grid-area:1/1/2/4] hover:text-violet-500">
           <div class="absolute bottom-12 left-8 z-20 flex w-56 max-w-[464px] flex-col items-start rounded-md bg-white p-6 sm:w-full md:bottom-[10px] md:left-[10px]">
-            {% if big_news_category.is_some() %}
-            <div class="mb-4 rounded-md bg-[#f2f2f7] px-2 py-1.5">
-              <p class="text-sm font-semibold text-[#6574f8]">
-                {{ big_news_category.as_ref().unwrap() }}
-              </p>
-            </div>
+            {% if let Some(category) = big_news.categories.first() %}
+              <div class="mb-4 rounded-md bg-[#f2f2f7] px-2 py-1.5">
+                <p class="text-sm font-semibold text-[#6574f8]">
+                  {{ category.cat_name }}
+                </p>
+              </div>
             {% endif %}
               <p class="mb-4 max-w-xs text-xl font-bold md:text-2xl text-gray-800 hover:text-violet-500">
-                {{ big_news_title.as_ref().unwrap_or(&"".to_string()) }}
+                {{ big_news.title }}
               </p>
               <p class="mb-4 text-base md:text-base text-gray-500 max-h-19 overflow-hidden lg:max-h-none">
-                {{ big_news_summary.as_ref().unwrap_or(&"".to_string()) }}
+                {{ big_news.summary }}
               </p>
             <div class="flex flex-col text-sm text-gray-500 lg:flex-row">
-              <p>子十</p>
+              {% if let Some(author_nickname) = big_news.author_nickname %}
+                <p>{{ author_nickname }}</p>
+              {% endif %}
               <p class="mx-2 hidden lg:block">-</p>
-              <p>阅读时间：6分钟</p>
+              <p>阅读时间：3分钟</p>
             </div>
           </div>
           <img src="/images/big-news1.jpeg" alt="" class="inline-block h-full w-full object-cover" />
@@ -44,32 +47,51 @@
   {% endif %}
 
   <!-- News Grid -->
-  {% if news_items.len() > 0 %}
+  {% if big_news_items.len() > 0 %}
   <section class="oic-news-section mt-4">
     <div class="layout">
       <div class="oic-news1 max-w-screen-xl mx-auto dark:bg-gray-800 text-gray-100">
         <div class="grid grid-cols-1 gap-4 lg:grid-cols-4 sm:grid-cols-2">
-          {% for item in news_items %}
-          <div class="relative flex items-end justify-start w-full text-left bg-center bg-cover h-96 bg-gray-500" style="background-image: url('/images/big-news{{ item.image_index }}.jpeg');">
+          {% for item in big_news_items %}
+          <div
+            class="relative flex items-end justify-start w-full text-left bg-center
+            bg-cover h-96 bg-gray-500"
+            style="background-image: url('/images/big-news{{ loop.index }}.jpeg');"
+          >
             <div class="absolute top-0 bottom-0 left-0 right-0 bg-gradient-to-b via-transparent from-gray-900 to-gray-900"></div>
             <div class="absolute top-0 left-0 right-0 flex items-center justify-between mx-5 mt-3">
-              {% if item.category_name.is_some() %}
-              <a rel="noopener noreferrer" href="/category/{{ item.category_id.as_ref().unwrap_or(&0) }}" class="px-3 py-2 text-xs font-semibold tracki uppercase text-gray-100 bgundefined">
-                {{ item.category_name.as_ref().unwrap() }}
-              </a>
+              {% if let Some(category) = item.categories.first() %}
+                <a
+                  rel="noopener noreferrer"
+                  href="/category/{{ category.cat_vid }}"
+                  class="px-3 py-2 text-xs font-semibold tracki uppercase text-gray-100 bgundefined"
+                >
+                  {{ category.cat_name }}
+                </a>
               {% endif %}
-              {% if item.created_at.is_some() %}
-              <div class="flex flex-col justify-start text-center text-gray-100" data-date="{{ item.created_at.as_ref().unwrap() }}">
-                {% if item.date_year.is_some() && item.date_month.is_some() && item.date_day.is_some() %}
-                <span class="text-3xl font-semibold leadi tracki">{{ item.date_month.as_ref().unwrap() }}/{{ item.date_day.as_ref().unwrap() }}</span>
-                <span class="leadi uppercase">{{ item.date_year.as_ref().unwrap() }}</span>
-                {% endif %}
+              
+              {% let time = item.created_at %}
+              {% let time_str = time.format("%Y-%m-%d") %}
+              <div
+                class="flex flex-col justify-start text-center text-gray-100"
+                data-date="{{ time_str }}"
+              >
+                <span
+                  class="text-3xl font-semibold leadi tracki"
+                >
+                  {{ time.format("%m") }}/{{ time.format("%d") }}
+                </span>
+                <span class="leadi uppercase">{{ time.format("%Y") }}</span>
               </div>
-              {% endif %}
             </div>
             <h2 class="z-10 p-5">
-              <a rel="noopener noreferrer" href="/p/{{ item.vid.as_ref().unwrap_or(&"".to_string()) }}" class="font-medium text-md hover:underline text-gray-100 hover:text-violet-500">
-                {{ item.title.as_ref().unwrap_or(&"".to_string()) }}
+              <a
+                rel="noopener noreferrer"
+                href="/p/{{ item.vid }}"
+                class="font-medium text-md hover:underline 
+                text-gray-100 hover:text-violet-500"
+              >
+                {{ item.title }}
               </a>
             </h2>
           </div>
@@ -84,42 +106,7 @@
 {% block content %}
   <div class="relative flex flex-wrap flex-row gap-2">
     {% for item in article_items %}
-    <div class="w-full">
-      <div class="overflow-hidden rounded-lg hover:shadow-lg hover:shadow-violet-100 hover:border-violet-400 cursor-pointer border border-slate-200 border-solid">
-        <a href="/p/{{ item.vid.as_ref().unwrap_or(&"".to_string()) }}" class="block w-full h-full md:flex">
-          <div class="w-full p-4 bg-white dark:bg-gray-800">
-            <p class="font-light text-gray-400 text-md">
-              <i class="iconfont icon-benshubook122 mr-1"></i>
-              {% if item.category_name.is_some() %}
-              {{ item.category_name.as_ref().unwrap() }}
-              {% endif %}
-              {% if item.created_at.is_some() %}
-              &nbsp;
-              <span class="ml-2 text-gray-400 font-light">
-                <i class="iconfont icon-date mr-1"></i>
-                {{ item.created_at.as_ref().unwrap() }}
-              </span>
-              {% endif %}
-            </p>
-            <p class="mb-2 text-xl font-medium text-gray-800 dark:text-white">
-              {{ item.title.as_ref().unwrap_or(&"".to_string()) }}
-            </p>
-            <p class="font-light text-gray-400 dark:text-gray-300 text-md">
-              {{ item.summary.as_ref().unwrap_or(&"".to_string()) }}
-            </p>
-            {% if item.tags.len() > 0 %}
-            <div class="flex flex-wrap items-center mt-4 justify-starts">
-              {% for tag in item.tags %}
-              <div class="mb-1 text-xs mr-2 py-1.5 px-4 text-gray-600 bg-blue-100 rounded-2xl">
-                {{ tag }}
-              </div>
-              {% endfor %}
-            </div>
-            {% endif %}
-          </div>
-        </a>
-      </div>
-    </div>
+      {{ blog_macros::render_node_list_item(item) }}
     {% endfor %}
   </div>
 {% endblock %}
