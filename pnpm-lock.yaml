@@ -379,6 +379,9 @@ importers:
       dayjs:
         specifier: ^1.11.13
         version: 1.11.13
+      htmx.org:
+        specifier: ^2.0.8
+        version: 2.0.8
       react:
         specifier: ^18.3
         version: 18.3.1
@@ -10872,6 +10875,10 @@ packages:
 
   /html-void-elements@3.0.0:
     resolution: {integrity: sha512-bEqo66MRXsUGxWHV5IP0PUiAWwoEjba4VCzg0LjFJBpchPaTfyfCKTG6bc5F8ucKec3q5y6qOdGyYTSBEvhCrg==}
+    dev: false
+
+  /htmx.org@2.0.8:
+    resolution: {integrity: sha512-fm297iru0iWsNJlBrjvtN7V9zjaxd+69Oqjh4F/Vq9Wwi2kFisLcrLCiv5oBX0KLfOX/zG8AUo9ROMU5XUB44Q==}
     dev: false
 
   /http-proxy-agent@4.0.1:

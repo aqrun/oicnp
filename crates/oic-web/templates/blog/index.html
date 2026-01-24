@@ -25,9 +25,7 @@
 
 {% block content %}
   <div class="relative flex flex-wrap flex-row gap-2">
-    {% for item in nodes %}
-      {{ blog_macros::render_node_list_item(item) }}
-    {% endfor %}
+    {{ node_list_html | safe }}
   </div>
 {% endblock %}
 

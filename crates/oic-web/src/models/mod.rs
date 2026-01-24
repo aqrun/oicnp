@@ -2,6 +2,7 @@ mod tpl;
 mod vite;
 mod site;
 mod side_nav;
+pub mod blog;
 
 pub use tpl::*;
 pub use vite::*;

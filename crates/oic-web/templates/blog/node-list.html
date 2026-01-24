@@ -1,0 +1,21 @@
+{% import "macros/blog-macros.html" as blog_macros %}
+
+{% if is_tag_page && !is_htmx %}
+  <div class="w-full mb-4 pb-2 border-b border-gray-200">
+    <div class="flex items-center gap-3">
+      <i class="iconfont icon-tag text-purple-500 text-md"></i>
+      <div>
+        <span class="text-sm text-gray-500 font-light">标签：</span>
+        <span class="text-lg font-semibold text-gray-800 dark:text-white">
+          {{ tag_vid }}
+        </span>
+      </div>
+    </div>
+  </div>
+{% endif %}
+{% for item in nodes %}
+  {{ blog_macros::render_node_list_item(item) }}
+{% endfor %}
+{% if has_more %}
+  {{ blog_macros::render_load_more(more_uri, page, cat_vid) }}
+{% endif %}

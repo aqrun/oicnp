@@ -56,3 +56,24 @@
     </div>
   </div>
 {% endmacro %}
+
+{% macro render_load_more(uri, page, cat_vid) %}
+  <div 
+    class="w-full flex justify-center items-center py-[20px]"
+    hx-get="{{ uri }}?page={{ page }}{% if !cat_vid.is_empty() %}&cat_vid={{ cat_vid }}{% endif %}"
+    hx-trigger="click"
+    hx-swap="outerHTML"
+  >
+    <div
+      class="text-center text-gray-500 cursor-pointer hover:text-purple-700 transition-colors"
+    >
+      <span class="htmx-indicator">
+        <span class="inline-block animate-spin mr-2">⟳</span>
+        加载中...
+      </span>
+      <span class="htmx-request:hidden">
+        点击加载更多...
+      </span>
+    </div>
+  </div>
+{% endmacro %}
