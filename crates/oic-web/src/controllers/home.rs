@@ -2,7 +2,7 @@ use axum::{
     Router,
     routing::get,
     extract::{State, Query},
-    response::IntoResponse,
+    response::{IntoResponse, Html},
     http::StatusCode,
 };
 use crate::views::{render_home_index, render_out_link};
@@ -35,7 +35,7 @@ async fn out_link(
     };
     
     match render_out_link(target_url) {
-        Ok(bytes) => bytes.into_response(),
+        Ok(bytes) => Html(bytes).into_response(),
         Err(e) => {
             tracing::error!("Failed to render out link page: {}", e);
             // 返回一个简单的错误页面

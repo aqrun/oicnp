@@ -36,3 +36,9 @@
   </div>
 </div>
 {% endblock %}
+
+{% block scripts %}
+  {% for js_file in assets.js_files %}
+    <script type="module" src="{{ js_file }}"></script>
+  {% endfor %}
+{% endblock %}
