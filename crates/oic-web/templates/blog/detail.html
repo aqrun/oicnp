@@ -1,0 +1,55 @@
+{% extends "../layout.html" %}
+
+{% block title %}灵犀纪 - 心有灵犀，专注技术分享{% endblock %}
+
+{% block head %}
+  <meta name="description" content="灵犀纪,rust语言开发,服务器,html,css,js,nextjs,tailwindcss">
+  
+  {% for css_file in assets.css_files %}
+    <link rel="stylesheet" href="{{ css_file }}" />
+  {% endfor %}
+{% endblock %}
+
+{% block content %}
+  <!-- Article Detail -->
+  <section class="bg-white">
+    <div class="layout py-12">
+      <div class="flex flex-1 flex-col overflow-auto">
+        <h1 class="text-[1.8rem] lg:text-[2.67rem] mb-[1.3rem] text-slate-800 lg:leading-[2.67rem] lg:text-center">
+          {{ node.title }}
+        </h1>
+        <div class="node-metas mb-10 text-gray-400 lg:text-center">
+          {% if let Some(cat) = node.categories.first() %}
+            <a href="/cat/{{ cat.cat_vid }}">
+              <i class="iconfont icon-benshubook122 mr-1"></i>
+              {{ cat.cat_name }}
+            </a>
+          {% endif %}
+        
+          <span class="ml-4">
+            <i class="iconfont icon-date mr-1"></i>
+            {{ node.created_at.format("%Y-%m-%d").to_string() }}
+          </span>
+        </div>
+        <article class="oic-article-detail prose lg:prose-p max-w-full break-words">
+          {{ content|safe }}
+        </article>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+
+{% block sidebar %}
+  {% for widget in side_widgets %}
+    {{ widget | safe }}
+  {% endfor %}
+{% endblock %}
+
+
+{% block scripts %}
+{% for js_file in assets.js_files %}
+<script type="module" src="{{ js_file }}"></script>
+{% endfor %}
+{% endblock %}
+

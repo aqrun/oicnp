@@ -11,6 +11,7 @@ use anyhow::Result;
 use bytes::Bytes;
 use super::{CalendarWidget, RecommendBlogsWidget, RecommendTagsWidget, SideNavWidget};
 use crate::models::blog::BlogListParams;
+use crate::services::render_markdown;
 
 #[derive(Template)]
 #[template(path = "blog/index.html")]
@@ -21,6 +22,7 @@ pub struct BlogListTemplate {
     pub assets: AssetFiles,
     pub side_nav: String,
     pub side_widgets: Vec<String>,
+    pub has_sidebar_left: bool,
 }
 
 #[derive(Template)]
@@ -37,15 +39,16 @@ pub struct BlogNodeListTemplate {
 }
 
 #[derive(Template)]
-#[template(path = "blog_detail.html")]
+#[template(path = "blog/detail.html")]
 pub struct BlogDetailTemplate {
-    pub title: Option<String>,
-    pub summary: String, // 改为非 Option，始终有值
-    pub category_vid: Option<String>,
-    pub category_name: Option<String>,
-    pub created_at: Option<String>,
-    pub content: String,
+    pub ctx: WebAppContext,
+    pub menu_vid: String,
     pub assets: AssetFiles,
+    pub side_widgets: Vec<String>,
+    pub has_sidebar_left: bool,
+    
+    pub node: NodeDetailModel,
+    pub content: String,
 }
 
 pub async fn render_blog_list(
@@ -116,10 +119,10 @@ pub async fn render_blog_list(
     
     // 分类列表
     if is_category_page {
-        node_list_template.more_uri = format!("/cat/{}/", active_vid.as_str());
+        node_list_template.more_uri = format!("/cat/{}", active_vid.as_str());
     } else if is_tag_page {
         // 标签列表
-        node_list_template.more_uri = format!("/tag/{}/", active_tag_vid.as_str());
+        node_list_template.more_uri = format!("/tag/{}", active_tag_vid.as_str());
         node_list_template.tag_vid = String::from(active_tag_vid.as_str());
         node_list_template.is_tag_page = true;
     } else {
@@ -153,6 +156,7 @@ pub async fn render_blog_list(
         assets,
         side_nav,
         side_widgets,
+        has_sidebar_left: true,
     };
     
     // 使用 RenderBytes trait 直接渲染为 Bytes
@@ -163,47 +167,40 @@ pub async fn render_blog_detail(
     ctx: &WebAppContext,
     vid: String,
 ) -> Result<Bytes> {
-    let mut params = NodeFilters::default();
-    params.vid = Some(vid);
+    let params = NodeFilters {
+        vid: Some(vid),
+        fields: Some(String::from("body")),
+        ..Default::default()
+    };
     
     let json_res = describe_node_detail(ctx, params).await?;
     
     // 从 JsonRes 中提取节点
     let node = match json_res.data {
-        JsonResPayload::Data(node) => Some(node),
-        _ => None,
+        JsonResPayload::Data(x) => x,
+        _ => NodeDetailModel::default(),
     };
     
-    // 提取节点字段
-    let title = node.as_ref().map(|n| n.title.clone());
-    let summary = node.as_ref()
-        .map(|n| n.summary.clone())
-        .unwrap_or_default(); // 确保 summary 始终有值（即使为空字符串）
-    let category_vid = node.as_ref()
-        .and_then(|n| n.categories.first())
-        .map(|cat| cat.cat_vid.clone());
-    let category_name = node.as_ref()
-        .and_then(|n| n.categories.first())
-        .map(|cat| cat.cat_name.clone());
-    let created_at = node.as_ref()
-        .map(|n| n.created_at.format(oic_core::constants::DATE_TIME_FORMAT).to_string());
-    
-    // TODO: 解析 Markdown 内容
-    let content = node.as_ref()
-        .and_then(|n| n.body.as_ref())
-        .cloned()
-        .unwrap_or_default();
-    
+    let mut content = String::from("");
+
+    if let Some(x) = &node.body {
+        content = render_markdown(x);
+    }
+
     let assets = AssetFiles::default();
-    
+    let side_widgets = vec![
+        CalendarWidget::default().get_html(ctx).await,
+        RecommendBlogsWidget::init(ctx).await.get_html(ctx).await,
+        RecommendTagsWidget::init(ctx).await.get_html(ctx).await,
+    ];
     let template = BlogDetailTemplate {
-        title,
-        summary,
-        category_vid,
-        category_name,
-        created_at,
-        content,
+        ctx: ctx.clone(),
+        menu_vid: String::from("blog"),
         assets,
+        side_widgets,
+        has_sidebar_left: false,
+        node,
+        content,
     };
     
     // 使用 RenderBytes trait 直接渲染为 Bytes

@@ -33,3 +33,4 @@ vite-rs = { workspace = true }
 vite-rs-axum-0-8 = { workspace = true }
 chrono = { workspace = true }
 once_cell = { workspace = true }
+pulldown-cmark ={ workspace = true }

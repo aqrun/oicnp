@@ -34,3 +34,71 @@
     }
   }
 }
+
+article {
+  pre {
+    code {
+      background: var(--color-very-light-purple);
+      border-radius: 4px;
+      color: var(--inline-code-color, #6F42C1);
+      padding: 0 8px;
+
+      &::before,
+      &::after {
+        display: none;
+      }
+    }
+  }
+
+  a {
+    &:hover {
+      color: var(--primary, #6F42C1);
+    }
+  }
+}
+
+.oic-toc {
+  width: calc(100% - 3rem);
+  max-width: 25rem;
+}
+
+.PhotoView-Slider__Backdrop {
+  opacity: 0.7;
+}
+
+@media (min-width: 1000px) {
+  article p img {
+    margin: 0 auto;
+    max-width: 20%;
+  }
+}
+
+/* line numbers */
+// article {
+//   pre {
+//     code {
+//       counter-reset: line;
+//     }
+     
+//     code > span[class*="hljs-"]::before {
+//       counter-increment: line;
+//       content: counter(line);
+     
+//       /* Other styling */
+//       display: inline-block;
+//       width: 2rem;
+//       margin-right: 0.5rem;
+//       text-align: right;
+//       color: gray;
+//     }
+//   }
+// }
+
+@media (min-width: 64rem) {
+  .home-layout-content-w {
+    width: calc(100% - 22rem);
+  }
+  .oic-layout-content {
+    width: calc(100% - var(--spacing) * 80 - var(--spacing) * 4);
+  }
+}

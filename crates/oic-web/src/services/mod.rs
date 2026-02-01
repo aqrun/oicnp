@@ -1,6 +1,7 @@
 mod api;
 mod cache;
 mod base;
+mod html;
 
 pub use api::*;
 pub use cache::get_cached_or_render;
@@ -8,3 +9,4 @@ pub use cache::get_cached_or_render;
 // 如果 Controller 需要使用，可以从 cache 模块导入
 pub use cache::CacheConfig;
 pub use base::*;
+pub use html::*;

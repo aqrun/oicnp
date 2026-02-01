@@ -110,9 +110,9 @@ async fn blog_detail(
 
 pub fn blog_routes() -> Router<WebAppContext> {
     Router::new()
-        .route("/blog/", get(blog_list))
-        .route("/cat/{cat_vid}/", get(blog_list_by_category))
-        .route("/tag/{tag_vid}/", get(blog_list_by_tag))
-        .route("/p/{vid}/", get(blog_detail))
+        .route("/blog", get(blog_list))
+        .route("/cat/{cat_vid}", get(blog_list_by_category))
+        .route("/tag/{tag_vid}", get(blog_list_by_tag))
+        .route("/p/{vid}", get(blog_detail))
 }
 

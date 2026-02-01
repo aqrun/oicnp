@@ -7,6 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}灵犀纪{% endblock %}</title>
+    <link rel="shortcut icon" href="/public/favicon/favicon.ico" type="image/x-icon">
     {% block head %}{% endblock %}
     <script src="/public/vendor/alpine.js" defer></script>
     <script src="/public/vendor/htmx.min.js" defer></script>
@@ -25,9 +26,11 @@
           {% block page_hero %}{% endblock %}
 
           <div class="flex lg:flex-row flex-col gap-4 mb-8">
-            <aside class="sticky t-[80px] w-[200px] max-h-[400px] bg-white">
-              {% block sidebar_left %}{% endblock %}
-            </aside>
+            {% if has_sidebar_left %}
+              <aside class="sticky t-[80px] w-[200px] max-h-[400px] bg-white">
+                {% block sidebar_left %}{% endblock %}
+              </aside>
+            {% endif %}
 
             <div class="home-layout-content-w flex flex-col lg:w-[calc(100% - 22rem)]">
               {% block content %}{% endblock %}

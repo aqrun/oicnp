@@ -1,0 +1,44 @@
+{% extends "../layout.html" %}
+
+{% block title %}灵犀纪 - 心有灵犀，专注技术分享{% endblock %}
+
+{% block head %}
+  <meta name="description" content="灵犀纪,rust语言开发,服务器,html,css,js,nextjs,tailwindcss">
+  
+  {% for css_file in assets.css_files %}
+    <link rel="stylesheet" href="{{ css_file }}" />
+  {% endfor %}
+{% endblock %}
+
+{% block page_hero %}
+{{ blog_macros::page_hero(
+  id = "blog-hero",
+  title = "常用工具",
+  description = "常用工具列表，包括但不限于AI助手、代码编辑器、图像生成器、翻译工具、PDF阅读器等。",
+  bg_image = "/public/images/heros/tools.jpg"
+) }}
+{% endblock %}
+
+{% block sidebar_left %}
+  {{ side_nav | safe }}
+{% endblock %}
+
+{% block content %}
+  <div class="relative flex flex-wrap flex-row gap-2">
+    {{ node_list_html | safe }}
+  </div>
+{% endblock %}
+
+{% block sidebar %}
+  {% for widget in side_widgets %}
+    {{ widget | safe }}
+  {% endfor %}
+{% endblock %}
+
+
+{% block scripts %}
+{% for js_file in assets.js_files %}
+<script type="module" src="{{ js_file }}"></script>
+{% endfor %}
+{% endblock %}
+

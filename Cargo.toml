@@ -120,6 +120,7 @@ futures = "0.3"
 user-agent-parser = "0.3"
 http-body-util = "0"
 askama = { version = "0.15.1", default-features = false, features = ["std", "derive"] }
+pulldown-cmark ={ version = "0.13" }
 vite-rs = { version = "^0.2" }
 vite-rs-axum-0-8 = { version = "^0.2" }
 # cache
