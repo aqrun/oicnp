@@ -99,3 +99,19 @@ pub async fn render_home_index(ctx: &WebAppContext) -> Result<Bytes> {
     // 使用 RenderBytes trait 直接渲染为 Bytes
     template.render_bytes()
 }
+
+#[derive(Template)]
+#[template(path = "link.html")]
+pub struct OutLinkTemplate {
+    pub assets: AssetFiles,
+    pub target_url: String,
+}
+
+pub fn render_out_link(target_url: String) -> Result<Bytes> {
+    let assets = AssetFiles::default();
+    let template = OutLinkTemplate {
+        target_url,
+        assets,
+    };
+    template.render_bytes()
+}

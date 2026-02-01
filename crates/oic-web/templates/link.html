@@ -1,0 +1,38 @@
+{% extends "./base.html" %}
+
+{% block title %}灵犀纪 - 心有灵犀，专注技术分享{% endblock %}
+
+{% block head %}
+  <meta name="description" content="灵犀纪,rust语言开发,服务器,html,css,js,nextjs,tailwindcss">
+  
+  {% for css_file in assets.css_files %}
+    <link rel="stylesheet" href="{{ css_file }}" />
+  {% endfor %}
+{% endblock %}
+
+{% block content %}
+<div class="w-screen h-screen flex justify-center bg-gray-200">
+  <div class="out-link-page mt-24 ml-auto mr-auto max-w-xl">
+    <div class="logo mb-2">
+      <a href="/" class="flex items-center gap-2 font-medium text-3xl">
+        <img src="/public/favicon/logo112501.svg" alt="logo" width="40" height="40" />
+        <span>灵犀纪</span>
+      </a>
+    </div>
+    <div class="p-6 bg-white rounded-lg">
+      <h4 class="mb-2 text-lg font-semibold">即将离开灵犀纪</h4>
+      <p class="text-gray-600">您即将离开灵犀纪，请注意您的账号和财产安全。</p>
+      <p class="mt-2 text-sm text-gray-500 break-all">{{ target_url }}</p>
+      <div class="border-t border-gray-200 pt-4 mt-4 flex justify-end">
+        <a
+          href="{{ target_url }}"
+          rel="noopener noreferrer"
+          class="px-4 py-2 bg-fuchsia-700 text-white rounded-md hover:bg-fuchsia-800 transition-colors"
+        >
+          继续访问
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

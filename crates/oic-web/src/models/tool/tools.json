@@ -1,0 +1,764 @@
+{
+  "tools": [
+    {
+      "name": "ChatGPT",
+      "url": "https://chat.openai.com/",
+      "description": "OpenAI 的通用对话与创作助手，支持多模态与广泛插件生态。",
+      "language": "TypeScript/JavaScript",
+      "logo": "http://static.lxage.com/20251117/tools/chat-gpt.svg",
+      "category": "ai-apps"
+    },
+    {
+      "name": "Claude",
+      "url": "https://claude.ai/",
+      "description": "Anthropic 推出的安全友好型助理，长文本与工具使用能力强。",
+      "language": "TypeScript/JavaScript",
+      "logo": "http://static.lxage.com/20251117/tools/claude.svg",
+      "category": "ai-apps"
+    },
+    {
+      "name": "Gemini",
+      "url": "https://gemini.google.com/",
+      "description": "Google 的多模态助手，整合搜索、文档与工作流生态。",
+      "language": "TypeScript/JavaScript",
+      "logo": "http://static.lxage.com/20251117/tools/gemini.svg",
+      "category": "ai-apps"
+    },
+    {
+      "name": "Copilot",
+      "url": "https://github.com/features/copilot",
+      "description": "GitHub 与 OpenAI 合作打造的编程助理，支持 IDE 内联补全与聊天。",
+      "language": "TypeScript",
+      "logo": "http://static.lxage.com/20251117/tools/copilot.svg",
+      "category": "ai-apps"
+    },
+    {
+      "name": "Cursor",
+      "url": "https://www.cursor.com/",
+      "description": "面向工程师的 AI IDE，强化代码意图理解、改写与多文件协作。",
+      "language": "TypeScript",
+      "logo": "http://static.lxage.com/20251117/tools/cursor.svg",
+      "category": "ai-apps"
+    },
+    {
+      "name": "豆包（Doubao）",
+      "url": "https://www.doubao.com/",
+      "description": "字节跳动旗下 AI 助手，覆盖创作、办公与企业应用场景。",
+      "language": "TypeScript/JavaScript",
+      "logo": "http://static.lxage.com/20251117/tools/doubao.png",
+      "category": "ai-apps"
+    },
+    {
+      "name": "腾讯元宝",
+      "url": "https://yuanbao.tencent.com/",
+      "description": "腾讯推出的大模型助手，支持对话、写作、图像与企业集成。",
+      "language": "TypeScript/JavaScript",
+      "logo": "http://static.lxage.com/20251117/tools/yuanbao.svg",
+      "category": "ai-apps"
+    },
+    {
+      "name": "Meta AI",
+      "url": "https://ai.meta.com/meta-ai/",
+      "description": "Meta 的 AI 助手，融入社交与多媒体体验，支持生成式功能。",
+      "language": "TypeScript/JavaScript",
+      "logo": "http://static.lxage.com/20251117/tools/meta.svg",
+      "category": "ai-apps"
+    },
+    {
+      "name": "Poe",
+      "url": "https://poe.com/",
+      "description": "聚合多模型的对话平台，快速切换与分享机器人配置。",
+      "language": "TypeScript/JavaScript",
+      "logo": "http://static.lxage.com/20251117/tools/poe.svg",
+      "category": "ai-apps"
+    },
+    {
+      "name": "Midjourney",
+      "url": "https://www.midjourney.com/",
+      "description": "高质量图像生成工具，擅长艺术风格与创意视觉表达。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "ai-apps"
+    },
+    {
+      "name": "DeepSeek",
+      "url": "https://www.deepseek.com/",
+      "description": "DeepSeek 推出的 AI 助手，支持对话、写作、图像与多模态。",
+      "language": "TypeScript/JavaScript",
+      "logo": "http://static.lxage.com/20251117/tools/deepseek.png",
+      "category": "ai-apps"
+    },
+    {
+      "name": "Kimi",
+      "url": "https://kimi.moonshot.cn/",
+      "description": "Moonshot 推出的中文长文档助手，支持复杂阅读与问答任务。",
+      "language": "TypeScript/JavaScript",
+      "logo": "http://static.lxage.com/20251117/tools/kimi.png",
+      "category": "ai-apps"
+    },
+    {
+      "name": "通义千问（Qwen）",
+      "url": "https://qwen.ai/",
+      "description": "阿里云大模型应用与生态，覆盖 Agent、代码、图像与多模态。",
+      "language": "TypeScript/JavaScript",
+      "logo": "http://static.lxage.com/20251117/tools/qwen.png",
+      "category": "ai-apps"
+    },
+    {
+      "name": "ECharts",
+      "url": "https://echarts.apache.org/",
+      "description": "强大的可视化库，涵盖丰富图表类型与交互，国内社区活跃。",
+      "language": "TypeScript/JavaScript",
+      "logo": "",
+      "category": "charts"
+    },
+    {
+      "name": "Recharts",
+      "url": "https://recharts.org/",
+      "description": "基于 React 的可组合图表库，语义化组件、上手简单。",
+      "language": "TypeScript/JavaScript",
+      "logo": "",
+      "category": "charts"
+    },
+    {
+      "name": "visx",
+      "url": "https://airbnb.io/visx/",
+      "description": "Airbnb 推出的低层可视化库，将 D3 与 React 优雅结合。",
+      "language": "TypeScript/JavaScript",
+      "logo": "",
+      "category": "charts"
+    },
+    {
+      "name": "D3.js",
+      "url": "https://d3js.org/",
+      "description": "数据驱动文档的可视化基石，提供底层图形与数据处理能力。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "charts"
+    },
+    {
+      "name": "Chart.js",
+      "url": "https://www.chartjs.org/",
+      "description": "轻量易用的图表库，适合常见统计图快速落地。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "charts"
+    },
+    {
+      "name": "Nivo",
+      "url": "https://nivo.rocks/",
+      "description": "基于 React 的高质量图表组件，主题与响应式支持完善。",
+      "language": "TypeScript/JavaScript",
+      "logo": "",
+      "category": "charts"
+    },
+    {
+      "name": "react-hook-form",
+      "url": "https://react-hook-form.com/",
+      "description": "轻量高性能表单方案，基于原生表单与注册机制，性能与类型支持优秀。",
+      "language": "TypeScript",
+      "logo": "",
+      "category": "forms"
+    },
+    {
+      "name": "Formik",
+      "url": "https://formik.org/",
+      "description": "成熟的 React 表单库，生态完善，适合中大型表单场景。",
+      "language": "TypeScript/JavaScript",
+      "logo": "",
+      "category": "forms"
+    },
+    {
+      "name": "React Final Form",
+      "url": "https://final-form.org/react",
+      "description": "基于 Final Form 的 React 封装，订阅式更新，控制粒度细致。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "forms"
+    },
+    {
+      "name": "Zod",
+      "url": "https://zod.dev/",
+      "description": "TypeScript 优先的模式校验库，与表单库组合实现类型安全校验。",
+      "language": "TypeScript",
+      "logo": "",
+      "category": "forms"
+    },
+    {
+      "name": "Yup",
+      "url": "https://github.com/jquense/yup",
+      "description": "广泛使用的模式校验库，Formik 等方案的常见搭档。",
+      "language": "TypeScript/JavaScript",
+      "logo": "",
+      "category": "forms"
+    },
+    {
+      "name": "Valibot",
+      "url": "https://valibot.dev/",
+      "description": "轻量快速的模式校验库，良好的类型推断与 DX。",
+      "language": "TypeScript",
+      "logo": "",
+      "category": "forms"
+    },
+    {
+      "name": "Contentful",
+      "url": "https://www.contentful.com/",
+      "description": "企业级 Headless CMS，模型灵活，生态成熟，适合多渠道内容分发。",
+      "language": "TypeScript/JavaScript",
+      "logo": "",
+      "category": "headless-cms"
+    },
+    {
+      "name": "Sanity",
+      "url": "https://www.sanity.io/",
+      "description": "实时协作、结构化内容与强大 Studio 定制能力，开发体验优秀。",
+      "language": "TypeScript/JavaScript",
+      "logo": "",
+      "category": "headless-cms"
+    },
+    {
+      "name": "Strapi",
+      "url": "https://strapi.io/",
+      "description": "开源 Headless CMS，支持自定义内容模型与权限，插件生态活跃。",
+      "language": "JavaScript/TypeScript",
+      "logo": "",
+      "category": "headless-cms"
+    },
+    {
+      "name": "Hygraph (GraphCMS)",
+      "url": "https://hygraph.com/",
+      "description": "基于 GraphQL 的 Headless CMS，适合复杂内容关系与联邦架构。",
+      "language": "TypeScript/JavaScript",
+      "logo": "",
+      "category": "headless-cms"
+    },
+    {
+      "name": "Prismic",
+      "url": "https://prismic.io/",
+      "description": "以 Slice 为核心的可视化内容片段与页面搭建体验，适配多框架。",
+      "language": "TypeScript/JavaScript",
+      "logo": "",
+      "category": "headless-cms"
+    },
+    {
+      "name": "Directus",
+      "url": "https://directus.io/",
+      "description": "开源数据平台，直接为任意 SQL 数据库提供即用的 Headless API 与 CMS UI。",
+      "language": "TypeScript",
+      "logo": "",
+      "category": "headless-cms"
+    },
+    {
+      "name": "Payload CMS",
+      "url": "https://payloadcms.com/",
+      "description": "基于 Node.js/TypeScript 的开源 Headless CMS，灵活的代码优先模型与认证。",
+      "language": "TypeScript",
+      "logo": "",
+      "category": "headless-cms"
+    },
+    {
+      "name": "MDX",
+      "url": "https://mdxjs.com/",
+      "description": "将 Markdown 与 JSX 结合，内容与组件共存，适合文档与内容站点。",
+      "language": "TypeScript/JavaScript",
+      "logo": "",
+      "category": "markdown-mdx"
+    },
+    {
+      "name": "remark",
+      "url": "https://remark.js.org/",
+      "description": "基于 unified 的 Markdown 处理器，插件体系成熟，支持多种转换。",
+      "language": "TypeScript/JavaScript",
+      "logo": "",
+      "category": "markdown-mdx"
+    },
+    {
+      "name": "rehype",
+      "url": "https://rehypejs.org/",
+      "description": "HTML 处理器（unified 家族），常与 remark 配合实现 Markdown→HTML 流程。",
+      "language": "TypeScript/JavaScript",
+      "logo": "",
+      "category": "markdown-mdx"
+    },
+    {
+      "name": "unified",
+      "url": "https://unifiedjs.com/",
+      "description": "语法树处理生态的核心框架，串联 remark/rehype 等处理流程。",
+      "language": "TypeScript/JavaScript",
+      "logo": "",
+      "category": "markdown-mdx"
+    },
+    {
+      "name": "contentlayer",
+      "url": "https://www.contentlayer.dev/",
+      "description": "内容类型化与生成工具，结合 Next.js/MDX 提供类型安全的数据层。",
+      "language": "TypeScript",
+      "logo": "",
+      "category": "markdown-mdx"
+    },
+    {
+      "name": "next-mdx-remote",
+      "url": "https://github.com/hashicorp/next-mdx-remote",
+      "description": "在 Next.js 中远程/动态渲染 MDX 内容的解决方案。",
+      "language": "TypeScript",
+      "logo": "",
+      "category": "markdown-mdx"
+    },
+    {
+      "name": "gray-matter",
+      "url": "https://github.com/jonschlinkert/gray-matter",
+      "description": "解析 Markdown Front Matter（YAML/TOML/JSON），常用于内容站点。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "markdown-mdx"
+    },
+    {
+      "name": "markdown-it",
+      "url": "https://github.com/markdown-it/markdown-it",
+      "description": "可扩展的 Markdown 解析器，速度快、兼容性好、插件丰富。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "markdown-mdx"
+    },
+    {
+      "name": "remark-gfm",
+      "url": "https://github.com/remarkjs/remark-gfm",
+      "description": "支持 GitHub Flavored Markdown（表格、删除线、任务列表等）。",
+      "language": "TypeScript/JavaScript",
+      "logo": "",
+      "category": "markdown-mdx"
+    },
+    {
+      "name": "remark-breaks",
+      "url": "https://github.com/remarkjs/remark-breaks",
+      "description": "将换行符转换为 <br>，匹配 GFM 的换行行为。",
+      "language": "TypeScript/JavaScript",
+      "logo": "",
+      "category": "markdown-mdx"
+    },
+    {
+      "name": "remark-slug",
+      "url": "https://github.com/remarkjs/remark-slug",
+      "description": "为标题自动生成锚点 id，便于目录与跳转。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "markdown-mdx"
+    },
+    {
+      "name": "remark-autolink-headings",
+      "url": "https://github.com/remarkjs/remark-autolink-headings",
+      "description": "为标题自动插入锚点链接，便于复制与分享。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "markdown-mdx"
+    },
+    {
+      "name": "remark-toc",
+      "url": "https://github.com/remarkjs/remark-toc",
+      "description": "根据文档标题自动生成目录（Table of Contents）。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "markdown-mdx"
+    },
+    {
+      "name": "remark-emoji",
+      "url": "https://github.com/rhysd/remark-emoji",
+      "description": "将 :smile: 等短码转换为 emoji（支持多种渲染方式）。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "markdown-mdx"
+    },
+    {
+      "name": "rehype-highlight",
+      "url": "https://github.com/rehypejs/rehype-highlight",
+      "description": "基于 highlight.js 的代码高亮，零配置快速上手。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "markdown-mdx"
+    },
+    {
+      "name": "rehype-pretty-code",
+      "url": "https://github.com/atomiks/rehype-pretty-code",
+      "description": "结合 shiki 实现漂亮的代码高亮，支持行高亮与注释。",
+      "language": "TypeScript",
+      "logo": "",
+      "category": "markdown-mdx"
+    },
+    {
+      "name": "rehype-slug",
+      "url": "https://github.com/rehypejs/rehype-slug",
+      "description": "为 HTML 标题元素生成 id，方便目录与跳转。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "markdown-mdx"
+    },
+    {
+      "name": "rehype-autolink-headings",
+      "url": "https://github.com/rehypejs/rehype-autolink-headings",
+      "description": "为 HTML 标题自动插入可点击的锚点链接。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "markdown-mdx"
+    },
+    {
+      "name": "rehype-raw",
+      "url": "https://github.com/rehypejs/rehype-raw",
+      "description": "在 rehype 中安全地解析并合并原始 HTML（与 remark-rehype 配合）。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "markdown-mdx"
+    },
+    {
+      "name": "remark-rehype",
+      "url": "https://github.com/remarkjs/remark-rehype",
+      "description": "将 Markdown AST（mdast）转换为 HTML AST（hast）。",
+      "language": "TypeScript/JavaScript",
+      "logo": "",
+      "category": "markdown-mdx"
+    },
+    {
+      "name": "rehype-stringify",
+      "url": "https://github.com/rehypejs/rehype/tree/main/packages/rehype-stringify",
+      "description": "将 HTML AST（hast）序列化为字符串 HTML。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "markdown-mdx"
+    },
+    {
+      "name": "shadcn/ui",
+      "url": "https://github.com/shadcn-ui/ui",
+      "description": "基于 Radix UI + Tailwind CSS 的UI库",
+      "language": "TypeScript",
+      "logo": "",
+      "category": "react-ui"
+    },
+    {
+      "name": "material-ui",
+      "url": "https://github.com/mui/material-ui",
+      "description": "Material设计风格的React UI框架",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "react-ui"
+    },
+    {
+      "name": "chakra-ui",
+      "url": "https://github.com/chakra-ui/chakra-ui",
+      "description": "简单、模块化的React UI框架",
+      "language": "TypeScript",
+      "logo": "",
+      "category": "react-ui"
+    },
+    {
+      "name": "daisyui",
+      "url": "https://github.com/saadeghi/daisyui",
+      "description": "流行，免费的Tailwind CSS 组件",
+      "language": "Svelte",
+      "logo": "",
+      "category": "react-ui"
+    },
+    {
+      "name": "heroui",
+      "url": "https://github.com/heroui-inc/heroui",
+      "description": "漂亮、快速、现代化 React UI 库",
+      "language": "TypeScript",
+      "logo": "",
+      "category": "react-ui"
+    },
+    {
+      "name": "react-bootstrap",
+      "url": "https://github.com/react-bootstrap/react-bootstrap",
+      "description": "使用 React 构建的 Bootstrap 组件",
+      "language": "TypeScript",
+      "logo": "",
+      "category": "react-ui"
+    },
+    {
+      "name": "blueprint",
+      "url": "https://github.com/palantir/blueprint",
+      "description": "一个基于 React 的 UI 工具包",
+      "language": "TypeScript",
+      "logo": "",
+      "category": "react-ui"
+    },
+    {
+      "name": "Semantic-UI-React",
+      "url": "https://github.com/Semantic-Org/Semantic-UI-React",
+      "description": "Semantic-UI 官方React集成",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "react-ui"
+    },
+    {
+      "name": "rsuite",
+      "url": "https://github.com/rsuite/rsuite",
+      "description": "A suite of React components .",
+      "language": "TypeScript",
+      "logo": "",
+      "category": "react-ui"
+    },
+    {
+      "name": "primereact",
+      "url": "https://github.com/primefaces/primereact",
+      "description": "The Most Complete React UI Component Library",
+      "language": "CSS",
+      "logo": "",
+      "category": "react-ui"
+    },
+    {
+      "name": "preline",
+      "url": "https://github.com/htmlstreamofficial/preline",
+      "description": "Preline UI 是基于 Tailwind CSS 的预构建组件集合，开源可用。",
+      "language": "HTML",
+      "logo": "",
+      "category": "react-ui"
+    },
+    {
+      "name": "hyperui",
+      "url": "https://github.com/markmead/hyperui",
+      "description": "免费 Tailwind CSS v4 组件，助力使用最新特性与样式的 Web 开发。",
+      "language": "HTML",
+      "logo": "",
+      "category": "react-ui"
+    },
+    {
+      "name": "tail-kit",
+      "url": "https://github.com/Charlie85270/tail-kit",
+      "description": "基于 Tailwind CSS 3.0 的免费开源组件与模板库（包含示例）。",
+      "language": "TypeScript",
+      "logo": "",
+      "category": "react-ui"
+    },
+    {
+      "name": "sailboatui",
+      "url": "https://github.com/sailboatui/sailboatui",
+      "description": "现代化的 Tailwind CSS 组件库。",
+      "language": "HTML",
+      "logo": "",
+      "category": "react-ui"
+    },
+    {
+      "name": "flowrift",
+      "url": "https://github.com/sergejcodes/flowrift",
+      "description": "精美的 Tailwind CSS UI 区块集合。",
+      "language": "",
+      "logo": "",
+      "category": "react-ui"
+    },
+    {
+      "name": "Next.js",
+      "url": "https://nextjs.org/",
+      "description": "用于 SSG/SSR 的 React 框架，性能与 SEO 优秀，Vercel 集成完善。",
+      "language": "TypeScript/JavaScript",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "Hugo",
+      "url": "https://gohugo.io/",
+      "description": "超快的静态站点生成器，支持主题、i18n 与多种输出格式。",
+      "language": "Go",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "Gatsby",
+      "url": "https://www.gatsbyjs.com/",
+      "description": "基于 React 与 GraphQL，插件生态丰富，适合快速构建可扩展站点。",
+      "language": "TypeScript/JavaScript",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "Jekyll",
+      "url": "https://jekyllrb.com/",
+      "description": "资深 SSG，将 Markdown/Liquid 渲染为静态站点；常用于 GitHub Pages。",
+      "language": "Ruby",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "11ty",
+      "url": "https://www.11ty.dev/",
+      "description": "简洁灵活的 JavaScript SSG，支持多模板语言，开销极低。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "Gridsome",
+      "url": "https://gridsome.org/",
+      "description": "基于 Vue 的 SSG，生成静态 HTML 并在浏览器内重水化，内置 GraphQL 数据层。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "Nuxt.js",
+      "url": "https://nuxtjs.org/",
+      "description": "Vue 框架，支持 SSR/SSG，模块化架构，SEO 友好。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "Pelican",
+      "url": "https://getpelican.com/",
+      "description": "Python SSG，适合博客/个人站点，支持导入、主题与多语言。",
+      "language": "Python",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "Create React App",
+      "url": "https://create-react-app.dev/",
+      "description": "React 应用脚手架；虽非纯 SSG，但适合学习与简单静态部署。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "Docusaurus",
+      "url": "https://docusaurus.io/",
+      "description": "基于 React 的文档型 SSG，内置版本管理、搜索与国际化。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "Slate",
+      "url": "https://github.com/slatedocs/slate",
+      "description": "清爽的单页 API 文档生成器，灵感来自 Stripe/PayPal。",
+      "language": "Ruby",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "MkDocs",
+      "url": "https://www.mkdocs.org/",
+      "description": "Python 文档型 SSG，使用 Markdown 与 YAML 配置，开箱即用。",
+      "language": "Python",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "Astro",
+      "url": "https://astro.build/",
+      "description": "现代静态网站生成工具，支持岛屿架构，兼容多前端框架。",
+      "language": "TypeScript",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "Hexo",
+      "url": "https://hexo.io/",
+      "description": "Node.js 驱动的快速、简洁且高效的博客框架，秒级生成静态网页。",
+      "language": "JavaScript/TypeScript",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "Docsify",
+      "url": "https://docsify.js.org/",
+      "description": "无需构建的文档网站生成器，按需加载 Markdown 即时渲染。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "VuePress",
+      "url": "https://vuepress.vuejs.org/",
+      "description": "基于 Vue 的静态站点生成器，开箱即用的文档站点方案。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "Zola",
+      "url": "https://www.getzola.org/",
+      "description": "Rust 编写的快速静态站点生成器，单个二进制文件即可运行。",
+      "language": "Rust",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "Umi",
+      "url": "https://umijs.org/",
+      "description": "插件化的企业级前端框架，支持静态导出与服务端渲染。",
+      "language": "TypeScript",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "Nextra",
+      "url": "https://nextra.site/",
+      "description": "简洁、强大且灵活的站点生成框架，基于 Next.js 与 MDX。",
+      "language": "TypeScript",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "React Static",
+      "url": "https://github.com/react-static/react-static",
+      "description": "面向 React 的渐进式静态站点生成器。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "Middleman",
+      "url": "https://middlemanapp.com/",
+      "description": "Ruby 生态的静态站点生成器，适合定制化前端开发。",
+      "language": "Ruby",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "Hakyll",
+      "url": "https://jaspervdj.be/hakyll/",
+      "description": "Haskell 编写的静态网站编译库，灵活可编程。",
+      "language": "Haskell",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "Lume",
+      "url": "https://lume.land/",
+      "description": "面向 Deno 的静态站点生成器，TypeScript 优先。",
+      "language": "TypeScript",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "Publish",
+      "url": "https://github.com/JohnSundell/Publish",
+      "description": "面向 Swift 开发者的静态站点生成器。",
+      "language": "Swift",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "Harp",
+      "url": "http://harpjs.com/",
+      "description": "静态 Web 服务器 / 生成器 / 打包器。",
+      "language": "JavaScript",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "Abell",
+      "url": "https://abelljs.org/",
+      "description": "低门槛、框架无关且高度灵活的静态站点生成器，学习曲线平缓。",
+      "language": "TypeScript",
+      "logo": "",
+      "category": "static-site-generator"
+    },
+    {
+      "name": "Fumadocs",
+      "url": "https://github.com/fuma-nama/fumadocs",
+      "description": "优雅且灵活的 React 文档框架，基于 Next.js 应用路由。",
+      "language": "TypeScript",
+      "logo": "",
+      "category": "static-site-generator"
+    }
+  ]
+}

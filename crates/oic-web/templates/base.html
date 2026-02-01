@@ -1,26 +1,18 @@
+{% import "macros/main-macros.html" as main %}
+{% import "macros/blog-macros.html" as blog_macros %}
+
 <!DOCTYPE html>
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}灵犀纪{% endblock %}</title>
+    <link rel="shortcut icon" href="/public/favicon/favicon.ico" type="image/x-icon">
     {% block head %}{% endblock %}
-    <script>
-      (function() {
-        try {
-          if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
-              document.documentElement.classList.add('loaded');
-            });
-          } else {
-            document.documentElement.classList.add('loaded');
-          }
-        } catch (e) {}
-      })();
-    </script>
   </head>
   <body>
-    {% block content %}<p>Placeholder content</p>{% endblock %}
+    {% block content %}{% endblock %}
+    
     {% block scripts %}{% endblock %}
   </body>
 </html>

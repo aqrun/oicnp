@@ -4,63 +4,40 @@ use axum::{
   extract::{State, Path, Query},
   response::IntoResponse,
 };
-use oic_core::middleware::HtmxRequest;
-use crate::views::{render_blog_list, render_blog_detail};
+use crate::views::{render_tool_list};
 use crate::{cached, consts::HANDLER_CACHE_TIME, WebAppContext};
-use crate::models::blog::BlogListParams;
+use crate::models::tool::ToolListParams;
 
 /// 工具列表页
 async fn tool_list(
   State(ctx): State<WebAppContext>,
-  Query(params): Query<BlogListParams>,
-  htmx: HtmxRequest,
+  Query(params): Query<ToolListParams>,
 ) -> impl IntoResponse {
-  let mut cat_vid = String::from("all");
-  let mut page = 1;
-  let list_key = if htmx.is_htmx { "htmx_list" } else { "list" };
-
-  if let Some(x) = &params.cat_vid {
-      cat_vid = String::from(x);
-  }
-  if let Some(x) = params.page {
-      page = x;
-  }
-
-  let cache_key = format!("tool:{}:{}:{}", list_key, cat_vid, page);
+  let cache_key = "tool:list:all";
 
   cached!(
       &ctx.cache,
       &cache_key,
-      render_blog_list(&ctx, &params, &htmx),
+      render_tool_list(&ctx, &params),
       HANDLER_CACHE_TIME
   )
 }
 
-/// 分类博客列表页
-async fn blog_list_by_category(
+/// 分类工具列表页
+async fn tool_list_by_category(
   Path(cat_vid): Path<String>,
   State(ctx): State<WebAppContext>,
-  Query(params): Query<BlogListParams>,
-  htmx: HtmxRequest,
 ) -> impl IntoResponse {
-  let mut page = 1;
-  let list_key = if htmx.is_htmx { "htmx_list" } else { "list" };
-
-  if let Some(x) = params.page {
-      page = x;
-  }
-
-  let cache_key = format!("blog:cat:{}:{}:{}", list_key, cat_vid, page);
-  let new_params = BlogListParams {
+  let cache_key = format!("tool:list:cat:{}", cat_vid);
+  let new_params = ToolListParams {
       cat_vid: Some(cat_vid),
-      page: Some(page),
       is_category_page: Some(true),
       ..Default::default()
   };
   cached!(
       &ctx.cache,
       &cache_key,
-      render_blog_list(&ctx, &new_params, &htmx),
+      render_tool_list(&ctx, &new_params),
       HANDLER_CACHE_TIME
   )
 }
@@ -68,5 +45,6 @@ async fn blog_list_by_category(
 pub fn tool_routes() -> Router<WebAppContext> {
   Router::new()
       .route("/tool", get(tool_list))
+      .route("/tool/cat/{cat_vid}", get(tool_list_by_category))
 }
 
