@@ -1,0 +1,118 @@
+{% extends "../layout.html" %}
+{% import "macros/blog-macros.html" as blog_macros %}
+
+{% block title %}{{ poetry.title }}|灵犀纪-心有灵犀，专注技术分享{% endblock %}
+
+{% block head %}
+  <meta name="description" content="灵犀纪,诗词鉴赏,{{ poetry.title }},{{ poetry.dynasty }}">
+  
+  {% for css_file in assets.css_files %}
+    <link rel="stylesheet" href="{{ css_file }}" />
+  {% endfor %}
+{% endblock %}
+
+{% block content %}
+  <section class="bg-white">
+    <div class="layout py-12">
+      <div class="flex flex-1 flex-col overflow-auto">
+        <h1 class="text-[1.8rem] lg:text-[2.67rem] mb-[1.3rem] text-slate-800 lg:leading-[2.67rem] lg:text-center">
+          {{ poetry.title }}
+        </h1>
+        <div class="node-metas mb-10 text-gray-400 lg:text-center">
+          <a href="/poetry/cat/{{ poetry.dynasty }}">
+            <i class="iconfont icon-benshubook122 mr-1"></i>
+            {{ poetry.dynasty }}
+          </a>
+          {% if !author_name.is_empty() %}
+            <span class="ml-4">
+              <i class="iconfont icon-OOjs_UI_icon_userAvatar mr-1"></i>
+              {{ author_name }}
+            </span>
+          {% endif %}
+          {% if !poetry.tags.is_empty() %}
+            <div class="tags mt-2">
+              {% for tag in poetry.tags.split(',') %}
+                <span class="text-sm text-gray-500 mr-2 ml-2 rounded-sm bg-gray-100 p-1">
+                  {{ tag }}
+                </span>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+        
+        {% if is_book && chapters.len() > 0 %}
+          {# 书籍类型：显示章节列表和内容 #}
+          <div class="flex lg:flex-row flex-col gap-4" x-data="{ selectedChapterId: {{ chapters[0].id }} }">
+            <div class="chapter-title-list min-w-52 border-r border-gray-200">
+              <div class="p-2 mr-2 mb-4 rounded-md bg-gray-100">
+                <h2 class="text-lg font-bold">章节目录</h2>
+              </div>
+              <div class="max-h-[calc(100vh-200px)] overflow-auto">
+                {% for chapter in chapters %}
+                  {% if chapter.pid == 0 %}
+                    {# 根章节 #}
+                    <div>
+                      <a
+                        class="block p-2 hover:bg-gray-200 rounded-md mr-2 cursor-pointer"
+                        :class="{ 'text-purple-700': selectedChapterId === {{ chapter.id }} }"
+                        @click="selectedChapterId = {{ chapter.id }}"
+                      >
+                        {{ chapter.title }}
+                      </a>
+                      {# 子章节 #}
+                      {% for child in chapters %}
+                        {% if child.pid == chapter.id %}
+                          <div>
+                            <a
+                              class="block p-2 hover:bg-gray-200 rounded-md mr-2 cursor-pointer ml-4"
+                              :class="{ 'text-purple-700': selectedChapterId === {{ child.id }} }"
+                              @click="selectedChapterId = {{ child.id }}"
+                            >
+                              {{ child.title }}
+                            </a>
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+            <div class="chapter-content flex-1">
+              {% for chapter in chapters %}
+                <article 
+                  id="chapter-{{ chapter.id }}"
+                  x-show="selectedChapterId === {{ chapter.id }}"
+                  x-cloak
+                >
+                  {% for line in chapter.content.split('\n') %}
+                    <p class="mt-4">{{ line }}</p>
+                  {% endfor %}
+                </article>
+              {% endfor %}
+            </div>
+          </div>
+        {% else %}
+          {# 普通诗词：直接显示内容 #}
+          <article class="oic-article-detail prose lg:prose-p max-w-full break-words{% if !has_wenyanwen %} lg:text-center{% endif %}">
+            {% for line in poetry.content.split('\n') %}
+              <p>{{ line }}</p>
+            {% endfor %}
+          </article>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+{% block sidebar %}
+  {% for widget in side_widgets %}
+    {{ widget | safe }}
+  {% endfor %}
+{% endblock %}
+
+{% block scripts %}
+{% for js_file in assets.js_files %}
+<script type="module" src="{{ js_file }}"></script>
+{% endfor %}
+{% endblock %}

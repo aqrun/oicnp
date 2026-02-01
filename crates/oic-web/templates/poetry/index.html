@@ -1,0 +1,65 @@
+{% extends "../layout.html" %}
+{% import "macros/poetry-macros.html" as poetry_macros %}
+{% import "macros/blog-macros.html" as blog_macros %}
+
+{% block title %}诗词鉴赏|灵犀纪-心有灵犀，专注技术分享{% endblock %}
+
+{% block head %}
+  <meta name="description" content="灵犀纪,诗词鉴赏,古诗词,唐诗,宋词,诗经,楚辞">
+  
+  {% for css_file in assets.css_files %}
+    <link rel="stylesheet" href="{{ css_file }}" />
+  {% endfor %}
+{% endblock %}
+
+{% block page_hero %}
+{{ blog_macros::page_hero(
+  id = "blog-hero",
+  title = "内容阅读",
+  description = "在线内容阅读，包括但不限于诗词、技术文档等。",
+  bg_image = "/public/images/heros/blog.png"
+) }}
+{% endblock %}
+
+{% block sidebar_left %}
+  {{ side_nav | safe }}
+{% endblock %}
+
+{% block content %}
+  {% for category_group in poetry_by_category %}
+    <div class="mb-8">
+      <div class="list-block-title flex items-end justify-between mb-4 border-b border-gray-200 pb-1">
+        <div class="flex items-center">
+          <h2 class="list-block-title-text text-xl font-medium">
+            {{ category_group.category_name }}
+          </h2>
+        </div>
+        {% if !category_group.more_link.is_empty() %}
+          <div>
+            <a href="{{ category_group.more_link }}" class="text-sm text-gray-400 hover:text-purple-500">
+              更多
+            </a>
+          </div>
+        {% endif %}
+      </div>
+      
+      <div class="relative flex flex-wrap flex-row">
+        {% for item in category_group.poetry_list %}
+          {{ poetry_macros::render_poem_item(item, category_group.category_name) }}
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+{% endblock %}
+
+{% block sidebar %}
+  {% for widget in side_widgets %}
+    {{ widget | safe }}
+  {% endfor %}
+{% endblock %}
+
+{% block scripts %}
+{% for js_file in assets.js_files %}
+<script type="module" src="{{ js_file }}"></script>
+{% endfor %}
+{% endblock %}

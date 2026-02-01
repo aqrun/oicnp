@@ -28,6 +28,7 @@ pub async fn run() -> Result<()> {
         .merge(controllers::home_routes())
         .merge(controllers::blog_routes())
         .merge(controllers::tool_routes())
+        .merge(controllers::poetry_routes())
         // 内联资源
         .merge(static_assets_router(vite_serve))
         // 静态资源路由配置

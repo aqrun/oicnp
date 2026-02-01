@@ -145,7 +145,7 @@ pub static POETRY_CATEGORIES: Lazy<Vec<SideNavItem>> = Lazy::new(|| {
     SideNavItem {
       name: "宋词".to_string(),
       vid: "song-ci".to_string(),
-      href: "/poetry/cat/song-ci/".to_string(),
+      href: "/poetry/cat/song-ci".to_string(),
       tags: Some(vec!["宋词".to_string()]),
       dynasty: Some("宋".to_string()),
     },

@@ -1,0 +1,66 @@
+{% macro render_poem_item(item, category) %}
+  <div class="poem-list-item-w w-full lg:w-1/2 mb-4 lg:[&:nth-child(even)_.poem-list-item]:ml-2 lg:[&:nth-child(odd)_.poem-list-item]:mr-2">
+    <div class="poem-list-item overflow-hidden rounded-lg hover:shadow-lg hover:shadow-violet-100 hover:border-violet-400 cursor-pointer border border-slate-200 border-solid">
+      <a
+        href="/poetry/n/{{ item.poetry.uuid }}"
+        class="block w-full h-full md:flex"
+      >
+        <div class="w-full p-4 bg-white dark:bg-gray-800 lg:min-h-40">
+          <p class="font-light text-gray-400 text-md">
+            <i class="iconfont icon-benshubook122 mr-1"></i>
+            {{ category }}
+            {% if !item.author_name.is_empty() %}
+              <span class="ml-2 text-gray-400 font-light">
+                <i class="iconfont icon-OOjs_UI_icon_userAvatar mr-1"></i>
+                {{ item.author_name }}
+              </span>
+            {% endif %}
+          </p>
+          <p class="mb-2 text-xl font-medium text-gray-800 dark:text-white">
+            {{ item.poetry.title }}
+          </p>
+          <div class="font-light text-gray-800 dark:text-gray-300 text-md">
+            {% if item.poetry.content == "book" %}
+              {% if !item.poetry.description.is_empty() %}
+                <p>{{ item.poetry.description | truncate(40) }}</p>
+              {% elif item.chapters.len() > 0 %}
+                <p>{{ item.chapters[0].content | truncate(40) }}</p>
+              {% else %}
+                <p>暂无内容</p>
+              {% endif %}
+            {% elif item.poetry.content.len() > 100 %}
+              <p>{{ item.poetry.content | truncate(40) }}</p>
+            {% else %}
+              {% for line in item.poetry.content.split('\n') %}
+                {% if loop.index0 < 2 %}
+                  <p>{{ line }}</p>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro render_load_more(uri, page, cat_vid) %}
+  <div 
+    class="w-full flex justify-center items-center py-[20px]"
+    hx-get="{{ uri }}?page={{ page }}{% if !cat_vid.is_empty() %}&cat_vid={{ cat_vid }}{% endif %}"
+    hx-trigger="click"
+    hx-swap="outerHTML"
+  >
+    <div
+      class="text-center text-gray-500 cursor-pointer hover:text-purple-700 transition-colors"
+    >
+      <span class="htmx-indicator">
+        <span class="inline-block animate-spin mr-2">⟳</span>
+        加载中...
+      </span>
+      <span class="htmx-request:hidden">
+        点击加载更多...
+      </span>
+    </div>
+  </div>
+{% endmacro %}
