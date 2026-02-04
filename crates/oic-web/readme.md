@@ -1,5 +1,7 @@
 # lxage 博客
 
+> https://pinemix.com/docs/getting-started
+
 > 📝 **迁移进度**: 查看 [MIGRATION.md](./MIGRATION.md) 了解详细的迁移进度和待办事项
 
 ## 技术栈

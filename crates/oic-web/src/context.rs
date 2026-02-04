@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use anyhow::Result;
 use oic_cache::{Cache, CacheConfig};
 use crate::models::SiteConfig;
+use std::path::PathBuf;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(default)]
@@ -14,6 +15,8 @@ pub struct WebConfig {
     pub dev_cache_seconds: u64,
     pub api_url: String,
     pub site: SiteConfig,
+    /// 当前工作目录
+    pub base_dir: String,
 }
 
 /// Web 应用的上下文
@@ -29,12 +32,21 @@ pub async fn load_config() -> Result<WebConfig> {
 
   let mut cfg = WebConfig::default();
 
-  if let Ok(content) = tokio::fs::read_to_string(config_file).await {
+  if let Ok(content) = tokio::fs::read_to_string(config_file.as_str()).await {
     if let Ok(config) = serde_yaml::from_str::<WebConfig>(&content) {
       cfg = config;
     }
   }
-  
+
+  let default_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
+  let base_dir = if let Ok(config_path) = std::fs::canonicalize(config_file.as_str()) {
+    let mut c: PathBuf = config_path;
+    c.push("../../");
+    let a = std::fs::canonicalize(c).unwrap_or(default_dir);
+    a
+  } else { default_dir };
+  cfg.base_dir = base_dir.to_string_lossy().to_string();
+
   Ok(cfg)
 }
 

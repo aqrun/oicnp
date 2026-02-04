@@ -31,7 +31,7 @@
       <div class="list-block-title flex items-end justify-between mb-4 border-b border-gray-200 pb-1">
         <div class="flex items-center">
           <h2 class="list-block-title-text text-xl font-medium">
-            {{ category_group.category_name }}
+            {{ category_group.category_name.as_str() }}
           </h2>
         </div>
         {% if !category_group.more_link.is_empty() %}
@@ -45,7 +45,7 @@
       
       <div class="relative flex flex-wrap flex-row">
         {% for item in category_group.poetry_list %}
-          {{ poetry_macros::render_poem_item(item, category_group.category_name) }}
+          {{ poetry_macros::render_poem_item(item, category_group.category_name.as_str()) }}
         {% endfor %}
       </div>
     </div>

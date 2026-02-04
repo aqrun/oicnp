@@ -12,6 +12,16 @@ use bytes::Bytes;
 use super::{CalendarWidget, RecommendBlogsWidget, RecommendTagsWidget, SideNavWidget};
 use crate::models::poetry::PoetryListParams;
 
+/// 安全地按字符数截取字符串（不添加省略号）
+fn truncate_chars(s: &str, max_chars: usize) -> (String, bool) {
+    let chars: Vec<char> = s.chars().collect();
+    if chars.len() > max_chars {
+        (chars[..max_chars].iter().collect(), true)
+    } else {
+        (s.to_string(), false)
+    }
+}
+
 #[derive(Template)]
 #[template(path = "poetry/index.html")]
 pub struct PoetryHomeTemplate {
@@ -24,7 +34,7 @@ pub struct PoetryHomeTemplate {
     pub has_sidebar_left: bool,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct PoetryCategoryGroup {
     pub category_id: String,
     pub category_name: String,
@@ -32,11 +42,13 @@ pub struct PoetryCategoryGroup {
     pub more_link: String,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct PoetryItemWithChapters {
     pub poetry: PoetryListDataModel,
     pub chapters: Vec<ChapterModel>,
     pub author_name: String,
+    pub title_truncated: String,
+    pub title_needs_tooltip: bool,
 }
 
 #[derive(Template)]
@@ -91,6 +103,7 @@ pub async fn render_poetry_home(
         ..Default::default()
     };
     
+    tracing::info!("获取诗词列表首页数据 list-page-data: {:?}", params.clone());
     let response = describe_poetry_list_page_data(ctx, &params).await?;
     
     // 按分类分组
@@ -123,10 +136,13 @@ pub async fn render_poetry_home(
                         .take(5)
                         .cloned()
                         .collect();
+                    let (title_truncated, title_needs_tooltip) = truncate_chars(&poetry.title, 10);
                     PoetryItemWithChapters {
                         poetry: poetry.clone(),
                         chapters,
                         author_name: poetry.author_name.clone().unwrap_or_default(),
+                        title_truncated,
+                        title_needs_tooltip,
                     }
                 })
                 .collect();
@@ -205,6 +221,7 @@ pub async fn render_poetry_list(
         }
     }
     
+    tracing::info!("获取诗词列表首页数据 list-page-data: {:?}", api_params.clone());
     let response = describe_poetry_list_with_chapters(ctx, &api_params).await?;
     
     // 为每个诗词准备章节列表
@@ -214,10 +231,13 @@ pub async fn render_poetry_list(
                 .filter(|ch| ch.poetry_id == poetry.id)
                 .cloned()
                 .collect();
+            let (title_truncated, title_needs_tooltip) = truncate_chars(&poetry.title, 10);
             PoetryItemWithChapters {
                 poetry: poetry.clone(),
                 chapters,
                 author_name: poetry.author_name.clone().unwrap_or_default(),
+                title_truncated,
+                title_needs_tooltip,
             }
         })
         .collect();
@@ -281,6 +301,7 @@ pub async fn render_poetry_detail(
         ..Default::default()
     };
     
+    tracing::info!("获取诗词详情数据 list-with-chapters: {:?}", params.clone());
     let response = describe_poetry_list_with_chapters(ctx, &params).await?;
     
     let poetry = response.poetry_list.first()
@@ -297,18 +318,13 @@ pub async fn render_poetry_detail(
     let has_wenyanwen = poetry.tags.contains("文言文");
     
     let assets = AssetFiles::default();
-    let side_widgets = vec![
-        CalendarWidget::default().get_html(ctx).await,
-        RecommendBlogsWidget::init(ctx).await.get_html(ctx).await,
-        RecommendTagsWidget::init(ctx).await.get_html(ctx).await,
-    ];
     let template = PoetryDetailTemplate {
         ctx: ctx.clone(),
         menu_vid: String::from("poetry"),
         poetry,
         chapters,
         assets,
-        side_widgets,
+        side_widgets: vec![],
         has_sidebar_left: false,
         is_book,
         author_name,

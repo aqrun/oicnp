@@ -138,10 +138,11 @@ macro_rules! cached {
         // 生产模式：使用缓存
         #[cfg(not(debug_assertions))]
         {
+            let render_future = $render;
             match crate::services::get_cached_or_render(
                 $cache,
                 $key,
-                move || async move { $render.await },
+                move || render_future,
                 None,
             ).await {
                 Ok(bytes) => axum::response::Html(bytes).into_response(),
@@ -194,6 +195,7 @@ macro_rules! cached {
         // 生产模式：使用缓存
         #[cfg(not(debug_assertions))]
         {
+            let render_future = $render;
             let config = crate::services::CacheConfig {
                 dev_ttl: $ttl,
                 prod_ttl: $ttl,
@@ -201,7 +203,7 @@ macro_rules! cached {
             match crate::services::get_cached_or_render(
                 $cache,
                 $key,
-                move || async move { $render.await },
+                move || render_future,
                 Some(config),
             ).await {
                 Ok(bytes) => axum::response::Html(bytes).into_response(),
