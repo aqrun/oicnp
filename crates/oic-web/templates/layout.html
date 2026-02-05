@@ -28,7 +28,7 @@
 
           <div class="flex lg:flex-row flex-col gap-4 mb-8">
             {% if has_sidebar_left %}
-              <aside class="sticky t-[80px] w-[200px] max-h-[400px] bg-white">
+              <aside class="w-full shrink-0 lg:w-[200px] lg:min-w-[200px]">
                 {% block sidebar_left %}{% endblock %}
               </aside>
             {% endif %}

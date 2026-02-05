@@ -20,16 +20,28 @@
   }
 }
 
+/* side-nav: 移动端横向排列，桌面端纵向 + sticky；参考 Next.js poetry/BookList/SideNav */
+.side-nav-container {
+  font-size: 16px;
+  color: var(--text-color);
+}
+
 .side-nav-list {
   .side-nav-item {
     &.active {
-      a {
+      .side-nav-link {
         color: var(--primary);
         background-color: var(--color-very-light-purple);
         font-weight: 500;
-        border-left-color: var(--primary);
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
+      }
+
+      /* 桌面端：左侧边框作为激活指示 */
+      @media (min-width: 64rem) {
+        .side-nav-link {
+          border-left-color: var(--primary);
+          border-top-left-radius: 0;
+          border-bottom-left-radius: 0;
+        }
       }
     }
   }

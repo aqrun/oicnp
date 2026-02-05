@@ -103,3 +103,9 @@ crates/oic-web/
 │   └── services/        # 业务逻辑（API 调用等）
 └── templates/           # Askama 模板文件
 ```
+
+# DEV
+
+```shell
+cargo run -p oic_cmd --release -- serve
+```
