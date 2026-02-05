@@ -4,6 +4,7 @@ public_dir: ./apps/web-app/dist
 default_cache_seconds: 3600
 dev_cache_seconds: 1
 api_url: http://localhost:5150
+handler_cache_time: 1 # 60 * 60 * 2;
 
 site:
   title: "灵犀纪"

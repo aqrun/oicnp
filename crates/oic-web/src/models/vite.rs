@@ -292,7 +292,7 @@ impl AssetFiles {
             // 如果函数返回 None，尝试从文件系统读取
             // 构建输出目录通常是 ./app/dist
             let manifest_paths = vec![
-                "../../apps/web-app/dist/.vite/manifest.json",
+                "./apps/web-app/dist/.vite/manifest.json",
                 "./app/dist/.vite/manifest.json",
                 "./dist/.vite/manifest.json",
                 "../app/dist/.vite/manifest.json",
@@ -305,7 +305,7 @@ impl AssetFiles {
             }
             None
         });
-        println!("manifest_str_opt: {:?}", manifest_str_opt);
+
         if let Some(manifest_str) = manifest_str_opt {
             if let Ok(manifest) = serde_json::from_str::<ViteManifest>(&manifest_str) {
                 if let Some((js_files, css_files)) = Self::extract_paths_from_manifest(&manifest) {
@@ -540,7 +540,6 @@ async fn handle_static_assets(
 pub fn static_assets_router(vite_serve: ViteServe) -> Router<WebAppContext> {
     #[cfg(debug_assertions)]
     {
-        println!("static_assets_router debug======");
         // Debug 模式：使用智能处理器，只处理静态资源请求
         // 这样不会拦截其他 Askama 路由（如 /about, /contact 等）
         // 注意：这个路由必须放在所有其他路由之后，作为最后的 fallback
@@ -555,12 +554,11 @@ pub fn static_assets_router(vite_serve: ViteServe) -> Router<WebAppContext> {
     
     #[cfg(not(debug_assertions))]
     {
-        println!("static_assets_router release======");
         // Release 模式：处理嵌入的静态资源
         // 注意：/public/* 路径由文件系统 ServeDir 处理，不在这里
         // 只处理编译后的资源：/assets/* (JS/CSS), /.vite/* (manifest)
         Router::new()
             .route_service("/assets/{*path}", vite_serve.clone())
-            .route_service("/.vite/{*path}", vite_serve.clone())
+            .route_service("/.vite", vite_serve.clone())
     }
 }

@@ -6,7 +6,7 @@ use axum::{
 };
 use oic_core::middleware::HtmxRequest;
 use crate::views::poetry::{render_poetry_home, render_poetry_list, render_poetry_detail};
-use crate::{cached, consts::HANDLER_CACHE_TIME, WebAppContext};
+use crate::{cached, WebAppContext};
 use crate::models::poetry::PoetryListParams;
 
 /// 诗词首页
@@ -18,7 +18,7 @@ async fn poetry_home(
       &ctx.cache,
       &cache_key,
       render_poetry_home(&ctx),
-      HANDLER_CACHE_TIME
+      ctx.config.handler_cache_time
   )
 }
 
@@ -46,7 +46,7 @@ async fn poetry_list_by_category(
       &ctx.cache,
       &cache_key,
       render_poetry_list(&ctx, &new_params, &htmx),
-      HANDLER_CACHE_TIME
+      ctx.config.handler_cache_time
   )
 }
 
@@ -60,7 +60,7 @@ async fn poetry_detail(
       &ctx.cache,
       &cache_key,
       render_poetry_detail(&ctx, uuid.clone()),
-      HANDLER_CACHE_TIME
+      ctx.config.handler_cache_time
   )
 }
 

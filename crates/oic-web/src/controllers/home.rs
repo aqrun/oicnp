@@ -6,7 +6,7 @@ use axum::{
     http::StatusCode,
 };
 use crate::views::{render_home_index, render_out_link};
-use crate::{cached, consts::HANDLER_CACHE_TIME, WebAppContext};
+use crate::{cached, WebAppContext};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -21,7 +21,7 @@ async fn index(
         &ctx.cache,
         "home:index",
         render_home_index(&ctx),
-        HANDLER_CACHE_TIME
+        ctx.config.handler_cache_time
     )
 }
 

@@ -6,7 +6,7 @@ use axum::{
 };
 use oic_core::middleware::HtmxRequest;
 use crate::views::{render_blog_list, render_blog_detail};
-use crate::{cached, consts::HANDLER_CACHE_TIME, WebAppContext};
+use crate::{cached, WebAppContext};
 use crate::models::blog::BlogListParams;
 
 /// 博客列表页
@@ -32,7 +32,7 @@ async fn blog_list(
         &ctx.cache,
         &cache_key,
         render_blog_list(&ctx, &params, &htmx),
-        HANDLER_CACHE_TIME
+        ctx.config.handler_cache_time
     )
 }
 
@@ -61,7 +61,7 @@ async fn blog_list_by_category(
         &ctx.cache,
         &cache_key,
         render_blog_list(&ctx, &new_params, &htmx),
-        HANDLER_CACHE_TIME
+        ctx.config.handler_cache_time
     )
 }
 
@@ -90,7 +90,7 @@ async fn blog_list_by_tag(
         &ctx.cache,
         &cache_key,
         render_blog_list(&ctx, &new_params, &htmx),
-        HANDLER_CACHE_TIME
+        ctx.config.handler_cache_time
     )
 }
 
@@ -104,7 +104,7 @@ async fn blog_detail(
         &ctx.cache,
         &cache_key,
         render_blog_detail(&ctx, vid.clone()),
-        HANDLER_CACHE_TIME
+        ctx.config.handler_cache_time
     )
 }
 

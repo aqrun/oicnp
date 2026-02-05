@@ -3,16 +3,23 @@
 module.exports = {
   apps: [
     {
-      name: 'lxage-axum-web',
-      cwd: 'github.com/aqrun/oicnp',
-      script: 'target/release/ic',
-      args: 'serve',
+      name: 'lxage-web',
+      cwd: 'github.com/aqrun/oicnp/apps/web',
+      script: 'npm',
+      args: 'start',
       instances: 1,
       exec_mode: 'fork',
       autorestart: true,
       watch: false,
-      max_memory_restart: '100M',
-      env: {},
+      max_memory_restart: '500M',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 9000,
+        HOSTNAME: '0.0.0.0',
+        NODE_OPTIONS: '--max-old-space-size=500',
+        NEXT_PUBLIC_OICNP_API_URI: 'http://localhost:5150',
+        NEXT_PUBLIC_OICNP_STATIC_URI: 'http://static.oicnp.my/',
+      },
       error_file: '/var/log/pm2/lxage-web-error.log',
       out_file: '/var/log/pm2/lxage-web-out.log',
       log_date_format: 'YYYY-MM-DD HH:mm:ss',
@@ -28,7 +35,7 @@ module.exports = {
       exec_mode: 'fork',
       autorestart: true,
       watch: false,
-      max_memory_restart: '100M',
+      max_memory_restart: '500M',
       env: {
         NODE_ENV: 'production',
         PORT: 9001,
@@ -52,7 +59,7 @@ module.exports = {
       exec_mode: 'fork',
       autorestart: true,
       watch: false,
-      max_memory_restart: '100M',
+      max_memory_restart: '500M',
       env: {
         PORT: 5150,
         HOSTNAME: '0.0.0.0',

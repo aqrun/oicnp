@@ -17,6 +17,8 @@ pub struct WebConfig {
     pub site: SiteConfig,
     /// 当前工作目录
     pub base_dir: String,
+    /// 处理器缓存时间
+    pub handler_cache_time: i64,
 }
 
 /// Web 应用的上下文

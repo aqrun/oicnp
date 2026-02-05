@@ -5,7 +5,7 @@ use axum::{
   response::IntoResponse,
 };
 use crate::views::{render_tool_list};
-use crate::{cached, consts::HANDLER_CACHE_TIME, WebAppContext};
+use crate::{cached, WebAppContext};
 use crate::models::tool::ToolListParams;
 
 /// 工具列表页
@@ -19,7 +19,7 @@ async fn tool_list(
       &ctx.cache,
       &cache_key,
       render_tool_list(&ctx, &params),
-      HANDLER_CACHE_TIME
+      ctx.config.handler_cache_time
   )
 }
 
@@ -38,7 +38,7 @@ async fn tool_list_by_category(
       &ctx.cache,
       &cache_key,
       render_tool_list(&ctx, &new_params),
-      HANDLER_CACHE_TIME
+      ctx.config.handler_cache_time
   )
 }
 
