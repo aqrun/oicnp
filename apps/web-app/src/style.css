@@ -8,7 +8,7 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --font-primary: Inter, var(--font-sans);
+  --font-primary: -apple-system,SF UI Text,Arial,PingFang SC,Hiragino Sans GB,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
   --color-primary: #764abc;
 }
 

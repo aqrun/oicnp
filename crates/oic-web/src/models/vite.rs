@@ -374,14 +374,14 @@ impl AssetFiles {
             // 收集所有 CSS 文件
             // 1. 从入口文件的 css 字段获取
             for css in &entry.css {
-                css_files.push(format!("/{}", css));
+                css_files.push(format!("/public/{}", css));
             }
             
             // 2. 从静态导入的文件中收集 CSS
             for import_key in &entry.imports {
                 if let Some(import_entry) = manifest.get(import_key) {
                     for css in &import_entry.css {
-                        let css_path = format!("/{}", css);
+                        let css_path = format!("/public/{}", css);
                         if !css_files.contains(&css_path) {
                             css_files.push(css_path);
                         }
@@ -407,18 +407,18 @@ impl AssetFiles {
                 });
                 
                 if let Some((_, css_entry)) = css_entry {
-                    css_files.push(format!("/{}", css_entry.file));
+                    css_files.push(format!("/public/{}", css_entry.file));
                 } else {
                     // 如果没找到，使用第一个 CSS 条目
                     if let Some((_, css_entry)) = manifest.iter().find(|(key, _)| key.ends_with(".css")) {
-                        css_files.push(format!("/{}", css_entry.file));
+                        css_files.push(format!("/public/{}", css_entry.file));
                     }
                 }
             }
             
             // 如果 JS 路径为空，至少添加入口文件
             if js_files.is_empty() {
-                js_files.push(format!("/{}", entry.file));
+                js_files.push(format!("/public/{}", entry.file));
             }
             
             return Some((js_files, css_files));
@@ -441,7 +441,7 @@ impl AssetFiles {
 
         if let Some(entry) = manifest.get(key) {
             // 添加当前文件的 JS 路径
-            js_files.push(format!("/{}", entry.file));
+            js_files.push(format!("/public/{}", entry.file));
 
             // 递归收集静态导入的文件
             for import_key in &entry.imports {

@@ -2,7 +2,7 @@ use axum::Router;
 use anyhow::Result;
 use crate::controllers;
 use tower_http::services::ServeDir;
-use crate::{models::static_assets_router, context::init_context};
+use crate::context::init_context;
 
 #[derive(vite_rs::Embed)]
 #[root = "../../apps/web-app"]
@@ -17,7 +17,7 @@ pub async fn run() -> Result<()> {
     // 等待 dev server 启动
     #[cfg(debug_assertions)]
     tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
-    let vite_serve = vite_rs_axum_0_8::ViteServe::new(Assets::boxed());
+    let _vite_serve = vite_rs_axum_0_8::ViteServe::new(Assets::boxed());
 
     // 监听地址
     let addr = format!("{}:{}", app_ctx.config.host.as_str(), app_ctx.config.port);
@@ -28,7 +28,7 @@ pub async fn run() -> Result<()> {
         .merge(controllers::tool_routes())
         .merge(controllers::poetry_routes())
         // 内联资源（Release 模式下处理嵌入的静态资源，如 /assets/*）
-        .merge(static_assets_router(vite_serve))
+        // .merge(static_assets_router(vite_serve))
         .nest_service("/public", ServeDir::new(app_ctx.config.public_dir.as_str()))
         .with_state(app_ctx);
 
