@@ -172,7 +172,7 @@ pub fn get_user_agent_info(user_agent: &str, user_agent_parser: &str) -> UserAge
 
 pub async fn get_city_by_ip(ip: &str) -> Result<ClientNetInfo, Box<dyn std::error::Error>> {
     let url = "http://whois.pconline.com.cn/ipJson.jsp?json=true&ip=".to_string() + ip;
-    let resp = reqwest::get(url.as_str()).await?.text_with_charset("utf-8").await?;
+    let resp = reqwest::get(url.as_str()).await?.text().await?;
 
     let mut info = serde_json::from_str::<ClientNetInfo>(resp.as_str())?;
     info.location = format!("{}{}", info.province, info.city);
