@@ -1,0 +1,11 @@
+{% import "macros/poetry-macros.html" as poetry_macros %}
+
+<div class="relative flex flex-wrap flex-row">
+  {% for item in poetry_list %}
+    {{ poetry_macros::render_poem_item(item, category_title) }}
+  {% endfor %}
+</div>
+
+{% if has_more %}
+  {{ poetry_macros::render_load_more(more_uri, page, "") }}
+{% endif %}

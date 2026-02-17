@@ -6,7 +6,8 @@
     "lint": "turbo lint",
     "type-check": "turbo type-check",
     "clean": "turbo clean",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "serve:web": "cargo run --release -p oic_cmd -- serve"
   },
   "devDependencies": {
     "prettier": "^3.2.5",

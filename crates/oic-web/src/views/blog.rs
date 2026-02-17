@@ -110,7 +110,7 @@ pub async fn render_blog_list(
         nodes,
         page: next_page,
         cat_vid: String::from(""),
-        more_uri: String::from("/blog/"),
+        more_uri: String::from("/blog"),
         has_more,
         tag_vid: String::from(""),
         is_tag_page: false,
@@ -127,7 +127,7 @@ pub async fn render_blog_list(
         node_list_template.is_tag_page = true;
     } else {
         // 首页
-        node_list_template.more_uri = format!("/blog/");
+        node_list_template.more_uri = format!("/blog");
 
         if active_vid != "all" {
             node_list_template.cat_vid = String::from(active_vid.as_str());

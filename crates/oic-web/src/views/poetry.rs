@@ -71,6 +71,18 @@ pub struct PoetryListTemplate {
 }
 
 #[derive(Template)]
+#[template(path = "poetry/poetry-list.html")]
+pub struct PoetryListPartialTemplate {
+    pub poetry_list: Vec<PoetryItemWithChapters>,
+    pub page: u64,
+    pub total: u64,
+    pub page_size: u64,
+    pub has_more: bool,
+    pub more_uri: String,
+    pub category_title: String,
+}
+
+#[derive(Template)]
 #[template(path = "poetry/detail.html")]
 pub struct PoetryDetailTemplate {
     pub ctx: WebAppContext,
@@ -250,8 +262,16 @@ pub async fn render_poetry_list(
     
     // HTMX 请求直接返回部分内容
     if htmx.is_htmx {
-        // TODO: 创建 HTMX 部分模板
-        return Ok(Bytes::from(""));
+        let template = PoetryListPartialTemplate {
+            poetry_list: poetry_with_chapters,
+            page: next_page,
+            total: response.total,
+            page_size: response.page_size,
+            has_more,
+            more_uri,
+            category_title: String::from(category_title.as_str()),
+        };
+        return template.render_bytes();
     }
     
     let side_nav = SideNavWidget {
