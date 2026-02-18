@@ -1,11 +1,15 @@
 @import 'https:////at.alicdn.com/t/c/font_3063613_sd5908urvd.css';
 /* @import 'react-photo-view/dist/react-photo-view.css'; */
 @import 'tailwindcss';
-
-@source '../../../crates/oic-web/templates';
+@import 'flowbite/src/themes/default.css';
 
 @plugin "@tailwindcss/forms";
 @plugin "@tailwindcss/typography";
+@plugin "flowbite/plugin";
+
+@source '../../../crates/oic-web/templates';
+@source "../node_modules/flowbite";
+
 
 @theme {
   --font-primary: -apple-system,SF UI Text,Arial,PingFang SC,Hiragino Sans GB,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;

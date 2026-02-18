@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use askama::Template;
 use crate::models::{AssetFiles, RenderBytes, POETRY_CATEGORIES};
 use crate::services::{describe_poetry_list_page_data, describe_poetry_list_with_chapters};

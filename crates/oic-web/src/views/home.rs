@@ -22,31 +22,6 @@ pub struct HomeTemplate {
     pub side_widgets: Vec<String>,
 }
 
-#[derive(Clone)]
-pub struct NewsItem {
-    pub node: NodeDetailModel,
-    pub category_name: Option<String>,
-    pub category_id: Option<i64>,
-    pub vid: Option<String>,
-    pub title: Option<String>,
-    pub created_at: Option<String>,
-    pub date_year: Option<String>,
-    pub date_month: Option<String>,
-    pub date_day: Option<String>,
-    pub image_index: usize,
-}
-
-#[derive(Clone)]
-pub struct ArticleItem {
-    pub node: NodeDetailModel,
-    pub category_name: Option<String>,
-    pub vid: Option<String>,
-    pub title: Option<String>,
-    pub summary: Option<String>,
-    pub created_at: Option<String>,
-    pub tags: Vec<String>,
-}
-
 pub async fn render_home_index(ctx: &WebAppContext) -> Result<Bytes> {
     // 调用 API 获取节点列表
     let node_filters = NodeFilters {
@@ -112,6 +87,50 @@ pub fn render_out_link(target_url: String) -> Result<Bytes> {
     let template = OutLinkTemplate {
         target_url,
         assets,
+    };
+    template.render_bytes()
+}
+
+#[derive(Template)]
+#[template(path = "about.html")]
+pub struct AboutTemplate {
+    pub ctx: WebAppContext,
+    pub menu_vid: String,
+    pub assets: AssetFiles,
+}
+
+pub async fn render_about(ctx: &WebAppContext) -> Result<Bytes> {
+    let assets = AssetFiles::default();
+    let template = AboutTemplate {
+        ctx: ctx.clone(),
+        menu_vid: String::from("home"),
+        assets,
+    };
+    template.render_bytes()
+}
+
+#[derive(Template)]
+#[template(path = "contact.html")]
+pub struct ContactTemplate {
+    pub ctx: WebAppContext,
+    pub menu_vid: String,
+    pub assets: AssetFiles,
+    pub side_widgets: Vec<String>,
+    pub has_sidebar_left: bool,
+}
+
+pub async fn render_contact(ctx: &WebAppContext) -> Result<Bytes> {
+    let assets = AssetFiles::default();
+    let template = ContactTemplate {
+        ctx: ctx.clone(),
+        menu_vid: String::from("home"),
+        assets,
+        has_sidebar_left: false,
+        side_widgets: vec![
+            CalendarWidget::default().get_html(ctx).await,
+            RecommendBlogsWidget::init(ctx).await.get_html(ctx).await,
+            RecommendTagsWidget::init(ctx).await.get_html(ctx).await,
+        ],
     };
     template.render_bytes()
 }

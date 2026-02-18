@@ -62,13 +62,13 @@ pub async fn init_context() -> Result<WebAppContext> {
   })
 }
 
-async fn init_cache(cfg: &WebConfig) -> Result<Cache> {
+async fn init_cache(_cfg: &WebConfig) -> Result<Cache> {
   let mut config = CacheConfig::default();
 
   #[cfg(debug_assertions)]
   {
       config.storage.inline_threshold = 0;
-      config.default_ttl_seconds = cfg.dev_cache_seconds as i64; // 1 秒过期
+      config.default_ttl_seconds = _cfg.dev_cache_seconds as i64; // 1 秒过期
       // 在开发模式下，明确禁用 SWR，确保过期数据能被清理
       config.swr.enabled = false;
   }

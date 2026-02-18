@@ -141,7 +141,7 @@ fn generate_blog(
     let matter = Matter::<YAML>::new();
     let res: ParsedEntity<BlogMatter> = match matter.parse(&content) {
         Ok(data) => data,
-        Err(err) => {
+        Err(_err) => {
             println!("[OICNP]Matter parse failed: {}{}", &file_path, &file_name);
             return Err(anyhow!(
                 "[OICNP]Matter parse failed: {}{}",

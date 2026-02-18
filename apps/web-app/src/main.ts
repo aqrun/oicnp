@@ -1,6 +1,7 @@
 import '@vitejs/plugin-react-swc/preamble';
 import { renderMonthCalendar } from './components/MonthCalendar';
 import hljs from 'highlight.js';
+import 'flowbite';
 
 import 'highlight.js/styles/github-dark.css';
 import './style.css';

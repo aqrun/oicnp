@@ -1,9 +1,5 @@
 use serde::{Deserialize, Serialize};
 use chrono::{Utc, Datelike};
-use oic_core::{
-  entities::prelude::*,
-  models::nodes::NodeDetailModel,
-};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(default)]
@@ -26,13 +22,4 @@ pub struct SiteMenu {
 
 pub fn get_current_year() -> i32 {
   Utc::now().year()
-}
-
-#[derive(Debug, Default)]
-pub struct SideBar {
-  pub has_calendar: bool,
-  pub has_recommend_blogs: bool,
-  pub recommend_blogs: Vec<NodeDetailModel>,
-  pub has_blog_tags: bool,
-  pub blog_tags: Vec<TagModel>,
 }

@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use askama::Template;
 use crate::models::{AssetFiles, RenderBytes, TOOL_CATEGORIES};
 use crate::models::tool::{ALL_TOOLS, get_tools_by_category, ToolItem};

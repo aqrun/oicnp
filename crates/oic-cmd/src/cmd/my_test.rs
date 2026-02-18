@@ -1,11 +1,11 @@
 use oic_core::{
     AppContext,
-    services::user::check_user_has_role,
+    // services::user::check_user_has_role,
     uuid,
 };
 use anyhow::Result;
 
-pub async fn run(ctx: &AppContext) -> Result<()> {
+pub async fn run(_ctx: &AppContext) -> Result<()> {
     // let _ = check_user_has_role(&ctx.db, 1, "author").await?;
     // for _i in 0..10 {
     //     println!("{}", oid!());

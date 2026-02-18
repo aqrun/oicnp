@@ -5,7 +5,12 @@ use axum::{
     response::{IntoResponse, Html},
     http::StatusCode,
 };
-use crate::views::{render_home_index, render_out_link};
+use crate::views::{
+    render_home_index,
+    render_out_link,
+    render_about,
+    render_contact,
+};
 use crate::{cached, WebAppContext};
 use serde::Deserialize;
 
@@ -44,9 +49,33 @@ async fn out_link(
     }
 }
 
+async fn about(
+    State(ctx): State<WebAppContext>,
+) -> impl IntoResponse {
+    cached!(
+        &ctx.cache,
+        "home:about",
+        render_about(&ctx),
+        ctx.config.handler_cache_time
+    )
+}
+
+async fn contact(
+    State(ctx): State<WebAppContext>,
+) -> impl IntoResponse {
+    cached!(
+        &ctx.cache,
+        "home:contact",
+        render_contact(&ctx),
+        ctx.config.handler_cache_time
+    )
+}
+
 pub fn home_routes() -> Router<WebAppContext> {
     Router::new()
         //  "/" 与所有路由冲突
         .route("/", get(index))
         .route("/link", get(out_link))
+        .route("/about", get(about))
+        .route("/contact", get(contact))
 }

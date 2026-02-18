@@ -9,7 +9,7 @@ export const AI_APPS_ITEMS: ToolItem[] = [
     url: 'https://chat.openai.com/',
     description: 'OpenAI 的通用对话与创作助手，支持多模态与广泛插件生态。',
     language: 'TypeScript/JavaScript',
-    logo: 'http://static.lxage.com/20251117/tools/chat-gpt.svg',
+    logo: 'https://static.lxage.com/20251117/tools/chat-gpt.svg',
     category: 'ai-apps',
   },
   {
@@ -17,7 +17,7 @@ export const AI_APPS_ITEMS: ToolItem[] = [
     url: 'https://claude.ai/',
     description: 'Anthropic 推出的安全友好型助理，长文本与工具使用能力强。',
     language: 'TypeScript/JavaScript',
-    logo: 'http://static.lxage.com/20251117/tools/claude.svg',
+    logo: 'https://static.lxage.com/20251117/tools/claude.svg',
     category: 'ai-apps',
   },
   {
@@ -25,7 +25,7 @@ export const AI_APPS_ITEMS: ToolItem[] = [
     url: 'https://gemini.google.com/',
     description: 'Google 的多模态助手，整合搜索、文档与工作流生态。',
     language: 'TypeScript/JavaScript',
-    logo: 'http://static.lxage.com/20251117/tools/gemini.svg',
+    logo: 'https://static.lxage.com/20251117/tools/gemini.svg',
     category: 'ai-apps',
   },
   {
@@ -33,7 +33,7 @@ export const AI_APPS_ITEMS: ToolItem[] = [
     url: 'https://github.com/features/copilot',
     description: 'GitHub 与 OpenAI 合作打造的编程助理，支持 IDE 内联补全与聊天。',
     language: 'TypeScript',
-    logo: 'http://static.lxage.com/20251117/tools/copilot.svg',
+    logo: 'https://static.lxage.com/20251117/tools/copilot.svg',
     category: 'ai-apps',
   },
   {
@@ -41,7 +41,7 @@ export const AI_APPS_ITEMS: ToolItem[] = [
     url: 'https://www.cursor.com/',
     description: '面向工程师的 AI IDE，强化代码意图理解、改写与多文件协作。',
     language: 'TypeScript',
-    logo: 'http://static.lxage.com/20251117/tools/cursor.svg',
+    logo: 'https://static.lxage.com/20251117/tools/cursor.svg',
     category: 'ai-apps',
   },
   {
@@ -49,7 +49,7 @@ export const AI_APPS_ITEMS: ToolItem[] = [
     url: 'https://www.doubao.com/',
     description: '字节跳动旗下 AI 助手，覆盖创作、办公与企业应用场景。',
     language: 'TypeScript/JavaScript',
-    logo: 'http://static.lxage.com/20251117/tools/doubao.png',
+    logo: 'https://static.lxage.com/20251117/tools/doubao.png',
     category: 'ai-apps',
   },
   {
@@ -57,7 +57,7 @@ export const AI_APPS_ITEMS: ToolItem[] = [
     url: 'https://yuanbao.tencent.com/',
     description: '腾讯推出的大模型助手，支持对话、写作、图像与企业集成。',
     language: 'TypeScript/JavaScript',
-    logo: 'http://static.lxage.com/20251117/tools/yuanbao.svg',
+    logo: 'https://static.lxage.com/20251117/tools/yuanbao.svg',
     category: 'ai-apps',
   },
   {
@@ -65,7 +65,7 @@ export const AI_APPS_ITEMS: ToolItem[] = [
     url: 'https://ai.meta.com/meta-ai/',
     description: 'Meta 的 AI 助手，融入社交与多媒体体验，支持生成式功能。',
     language: 'TypeScript/JavaScript',
-    logo: 'http://static.lxage.com/20251117/tools/meta.svg',
+    logo: 'https://static.lxage.com/20251117/tools/meta.svg',
     category: 'ai-apps',
   },
   {
@@ -73,7 +73,7 @@ export const AI_APPS_ITEMS: ToolItem[] = [
     url: 'https://poe.com/',
     description: '聚合多模型的对话平台，快速切换与分享机器人配置。',
     language: 'TypeScript/JavaScript',
-    logo: 'http://static.lxage.com/20251117/tools/poe.svg',
+    logo: 'https://static.lxage.com/20251117/tools/poe.svg',
     category: 'ai-apps',
   },
   {
@@ -89,7 +89,7 @@ export const AI_APPS_ITEMS: ToolItem[] = [
     url: 'https://www.deepseek.com/',
     description: 'DeepSeek 推出的 AI 助手，支持对话、写作、图像与多模态。',
     language: 'TypeScript/JavaScript',
-    logo: 'http://static.lxage.com/20251117/tools/deepseek.png',
+    logo: 'https://static.lxage.com/20251117/tools/deepseek.png',
     category: 'ai-apps',
   },
   {
@@ -97,7 +97,7 @@ export const AI_APPS_ITEMS: ToolItem[] = [
     url: 'https://kimi.moonshot.cn/',
     description: 'Moonshot 推出的中文长文档助手，支持复杂阅读与问答任务。',
     language: 'TypeScript/JavaScript',
-    logo: 'http://static.lxage.com/20251117/tools/kimi.png',
+    logo: 'https://static.lxage.com/20251117/tools/kimi.png',
     category: 'ai-apps',
   },
   {
@@ -105,7 +105,7 @@ export const AI_APPS_ITEMS: ToolItem[] = [
     url: 'https://qwen.ai/',
     description: '阿里云大模型应用与生态，覆盖 Agent、代码、图像与多模态。',
     language: 'TypeScript/JavaScript',
-    logo: 'http://static.lxage.com/20251117/tools/qwen.png',
+    logo: 'https://static.lxage.com/20251117/tools/qwen.png',
     category: 'ai-apps',
   },
 ];

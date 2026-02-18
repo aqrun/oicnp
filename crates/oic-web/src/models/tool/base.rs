@@ -26,13 +26,6 @@ pub struct ToolItem {
   pub category: String,
 }
 
-#[derive(Deserialize, Serialize, Debug, Default, Clone)]
-#[serde(default)]
-pub struct ToolCategories {
-  pub id: String,
-  pub name: String,
-}
-
 #[derive(Deserialize)]
 struct ToolsData {
     tools: Vec<ToolItem>,
