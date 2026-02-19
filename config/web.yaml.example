@@ -28,3 +28,6 @@ site:
     - name: "Rust语言"
       vid: "rust"
       href: "/rust"
+
+admin:
+  port: 9001

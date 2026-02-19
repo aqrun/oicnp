@@ -67,6 +67,7 @@ oic_derives = { path = "crates/oic-derives" }
 oic_cmd = { path = "crates/oic-cmd" }
 oic_web = { path = "crates/oic-web" }
 oic_cache = { path = "crates/oic-cache" }
+oic_admin = { path = "crates/oic-admin" }
 migration = { path = "migration" }
 loco-rs = { version = "0.16", features = ["with-db", "cache_redis"] }
 clap = { version = "^4", features = ["derive"] }

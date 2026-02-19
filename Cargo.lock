@@ -3704,6 +3704,42 @@ dependencies = [
 ]
 
 [[package]]
+name = "oic_admin"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "askama",
+ "async-std",
+ "axum",
+ "bytes",
+ "chrono",
+ "clap",
+ "dotenv",
+ "gray_matter",
+ "lazy_static",
+ "loco-rs",
+ "oic_cache",
+ "oic_core",
+ "once_cell",
+ "pulldown-cmark",
+ "rand 0.7.3",
+ "regex",
+ "reqwest",
+ "scru128",
+ "sea-orm",
+ "sea-orm-migration",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "tokio",
+ "tower-http",
+ "tracing",
+ "urlencoding",
+ "vite-rs",
+ "vite-rs-axum-0-8",
+]
+
+[[package]]
 name = "oic_cache"
 version = "0.1.0"
 dependencies = [
