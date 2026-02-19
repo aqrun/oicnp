@@ -31,7 +31,7 @@
               </aside>
             {% endif %}
 
-            <div class="home-layout-content-w flex flex-col lg:w-[calc(100% - 22rem)]">
+            <div class="home-layout-content-w flex flex-col {% if has_sidebar_left %}has-sidebar-left{% endif %}">
               {% block content %}{% endblock %}
             </div>
             

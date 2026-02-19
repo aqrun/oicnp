@@ -1,4 +1,4 @@
-{% extends "layout_homepage.html" %}
+{% extends "layout.html" %}
 
 {% block title %}灵犀纪 - 心有灵犀，专注技术分享{% endblock %}
 
@@ -48,7 +48,7 @@
 
   <!-- News Grid -->
   {% if big_news_items.len() > 0 %}
-  <section class="oic-news-section mt-4">
+  <section class="oic-news-section mt-4 mb-4">
     <div class="layout">
       <div class="oic-news1 max-w-screen-xl mx-auto dark:bg-gray-800 text-gray-100">
         <div class="grid grid-cols-1 gap-4 lg:grid-cols-4 sm:grid-cols-2">

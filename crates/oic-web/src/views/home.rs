@@ -20,13 +20,14 @@ pub struct HomeTemplate {
     pub article_items: Vec<NodeDetailModel>,
     pub assets: AssetFiles,
     pub side_widgets: Vec<String>,
+    pub has_sidebar_left: bool,
 }
 
 pub async fn render_home_index(ctx: &WebAppContext) -> Result<Bytes> {
     // 调用 API 获取节点列表
     let node_filters = NodeFilters {
         page: Some(1),
-        page_size: Some(11),
+        page_size: Some(12),
         ..Default::default()
     };
     
@@ -69,6 +70,7 @@ pub async fn render_home_index(ctx: &WebAppContext) -> Result<Bytes> {
             RecommendBlogsWidget::init(ctx).await.get_html(ctx).await,
             RecommendTagsWidget::init(ctx).await.get_html(ctx).await,
         ],
+        has_sidebar_left: false,
     };
     
     // 使用 RenderBytes trait 直接渲染为 Bytes
@@ -97,6 +99,7 @@ pub struct AboutTemplate {
     pub ctx: WebAppContext,
     pub menu_vid: String,
     pub assets: AssetFiles,
+    pub has_sidebar_left: bool,
 }
 
 pub async fn render_about(ctx: &WebAppContext) -> Result<Bytes> {
@@ -105,6 +108,7 @@ pub async fn render_about(ctx: &WebAppContext) -> Result<Bytes> {
         ctx: ctx.clone(),
         menu_vid: String::from("home"),
         assets,
+        has_sidebar_left: false,
     };
     template.render_bytes()
 }

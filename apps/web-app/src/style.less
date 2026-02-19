@@ -108,7 +108,11 @@ article {
 
 @media (min-width: 64rem) {
   .home-layout-content-w {
-    width: calc(100% - 22rem);
+    width: calc(100% - 20rem);
+
+    &.has-sidebar-left {
+      width: calc(100% - 22rem);
+    }
   }
   .oic-layout-content {
     width: calc(100% - var(--spacing) * 80 - var(--spacing) * 4);
