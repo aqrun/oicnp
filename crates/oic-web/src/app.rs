@@ -27,6 +27,7 @@ pub async fn run() -> Result<()> {
         .merge(controllers::blog_routes())
         .merge(controllers::tool_routes())
         .merge(controllers::poetry_routes())
+        .merge(controllers::rust_routes())
         // 内联资源（Release 模式下处理嵌入的静态资源，如 /assets/*）
         // .merge(static_assets_router(vite_serve))
         .nest_service("/public", ServeDir::new(app_ctx.config.public_dir.as_str()))

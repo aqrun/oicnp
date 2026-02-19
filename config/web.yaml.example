@@ -27,4 +27,4 @@ site:
       href: "/blog"
     - name: "Rust语言"
       vid: "rust"
-      href: "/cat/rust"
+      href: "/rust"

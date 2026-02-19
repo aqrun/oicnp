@@ -232,15 +232,3 @@ article p img {
   margin: 0 auto;
   max-width: 80%;
 }
-
-/* 防止页面闪烁 - 在页面加载完成前隐藏内容 */
-html:not(.loaded) body {
-  opacity: 0;
-  visibility: hidden;
-}
-
-html.loaded body {
-  opacity: 1;
-  visibility: visible;
-  transition: opacity 0.2s ease-in-out;
-}
