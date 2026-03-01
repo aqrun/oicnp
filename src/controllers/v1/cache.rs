@@ -1,14 +1,10 @@
 use axum::debug_handler;
 use loco_rs::prelude::*;
 use oic_core::{
-    entities::prelude::*, 
-    models::caches::{
-        DeleteCacheReqParams,
-        CacheFilters,
-        CacheScopeModel,
-    },
-    utils::get_api_prefix,
+    entities::prelude::*,
+    models::caches::{CacheFilters, CacheScopeModel, DeleteCacheReqParams},
     typings::{JsonRes, Pagination},
+    utils::get_api_prefix,
     ModelCrudHandler,
 };
 
@@ -17,8 +13,9 @@ pub async fn get_one(
     State(ctx): State<AppContext>,
     Json(params): Json<CacheFilters>,
 ) -> JsonRes<CacheModel> {
-    let mut res: ModelResult<CacheModel> = Err(ModelError::Any(String::from("参数不能为空").into()));
-    
+    let mut res: ModelResult<CacheModel> =
+        Err(ModelError::Any(String::from("参数不能为空").into()));
+
     if let Some(id) = params.id {
         res = CacheModel::find_by_id(&ctx.db, id).await;
     }
@@ -31,10 +28,8 @@ pub async fn get_one(
         Ok(data) => {
             // 使用两个数据的元组指定最终 JSON 数据 key
             JsonRes::from((data, "cache"))
-        },
-        Err(err) => {
-            JsonRes::err(err)
         }
+        Err(err) => JsonRes::err(err),
     }
 }
 
@@ -59,9 +54,7 @@ pub async fn list(
 }
 
 #[debug_handler]
-pub async fn scope_list(
-    State(ctx): State<AppContext>,
-) -> JsonRes<Vec<CacheScopeModel>> {
+pub async fn scope_list(State(ctx): State<AppContext>) -> JsonRes<Vec<CacheScopeModel>> {
     let _ = CacheModel::refresh(&ctx.db).await;
 
     let scopes = match CacheModel::find_scope_list(&ctx.db).await {

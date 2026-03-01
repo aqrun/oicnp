@@ -42,10 +42,23 @@ tracing-subscriber = { workspace = true }
 # 性能监控（可选）
 prometheus = { version = "0.13", optional = true }
 
+# 服务化：Redis Protocol + gRPC
+tonic = "0.12"
+prost = "0.13"
+tokio-stream = { version = "0.1", features = ["net"] }
+
+[build-dependencies]
+tonic-build = "0.12"
+
+[[bin]]
+name = "oic-cache-server"
+path = "bin/oic-cache-server.rs"
+
 [dev-dependencies]
 criterion = { workspace = true }
 tempfile = { workspace = true }
 axum = { workspace = true }
+redis = { version = "0.27", features = ["tokio-comp", "disable-client-setinfo"] }
 
 [features]
 default = ["axum"]

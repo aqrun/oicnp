@@ -46,7 +46,10 @@ pub enum Command {
 
     /// 启动接口服务
     ///
-    Serve,
+    Serve {
+        #[clap(subcommand)]
+        command: ServeCommand,
+    },
 
     /// 诗词相关命令
     Poetry {
@@ -61,6 +64,16 @@ pub enum PoetryCommand {
     Init,
     /// 读取诗词数据到数据库
     SyncData,
+}
+
+#[derive(Subcommand)]
+pub enum ServeCommand {
+    /// 启动缓存服务
+    Cache,
+    /// 启动 web 服务
+    Web,
+    /// 启动 admin 服务
+    Admin,
 }
 
 pub async fn init_cmd() {
@@ -121,8 +134,18 @@ pub async fn init_cmd() {
         //         log::error!("SeedDataErr: {}", err);
         //     }
         // },
-        Command::Serve => {
-            let _ = oic_web::app::run().await;
+        Command::Serve { command } => {
+            match command {
+                ServeCommand::Cache => {
+                    let _ = oic_cache::app::run().await;
+                },
+                ServeCommand::Web => {
+                    let _ = oic_web::app::run().await;
+                },
+                ServeCommand::Admin => {
+                    // let _ = oic_admin::app::run().await;
+                },
+            }
         },
 
         Command::Poetry { command } => {

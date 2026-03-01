@@ -25,6 +25,7 @@ const MODULE_WHITELIST: &[&str] = &[
     "oic_core",
     "oic_web",
     "oic_derives",
+    "oic_cache",
 ];
 
 // Keep nonblocking file appender work guard

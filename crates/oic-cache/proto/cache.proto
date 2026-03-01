@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package cache;
+
+service CacheService {
+  rpc Get(GetRequest) returns (GetResponse);
+  rpc Set(SetRequest) returns (SetResponse);
+  rpc GetStatistics(Empty) returns (StatsResponse);
+  rpc InvalidateNamespace(InvalidateRequest) returns (InvalidateResponse);
+}
+
+message GetRequest {
+  string key = 1;
+}
+
+message GetResponse {
+  bytes data = 1;
+  bool found = 2;
+}
+
+message SetRequest {
+  string key = 1;
+  bytes data = 2;
+  int64 ttl_seconds = 3;
+}
+
+message SetResponse {
+  bool success = 1;
+}
+
+message Empty {}
+
+message StatsResponse {
+  int64 total_requests = 1;
+  int64 hits = 2;
+  int64 misses = 3;
+  double hit_rate = 4;
+  int64 total_entries = 5;
+}
+
+message InvalidateRequest {
+  string namespace = 1;
+}
+
+message InvalidateResponse {
+  int32 invalidated_count = 1;
+}

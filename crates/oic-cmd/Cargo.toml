@@ -13,6 +13,7 @@ name = "ic"
 [dependencies]
 oic_core = { workspace = true }
 oic_web = { workspace = true }
+oic_cache = { workspace = true }
 # migration = { workspace = true }
 sea-orm = { workspace = true }
 sea-orm-migration = { workspace = true }

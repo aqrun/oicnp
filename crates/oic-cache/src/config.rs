@@ -26,6 +26,18 @@ pub struct CacheConfig {
     
     /// SWR 配置（Stale-While-Revalidate）
     pub swr: SwrConfig,
+
+    /// 服务端监听配置
+    pub server: ServerConfig,
+}
+
+/// 独立服务监听地址配置（仅 oic-cache-server 使用）
+#[derive(Clone, Serialize, Deserialize)]
+pub struct ServerConfig {
+    /// Redis 协议监听地址
+    pub redis_addr: String,
+    /// gRPC 监听地址
+    pub grpc_addr: String,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -112,6 +124,10 @@ impl Default for CacheConfig {
             swr: SwrConfig {
                 enabled: false,
                 max_stale_seconds: 3600, // 默认最多保留 1 小时的 stale 数据
+            },
+            server: ServerConfig {
+                redis_addr: "0.0.0.0:6380".to_string(),
+                grpc_addr: "0.0.0.0:50051".to_string(),
             },
         }
     }

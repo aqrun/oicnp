@@ -18,6 +18,7 @@
 - ✅ **索引持久化** - 支持索引保存和自动加载
 - ✅ **自动保存** - 支持定期保存和更新后延迟保存（debounce）
 - ✅ **Loco_rs 兼容** - 提供与 loco_rs cache trait 兼容的 API
+- ✅ **独立服务模式** - 支持 Redis 协议（6379）与 gRPC（50051），多进程共享同一缓存
 
 ## 架构设计
 
@@ -158,6 +159,121 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 ```
+
+## 独立服务模式
+
+oic-cache 可作为独立进程运行，对外提供 **Redis 协议**（供 oic-web 等高频访问）和 **gRPC**（供 oic-admin 等管理端）。多应用共享同一份缓存。
+
+### 启动服务
+
+编译并运行独立服务二进制：
+
+```bash
+cargo build --release -p oic_cache --bin oic-cache-server
+./target/release/oic-cache-server
+```
+
+**监听地址** 可在 `CacheConfig` 的 `[server]` 中配置（与 `disk_path`、`storage` 等同文件），环境变量会覆盖配置文件：
+
+| 来源 | 说明 |
+|------|------|
+| 环境变量 | `OIC_CACHE_REDIS_ADDR`、`OIC_CACHE_GRPC_ADDR`（覆盖 config） |
+| 配置文件 | `OIC_CACHE_CONFIG` 指向的 TOML 中 `[server]` 的 `redis_addr`、`grpc_addr` |
+| 默认值 | `0.0.0.0:6379`、`0.0.0.0:50051` |
+
+配置文件示例（`cache.toml`）：
+
+```toml
+[server]
+redis_addr = "0.0.0.0:6379"
+grpc_addr = "0.0.0.0:50051"
+```
+
+命令行用环境变量覆盖配置：
+
+```bash
+OIC_CACHE_CONFIG=/etc/oic/cache.toml OIC_CACHE_REDIS_ADDR=0.0.0.0:6380 ./target/release/oic-cache-server
+```
+
+启动后会自动尝试从配置中的 `disk_path` 加载已有索引（若存在）；未设置 `OIC_CACHE_CONFIG` 时使用默认 `disk_path`。
+
+### 客户端接入 Redis 协议
+
+任何兼容 Redis 协议的客户端均可连接，例如 oic-web 使用 [redis](https://crates.io/crates/redis)：
+
+```toml
+[dependencies]
+redis = { version = "0.27", features = ["tokio-comp", "disable-client-setinfo"] }
+```
+
+```rust
+use redis::AsyncCommands;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = redis::Client::open("redis://127.0.0.1:6379")?;
+    let mut conn = client.get_multiplexed_async_connection().await?;
+
+    // 与使用 Redis 一致
+    redis::cmd("SET").arg("user:123").arg(b"alice").query_async::<()>(&mut conn).await?;
+    let value: Vec<u8> = redis::cmd("GET").arg("user:123").query_async(&mut conn).await?;
+
+    // 带过期时间
+    redis::cmd("SET").arg("session:abc").arg(b"data").arg("EX").arg(3600i64).query_async::<()>(&mut conn).await?;
+
+    // 自定义命令：按命名空间失效、查看统计
+    let _: i64 = redis::cmd("INVALIDATE_NS").arg("users").query_async(&mut conn).await?;
+    let stats: String = redis::cmd("STATS").query_async(&mut conn).await?;
+
+    Ok(())
+}
+```
+
+**服务端支持的 Redis 命令：** `GET`、`SET`（支持 `EX seconds`）、`DEL`、`EXISTS`、`FLUSHALL`、`PING`；扩展命令 `INVALIDATE_NS namespace`、`STATS`。
+
+### 客户端接入 gRPC
+
+管理端（如 oic-admin）可通过 gRPC 调用统计、按命名空间失效等。需使用与 `proto/cache.proto` 同源的客户端代码（例如本 crate 的 `oic_cache::server::proto` 或自行用 tonic 从同一 proto 生成）：
+
+```rust
+use oic_cache::server::proto::cache_service_client::CacheServiceClient;
+use oic_cache::server::proto::{Empty, GetRequest, InvalidateRequest, SetRequest};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let mut client = CacheServiceClient::connect("http://127.0.0.1:50051").await?;
+
+    // 统计信息
+    let stats = client.get_statistics(Empty {}).await?.into_inner();
+    println!("hits: {}, misses: {}, hit_rate: {}", stats.hits, stats.misses, stats.hit_rate);
+
+    // 按命名空间失效
+    let inv = client
+        .invalidate_namespace(InvalidateRequest {
+            namespace: "users".to_string(),
+        })
+        .await?
+        .into_inner();
+    println!("invalidated: {}", inv.invalidated_count);
+
+    // 读写（与 Redis 共用同一缓存）
+    client
+        .set(SetRequest {
+            key: "grpc:key".to_string(),
+            data: b"value".to_vec(),
+            ttl_seconds: 300,
+        })
+        .await?;
+    let res = client.get(GetRequest { key: "grpc:key".to_string() }).await?.into_inner();
+    assert!(res.found);
+
+    Ok(())
+}
+```
+
+gRPC 接口定义见 `proto/cache.proto`，包含 `Get`、`Set`、`GetStatistics`、`InvalidateNamespace`。
+
+---
 
 ## 高级功能
 
@@ -442,6 +558,9 @@ cargo test --package oic_cache --test integration_test
 
 # 运行并发测试
 cargo test --package oic_cache --test concurrent_test
+
+# 运行服务化集成测试（Redis + gRPC）
+cargo test --package oic_cache --test server_integration_test
 ```
 
 ## 性能特性

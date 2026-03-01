@@ -1,29 +1,19 @@
-use std::sync::Arc;
-use axum::{
-    debug_handler,
-    extract::Multipart,
-};
+use axum::{debug_handler, extract::Multipart};
+use futures::TryStreamExt;
 use loco_rs::prelude::*;
 use oic_core::{
-    entities::prelude::*, 
+    entities::prelude::*,
     models::files::{
-        CreateFileReqParams,
-        UpdateFileReqParams,
-        DeleteFileReqParams,
-        FileFilters,
-        UploadFileRes,
+        CreateFileReqParams, DeleteFileReqParams, FileFilters, UpdateFileReqParams, UploadFileRes,
     },
-    utils::get_api_prefix,
-    typings::{JsonRes, Pagination},
-    ModelCrudHandler,
     prelude::Settings,
-    services::file::{
-        store_file_local,
-        store_file_oss,
-    },
+    services::file::{store_file_local, store_file_oss},
+    typings::{JsonRes, Pagination},
+    utils::get_api_prefix,
+    ModelCrudHandler,
 };
-use futures::TryStreamExt;
 use std::io;
+use std::sync::Arc;
 use tokio_util::io::StreamReader;
 
 #[debug_handler]
@@ -47,10 +37,8 @@ pub async fn get_one(
             file.url = format!("{}/{}", storage_cfg.uri, file.uri);
             // 使用两个数据的元组指定最终 JSON 数据 key
             JsonRes::from((file, "file"))
-        },
-        Err(err) => {
-            JsonRes::err(err)
         }
+        Err(err) => JsonRes::err(err),
     }
 }
 
@@ -77,11 +65,14 @@ pub async fn list(
         page_size: params.page_size.unwrap_or(10),
     };
 
-    let files = files.iter().map(|file| {
-        let mut file = UploadFileRes::from(file.clone());
-        file.url = format!("{}/{}", storage_cfg.uri, file.uri);
-        file
-    }).collect::<Vec<UploadFileRes>>();
+    let files = files
+        .iter()
+        .map(|file| {
+            let mut file = UploadFileRes::from(file.clone());
+            file.url = format!("{}/{}", storage_cfg.uri, file.uri);
+            file
+        })
+        .collect::<Vec<UploadFileRes>>();
 
     // 使用传递三个数据的元组指定最终 JSON 数据 key
     JsonRes::from((files, pager, "files"))
@@ -137,11 +128,11 @@ pub async fn upload(
         Some(s) => s,
         None => {
             return JsonRes::err(String::from("Storage 配置参数不存在"));
-        },
+        }
     };
     let storage_cfg = settings.storage.clone();
 
-    let mut file_name = String::from("");
+    let mut _file_name = String::from("");
     let mut file_size = 0;
     let mut file_type = String::from("");
     let mut storage = String::from("local");
@@ -152,9 +143,9 @@ pub async fn upload(
 
     while let Some(field) = multipart.next_field().await.unwrap() {
         let name = field.name().unwrap_or("").to_string();
-        
+
         if name.as_str().eq("name") {
-            file_name = field.text().await.unwrap_or("".to_string());
+            _file_name = field.text().await.unwrap_or("".to_string());
         } else if name.as_str().eq("size") {
             let size_str = field.text().await.unwrap_or("".to_string());
             file_size = size_str.parse::<i32>().unwrap_or(0);
@@ -169,7 +160,7 @@ pub async fn upload(
         } else if name.as_str().eq("link") {
             link = field.text().await.unwrap_or("".to_string());
         } else if name.as_str().eq("file") {
-            file_name = if let Some(filename) = field.file_name() {
+            _file_name = if let Some(filename) = field.file_name() {
                 filename.to_string()
             } else {
                 continue;
@@ -180,19 +171,15 @@ pub async fn upload(
 
             futures::pin_mut!(body_reader);
 
-            file_req_params.filename = Some(String::from(file_name.as_str()));
+            file_req_params.filename = Some(String::from(_file_name.as_str()));
             file_req_params.storage = Some(String::from(storage.as_str()));
             file_req_params.mime = Some(String::from(file_type.as_str()));
             file_req_params.link = Some(String::from(link.as_str()));
             file_req_params.size = Some(file_size);
-            
+
             // 本地存储
             if storage.as_str().eq("local") {
-                uri = match store_file_local(
-                    body_reader, 
-                    &storage_cfg, 
-                    &file_req_params
-                ).await {
+                uri = match store_file_local(body_reader, &storage_cfg, &file_req_params).await {
                     Ok(res) => res,
                     Err(err) => {
                         return JsonRes::err(err.to_string());
@@ -226,7 +213,7 @@ pub async fn upload(
     // 转换为接口返回数据
     let mut res = UploadFileRes::from(res_file);
     res.url = format!("{}/{}", storage_cfg.uri, uri.as_str());
-    
+
     JsonRes::from((res, "file"))
 }
 
