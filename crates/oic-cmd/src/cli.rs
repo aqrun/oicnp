@@ -137,10 +137,14 @@ pub async fn init_cmd() {
         Command::Serve { command } => {
             match command {
                 ServeCommand::Cache => {
-                    let _ = oic_cache::app::run().await;
+                    if let Err(err) = oic_cache::app::run().await {
+                        log::error!("CacheServeErr: {}", err);
+                    }
                 },
                 ServeCommand::Web => {
-                    let _ = oic_web::app::run().await;
+                    if let Err(err) = oic_web::app::run().await {
+                        log::error!("WebErr: {}", err);
+                    }
                 },
                 ServeCommand::Admin => {
                     // let _ = oic_admin::app::run().await;

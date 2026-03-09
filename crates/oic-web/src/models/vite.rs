@@ -102,7 +102,7 @@ impl AssetFiles {
     ///
     /// # Arguments
     /// * `get_manifest` - 可选函数，用于在 release 模式下获取 manifest 内容
-    pub fn new<F>(_get_manifest: Option<F>) -> Self
+    pub fn new<F>(get_manifest: Option<F>) -> Self
     where
         F: FnOnce() -> Option<String>,
     {

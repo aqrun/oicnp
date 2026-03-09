@@ -26,6 +26,7 @@ loco-rs = { workspace = true, features = ["testing", 'with-db'] }
 axum = { workspace = true, features = ["json"] }
 tower-http = { workspace = true }
 anyhow = { workspace = true }
+async-trait = { workspace = true }
 askama = { workspace = true, features = ["urlencode"]}
 bytes = { workspace = true }
 tracing = { workspace = true }
@@ -35,3 +36,4 @@ chrono = { workspace = true }
 once_cell = { workspace = true }
 pulldown-cmark ={ workspace = true }
 urlencoding = "2.1"
+tonic = "0.12"

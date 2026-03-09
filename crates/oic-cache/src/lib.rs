@@ -22,6 +22,6 @@ pub use metadata::{
 };
 pub use stats::CacheStatistics;
 pub use vary::VaryValues;
-
+pub use app::load_config;
 pub use ext::CacheExt;
 

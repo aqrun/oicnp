@@ -1,6 +1,64 @@
-use oic_cache::Cache;
 use anyhow::Result;
+use async_trait::async_trait;
 use bytes::Bytes;
+use oic_cache::server::proto::cache_service_client::CacheServiceClient;
+use oic_cache::server::proto::{GetRequest, SetRequest};
+use tonic::transport::Channel;
+
+/// Bytes 版缓存抽象：以二进制读写，便于零拷贝（如 HTML 片段）。
+#[async_trait]
+pub trait CacheDriver: Send + Sync {
+    /// 按 key 取回缓存，未命中返回 `None`。
+    async fn get_bytes(&self, key: &str) -> Result<Option<Bytes>>;
+    /// 写入缓存并设置过期秒数。
+    async fn set_ex_bytes(&self, key: &str, value: &[u8], ttl_secs: u64) -> Result<()>;
+}
+
+/// 基于 oic-cache gRPC 的缓存实现，走 CacheService Get/Set，无 Redis 协议握手问题。
+#[derive(Clone)]
+pub struct GrpcCache {
+    client: CacheServiceClient<Channel>,
+}
+
+impl GrpcCache {
+    pub fn new(client: CacheServiceClient<Channel>) -> Self {
+        Self { client }
+    }
+}
+
+#[async_trait]
+impl CacheDriver for GrpcCache {
+    async fn get_bytes(&self, key: &str) -> Result<Option<Bytes>> {
+        let req = GetRequest {
+            key: key.to_string(),
+        };
+        let mut client = self.client.clone();
+        let res = client
+            .get(req)
+            .await
+            .map_err(|e| anyhow::anyhow!("cache grpc get: {}", e))?
+            .into_inner();
+        if res.found {
+            Ok(Some(Bytes::from(res.data)))
+        } else {
+            Ok(None)
+        }
+    }
+
+    async fn set_ex_bytes(&self, key: &str, value: &[u8], ttl_secs: u64) -> Result<()> {
+        let req = SetRequest {
+            key: key.to_string(),
+            data: value.to_vec(),
+            ttl_seconds: ttl_secs as i64,
+        };
+        let mut client = self.client.clone();
+        client
+            .set(req)
+            .await
+            .map_err(|e| anyhow::anyhow!("cache grpc set: {}", e))?;
+        Ok(())
+    }
+}
 
 /// 缓存配置
 #[derive(Debug, Clone, Copy)]
@@ -21,20 +79,21 @@ impl Default for CacheConfig {
 }
 
 /// 获取缓存或渲染新内容（统一实现）
-/// 
+///
 /// 使用 `Bytes` 数据类型进行缓存和返回，零拷贝，性能最优。
-/// 
+/// 通过 `CacheDriver` 抽象，可对接 Redis 或其他实现。
+///
 /// # 参数
-/// - `cache`: 缓存实例
+/// - `cache`: 实现 `CacheDriver` 的缓存（如 `RedisCache`）
 /// - `cache_key`: 缓存键
 /// - `render_fn`: 渲染函数，返回 `Result<Bytes>`
 /// - `config`: 缓存配置（可选，默认使用开发/生产环境配置）
-/// 
+///
 /// # 返回
 /// - `Ok(Bytes)`: 成功（缓存命中或已渲染并缓存）
 /// - `Err(e)`: 渲染或缓存失败
 pub async fn get_cached_or_render<F, Fut>(
-    cache: &Cache,
+    cache: &dyn CacheDriver,
     cache_key: &str,
     render_fn: F,
     config: Option<CacheConfig>,
@@ -43,35 +102,21 @@ where
     F: FnOnce() -> Fut,
     Fut: std::future::Future<Output = Result<Bytes, anyhow::Error>>,
 {
-    // 先检查缓存（使用底层 get API，返回 Bytes）
-    if let Ok(Some(bytes)) = cache.get(cache_key).await {
-        // ✅ 直接返回 Bytes，零拷贝
-        return Ok(bytes);
+    if let Some(data) = cache.get_bytes(cache_key).await? {
+        return Ok(data);
     }
 
-    // 缓存未命中，调用渲染函数
     let bytes: Bytes = render_fn().await?;
 
-    // 确定 TTL
     let config = config.unwrap_or_default();
     let ttl_seconds = if cfg!(debug_assertions) {
         config.dev_ttl
     } else {
         config.prod_ttl
     };
+    let ttl_u64 = ttl_seconds.max(0) as u64;
 
-    // 将渲染后的数据存入缓存（使用底层 set_with_ttl API，接受 Bytes）
-    // bytes.clone() 现在是零拷贝的（引用计数）
-    if let Err(e) = cache.set_with_ttl(
-        cache_key.to_string(),
-        bytes.clone(),
-        "text/html".to_string(),
-        ttl_seconds
-    ).await {
-        eprintln!("Failed to cache: {}", e);
-    }
-
-    // ✅ 直接返回 Bytes，零拷贝
+    cache.set_ex_bytes(cache_key, bytes.as_ref(), ttl_u64).await?;
     Ok(bytes)
 }
 
@@ -104,7 +149,7 @@ macro_rules! cached {
         {
             let _ = &$cache;
             let _ = crate::services::get_cached_or_render(
-                $cache,
+                $cache.as_ref(),
                 "dev:none",
                 move || async move { Ok(bytes::Bytes::from("")) },
                 None,
@@ -140,7 +185,7 @@ macro_rules! cached {
         {
             let render_future = $render;
             match crate::services::get_cached_or_render(
-                $cache,
+                $cache.as_ref(),
                 $key,
                 move || render_future,
                 None,
@@ -161,7 +206,7 @@ macro_rules! cached {
         {
             let _ = &$cache;
             let _ = crate::services::get_cached_or_render(
-                $cache,
+                $cache.as_ref(),
                 "dev:none",
                 move || async move { Ok(bytes::Bytes::from("")) },
                 None,
@@ -201,7 +246,7 @@ macro_rules! cached {
                 prod_ttl: $ttl,
             };
             match crate::services::get_cached_or_render(
-                $cache,
+                $cache.as_ref(),
                 $key,
                 move || render_future,
                 Some(config),

@@ -8,6 +8,7 @@ use oic_cache::{Cache, CacheConfig, CachePriority, NamespaceInfo};
 use std::sync::Arc;
 use std::time::Duration;
 use tempfile::TempDir;
+use redis::AsyncCommands;
 
 fn create_test_cache() -> (Cache, TempDir) {
     let temp_dir = TempDir::new().unwrap();
@@ -160,6 +161,45 @@ async fn test_redis_protocol_set_ex_and_get_nil() {
     )
     .await
     .expect("redis set_ex_get_nil timeout");
+}
+
+/// 使用 redis 的 multiplexed 连接 + AsyncCommands 做 SET/GET，与 bb8-redis 使用同一套协议与 API。
+/// 不直接用 bb8 pool 建连，避免 redis-rs 先发 CLIENT SETINFO 时与自研服务握手卡住；协议与命令行为与 bb8 一致。
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn test_redis_protocol_bb8_pool_get_set() {
+    let (cache, _temp) = create_test_cache();
+    let cache = Arc::new(cache);
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let redis_addr = listener.local_addr().unwrap();
+
+    let server = RedisServer::new(Arc::clone(&cache));
+    tokio::spawn(async move {
+        let _ = server.run_with_listener(listener).await;
+    });
+
+    tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+
+    let url = format!("redis://{}", redis_addr);
+    let client = redis::Client::open(url.as_str()).unwrap();
+    let mut conn = tokio::time::timeout(
+        Duration::from_secs(3),
+        client.get_multiplexed_async_connection(),
+    )
+    .await
+    .expect("redis connect timeout")
+    .unwrap();
+
+    tokio::time::timeout(
+        Duration::from_secs(3),
+        async {
+            conn.set::<_, _, ()>("bb8:k1", "bb8:v1").await.unwrap();
+            let v: String = conn.get("bb8:k1").await.unwrap();
+            assert_eq!(v, "bb8:v1");
+        },
+    )
+    .await
+    .expect("redis get_set timeout");
 }
 
 // ---------- 跨协议数据共享（Redis ↔ gRPC 共用同一 Cache）-----------

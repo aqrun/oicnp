@@ -123,3 +123,26 @@ pub fn encode_null_bulk_string() -> Vec<u8> {
 pub fn encode_empty_bulk_string() -> Vec<u8> {
     b"$0\r\n\r\n".to_vec()
 }
+
+/// RESP3 map 值：字符串或整数（HELLO 响应中 proto/id 须为整数）。
+pub enum Resp3MapVal<'a> {
+    Str(&'a str),
+    Int(i64),
+}
+
+/// RESP3 map：%n\r\n 后接 n 对 key/value；value 为 bulk string 或 integer。
+/// 用于 HELLO 3 响应，使 redis-rs 0.31 / bb8-redis 能完成握手。
+pub fn encode_resp3_map(pairs: &[(&str, Resp3MapVal<'_>)]) -> Vec<u8> {
+    let mut out = Vec::new();
+    out.extend_from_slice(b"%");
+    out.extend_from_slice(pairs.len().to_string().as_bytes());
+    out.extend_from_slice(b"\r\n");
+    for (k, v) in pairs {
+        out.extend_from_slice(&encode_bulk_string(k.as_bytes()));
+        match v {
+            Resp3MapVal::Str(s) => out.extend_from_slice(&encode_bulk_string(s.as_bytes())),
+            Resp3MapVal::Int(n) => out.extend_from_slice(&encode_integer(*n)),
+        }
+    }
+    out
+}

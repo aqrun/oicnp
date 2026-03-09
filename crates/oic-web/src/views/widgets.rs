@@ -36,7 +36,7 @@ impl Default for CalendarWidget {
 impl CalendarWidget {
   pub async fn get_html(&self, ctx: &WebAppContext) -> String {
     let html = match get_cached_or_render(
-      &ctx.cache,
+      ctx.cache.as_ref(),
       format!("widget:{}", self.id).as_str(),
       || async {
         let html = self.render_bytes().unwrap_or(Bytes::from(""));
@@ -107,7 +107,7 @@ impl RecommendBlogsWidget {
 
   pub async fn get_html(&self, ctx: &WebAppContext) -> String {
     let html = match get_cached_or_render(
-      &ctx.cache,
+      ctx.cache.as_ref(),
       format!("widget:{}", self.id).as_str(),
       || async {
         let html = self.render_bytes().unwrap_or(Bytes::from(""));
@@ -180,7 +180,7 @@ impl RecommendTagsWidget {
 
   pub async fn get_html(&self, ctx: &WebAppContext) -> String {
     let html = match get_cached_or_render(
-      &ctx.cache,
+      ctx.cache.as_ref(),
       format!("widget:{}", self.id).as_str(),
       || async {
         let html = self.render_bytes().unwrap_or(Bytes::from(""));
@@ -214,7 +214,7 @@ pub struct SideNavWidget {
 impl SideNavWidget {
   pub async fn get_html(&self, ctx: &WebAppContext) -> String {
     let html = match get_cached_or_render(
-      &ctx.cache,
+      ctx.cache.as_ref(),
       format!("widget:side-nav:{}:{}",
         self.key.as_str(),
         self.active_vid.as_str()
