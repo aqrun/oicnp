@@ -59,8 +59,7 @@ path = "bin/oic-cache-server.rs"
 criterion = { workspace = true }
 tempfile = { workspace = true }
 axum = { workspace = true }
-# 0.27 + disable-client-setinfo：集成测试里客户端先发 HELLO，自研 Redis 协议服务能完成握手
-redis = { version = "0.27", features = ["tokio-comp", "disable-client-setinfo"] }
+redis = { workspace = true }
 tracing-subscriber = { workspace = true }
 
 [features]

@@ -9,7 +9,7 @@ use tokio::net::{TcpListener, TcpStream};
 
 const DEFAULT_CONTENT_TYPE: &str = "application/octet-stream";
 const DEFAULT_TTL_SECONDS: i64 = 360;
-const BUF_SIZE: usize = 4096;
+const BUF_SIZE: usize = 5 * 1024 * 1024;
 
 /// Redis 协议服务器
 pub struct RedisServer {
@@ -60,56 +60,76 @@ async fn handle_client(socket: TcpStream, cache: Arc<Cache>) -> std::io::Result<
             break;
         }
         read_pos += n;
-        let data = &buf[..read_pos];
+        // 当前缓冲区可能包含多条 RESP 命令（pipeline），需要在一个 read 后尽量解析多条。
+        loop {
+            let data = &buf[..read_pos];
 
-        let (args, consumed) = match resp::parse_resp(data) {
-            Ok(x) => x,
-            Err(_e) => {
-                tracing::debug!("resp parse error: {:?}, buf = {:?}", _e, &data[..read_pos]);
+            let (args, consumed) = match resp::parse_resp(data) {
+                Ok(x) => x,
+                Err(e) => {
+                    // 对于数据尚不完整的情况（例如 EOF），等待下一次 read。
+                    // 目前 parse_resp 在读到 EOF 时会返回 "unexpected EOF"。
+                    if e.0 == "unexpected EOF" {
+                        break;
+                    }
 
-                if read_pos >= BUF_SIZE {
-                    let _ = writer
-                        .write_all(&resp::encode_error("ERR request too large"))
-                        .await;
-                    let _ = writer.flush().await;
-                    read_pos = 0;
+                    // tracing::debug!("resp parse error: {:?}, buf = {:?}", e, &data[..read_pos]);
+
+                    if read_pos >= BUF_SIZE {
+                        let _ = writer
+                            .write_all(&resp::encode_error("ERR request too large"))
+                            .await;
+                        let _ = writer.flush().await;
+                        read_pos = 0;
+                    }
+                    // 对于格式错误，丢弃当前缓冲并继续读后续请求。
+                    break;
                 }
-                continue;
+            };
+
+            let cmd_args: Vec<String> = args
+                .iter()
+                .map(|a| String::from_utf8_lossy(a).to_string())
+                .collect();
+            // tracing::debug!("redis raw args: {:?}", cmd_args);
+            // 便于集成测试排查：无 tracing 时也能在 stderr 看到首包
+            if args.first().map(|c| c.as_slice()) == Some(b"HELLO") {
+                eprintln!("[oic-cache] received HELLO, args={:?}", cmd_args);
             }
-        };
 
-        let cmd_args: Vec<String> = args
-            .iter()
-            .map(|a| String::from_utf8_lossy(a).to_string())
-            .collect();
-        tracing::debug!("redis raw args: {:?}", cmd_args);
-        // 便于集成测试排查：无 tracing 时也能在 stderr 看到首包
-        if args.first().map(|c| c.as_slice()) == Some(b"HELLO") {
-            eprintln!("[oic-cache] received HELLO, args={:?}", cmd_args);
-        }
+            read_pos -= consumed;
+            if read_pos > 0 {
+                buf.copy_within(consumed.., 0);
+            }
 
-        read_pos -= consumed;
-        if read_pos > 0 {
-            buf.copy_within(consumed.., 0);
-        }
+            if args.is_empty() {
+                let _ = writer
+                    .write_all(&resp::encode_error("ERR empty command"))
+                    .await;
+                let _ = writer.flush().await;
+                // 继续尝试解析缓冲区中后续命令
+                if read_pos == 0 {
+                    break;
+                } else {
+                    continue;
+                }
+            }
 
-        if args.is_empty() {
-            let _ = writer
-                .write_all(&resp::encode_error("ERR empty command"))
-                .await;
-            let _ = writer.flush().await;
-            continue;
-        }
+            let cmd = std::str::from_utf8(&args[0]).unwrap_or("");
+            let response = dispatch(&cache, cmd, &args).await;
+            if let Err(e) = writer.write_all(&response).await {
+                tracing::debug!("write error: {}", e);
+                return Ok(());
+            }
+            if let Err(e) = writer.flush().await {
+                tracing::debug!("flush error: {}", e);
+                return Ok(());
+            }
 
-        let cmd = std::str::from_utf8(&args[0]).unwrap_or("");
-        let response = dispatch(&cache, cmd, &args).await;
-        if let Err(e) = writer.write_all(&response).await {
-            tracing::debug!("write error: {}", e);
-            break;
-        }
-        if let Err(e) = writer.flush().await {
-            tracing::debug!("flush error: {}", e);
-            break;
+            // 如果缓冲区中已经没有未解析的数据，则回到外层循环继续 read。
+            if read_pos == 0 {
+                break;
+            }
         }
     }
     Ok(())
@@ -188,6 +208,28 @@ async fn dispatch(cache: &Cache, cmd: &str, args: &[Vec<u8>]) -> Vec<u8> {
             }
             match cache
                 .set_with_ttl(key, value, DEFAULT_CONTENT_TYPE.to_string(), ttl)
+                .await
+            {
+                Ok(()) => resp::encode_simple_string("OK"),
+                Err(e) => resp::encode_error(&format!("ERR {}", e)),
+            }
+        }
+        c if c.eq_ignore_ascii_case("SETEX") => {
+            // 兼容 redis-rs AsyncCommands::set_ex：SETEX key seconds value
+            if args.len() < 4 {
+                return resp::encode_error("ERR wrong number of arguments for 'SETEX'");
+            }
+            let key = String::from_utf8_lossy(&args[1]).to_string();
+            let ttl_secs = match std::str::from_utf8(&args[2])
+                .unwrap_or("0")
+                .parse::<i64>()
+            {
+                Ok(secs) => secs,
+                Err(_) => return resp::encode_error("ERR value is not an integer or out of range"),
+            };
+            let value = Bytes::from(args[3].clone());
+            match cache
+                .set_with_ttl(key, value, DEFAULT_CONTENT_TYPE.to_string(), ttl_secs)
                 .await
             {
                 Ok(()) => resp::encode_simple_string("OK"),

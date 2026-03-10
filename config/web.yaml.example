@@ -5,8 +5,8 @@ default_cache_seconds: 3600
 dev_cache_seconds: 1
 api_url: http://localhost:5150
 handler_cache_time: 1 # 60 * 60 * 2;
-# oic-cache gRPC 地址（与 Redis 协议二选一，推荐 gRPC）
-cache_grpc_endpoint: http://127.0.0.1:50051
+# oic-cache Redis 协议地址（与 gRPC 二选一）
+redis_uri: redis://127.0.0.1:6381
 
 site:
   title: "灵犀纪"

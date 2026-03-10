@@ -36,4 +36,6 @@ chrono = { workspace = true }
 once_cell = { workspace = true }
 pulldown-cmark ={ workspace = true }
 urlencoding = "2.1"
-tonic = "0.12"
+bb8 = { workspace = true }
+bb8-redis = { workspace = true }
+redis = { workspace = true }

@@ -1,9 +1,9 @@
 use anyhow::Result;
 use async_trait::async_trait;
+use bb8::Pool;
+use bb8_redis::redis::AsyncCommands;
+use bb8_redis::RedisConnectionManager;
 use bytes::Bytes;
-use oic_cache::server::proto::cache_service_client::CacheServiceClient;
-use oic_cache::server::proto::{GetRequest, SetRequest};
-use tonic::transport::Channel;
 
 /// Bytes 版缓存抽象：以二进制读写，便于零拷贝（如 HTML 片段）。
 #[async_trait]
@@ -14,48 +14,39 @@ pub trait CacheDriver: Send + Sync {
     async fn set_ex_bytes(&self, key: &str, value: &[u8], ttl_secs: u64) -> Result<()>;
 }
 
-/// 基于 oic-cache gRPC 的缓存实现，走 CacheService Get/Set，无 Redis 协议握手问题。
+/// 基于 bb8 + bb8-redis 的 Redis 缓存实现，使用 oic-cache 的 Redis 协议服务作为后端。
 #[derive(Clone)]
-pub struct GrpcCache {
-    client: CacheServiceClient<Channel>,
+pub struct RedisCache {
+    pool: Pool<RedisConnectionManager>,
 }
 
-impl GrpcCache {
-    pub fn new(client: CacheServiceClient<Channel>) -> Self {
-        Self { client }
+impl RedisCache {
+    pub fn new(pool: Pool<RedisConnectionManager>) -> Self {
+        Self { pool }
     }
 }
 
 #[async_trait]
-impl CacheDriver for GrpcCache {
+impl CacheDriver for RedisCache {
     async fn get_bytes(&self, key: &str) -> Result<Option<Bytes>> {
-        let req = GetRequest {
-            key: key.to_string(),
-        };
-        let mut client = self.client.clone();
-        let res = client
-            .get(req)
+        let mut conn = self
+            .pool
+            .get()
             .await
-            .map_err(|e| anyhow::anyhow!("cache grpc get: {}", e))?
-            .into_inner();
-        if res.found {
-            Ok(Some(Bytes::from(res.data)))
-        } else {
-            Ok(None)
-        }
+            .map_err(|e| anyhow::anyhow!("redis pool get: {}", e))?;
+        let cached: Option<Vec<u8>> = conn.get(key).await?;
+        Ok(cached.map(Bytes::from))
     }
 
     async fn set_ex_bytes(&self, key: &str, value: &[u8], ttl_secs: u64) -> Result<()> {
-        let req = SetRequest {
-            key: key.to_string(),
-            data: value.to_vec(),
-            ttl_seconds: ttl_secs as i64,
-        };
-        let mut client = self.client.clone();
-        client
-            .set(req)
+        let mut conn = self
+            .pool
+            .get()
             .await
-            .map_err(|e| anyhow::anyhow!("cache grpc set: {}", e))?;
+            .map_err(|e| anyhow::anyhow!("redis pool get: {}", e))?;
+        conn.set_ex::<_, _, ()>(key, value, ttl_secs)
+            .await
+            .map_err(|e| anyhow::anyhow!("redis set_ex: {}", e))?;
         Ok(())
     }
 }

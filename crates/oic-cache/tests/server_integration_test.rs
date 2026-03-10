@@ -163,6 +163,56 @@ async fn test_redis_protocol_set_ex_and_get_nil() {
     .expect("redis set_ex_get_nil timeout");
 }
 
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn test_redis_protocol_setex_and_get() {
+    let (cache, _temp) = create_test_cache();
+    let cache = Arc::new(cache);
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let redis_addr = listener.local_addr().unwrap();
+
+    let server = RedisServer::new(Arc::clone(&cache));
+    tokio::spawn(async move {
+        let _ = server.run_with_listener(listener).await;
+    });
+
+    tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+
+    let url = format!("redis://{}", redis_addr);
+    let client = redis::Client::open(url.as_str()).unwrap();
+
+    let mut conn = tokio::time::timeout(
+        Duration::from_secs(3),
+        client.get_multiplexed_async_connection(),
+    )
+    .await
+    .expect("redis connect timeout")
+    .unwrap();
+
+    tokio::time::timeout(
+        Duration::from_secs(3),
+        async {
+            // 使用标准 SETEX 命令
+            redis::cmd("SETEX")
+                .arg("setex:key")
+                .arg(120i64)
+                .arg("setex-value")
+                .query_async::<()>(&mut conn)
+                .await
+                .unwrap();
+
+            let v: String = redis::cmd("GET")
+                .arg("setex:key")
+                .query_async(&mut conn)
+                .await
+                .unwrap();
+            assert_eq!(v, "setex-value");
+        },
+    )
+    .await
+    .expect("redis setex_get timeout");
+}
+
 /// 使用 redis 的 multiplexed 连接 + AsyncCommands 做 SET/GET，与 bb8-redis 使用同一套协议与 API。
 /// 不直接用 bb8 pool 建连，避免 redis-rs 先发 CLIENT SETINFO 时与自研服务握手卡住；协议与命令行为与 bb8 一致。
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]

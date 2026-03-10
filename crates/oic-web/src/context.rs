@@ -2,13 +2,10 @@ use std::sync::Arc;
 use serde::{Deserialize, Serialize};
 use anyhow::Result;
 use crate::models::SiteConfig;
-use crate::services::{CacheDriver, GrpcCache};
+use crate::services::{CacheDriver, RedisCache};
 use std::path::PathBuf;
-use oic_cache::server::proto::cache_service_client::CacheServiceClient;
-
-fn default_cache_grpc_endpoint() -> String {
-    "http://127.0.0.1:50051".to_string()
-}
+use bb8::Pool;
+use bb8_redis::RedisConnectionManager;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(default)]
@@ -24,9 +21,8 @@ pub struct WebConfig {
     pub base_dir: String,
     /// 处理器缓存时间
     pub handler_cache_time: i64,
-    /// oic-cache gRPC 地址，如 http://127.0.0.1:50051
-    #[serde(default = "default_cache_grpc_endpoint")]
-    pub cache_grpc_endpoint: String,
+    /// oic-cache Redis 地址，如 redis://127.0.0.1:6381
+    pub redis_uri: String,
 }
 
 /// Web 应用的上下文
@@ -62,7 +58,7 @@ pub async fn load_config() -> Result<WebConfig> {
 
 pub async fn init_context() -> Result<WebAppContext> {
   let config = load_config().await?;
-  let cache = init_cache(config.cache_grpc_endpoint.as_str()).await?;
+  let cache = init_cache(config.redis_uri.as_str()).await?;
 
   Ok(WebAppContext {
     config,
@@ -70,12 +66,15 @@ pub async fn init_context() -> Result<WebAppContext> {
   })
 }
 
-async fn init_cache(endpoint: &str) -> Result<GrpcCache> {
-  tracing::info!("cache gRPC endpoint: {}", endpoint);
+async fn init_cache(redis_uri: &str) -> Result<RedisCache> {
+  tracing::info!("redis cache uri: {}", redis_uri);
 
-  let client = CacheServiceClient::connect(endpoint.to_string())
+  let manager = RedisConnectionManager::new(redis_uri)?;
+  let pool = Pool::builder()
+    .max_size(16)
+    .build(manager)
     .await
-    .map_err(|e| anyhow::anyhow!("cache grpc connect: {}", e))?;
+    .map_err(|e| anyhow::anyhow!("redis pool: {}", e))?;
 
-  Ok(GrpcCache::new(client))
+  Ok(RedisCache::new(pool))
 }
