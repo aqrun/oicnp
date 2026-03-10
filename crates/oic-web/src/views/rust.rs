@@ -1,5 +1,5 @@
 use askama::Template;
-use crate::models::{AssetFiles, RenderBytes};
+use crate::models::AssetFiles;
 use crate::services::describe_node_list;
 use oic_core::{
     models::nodes::NodeFilters,
@@ -8,6 +8,7 @@ use oic_core::{
 use crate::WebAppContext;
 use anyhow::Result;
 use bytes::Bytes;
+use oic_html::minify_html;
 use super::{
     CalendarWidget,
     RecommendBlogsWidget,
@@ -81,6 +82,7 @@ pub async fn render_rust_home(
         has_sidebar_left: false,
     };
     
-    // 使用 RenderBytes trait 直接渲染为 Bytes
-    template.render_bytes()
+    let html = template.render().unwrap_or_default();
+    let html = minify_html(&html);
+    Ok(Bytes::from(html))
 }

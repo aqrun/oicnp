@@ -5,7 +5,7 @@ use crate::services::{
   describe_node_list,
   describe_tag_list,
 };
-use crate::models::{RenderBytes, SideNavItem};
+use crate::models::SideNavItem;
 use crate::WebAppContext;
 use bytes::Bytes;
 use oic_core::{
@@ -16,6 +16,7 @@ use oic_core::{
   },
 };
 use oic_core::typings::JsonResPayload;
+use oic_html::minify_html;
 
 #[derive(Template)]
 #[template(path = "widgets/calendar.html")]
@@ -39,8 +40,9 @@ impl CalendarWidget {
       ctx.cache.as_ref(),
       format!("widget:{}", self.id).as_str(),
       || async {
-        let html = self.render_bytes().unwrap_or(Bytes::from(""));
-        Ok(html)
+        let s = self.render().unwrap_or_default();
+        let s = minify_html(&s);
+        Ok(Bytes::from(s))
       },
       Some(CacheConfig {
         dev_ttl: 1,
@@ -110,8 +112,9 @@ impl RecommendBlogsWidget {
       ctx.cache.as_ref(),
       format!("widget:{}", self.id).as_str(),
       || async {
-        let html = self.render_bytes().unwrap_or(Bytes::from(""));
-        Ok(html)
+        let s = self.render().unwrap_or_default();
+        let s = minify_html(&s);
+        Ok(Bytes::from(s))
       },
       Some(CacheConfig {
         dev_ttl: 1,
@@ -183,8 +186,9 @@ impl RecommendTagsWidget {
       ctx.cache.as_ref(),
       format!("widget:{}", self.id).as_str(),
       || async {
-        let html = self.render_bytes().unwrap_or(Bytes::from(""));
-        Ok(html)
+        let s = self.render().unwrap_or_default();
+        let s = minify_html(&s);
+        Ok(Bytes::from(s))
       },
       Some(CacheConfig {
         dev_ttl: 1,
@@ -220,8 +224,9 @@ impl SideNavWidget {
         self.active_vid.as_str()
       ).as_str(),
       || async {
-        let html = self.render_bytes().unwrap_or(Bytes::from(""));
-        Ok(html)
+        let s = self.render().unwrap_or_default();
+        let s = minify_html(&s);
+        Ok(Bytes::from(s))
       },
       Some(CacheConfig {
         dev_ttl: 1,

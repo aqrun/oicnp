@@ -1,5 +1,5 @@
 use askama::Template;
-use crate::models::{AssetFiles, RenderBytes};
+use crate::models::AssetFiles;
 use crate::services::describe_node_list;
 use crate::WebAppContext;
 use oic_core::{
@@ -8,6 +8,7 @@ use oic_core::{
 };
 use anyhow::Result;
 use bytes::Bytes;
+use oic_html::minify_html;
 use super::{CalendarWidget, RecommendBlogsWidget, RecommendTagsWidget};
 
 #[derive(Template)]
@@ -73,8 +74,9 @@ pub async fn render_home_index(ctx: &WebAppContext) -> Result<Bytes> {
         has_sidebar_left: false,
     };
     
-    // 使用 RenderBytes trait 直接渲染为 Bytes
-    template.render_bytes()
+    let html = template.render().unwrap_or_default();
+    let html = minify_html(&html);
+    Ok(Bytes::from(html))
 }
 
 #[derive(Template)]
@@ -90,7 +92,9 @@ pub fn render_out_link(target_url: String) -> Result<Bytes> {
         target_url,
         assets,
     };
-    template.render_bytes()
+    let html = template.render().unwrap_or_default();
+    let html = minify_html(&html);
+    Ok(Bytes::from(html))
 }
 
 #[derive(Template)]
@@ -110,7 +114,9 @@ pub async fn render_about(ctx: &WebAppContext) -> Result<Bytes> {
         assets,
         has_sidebar_left: false,
     };
-    template.render_bytes()
+    let html = template.render().unwrap_or_default();
+    let html = minify_html(&html);
+    Ok(Bytes::from(html))
 }
 
 #[derive(Template)]
@@ -136,5 +142,7 @@ pub async fn render_contact(ctx: &WebAppContext) -> Result<Bytes> {
             RecommendTagsWidget::init(ctx).await.get_html(ctx).await,
         ],
     };
-    template.render_bytes()
+    let html = template.render().unwrap_or_default();
+    let html = minify_html(&html);
+    Ok(Bytes::from(html))
 }

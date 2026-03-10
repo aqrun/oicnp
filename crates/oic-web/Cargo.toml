@@ -7,6 +7,7 @@ authors = ["Aqrun <aqrun@sina.com>"]
 [dependencies]
 oic_core = { workspace = true }
 oic_cache = { workspace = true }
+oic_html = { workspace = true }
 sea-orm = { workspace = true }
 sea-orm-migration = { workspace = true }
 serde = { workspace = true }

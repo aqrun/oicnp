@@ -47,13 +47,25 @@ fn minify_node(handle: &Handle, in_preserve_whitespace: bool) {
 
     // 判断当前节点是否是需要保留空白的标签
     let mut preserve = in_preserve_whitespace;
-    if let NodeData::Element { ref name, .. } = node.data {
+    if let NodeData::Element { ref name, ref attrs, .. } = node.data {
         let local = name.local.as_ref().to_ascii_lowercase();
         if matches!(
             local.as_str(),
             "pre" | "code" | "textarea" | "script" | "style"
         ) {
             preserve = true;
+        }
+
+        // 压缩 class 属性中的空白（包括换行），例如：
+        // class="foo
+        //   bar   baz" -> class="foo bar baz"
+        let mut attrs_mut = attrs.borrow_mut();
+        for attr in attrs_mut.iter_mut() {
+            if attr.name.local.as_ref().eq_ignore_ascii_case("class") {
+                let v = attr.value.to_string();
+                let v = collapse_whitespace(&v);
+                attr.value = v.into();
+            }
         }
     }
 

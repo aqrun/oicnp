@@ -1,7 +1,7 @@
 #![allow(dead_code)]
-
+ 
 use askama::Template;
-use crate::models::{AssetFiles, RenderBytes, POETRY_CATEGORIES};
+use crate::models::{AssetFiles, POETRY_CATEGORIES};
 use crate::services::{describe_poetry_list_page_data, describe_poetry_list_with_chapters};
 use oic_core::{
     models::poetry::{PoetryFilters, PoetryListDataModel},
@@ -11,6 +11,7 @@ use oic_core::{
 use crate::WebAppContext;
 use anyhow::Result;
 use bytes::Bytes;
+use oic_html::minify_html;
 use super::{CalendarWidget, RecommendBlogsWidget, RecommendTagsWidget, SideNavWidget};
 use crate::models::poetry::PoetryListParams;
 
@@ -192,7 +193,9 @@ pub async fn render_poetry_home(
         has_sidebar_left: true,
     };
     
-    template.render_bytes()
+    let html = template.render().unwrap_or_default();
+    let html = minify_html(&html);
+    Ok(Bytes::from(html))
 }
 
 /// 分类诗词列表页
@@ -273,7 +276,9 @@ pub async fn render_poetry_list(
             more_uri,
             category_title: String::from(category_title.as_str()),
         };
-        return template.render_bytes();
+        let html = template.render().unwrap_or_default();
+        let html = minify_html(&html);
+        return Ok(Bytes::from(html));
     }
     
     let side_nav = SideNavWidget {
@@ -305,7 +310,9 @@ pub async fn render_poetry_list(
         is_htmx: htmx.is_htmx,
     };
     
-    template.render_bytes()
+    let html = template.render().unwrap_or_default();
+    let html = minify_html(&html);
+    Ok(Bytes::from(html))
 }
 
 /// 诗词详情页
@@ -353,5 +360,7 @@ pub async fn render_poetry_detail(
         has_wenyanwen,
     };
     
-    template.render_bytes()
+    let html = template.render().unwrap_or_default();
+    let html = minify_html(&html);
+    Ok(Bytes::from(html))
 }

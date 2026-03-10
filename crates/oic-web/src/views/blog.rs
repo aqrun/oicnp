@@ -1,5 +1,5 @@
 use askama::Template;
-use crate::models::{AssetFiles, RenderBytes, BLOG_CATEGORIES};
+use crate::models::{AssetFiles, BLOG_CATEGORIES};
 use crate::services::{describe_node_list, describe_node_detail};
 use oic_core::{
     models::nodes::{NodeFilters, NodeDetailModel},
@@ -12,6 +12,7 @@ use bytes::Bytes;
 use super::{CalendarWidget, RecommendBlogsWidget, RecommendTagsWidget, SideNavWidget};
 use crate::models::blog::BlogListParams;
 use crate::services::render_markdown;
+use oic_html::minify_html;
 
 #[derive(Template)]
 #[template(path = "blog/index.html")]
@@ -135,7 +136,9 @@ pub async fn render_blog_list(
     }
 
     if htmx.is_htmx {
-        return node_list_template.render_bytes();
+        let html = node_list_template.render().unwrap_or_default();
+        let html = minify_html(&html);
+        return Ok(Bytes::from(html));
     }
 
     let side_nav = SideNavWidget {
@@ -159,8 +162,9 @@ pub async fn render_blog_list(
         has_sidebar_left: true,
     };
     
-    // 使用 RenderBytes trait 直接渲染为 Bytes
-    template.render_bytes()
+    let html = template.render().unwrap_or_default();
+    let html = minify_html(&html);
+    Ok(Bytes::from(html))
 }
 
 pub async fn render_blog_detail(
@@ -203,7 +207,8 @@ pub async fn render_blog_detail(
         content,
     };
     
-    // 使用 RenderBytes trait 直接渲染为 Bytes
-    template.render_bytes()
+    let html = template.render().unwrap_or_default();
+    let html = minify_html(&html);
+    Ok(Bytes::from(html))
 }
 

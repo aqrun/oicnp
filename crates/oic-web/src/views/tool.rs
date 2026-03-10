@@ -1,10 +1,11 @@
 #![allow(dead_code)]
 use askama::Template;
-use crate::models::{AssetFiles, RenderBytes, TOOL_CATEGORIES};
+use crate::models::{AssetFiles, TOOL_CATEGORIES};
 use crate::models::tool::{ALL_TOOLS, get_tools_by_category, ToolItem};
 use crate::WebAppContext;
 use anyhow::Result;
 use bytes::Bytes;
+use oic_html::minify_html;
 use super::{CalendarWidget, RecommendBlogsWidget, RecommendTagsWidget, SideNavWidget};
 use crate::models::tool::ToolListParams;
 
@@ -102,7 +103,9 @@ pub async fn render_tool_list(
             has_sidebar_left: true,
         };
         
-        return template.render_bytes();
+        let html = template.render().unwrap_or_default();
+        let html = minify_html(&html);
+        return Ok(Bytes::from(html));
     }
 
     // 分类页：显示指定分类的所有工具
@@ -125,5 +128,7 @@ pub async fn render_tool_list(
         has_sidebar_left: true,
     };
     
-    template.render_bytes()
+    let html = template.render().unwrap_or_default();
+    let html = minify_html(&html);
+    Ok(Bytes::from(html))
 }
