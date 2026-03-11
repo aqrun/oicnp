@@ -1,0 +1,23 @@
+// pm2 start cache.config.js
+
+module.exports = {
+  apps: [
+    {
+      name: 'lxage-cache',
+      cwd: 'github.com/aqrun/oicnp',
+      script: 'target/release/ic',
+      args: 'serve cache',
+      instances: 1,
+      exec_mode: 'fork',
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '100M',
+      env: {},
+      error_file: '/var/log/pm2/lxage-cache-error.log',
+      out_file: '/var/log/pm2/lxage-cache-out.log',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss',
+      merge_logs: true,
+      log_type: 'json'
+    }
+  ]
+};

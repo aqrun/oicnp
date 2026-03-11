@@ -63,3 +63,4 @@ target/
 *.pdb
 .docker-cache/
 scrips/frontend.config.js
+scrips/cache.config.js

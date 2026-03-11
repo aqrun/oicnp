@@ -6,7 +6,7 @@ module.exports = {
       name: 'lxage-axum-web',
       cwd: 'github.com/aqrun/oicnp',
       script: 'target/release/ic',
-      args: 'serve',
+      args: 'serve web',
       instances: 1,
       exec_mode: 'fork',
       autorestart: true,
