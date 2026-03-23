@@ -7,3 +7,4 @@ pub mod settings;
 pub mod file;
 pub mod common;
 pub mod poetry;
+pub mod cache_client;

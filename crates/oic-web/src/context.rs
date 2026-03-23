@@ -2,7 +2,7 @@ use std::sync::Arc;
 use serde::{Deserialize, Serialize};
 use anyhow::Result;
 use crate::models::SiteConfig;
-use crate::services::{CacheDriver, RedisCache};
+use oic_core::prelude::cache_client::{CacheDriver, RedisCache};
 use std::path::PathBuf;
 use bb8::Pool;
 use bb8_redis::RedisConnectionManager;

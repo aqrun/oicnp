@@ -1,7 +1,5 @@
 use askama::Template;
 use crate::services::{
-  get_cached_or_render,
-  CacheConfig,
   describe_node_list,
   describe_tag_list,
 };
@@ -15,6 +13,7 @@ use oic_core::{
     tags::TagFilters,
   },
 };
+use oic_core::prelude::cache_client::{get_cached_or_render, CacheConfig};
 use oic_core::typings::JsonResPayload;
 use oic_html::minify_html;
 

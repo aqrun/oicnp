@@ -39,4 +39,3 @@ pulldown-cmark ={ workspace = true }
 urlencoding = "2.1"
 bb8 = { workspace = true }
 bb8-redis = { workspace = true }
-redis = { workspace = true }

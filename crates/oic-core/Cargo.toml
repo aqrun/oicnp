@@ -57,3 +57,6 @@ tokio-util = { workspace = true }
 futures = { workspace = true }
 user-agent-parser = { workspace = true }
 http-body-util = { workspace = true }
+bb8 = { workspace = true }
+bb8-redis = { workspace = true }
+bytes = { workspace = true }

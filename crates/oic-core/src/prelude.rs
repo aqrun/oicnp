@@ -8,3 +8,4 @@ pub use crate::services::{
 pub use crate::typings::ResJsonString;
 pub use crate::utils::utc_now;
 pub use crate::uuid;
+pub use crate::services::cache_client;
