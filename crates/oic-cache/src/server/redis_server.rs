@@ -254,6 +254,19 @@ async fn dispatch(cache: &Cache, cmd: &str, args: &[Vec<u8>]) -> Vec<u8> {
             let exists = cache.exists(&key).await;
             resp::encode_integer(if exists { 1 } else { 0 })
         }
+        c if c.eq_ignore_ascii_case("KEYS") => {
+            if args.len() < 2 {
+                return resp::encode_error("ERR wrong number of arguments for 'KEYS'");
+            }
+            let pattern = String::from_utf8_lossy(&args[1]).to_string();
+            let keys = cache.list_keys().await;
+            let matched: Vec<Vec<u8>> = keys
+                .into_iter()
+                .filter(|k| glob_match(&pattern, k))
+                .map(|k| k.into_bytes())
+                .collect();
+            resp::encode_array_bulk(&matched)
+        }
         c if c.eq_ignore_ascii_case("FLUSHALL") => match cache.clear().await {
             Ok(()) => resp::encode_simple_string("OK"),
             Err(e) => resp::encode_error(&format!("ERR {}", e)),
@@ -282,4 +295,34 @@ async fn dispatch(cache: &Cache, cmd: &str, args: &[Vec<u8>]) -> Vec<u8> {
         }
         _ => resp::encode_error("ERR unknown command"),
     }
+}
+
+/// 简单 glob 匹配：支持 `*`（任意长度）与 `?`（单字符）
+fn glob_match(pattern: &str, text: &str) -> bool {
+    let p = pattern.as_bytes();
+    let t = text.as_bytes();
+    let (mut pi, mut ti) = (0usize, 0usize);
+    let (mut star_idx, mut match_idx) = (None, 0usize);
+
+    while ti < t.len() {
+        if pi < p.len() && (p[pi] == b'?' || p[pi] == t[ti]) {
+            pi += 1;
+            ti += 1;
+        } else if pi < p.len() && p[pi] == b'*' {
+            star_idx = Some(pi);
+            match_idx = ti;
+            pi += 1;
+        } else if let Some(star) = star_idx {
+            pi = star + 1;
+            match_idx += 1;
+            ti = match_idx;
+        } else {
+            return false;
+        }
+    }
+
+    while pi < p.len() && p[pi] == b'*' {
+        pi += 1;
+    }
+    pi == p.len()
 }

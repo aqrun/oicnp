@@ -688,6 +688,12 @@ impl Cache {
         entries.truncate(top_n);
         entries
     }
+
+    /// 列出当前内存索引中的所有键（用于管理接口，如 Redis KEYS）
+    pub async fn list_keys(&self) -> Vec<String> {
+        let index = self.inner.index.read().await;
+        index.iter().map(|(key, _)| key.clone()).collect()
+    }
     
     // ============ 维护操作 ============
     

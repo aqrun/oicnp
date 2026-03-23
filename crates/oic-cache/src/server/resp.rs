@@ -124,6 +124,18 @@ pub fn encode_empty_bulk_string() -> Vec<u8> {
     b"$0\r\n\r\n".to_vec()
 }
 
+/// `*N\r\n$len\r\n...\r\n` 数组（元素为 bulk string）
+pub fn encode_array_bulk(items: &[Vec<u8>]) -> Vec<u8> {
+    let mut out = Vec::new();
+    out.extend_from_slice(b"*");
+    out.extend_from_slice(items.len().to_string().as_bytes());
+    out.extend_from_slice(b"\r\n");
+    for item in items {
+        out.extend_from_slice(&encode_bulk_string(item));
+    }
+    out
+}
+
 /// RESP3 map 值：字符串或整数（HELLO 响应中 proto/id 须为整数）。
 pub enum Resp3MapVal<'a> {
     Str(&'a str),

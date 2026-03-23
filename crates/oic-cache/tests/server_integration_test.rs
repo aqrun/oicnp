@@ -213,6 +213,75 @@ async fn test_redis_protocol_setex_and_get() {
     .expect("redis setex_get timeout");
 }
 
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn test_redis_protocol_keys() {
+    let (cache, _temp) = create_test_cache();
+    let cache = Arc::new(cache);
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let redis_addr = listener.local_addr().unwrap();
+
+    let server = RedisServer::new(Arc::clone(&cache));
+    tokio::spawn(async move {
+        let _ = server.run_with_listener(listener).await;
+    });
+
+    tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+
+    let url = format!("redis://{}", redis_addr);
+    let client = redis::Client::open(url.as_str()).unwrap();
+    let mut conn = tokio::time::timeout(
+        Duration::from_secs(3),
+        client.get_multiplexed_async_connection(),
+    )
+    .await
+    .expect("redis connect timeout")
+    .unwrap();
+
+    tokio::time::timeout(
+        Duration::from_secs(3),
+        async {
+            redis::cmd("SET")
+                .arg("k:user:1")
+                .arg("v1")
+                .query_async::<()>(&mut conn)
+                .await
+                .unwrap();
+            redis::cmd("SET")
+                .arg("k:user:2")
+                .arg("v2")
+                .query_async::<()>(&mut conn)
+                .await
+                .unwrap();
+            redis::cmd("SET")
+                .arg("other")
+                .arg("v3")
+                .query_async::<()>(&mut conn)
+                .await
+                .unwrap();
+
+            let keys: Vec<String> = redis::cmd("KEYS")
+                .arg("k:user:*")
+                .query_async(&mut conn)
+                .await
+                .unwrap();
+            assert_eq!(keys.len(), 2);
+            assert!(keys.iter().any(|k| k == "k:user:1"));
+            assert!(keys.iter().any(|k| k == "k:user:2"));
+
+            let all_keys: Vec<String> = redis::cmd("KEYS")
+                .arg("*")
+                .query_async(&mut conn)
+                .await
+                .unwrap();
+            println!("all_keys: {:?}", all_keys);
+            assert!(all_keys.iter().any(|k| k == "other"));
+        },
+    )
+    .await
+    .expect("redis keys timeout");
+}
+
 /// 使用 redis 的 multiplexed 连接 + AsyncCommands 做 SET/GET，与 bb8-redis 使用同一套协议与 API。
 /// 不直接用 bb8 pool 建连，避免 redis-rs 先发 CLIENT SETINFO 时与自研服务握手卡住；协议与命令行为与 bb8 一致。
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
