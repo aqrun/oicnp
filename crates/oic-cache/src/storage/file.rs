@@ -1,5 +1,6 @@
 use crate::error::{CacheError, Result};
 use crate::metadata::StorageLocation;
+use crate::storage::redb::{delete_value, read_value, write_value};
 use std::path::{Path, PathBuf};
 use sha2::{Sha256, Digest};
 use bytes::Bytes;
@@ -26,16 +27,13 @@ pub async fn read_file(location: &StorageLocation, base_path: &Path) -> Result<O
     match location {
         StorageLocation::Inline(_) => Ok(None),
         StorageLocation::File(file_path) => {
-            let full_path = if Path::new(file_path).is_absolute() {
-                PathBuf::from(file_path)
-            } else {
-                base_path.join(file_path)
-            };
-            
-            tokio::fs::read(&full_path)
-                .await
-                .map(|data| Some(Bytes::from(data))) // 零成本转换：Vec<u8> -> Bytes
-                .map_err(|e| CacheError::Io(e))
+            let key = file_path.as_bytes().to_vec();
+            let base_path = base_path.to_path_buf();
+            tokio::task::spawn_blocking(move || {
+                read_value(&base_path, &key).map(|opt| opt.map(Bytes::from))
+            })
+            .await
+            .map_err(|e| CacheError::InvalidConfig(format!("Failed to join read task: {}", e)))?
         }
     }
 }
@@ -46,41 +44,26 @@ pub async fn write_file(
     key: &str,
     data: &[u8],
 ) -> Result<String> {
-    let file_path = generate_file_path(base_path, key);
-    
-    // 确保目录存在
-    if let Some(parent) = file_path.parent() {
-        tokio::fs::create_dir_all(parent)
-            .await
-            .map_err(|e| CacheError::Io(e))?;
-    }
-    
-    // 写入文件
-    tokio::fs::write(&file_path, data)
+    let file_path = generate_file_path(base_path, key)
+        .file_name()
+        .map(|name| name.to_string_lossy().to_string())
+        .unwrap_or_else(|| format!("{}.cache", key));
+    let table_key = file_path.as_bytes().to_vec();
+    let value = data.to_vec();
+    let base_path = base_path.to_path_buf();
+    tokio::task::spawn_blocking(move || write_value(&base_path, &table_key, &value))
         .await
-        .map_err(|e| CacheError::Io(e))?;
-    
-    // 返回相对路径
-    Ok(file_path
-        .strip_prefix(base_path)
-        .map(|p| p.to_string_lossy().to_string())
-        .unwrap_or_else(|_| file_path.to_string_lossy().to_string()))
+        .map_err(|e| CacheError::InvalidConfig(format!("Failed to join write task: {}", e)))??;
+    Ok(file_path)
 }
 
 /// 删除文件
 pub async fn delete_file(base_path: &Path, file_path: &str) -> Result<()> {
-    let full_path = if Path::new(file_path).is_absolute() {
-        PathBuf::from(file_path)
-    } else {
-        base_path.join(file_path)
-    };
-    
-    if full_path.exists() {
-        tokio::fs::remove_file(&full_path)
-            .await
-            .map_err(|e| CacheError::Io(e))?;
-    }
-    
+    let key = file_path.as_bytes().to_vec();
+    let base_path = base_path.to_path_buf();
+    tokio::task::spawn_blocking(move || delete_value(&base_path, &key))
+        .await
+        .map_err(|e| CacheError::InvalidConfig(format!("Failed to join delete task: {}", e)))??;
     Ok(())
 }
 

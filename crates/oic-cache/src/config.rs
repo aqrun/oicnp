@@ -59,11 +59,7 @@ pub struct StorageConfig {
     /// 流式读取阈值（字节）
     #[serde(default = "default_streaming_threshold")]
     pub streaming_threshold: u64,
-    
-    /// 是否启用磁盘持久化
-    #[serde(default = "default_enable_persistence")]
-    pub enable_persistence: bool,
-    
+
     /// 是否在启动时自动加载索引
     #[serde(default = "default_auto_load_index")]
     pub auto_load_index: bool,
@@ -141,7 +137,6 @@ impl Default for StorageConfig {
         Self {
             inline_threshold: default_inline_threshold(),
             streaming_threshold: default_streaming_threshold(),
-            enable_persistence: default_enable_persistence(),
             auto_load_index: default_auto_load_index(),
             auto_save_index: default_auto_save_index(),
             auto_save_interval_seconds: default_auto_save_interval_seconds(),
@@ -205,10 +200,6 @@ fn default_inline_threshold() -> u64 {
 
 fn default_streaming_threshold() -> u64 {
     10 * 1024 * 1024
-}
-
-fn default_enable_persistence() -> bool {
-    true
 }
 
 fn default_auto_load_index() -> bool {

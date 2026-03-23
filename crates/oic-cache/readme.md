@@ -1,10 +1,10 @@
 # oic-cache
 
-轻量级索引 + 文件存储缓存系统，内存只存索引元数据，数据存储在磁盘文件中。
+轻量级索引 + redb 持久化缓存系统，内存只存热点索引元数据，数据持久化在单文件数据库中。
 
 ## 功能特性
 
-- ✅ **智能存储策略** - 小数据（<4KB）内联存储，大数据文件存储
+- ✅ **智能存储策略** - 小数据（<4KB）内联存储，大数据持久化到 redb
 - ✅ **命名空间/分组支持** - 逻辑分组和批量失效
 - ✅ **Vary 变种缓存** - 基于请求头的多版本缓存
 - ✅ **回源保护（防击穿）** - 防止缓存击穿和缓存雪崩
@@ -15,7 +15,7 @@
 - ✅ **LRU 淘汰策略** - 内存索引 LRU 管理
 - ✅ **过期时间管理** - TTL 和过期检查
 - ✅ **Stale-While-Revalidate (SWR)** - 过期缓存兜底策略
-- ✅ **索引持久化** - 支持索引保存和自动加载
+- ✅ **索引持久化** - 索引元数据持久化到 redb，支持自动加载
 - ✅ **自动保存** - 支持定期保存和更新后延迟保存（debounce）
 - ✅ **Loco_rs 兼容** - 提供与 loco_rs cache trait 兼容的 API
 - ✅ **独立服务模式** - 支持 Redis 协议（6379）与 gRPC（50051），多进程共享同一缓存
@@ -24,14 +24,15 @@
 
 ### 核心设计理念
 
-- **内存只存索引**：内存中只存储 `CacheMetadata`，实际数据存储在磁盘文件中
-- **智能存储策略**：根据数据大小自动选择内联存储或文件存储
+- **内存只存热点索引**：内存中维护 `CacheMetadata` 的 LRU 索引用于快速命中
+- **统一持久化后端**：索引与大对象数据都持久化到 `disk_path/cache.redb`
+- **智能存储策略**：根据数据大小自动选择内联存储或 redb 存储
 - **扩展 Trait 模式**：核心 `Cache` 只处理 `Vec<u8>`，序列化逻辑通过 `CacheExt` trait 提供
 
 ### 存储策略
 
 - **内联存储**（< 4KB）：数据直接存储在元数据中，零文件 I/O
-- **文件存储**（≥ 4KB）：数据存储在磁盘文件中，支持压缩
+- **redb 存储**（>= 4KB）：数据存储在 `cache.redb` 中，支持压缩
 
 ## 快速开始
 
@@ -195,7 +196,7 @@ grpc_addr = "0.0.0.0:50051"
 OIC_CACHE_CONFIG=/etc/oic/cache.toml OIC_CACHE_REDIS_ADDR=0.0.0.0:6380 ./target/release/oic-cache-server
 ```
 
-启动后会自动尝试从配置中的 `disk_path` 加载已有索引（若存在）；未设置 `OIC_CACHE_CONFIG` 时使用默认 `disk_path`。
+启动后会自动尝试从配置中的 `disk_path/cache.redb` 加载已有索引；未设置 `OIC_CACHE_CONFIG` 时使用默认 `disk_path`。
 
 ### 客户端接入 Redis 协议
 
@@ -277,9 +278,9 @@ gRPC 接口定义见 `proto/cache.proto`，包含 `Get`、`Set`、`GetStatistics
 
 ## 高级功能
 
-### 索引持久化和自动加载
+### redb 持久化和自动加载
 
-缓存支持将索引保存到磁盘，并在重启后自动恢复：
+缓存将索引元数据与大对象数据持久化到 `disk_path/cache.redb`，并在重启后自动恢复：
 
 ```rust
 use oic_cache::{Cache, CacheConfig};
@@ -287,17 +288,17 @@ use oic_cache::{Cache, CacheConfig};
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut config = CacheConfig::default();
-    config.storage.auto_load_index = true; // 启用自动加载
+    config.storage.auto_load_index = true; // 启用自动加载（从 redb）
     config.storage.auto_save_interval_seconds = 30; // 每 30 秒定期保存
     config.storage.auto_save_debounce_ms = 2000; // 更新后延迟 2 秒保存
     
-    // 创建缓存并自动加载索引（如果存在）
+    // 创建缓存并自动加载持久化索引（如果存在）
     let cache = Cache::new_with_auto_load(config).await?;
     
     // 使用缓存...
     cache.set("key".to_string(), b"value".to_vec(), "text/plain".to_string()).await?;
     
-    // 手动保存索引（可选，因为已启用自动保存）
+    // 手动保存索引（写入 redb，可选）
     cache.save_index().await?;
     
     Ok(())
@@ -371,7 +372,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     cache.invalidate_namespace("users").await?;
     
     // 按标签失效
-    cache.invalidate_by_tag("v1").await?;
+    cache.invalidate_tags(&["v1".to_string()]).await?;
     
     Ok(())
 }
@@ -407,7 +408,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         ("Accept-Language", "en"),
     ]);
     
-    if let Some(data) = cache.get_with_vary("page:home", &vary_values).await? {
+    if let Some(data) = cache.get_vary("page:home", &vary_values).await? {
         println!("Content: {}", String::from_utf8_lossy(&data));
     }
     
@@ -449,7 +450,7 @@ use oic_cache::CacheConfig;
 let mut config = CacheConfig::default();
 
 // 存储配置
-config.storage.disk_path = "/tmp/cache".into();
+config.disk_path = "/tmp/cache".into();
 config.storage.inline_threshold = 4096; // 4KB
 config.storage.auto_load_index = true;
 config.storage.auto_save_interval_seconds = 30;
@@ -525,7 +526,7 @@ let cache = Cache::from_config_file("cache.toml").await?;
 # 基础使用示例
 cargo run --package oic_cache --example basic
 
-# 索引持久化示例
+# 持久化示例
 cargo run --package oic_cache --example persistence
 
 # SWR 示例
@@ -565,8 +566,8 @@ cargo test --package oic_cache --test server_integration_test
 
 ## 性能特性
 
-- **内存占用低**：只存储元数据索引，不存储实际数据
-- **文件 I/O 优化**：小数据内联存储，零文件 I/O
+- **内存占用低**：内存主要存热点元数据索引（LRU）
+- **磁盘 I/O 优化**：小数据内联存储，减少落盘 I/O
 - **并发安全**：使用 `DashMap` 和 `RwLock` 保证并发安全
 - **压缩支持**：大数据自动压缩，节省磁盘空间
 - **LRU 淘汰**：内存索引使用 LRU 策略，自动淘汰不常用项
@@ -574,7 +575,7 @@ cargo test --package oic_cache --test server_integration_test
 ## 设计原则
 
 1. **关注点分离**：核心 `Cache` 只处理 `Vec<u8>`，序列化逻辑通过 `CacheExt` trait 提供
-2. **内存优化**：内存只存索引，数据存储在磁盘
+2. **内存优化**：内存存热点索引，持久化数据统一存储在 redb
 3. **灵活扩展**：通过 trait 扩展，不污染核心 API
 4. **向后兼容**：提供与 loco_rs 兼容的 API
 

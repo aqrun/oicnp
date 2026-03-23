@@ -8,6 +8,7 @@ use crate::stats::{CacheStatistics, Statistics, create_stats, update_stats};
 use crate::storage::compression::{compress, decompress};
 use crate::storage::file::{delete_file, read_file, write_file};
 use crate::storage::inline::read_inline;
+use crate::storage::redb::{load_all_index, replace_all_index};
 use crate::vary::{build_cache_key, generate_variant_key, VaryValues};
 use crate::fetch::FetchProtection;
 use crate::utils::create_content_info;
@@ -211,21 +212,21 @@ impl Cache {
     
     /// 内部保存索引实现
     async fn save_index_inner(inner: &CacheInner) -> Result<()> {
-        let index_path = inner.disk_path.join("index.bin");
         let index = inner.index.read().await;
-        
-        // 序列化索引（收集为 Vec）
-        let entries: Vec<(String, CacheMetadata)> = index.iter()
-            .map(|(k, v)| (k.clone(), v.clone()))
+        let entries: Result<Vec<(String, Vec<u8>)>> = index
+            .iter()
+            .map(|(k, v)| {
+                let encoded = bincode::serialize(v).map_err(|e| {
+                    CacheError::Serialization(format!("Failed to serialize metadata: {}", e))
+                })?;
+                Ok((k.clone(), encoded))
+            })
             .collect();
-        
-        let serialized = bincode::serialize(&entries)
-            .map_err(|e| CacheError::Serialization(format!("Failed to serialize index: {}", e)))?;
-        
-        tokio::fs::write(&index_path, serialized)
+        let entries = entries?;
+        let disk_path = inner.disk_path.clone();
+        tokio::task::spawn_blocking(move || replace_all_index(&disk_path, &entries))
             .await
-            .map_err(|e| CacheError::Io(e))?;
-        
+            .map_err(|e| CacheError::InvalidConfig(format!("Failed to join index save task: {}", e)))??;
         Ok(())
     }
     
@@ -769,39 +770,43 @@ impl Cache {
     
     /// 保存索引到磁盘
     pub async fn save_index(&self) -> Result<()> {
-        let index_path = self.inner.disk_path.join("index.bin");
         let index = self.inner.index.read().await;
-        
-        // 序列化索引（收集为 Vec）
-        let entries: Vec<(String, CacheMetadata)> = index.iter()
-            .map(|(k, v)| (k.clone(), v.clone()))
+        let entries: Result<Vec<(String, Vec<u8>)>> = index
+            .iter()
+            .map(|(k, v)| {
+                let encoded = bincode::serialize(v).map_err(|e| {
+                    CacheError::Serialization(format!("Failed to serialize metadata: {}", e))
+                })?;
+                Ok((k.clone(), encoded))
+            })
             .collect();
-        
-        let serialized = bincode::serialize(&entries)
-            .map_err(|e| CacheError::Serialization(format!("Failed to serialize index: {}", e)))?;
-        
-        tokio::fs::write(&index_path, serialized)
+        let entries = entries?;
+        let disk_path = self.inner.disk_path.clone();
+        tokio::task::spawn_blocking(move || replace_all_index(&disk_path, &entries))
             .await
-            .map_err(|e| CacheError::Io(e))?;
-        
+            .map_err(|e| CacheError::InvalidConfig(format!("Failed to join index save task: {}", e)))??;
         Ok(())
     }
     
     /// 从磁盘加载索引并重建所有辅助索引
     pub async fn load_index(&self) -> Result<()> {
-        let index_path = self.inner.disk_path.join("index.bin");
-        
-        if !index_path.exists() {
-            tracing::info!("No index file found, starting with empty cache");
+        let disk_path = self.inner.disk_path.clone();
+        let rows = tokio::task::spawn_blocking(move || load_all_index(&disk_path))
+            .await
+            .map_err(|e| CacheError::InvalidConfig(format!("Failed to join index load task: {}", e)))??;
+        if rows.is_empty() {
+            tracing::info!("No persisted index found in redb, starting with empty cache");
             return Ok(());
         }
-        
-        let data = tokio::fs::read(&index_path)
-            .await
-            .map_err(|e| CacheError::Io(e))?;
-        
-        let entries: Vec<(String, CacheMetadata)> = bincode::deserialize(&data)
-            .map_err(|e| CacheError::Serialization(format!("Failed to deserialize index: {}", e)))?;
+        let entries: Vec<(String, CacheMetadata)> = rows
+            .into_iter()
+            .map(|(key, encoded)| {
+                let metadata = bincode::deserialize::<CacheMetadata>(&encoded).map_err(|e| {
+                    CacheError::Serialization(format!("Failed to deserialize metadata for key {}: {}", key, e))
+                })?;
+                Ok((key, metadata))
+            })
+            .collect::<Result<Vec<_>>>()?;
         
         let mut index = self.inner.index.write().await;
         let mut namespace_keys: std::collections::HashMap<String, Vec<String>> = std::collections::HashMap::new();
