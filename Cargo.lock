@@ -3858,6 +3858,8 @@ dependencies = [
  "askama",
  "async-std",
  "axum 0.8.4",
+ "bb8",
+ "bb8-redis",
  "bytes",
  "chrono",
  "clap",
