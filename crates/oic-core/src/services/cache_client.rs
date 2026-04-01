@@ -12,6 +12,10 @@ pub trait CacheDriver: Send + Sync {
     async fn get_bytes(&self, key: &str) -> Result<Option<Bytes>>;
     /// 写入缓存并设置过期秒数。
     async fn set_ex_bytes(&self, key: &str, value: &[u8], ttl_secs: u64) -> Result<()>;
+    /// 按 key 取回缓存，未命中返回 `None`。
+    async fn get(&self, key: &str) -> Result<Option<String>>;
+    /// 写入缓存并设置过期秒数。
+    async fn set_ex(&self, key: &str, value: &str, ttl_secs: u64) -> Result<()>;
 }
 
 /// 基于 bb8 + bb8-redis 的 Redis 缓存实现，使用 oic-cache 的 Redis 协议服务作为后端。
@@ -39,6 +43,28 @@ impl CacheDriver for RedisCache {
     }
 
     async fn set_ex_bytes(&self, key: &str, value: &[u8], ttl_secs: u64) -> Result<()> {
+        let mut conn = self
+            .pool
+            .get()
+            .await
+            .map_err(|e| anyhow::anyhow!("redis pool get: {}", e))?;
+        conn.set_ex::<_, _, ()>(key, value, ttl_secs)
+            .await
+            .map_err(|e| anyhow::anyhow!("redis set_ex: {}", e))?;
+        Ok(())
+    }
+
+    async fn get(&self, key: &str) -> Result<Option<String>> {
+        let mut conn = self
+            .pool
+            .get()
+            .await
+            .map_err(|e| anyhow::anyhow!("redis pool get: {}", e))?;
+        let cached: Option<String> = conn.get(key).await?;
+        Ok(cached)
+    }
+
+    async fn set_ex(&self, key: &str, value: &str, ttl_secs: u64) -> Result<()> {
         let mut conn = self
             .pool
             .get()

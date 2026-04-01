@@ -74,7 +74,7 @@ function createRouter() {
 	return createBrowserRouter(
 		rootRoute,
 		{
-			basename: import.meta.env.BASE_URL,
+			basename: '/', // import.meta.env.BASE_URL,
 		},
 	);
 }

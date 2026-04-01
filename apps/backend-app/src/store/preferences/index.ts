@@ -13,14 +13,14 @@ import { persist } from "zustand/middleware";
 export const DEFAULT_PREFERENCES = {
 	/* ================== General ================== */
 	watermark: false,
-	watermarkContent: "react-antd-admin",
+	watermarkContent: "lxage-admin",
 	enableBackTopButton: true,
 	pageLayout: "layout-right",
 	enableBackendAccess: true,
 	enableFrontendAceess: false,
 	language: "zh-CN",
 	enableDynamicTitle: true,
-	enableCheckUpdates: true,
+	enableCheckUpdates: false,
 	checkUpdatesInterval: 1,
 
 	/* ================== Theme ================== */

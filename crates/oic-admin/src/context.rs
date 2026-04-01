@@ -12,6 +12,7 @@ use std::path::PathBuf;
 #[serde(default)]
 pub struct AdminConfig {
   pub port: u64,
+  pub public_dir: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]

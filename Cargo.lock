@@ -3858,11 +3858,13 @@ dependencies = [
  "askama",
  "async-std",
  "axum 0.8.4",
+ "axum-extra",
  "bb8",
  "bb8-redis",
  "bytes",
  "chrono",
  "clap",
+ "cookie",
  "dotenv",
  "gray_matter",
  "lazy_static",
@@ -3884,8 +3886,7 @@ dependencies = [
  "tower-http",
  "tracing",
  "urlencoding",
- "vite-rs",
- "vite-rs-axum-0-8",
+ "uuid 1.18.1",
 ]
 
 [[package]]
@@ -3937,6 +3938,7 @@ dependencies = [
  "lazy_static",
  "loco-rs",
  "log",
+ "oic_admin",
  "oic_cache",
  "oic_core",
  "oic_web",

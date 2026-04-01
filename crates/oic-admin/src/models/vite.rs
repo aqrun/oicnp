@@ -1,14 +1,4 @@
-#![allow(dead_code)]
 use std::collections::{HashMap, HashSet};
-use axum::{
-    extract::Request,
-    response::IntoResponse,
-    Router,
-};
-#[cfg(debug_assertions)]
-use axum::routing::any;
-use vite_rs_axum_0_8::ViteServe;
-use crate::WebAppContext;
 
 // Vite Manifest 结构（根据 Vite 官方文档）
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
@@ -76,81 +66,12 @@ pub struct AssetFiles {
 
 impl Default for AssetFiles {
     fn default() -> Self {
-        #[cfg(debug_assertions)]
-        {
-            // Debug 模式：按 Vite 官方约定
-            // Vite dev server 会自动处理模块解析
-            // CSS 通过 JS import 加载，不需要单独 <link>
-            Self {
-                js_files: vec!["/src/main.js".to_string()],
-                css_files: vec![], // CSS 通过 JS import 加载，不需要单独 <link>
-            }
-        }
-        #[cfg(not(debug_assertions))]
-        {
-            // Release 模式：尝试从文件系统读取 manifest
-            // 如果没有找到，会使用默认值
-            let (js_files, css_files) = Self::get_paths_from_manifest(|| None);
-            Self { js_files, css_files }
-        }
+        let (js_files, css_files) = Self::get_paths_from_manifest(|| None);
+        Self { js_files, css_files }
     }
 }
 
 impl AssetFiles {
-    /// 获取资源文件路径（JS 和 CSS）
-    /// - Debug 模式：使用固定的源文件路径（main.js），CSS 通过 import 加载
-    /// - Release 模式：从 manifest 获取编译后的路径
-    /// 
-    /// # Arguments
-    /// * `get_manifest` - 可选函数，用于在 release 模式下获取 manifest 内容
-    pub fn new<F>(get_manifest: Option<F>) -> Self
-    where
-        F: FnOnce() -> Option<String>,
-    {
-        #[cfg(debug_assertions)]
-        {
-            // Debug 模式：忽略 manifest 加载器，使用固定路径
-            Self::default()
-        }
-        #[cfg(not(debug_assertions))]
-        {
-            // Release 模式：使用提供的 manifest 加载器，如果没有则尝试从文件系统读取
-            let (js_files, css_files) = if let Some(get_manifest_fn) = get_manifest {
-                Self::get_paths_from_manifest(get_manifest_fn)
-            } else {
-                Self::get_paths_from_manifest(|| None)
-            };
-            Self { js_files, css_files }
-        }
-    }
-
-    /// 使用自定义 manifest 加载器创建 AssetFiles
-    /// 
-    /// # Arguments
-    /// * `get_manifest` - 函数，用于获取 manifest 内容
-    pub fn with_manifest_loader<F>(get_manifest: F) -> Self
-    where
-        F: FnOnce() -> Option<String>,
-    {
-        Self::new(Some(get_manifest))
-    }
-
-    /// 获取第一个 JS 文件路径（向后兼容）
-    pub fn js_path(&self) -> &str {
-        self.js_files.first().map(|s| s.as_str()).unwrap_or("")
-    }
-
-    /// 获取第一个 CSS 文件路径（向后兼容）
-    pub fn css_path(&self) -> &str {
-        self.css_files.first().map(|s| s.as_str()).unwrap_or("")
-    }
-
-    /// 检查 CSS 文件列表是否为空（用于模板）
-    pub fn has_css_files(&self) -> bool {
-        !self.css_files.is_empty()
-    }
-
-    #[cfg(not(debug_assertions))]
     fn get_paths_from_manifest<F>(get_manifest: F) -> (Vec<String>, Vec<String>)
     where
         F: FnOnce() -> Option<String>,
@@ -160,10 +81,7 @@ impl AssetFiles {
             // 如果函数返回 None，尝试从文件系统读取
             // 构建输出目录通常是 ./app/dist
             let manifest_paths = vec![
-                "./apps/web-app/dist/.vite/manifest.json",
-                "./app/dist/.vite/manifest.json",
-                "./dist/.vite/manifest.json",
-                "../app/dist/.vite/manifest.json",
+                "./apps/backend-app/build/.vite/manifest.json",
             ];
             
             for path in manifest_paths {
@@ -316,117 +234,5 @@ impl AssetFiles {
                 Self::collect_js_files(manifest, import_key, js_files, collected_keys);
             }
         }
-    }
-}
-
-/// 检查路径是否是静态资源
-fn is_static_asset(path: &str) -> bool {
-    // 静态资源路径模式
-    path.starts_with("/assets/")
-        || path.starts_with("/@vite/")
-        || path.starts_with("/node_modules/")
-        || path == "/main.js"
-        || path == "/main.ts"
-        || path == "/style.css"
-        || path == "/@react-refresh"
-        || path.ends_with(".js")
-        || path.ends_with(".ts")
-        || path.ends_with(".tsx")
-        || path.ends_with("env.mjs")
-        || path.ends_with(".css")
-        || path.ends_with(".less")
-        || path.ends_with(".png")
-        || path.ends_with(".jpg")
-        || path.ends_with(".jpeg")
-        || path.ends_with(".gif")
-        || path.ends_with(".svg")
-        || path.ends_with(".ico")
-        || path.ends_with(".woff")
-        || path.ends_with(".woff2")
-        || path.ends_with(".ttf")
-        || path.ends_with(".eot")
-        || path.contains("@vitejs")
-}
-
-/// 智能静态资源处理器
-/// 只处理静态资源请求，其他请求返回 404，避免拦截 Askama 路由
-async fn handle_static_assets(
-    req: Request,
-    vite_serve: ViteServe,
-) -> impl IntoResponse {
-    let path = req.uri().path();
-    
-    // 检查是否是静态资源路径
-    if is_static_asset(path) {
-        vite_serve.serve(req).await
-    } else {
-        // 不是静态资源，返回 404
-        (
-            axum::http::StatusCode::NOT_FOUND,
-            "Not Found",
-        ).into_response()
-    }
-}
-
-/// 配置 Axum 静态资源路由
-///
-/// 此函数会根据编译模式自动配置合适的路由：
-///
-/// - **Debug 模式**: 使用智能处理器，只处理静态资源请求，避免拦截其他路由
-///   - 匹配所有静态资源路径（`/assets/*`, `/@vite/*`, `/main.js`, `/style.css` 等）
-///   - 支持 Vite HMR（Hot Module Replacement）
-///   - 不会拦截其他 Askama 路由（如 `/about`, `/contact` 等）
-///
-/// - **Release 模式**: 只匹配编译后的静态资源路径
-///   - `/assets/*` - 编译后的 JS 文件
-///   - `/style.css` - CSS 文件（可能在根目录）
-///
-/// # 参数
-///
-/// * `vite_serve` - ViteServe 实例，用于处理静态资源请求
-///
-/// # 返回值
-///
-/// 返回配置好的 Axum Router，应该使用 `.merge()` 合并到主应用中
-///
-/// # 示例
-///
-/// ```rust
-/// use vite::static_assets_router;
-/// use vite_rs_axum_0_8::ViteServe;
-///
-/// let vite_serve = ViteServe::new(Assets::boxed());
-/// let app = Router::new()
-///     .route("/", get(handle_index))
-///     .merge(static_assets_router(vite_serve));  // 必须放在其他路由之后
-/// ```
-///
-/// # 注意事项
-///
-/// - 此路由应该放在所有其他路由**之后**，作为最后的 fallback
-/// - Debug 模式下会使用 `/{*path}` 通配路由，但会智能判断是否为静态资源
-pub fn static_assets_router(vite_serve: ViteServe) -> Router<WebAppContext> {
-    #[cfg(debug_assertions)]
-    {
-        // Debug 模式：使用智能处理器，只处理静态资源请求
-        // 这样不会拦截其他 Askama 路由（如 /about, /contact 等）
-        // 注意：这个路由必须放在所有其他路由之后，作为最后的 fallback
-        Router::new()
-            .route("/{*path}", any(move |req: Request| {
-                let vite_serve = vite_serve.clone();
-                async move {
-                    handle_static_assets(req, vite_serve).await
-                }
-            }))
-    }
-    
-    #[cfg(not(debug_assertions))]
-    {
-        // Release 模式：处理嵌入的静态资源
-        // 注意：/public/* 路径由文件系统 ServeDir 处理，不在这里
-        // 只处理编译后的资源：/assets/* (JS/CSS), /.vite/* (manifest)
-        Router::new()
-            .route_service("/assets/{*path}", vite_serve.clone())
-            .route_service("/.vite", vite_serve.clone())
     }
 }

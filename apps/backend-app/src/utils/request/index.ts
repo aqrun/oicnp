@@ -14,7 +14,7 @@ const API_TIMEOUT = Number(import.meta.env.VITE_API_TIMEOUT) || 10000;
 
 const defaultConfig: Options = {
 	// The input argument cannot start with a slash / when using prefixUrl option.
-	prefixUrl: import.meta.env.VITE_API_BASE_URL,
+	prefixUrl: import.meta.env?.VITE_API_BASE_URL || '/api',
 	credentials: "include",
 	timeout: API_TIMEOUT,
 	retry: {

@@ -8,6 +8,7 @@
     "clean": "turbo clean",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "serve:web": "cargo run --release -p oic_cmd -- serve web",
+    "serve:admin": "pnpm build --filter backend-app && cargo run -p oic_cmd -- serve admin",
     "cargo:build": "cargo build --release --target x86_64-unknown-linux-musl && cargo build --release --target x86_64-unknown-linux-musl -p oic_cmd"
   },
   "devDependencies": {

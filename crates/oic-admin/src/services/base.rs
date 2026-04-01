@@ -41,6 +41,41 @@ where
     Ok(json_value)
 }
 
+/// POST JSON，并附带 `Authorization: Bearer <token>`；成功判定与 `call_api` 一致（`code == "200"`）。
+pub async fn call_api_with_bearer(
+    url: &str,
+    bearer: &str,
+    body: &impl Serialize,
+) -> Result<Value> {
+    let client = create_client();
+    let response = client
+        .post(url)
+        .header(
+            "Authorization",
+            format!("Bearer {}", bearer.trim()),
+        )
+        .json(body)
+        .send()
+        .await?;
+
+    let json_value: Value = response.json().await?;
+
+    let code = json_value
+        .get("code")
+        .and_then(|v| v.as_str())
+        .unwrap_or("400");
+
+    if code != "200" {
+        let message = json_value
+            .get("message")
+            .and_then(|v| v.as_str())
+            .unwrap_or("API error");
+        return Err(anyhow::anyhow!("API error [{}]: {}", code, message));
+    }
+
+    Ok(json_value)
+}
+
 /// 从 JSON Value 解析列表类型的 JsonRes
 pub fn parse_list_response<T>(json_value: Value, data_key: &str) -> Result<JsonRes<Vec<T>>>
 where

@@ -147,7 +147,9 @@ pub async fn init_cmd() {
                     }
                 },
                 ServeCommand::Admin => {
-                    // let _ = oic_admin::app::run().await;
+                    if let Err(err) = oic_admin::app::run().await {
+                        log::error!("AdminErr: {}", err);
+                    }
                 },
             }
         },

@@ -16,146 +16,157 @@ import { router } from "./router";
 import { customAntdDarkTheme, customAntdLightTheme } from "./styles/theme/antd/antd-theme";
 import "dayjs/locale/zh-cn";
 
-export default function App() {
-	const { i18n } = useTranslation();
-	const {
-		language,
-		isDark,
-		theme,
-		themeColorPrimary,
-		colorBlindMode,
-		colorGrayMode,
-		themeRadius,
-		changeSiteTheme,
+export interface AppProps {
+    isLoginPage?: boolean;
+}
 
-		enableCheckUpdates,
-		checkUpdatesInterval,
-		sideCollapsedWidth,
-	} = usePreferences();
+export default function App({ isLoginPage }: AppProps) {
+    const { i18n } = useTranslation();
+    const {
+        language,
+        isDark,
+        theme,
+        themeColorPrimary,
+        colorBlindMode,
+        colorGrayMode,
+        themeRadius,
+        changeSiteTheme,
 
-	useScrollToHash();
+        enableCheckUpdates,
+        checkUpdatesInterval,
+        sideCollapsedWidth,
+    } = usePreferences();
 
-	/**
-	 * ant design internationalization
-	 * @link https://ant.design/docs/react/i18n
-	 */
-	const getAntdLocale = () => {
-		return ANT_DESIGN_LOCALE[language as keyof typeof ANT_DESIGN_LOCALE];
-	};
+    useScrollToHash();
 
-	/**
-	 * day.js internationalization
-	 * @link https://day.js.org/docs/en/installation/installation
-	 */
-	useEffect(() => {
-		if (language === "en-US") {
-			dayjs.locale("en");
-		}
-		else if (language === "zh-CN") {
-			dayjs.locale("zh-cn");
-		}
-	}, [language]);
+    /**
+     * ant design internationalization
+     * @link https://ant.design/docs/react/i18n
+     */
+    const getAntdLocale = () => {
+        return ANT_DESIGN_LOCALE[language as keyof typeof ANT_DESIGN_LOCALE];
+    };
 
-	/**
-	 * react-i18next internationalization
-	 * @link https://www.i18next.com/overview/api#changelanguage
-	 */
-	useEffect(() => {
-		i18n.changeLanguage(language);
-	}, [language, i18n.changeLanguage]);
+    /**
+     * day.js internationalization
+     * @link https://day.js.org/docs/en/installation/installation
+     */
+    useEffect(() => {
+        if (language === "en-US") {
+            dayjs.locale("en");
+        }
+        else if (language === "zh-CN") {
+            dayjs.locale("zh-cn");
+        }
+    }, [language]);
 
-	/**
-	 * Change theme when the system theme changes
-	 */
-	const setEmulateTheme = useCallback(
-		// eslint-disable-next-line unused-imports/no-unused-vars
-		(dark?: boolean) => {
-			changeSiteTheme("auto");
-		},
-		[changeSiteTheme],
-	);
+    /**
+     * react-i18next internationalization
+     * @link https://www.i18next.com/overview/api#changelanguage
+     */
+    useEffect(() => {
+        i18n.changeLanguage(language);
+    }, [language, i18n.changeLanguage]);
 
-	/**
-	 * Watch system theme change
-	 */
-	useEffect(() => {
-		if (theme === "auto") {
-			// https://developer.chrome.com/docs/devtools/rendering/emulate-css/
-			const darkModeMediaQuery = window.matchMedia(
-				"(prefers-color-scheme: dark)",
-			);
+    /**
+     * Change theme when the system theme changes
+     */
+    const setEmulateTheme = useCallback(
+        // eslint-disable-next-line unused-imports/no-unused-vars
+        (dark?: boolean) => {
+            changeSiteTheme("auto");
+        },
+        [changeSiteTheme],
+    );
 
-			function matchMode(e: MediaQueryListEvent) {
-				setEmulateTheme(e.matches);
-			}
+    /**
+     * Watch system theme change
+     */
+    useEffect(() => {
+        if (theme === "auto") {
+            // https://developer.chrome.com/docs/devtools/rendering/emulate-css/
+            const darkModeMediaQuery = window.matchMedia(
+                "(prefers-color-scheme: dark)",
+            );
 
-			setEmulateTheme(darkModeMediaQuery.matches);
-			darkModeMediaQuery.addEventListener("change", matchMode);
-			return () => {
-				darkModeMediaQuery.removeEventListener("change", matchMode);
-			};
-		}
-	}, [theme, setEmulateTheme]);
+            function matchMode(e: MediaQueryListEvent) {
+                setEmulateTheme(e.matches);
+            }
 
-	/**
-	 * 更新页面颜色模式（灰色、色弱）
-	 */
-	const updateColorMode = () => {
-		const dom = document.documentElement;
-		const COLOR_BLIND = "color-blind-mode";
-		const COLOR_GRAY = "gray-mode";
-		colorBlindMode
-			? dom.classList.add(COLOR_BLIND)
-			: dom.classList.remove(COLOR_BLIND);
-		colorGrayMode
-			? dom.classList.add(COLOR_GRAY)
-			: dom.classList.remove(COLOR_GRAY);
-	};
+            setEmulateTheme(darkModeMediaQuery.matches);
+            darkModeMediaQuery.addEventListener("change", matchMode);
+            return () => {
+                darkModeMediaQuery.removeEventListener("change", matchMode);
+            };
+        }
+    }, [theme, setEmulateTheme]);
 
-	useEffect(() => {
-		updateColorMode();
-	}, [colorBlindMode, colorGrayMode]);
+    /**
+     * 更新页面颜色模式（灰色、色弱）
+     */
+    const updateColorMode = () => {
+        const dom = document.documentElement;
+        const COLOR_BLIND = "color-blind-mode";
+        const COLOR_GRAY = "gray-mode";
+        colorBlindMode
+            ? dom.classList.add(COLOR_BLIND)
+            : dom.classList.remove(COLOR_BLIND);
+        colorGrayMode
+            ? dom.classList.add(COLOR_GRAY)
+            : dom.classList.remove(COLOR_GRAY);
+    };
 
-	return (
-		<StyleProvider layer>
-			<ConfigProvider
-				input={{ autoComplete: "off" }}
-				locale={getAntdLocale()}
-				theme={{
-					cssVar: {},
-					hashed: false,
-					algorithm:
-						isDark
-							? antdTheme.darkAlgorithm
-							: antdTheme.defaultAlgorithm,
-					...(isDark ? customAntdDarkTheme : customAntdLightTheme),
-					token: {
-						...(isDark ? customAntdDarkTheme.token : customAntdLightTheme.token),
-						borderRadius: themeRadius,
-						colorPrimary: themeColorPrimary,
-					},
-					components: {
-						...(isDark ? customAntdDarkTheme.components : customAntdLightTheme.components),
-						Menu: {
-							darkItemBg: "#141414",
-							itemBg: "#fff",
-							...(isDark
-								? customAntdDarkTheme.components?.Menu
-								: customAntdLightTheme.components?.Menu),
-							collapsedWidth: sideCollapsedWidth,
-						},
-					},
-				}}
-			>
-				<AntdApp>
-					<JSSThemeProvider>
-						<Suspense fallback={null}>
-							{enableCheckUpdates ? <AppVersionMonitor checkUpdatesInterval={checkUpdatesInterval} /> : null}
-							<RouterProvider router={router} />
-						</Suspense>
-					</JSSThemeProvider>
-				</AntdApp>
-			</ConfigProvider>
-		</StyleProvider>
-	);
+    useEffect(() => {
+        updateColorMode();
+    }, [colorBlindMode, colorGrayMode]);
+
+    return (
+        <StyleProvider layer>
+            <ConfigProvider
+                input={{ autoComplete: "off" }}
+                locale={getAntdLocale()}
+                theme={{
+                    cssVar: {},
+                    hashed: false,
+                    algorithm:
+                        isDark
+                            ? antdTheme.darkAlgorithm
+                            : antdTheme.defaultAlgorithm,
+                    ...(isDark ? customAntdDarkTheme : customAntdLightTheme),
+                    token: {
+                        ...(isDark ? customAntdDarkTheme.token : customAntdLightTheme.token),
+                        borderRadius: themeRadius,
+                        colorPrimary: themeColorPrimary,
+                    },
+                    components: {
+                        ...(isDark ? customAntdDarkTheme.components : customAntdLightTheme.components),
+                        Menu: {
+                            darkItemBg: "#141414",
+                            itemBg: "#fff",
+                            ...(isDark
+                                ? customAntdDarkTheme.components?.Menu
+                                : customAntdLightTheme.components?.Menu),
+                            collapsedWidth: sideCollapsedWidth,
+                        },
+                    },
+                }}
+            >
+                <AntdApp>
+                    <JSSThemeProvider>
+                        <Suspense fallback={null}>
+                            {enableCheckUpdates ? (
+                                <AppVersionMonitor
+                                    checkUpdatesInterval={checkUpdatesInterval}
+                                    checkUpdateUrl="/"
+                                />
+                            ) : null}
+                            {isLoginPage ? null : (
+                              <RouterProvider router={router} />
+                            )}
+                        </Suspense>
+                    </JSSThemeProvider>
+                </AntdApp>
+            </ConfigProvider>
+        </StyleProvider>
+    );
 }

@@ -24,11 +24,11 @@ const isDev = process.env.NODE_ENV === "development";
 // https://vitejs.dev/config/
 export default defineConfig({
 
-	base: isDev ? "/" : "/react-antd-admin/",
+	base: isDev ? "/" : '/public/',
 	plugins: [
 		vitePluginFakeServer({
 			basename: "/api",
-			enableProd: true,
+			enableProd: false,
 			timeout: 1000,
 		}),
 		// https://github.com/pd4d10/vite-plugin-svgr#options
@@ -131,6 +131,7 @@ export default defineConfig({
 	build: {
 		// Generate license file after build
 		license: true,
+    manifest: true,
 		outDir: "build",
 		sourcemap: false,
 		rollupOptions: {
