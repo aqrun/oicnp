@@ -13,7 +13,7 @@ use crate::models::poetry::PoetryListParams;
 async fn poetry_home(
   State(ctx): State<WebAppContext>,
 ) -> impl IntoResponse {
-  let cache_key = "poetry:home";
+  let cache_key = "web:poetry:home";
   cached!(
       &ctx.cache,
       &cache_key,
@@ -36,7 +36,7 @@ async fn poetry_list_by_category(
       page = x;
   }
 
-  let cache_key = format!("poetry:cat:{}:{}:{}", list_key, cat_vid, page);
+  let cache_key = format!("web:poetry:cat:{}:{}:{}", list_key, cat_vid, page);
   let new_params = PoetryListParams {
       cat_vid: Some(cat_vid),
       page: Some(page),
@@ -55,7 +55,7 @@ async fn poetry_detail(
   Path(uuid): Path<String>,
   State(ctx): State<WebAppContext>,
 ) -> impl IntoResponse {
-  let cache_key = format!("poetry:detail:{}", uuid);
+  let cache_key = format!("web:poetry:detail:{}", uuid);
   cached!(
       &ctx.cache,
       &cache_key,

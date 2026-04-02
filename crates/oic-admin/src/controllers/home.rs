@@ -37,7 +37,7 @@ pub async fn home_index(
 
     cached!(
         &ctx.cache,
-        "home:index",
+        "admin:home:index",
         render_home_index(&ctx),
         ctx.config.handler_cache_time
     )

@@ -1,23 +1,32 @@
 use anyhow::Result;
 use oic_core::{
     models::{
-        nodes::{NodeFilters, NodeDetailModel},
-        tags::TagFilters,
-        poetry::{PoetryFilters, PoetryListPageDataResponse},
+        users::LoginParams,
     },
-    entities::{prelude::*, poetry::ChapterModel},
+    services::auth::LoginResponse,
 };
 use oic_core::typings::JsonRes;
-use super::{call_api, parse_list_response, parse_single_response};
+use super::{call_api_with_bearer, parse_response};
 use crate::WebAppContext;
-use serde_json::Value;
 
-/// 调用节点列表 API，返回 JsonRes<Vec<NodeDetailModel>>
-pub async fn describe_node_list(
+/// 获取当前登陆用户信息
+pub async fn describe_user_info(
     ctx: &WebAppContext,
-    params: NodeFilters,
-) -> Result<JsonRes<Vec<NodeDetailModel>>> {
-    let url = format!("{}/v1/node/list", ctx.config.api_url);
-    let json_value = call_api::<NodeFilters>(&url, &params).await?;
-    parse_list_response(json_value, "nodes")
+    bearer: &str,
+) -> Result<JsonRes<LoginResponse>> {
+    let url = format!("{}/v1/user/info", ctx.config.api_url);
+    let json_value = call_api_with_bearer(&url, bearer, &LoginParams::default()).await?;
+    parse_response(json_value)
+}
+
+///
+/// 调用 access-token API，返回 JsonRes<LoginResponse>
+/// 
+pub async fn describe_auth_login(
+    ctx: &WebAppContext,
+    params: LoginParams,
+) -> Result<JsonRes<LoginResponse>> {
+    let url = format!("{}/v1/auth/access-token", ctx.config.api_url);
+    let json_value = call_api_with_bearer(&url, "", &params).await?;
+    parse_response(json_value)
 }

@@ -21,6 +21,7 @@ use oic_core::services::{
         ForgotParams,
         ResetParams,
         LoginResponse,
+        RefreshTokenParams,
     },
     user::{add_user_login_log, update_user_online_log},
 };
@@ -188,12 +189,24 @@ async fn access_token(
     State(ctx): State<AppContext>,
     Json(params): Json<LoginParams>,
 ) -> JsonRes<LoginResponse> {
+    let cache = match ctx.shared_store.get::<Arc<OicCache>>() {
+        Some(cache) => cache,
+        None => {
+            return JsonRes::err(String::from("Cache not found"));
+        },
+    };
+
     let log_email = String::from(params.email.as_str());
 
     let mut login_status = true;
     let mut login_message = String::from("登陆成功");
 
-    let info = match services::auth::access_token(&ctx.db, &ctx.config, params).await {
+    let info = match services::auth::access_token(
+        &ctx.db, 
+        cache,
+        &ctx.config, 
+        params,
+    ).await {
         Ok(res) => res,
         Err(err) => {
             login_status = false;
@@ -244,8 +257,40 @@ async fn access_token(
 async fn auth_info(
     auth: JWTWithUser<UserModel>,
     State(_ctx): State<AppContext>,
-) -> JsonRes<UserClaims> {
-    JsonRes::from((auth.claims, "user"))
+) -> JsonRes<LoginResponse> {
+    let res = LoginResponse::new(&auth.user, "", "");
+    JsonRes::ok(res)
+}
+
+///
+/// 优化点：
+/// 1 refresh_token 参数未做基础校验（空值、长度、格式）
+/// 2 绑定维度较弱：缓存只存 user_uuid，没绑定设备/客户端指纹；如果同账号多端，你目前是“任一 refresh token 都可换新”。
+/// 
+async fn handle_refresh_token(
+    State(ctx): State<AppContext>,
+    Json(params): Json<RefreshTokenParams>
+) -> JsonRes<LoginResponse> {
+    let cache = match ctx.shared_store.get::<Arc<OicCache>>() {
+        Some(cache) => cache,
+        None => {
+            return JsonRes::err(String::from("Cache not found"));
+        },
+    };
+
+    let info = match services::auth::refresh_token(
+        &ctx.db, 
+        cache,
+        &ctx.config, 
+        &params,
+    ).await {
+        Ok(res) => res,
+        Err(_err) => {
+            return JsonRes::err(String::from("刷新令牌失败"));
+        }
+    };
+
+    JsonRes::ok(info)
 }
 
 pub fn routes() -> Routes {
@@ -257,5 +302,6 @@ pub fn routes() -> Routes {
         .add("/forgot", post(forgot))
         .add("/reset", post(reset))
         .add("/access-token", post(access_token))
+        .add("/refresh-token", post(handle_refresh_token))
         .add("/info", post(auth_info))
 }

@@ -3,7 +3,7 @@
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use uuid::Uuid;
+use oic_core::uuid;
 
 use crate::services::{call_api, call_api_with_bearer};
 use crate::WebAppContext;
@@ -57,7 +57,7 @@ fn resolve_email(req: &AuthLoginRequest) -> Result<String> {
 
 fn login_ttl_secs(remember: bool) -> u64 {
 	if remember {
-		30 * 24 * 3600
+		7 * 24 * 3600
 	}
 	else {
 		24 * 3600
@@ -91,8 +91,8 @@ pub async fn login(ctx: &WebAppContext, req: AuthLoginRequest) -> Result<AuthLog
 		.context("upstream login response missing data.token")?;
 
 	let ttl_secs = login_ttl_secs(req.remember);
-	let session_id = Uuid::new_v4().to_string();
-	let session_key = format!("session-{}", session_id);
+    let session_id = uuid!();
+	let session_key = format!("admin:session:{}", session_id.as_str());
 
 	ctx
 		.cache

@@ -37,7 +37,7 @@ impl CalendarWidget {
   pub async fn get_html(&self, ctx: &WebAppContext) -> String {
     let html = match get_cached_or_render(
       ctx.cache.as_ref(),
-      format!("widget:{}", self.id).as_str(),
+      format!("web:widget:{}", self.id).as_str(),
       || async {
         let s = self.render().unwrap_or_default();
         let s = minify_html(&s);
@@ -109,7 +109,7 @@ impl RecommendBlogsWidget {
   pub async fn get_html(&self, ctx: &WebAppContext) -> String {
     let html = match get_cached_or_render(
       ctx.cache.as_ref(),
-      format!("widget:{}", self.id).as_str(),
+      format!("web:widget:{}", self.id).as_str(),
       || async {
         let s = self.render().unwrap_or_default();
         let s = minify_html(&s);
@@ -183,7 +183,7 @@ impl RecommendTagsWidget {
   pub async fn get_html(&self, ctx: &WebAppContext) -> String {
     let html = match get_cached_or_render(
       ctx.cache.as_ref(),
-      format!("widget:{}", self.id).as_str(),
+      format!("web:widget:{}", self.id).as_str(),
       || async {
         let s = self.render().unwrap_or_default();
         let s = minify_html(&s);
@@ -218,7 +218,7 @@ impl SideNavWidget {
   pub async fn get_html(&self, ctx: &WebAppContext) -> String {
     let html = match get_cached_or_render(
       ctx.cache.as_ref(),
-      format!("widget:side-nav:{}:{}",
+      format!("web:widget:side-nav:{}:{}",
         self.key.as_str(),
         self.active_vid.as_str()
       ).as_str(),

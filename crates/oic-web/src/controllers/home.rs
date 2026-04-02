@@ -24,7 +24,7 @@ async fn index(
 ) -> impl IntoResponse {
     cached!(
         &ctx.cache,
-        "home:index",
+        "web:home:index",
         render_home_index(&ctx),
         ctx.config.handler_cache_time
     )
@@ -54,7 +54,7 @@ async fn about(
 ) -> impl IntoResponse {
     cached!(
         &ctx.cache,
-        "home:about",
+        "web:home:about",
         render_about(&ctx),
         ctx.config.handler_cache_time
     )
@@ -65,7 +65,7 @@ async fn contact(
 ) -> impl IntoResponse {
     cached!(
         &ctx.cache,
-        "home:contact",
+        "web:home:contact",
         render_contact(&ctx),
         ctx.config.handler_cache_time
     )

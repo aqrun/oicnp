@@ -131,3 +131,27 @@ where
     })
 }
 
+/// 从 JSON Value 解析单个对象的 JsonRes 不带 wrap_key 的
+pub fn parse_response<T>(json_value: Value) -> Result<JsonRes<T>>
+where
+    T: for<'de> Deserialize<'de> + Send + Sync + 'static,
+{
+    let data_value = json_value
+        .get("data")
+        .cloned()
+        .ok_or_else(|| anyhow::anyhow!("Missing 'data' field"))?;
+
+    let data: T = serde_json::from_value(data_value)
+        .map_err(|e| anyhow::anyhow!("Invalid data field: {}", e))?;
+
+    Ok(JsonRes {
+        wrap_key: None,
+        code: Some("200".to_string()),
+        message: json_value
+            .get("message")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string()),
+        data: JsonResPayload::Data(data),
+    })
+}
+

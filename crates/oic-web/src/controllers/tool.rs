@@ -13,7 +13,7 @@ async fn tool_list(
   State(ctx): State<WebAppContext>,
   Query(params): Query<ToolListParams>,
 ) -> impl IntoResponse {
-  let cache_key = "tool:list:all";
+  let cache_key = "web:tool:list:all";
 
   cached!(
       &ctx.cache,
@@ -28,7 +28,7 @@ async fn tool_list_by_category(
   Path(cat_vid): Path<String>,
   State(ctx): State<WebAppContext>,
 ) -> impl IntoResponse {
-  let cache_key = format!("tool:list:cat:{}", cat_vid);
+  let cache_key = format!("web:tool:list:cat:{}", cat_vid);
   let new_params = ToolListParams {
       cat_vid: Some(cat_vid),
       is_category_page: Some(true),

@@ -26,7 +26,7 @@ async fn blog_list(
         page = x;
     }
 
-    let cache_key = format!("blog:{}:{}:{}", list_key, cat_vid, page);
+    let cache_key = format!("web:blog:{}:{}:{}", list_key, cat_vid, page);
 
     cached!(
         &ctx.cache,
@@ -50,7 +50,7 @@ async fn blog_list_by_category(
         page = x;
     }
 
-    let cache_key = format!("blog:cat:{}:{}:{}", list_key, cat_vid, page);
+    let cache_key = format!("web:blog:cat:{}:{}:{}", list_key, cat_vid, page);
     let new_params = BlogListParams {
         cat_vid: Some(cat_vid),
         page: Some(page),
@@ -79,7 +79,7 @@ async fn blog_list_by_tag(
         page = x;
     }
 
-    let cache_key = format!("blog:tag:{}:{}:{}", list_key, tag_vid, page);
+    let cache_key = format!("web:blog:tag:{}:{}:{}", list_key, tag_vid, page);
     let new_params = BlogListParams {
         tag_vid: Some(tag_vid),
         page: Some(page),
@@ -99,7 +99,7 @@ async fn blog_detail(
     Path(vid): Path<String>,
     State(ctx): State<WebAppContext>,
 ) -> impl IntoResponse {
-    let cache_key = format!("blog:detail:{}", vid);
+    let cache_key = format!("web:blog:detail:{}", vid);
     cached!(
         &ctx.cache,
         &cache_key,

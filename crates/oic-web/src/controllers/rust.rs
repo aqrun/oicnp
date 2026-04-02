@@ -11,7 +11,7 @@ use axum::{
 async fn rust_home(
     State(ctx): State<WebAppContext>,
 ) -> impl IntoResponse {
-    let cache_key = "rust:home";
+    let cache_key = "web:rust:home";
     cached!(
         &ctx.cache,
         &cache_key,

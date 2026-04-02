@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use loco_rs::prelude::*;
 use loco_rs::config::Config;
 use serde::{Deserialize, Serialize};
@@ -6,6 +7,8 @@ use crate::models::users::{LoginParams, RegisterParams};
 use serde_json::{json, Value};
 use anyhow::{Result, anyhow};
 use crate::utils::{verify_password, catch_err};
+use crate::services::cache::OicCache;
+use std::time::Duration;
 use crate::uuid;
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -19,6 +22,12 @@ pub struct ForgotParams {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct RefreshTokenParams {
+    #[serde(rename(deserialize = "refreshToken"))]
+    pub refresh_token: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct ResetParams {
     pub token: String,
     pub password: String,
@@ -27,6 +36,7 @@ pub struct ResetParams {
 #[derive(Debug, Deserialize, Serialize, Default, Clone)]
 pub struct LoginResponse {
     pub token: String,
+    pub refresh_token: String,
     pub uid: i64,
     pub uuid: String,
     pub username: String,
@@ -37,9 +47,10 @@ pub struct LoginResponse {
 
 impl LoginResponse {
     #[must_use]
-    pub fn new(user: &UserModel, token: &str) -> Self {
+    pub fn new(user: &UserModel, token: &str, refresh_token: &str) -> Self {
         Self {
             token: String::from(token),
+            refresh_token: String::from(refresh_token),
             uid: user.uid,
             uuid: String::from(user.uuid.as_str()),
             username: String::from(user.username.as_str()),
@@ -176,8 +187,8 @@ pub async fn login(
     }
 
     let session_id = uuid!();
-
-    let mut login_res = LoginResponse::new(&user, session_id.as_str());
+    let refresh_token = uuid!();
+    let mut login_res = LoginResponse::new(&user, session_id.as_str(), refresh_token.as_str());
     login_res.remember = params.remember;
 
     Ok(login_res)
@@ -192,6 +203,7 @@ pub async fn login(
 /// 
 pub async fn access_token(
     db: &DatabaseConnection,
+    cache: Arc<OicCache>,
     config: &Config,
     params: LoginParams,
 ) -> Result<LoginResponse> {
@@ -217,10 +229,62 @@ pub async fn access_token(
     }
 
     let jwt_secret = config.get_jwt_config()?;
+    let refresh_token = uuid!();
 
     let token = user
         .generate_jwt(&jwt_secret.secret, &jwt_secret.expiration)
         .or_else(|_| unauthorized("unauthorized!"))?;
 
-    Ok(LoginResponse::new(&user, token.as_str()))
+    let cache_key = format!("api:refresh-token:{}", refresh_token);
+    let duration = Duration::from_secs(30 * 24 * 3600);
+    
+    if let Err(err) = cache.insert_with_expiry(cache_key.as_str(), user.uuid.as_str(), duration).await {
+        tracing::error!(message = err.to_string(), "failed to insert refresh token into cache");
+        return Err(anyhow!("failed to insert refresh token into cache"));
+    }
+    Ok(LoginResponse::new(&user, token.as_str(), refresh_token.as_str()))
+}
+
+/// 使用 refresh token 获取新的 access token
+/// 
+/// * Access Token: 短期有效（15分钟-1小时）
+/// * Refresh Token: 长期有效（7-30天）
+/// 
+/// 增加登陆尝试次数限制
+/// 
+pub async fn refresh_token(
+    db: &DatabaseConnection,
+    cache: Arc<OicCache>,
+    config: &Config,
+    params: &RefreshTokenParams,
+) -> Result<LoginResponse> {
+    let cache_key = format!("api:refresh-token:{}", params.refresh_token.as_str());
+    let user_uuid = match cache.get(cache_key.as_str()).await {
+        Ok(text) => text.unwrap_or(String::from("")),
+        Err(_) => {
+            return Err(anyhow!("Refresh token not found"));
+        },
+    };
+    cache.remove(cache_key.as_str()).await?;
+
+    if user_uuid.is_empty() {
+        return Err(anyhow!("Refresh token not found"));
+    }
+
+    let user = UserModel::find_by_uuid(db, user_uuid.as_str()).await?;
+
+    let jwt_data = config.get_jwt_config()?;
+    let token = user
+        .generate_jwt(&jwt_data.secret, &jwt_data.expiration)
+        .or_else(|_| unauthorized("unauthorized!"))?;
+
+    let refresh_token = uuid!();
+    let cache_key = format!("api:refresh-token:{}", refresh_token);
+    let duration = Duration::from_secs(30 * 24 * 3600);
+    
+    if let Err(err) = cache.insert_with_expiry(cache_key.as_str(), user.uuid.as_str(), duration).await {
+        tracing::error!(message = err.to_string(), "failed to insert refresh token into cache");
+        return Err(anyhow!("failed to insert refresh token into cache"));
+    }
+    Ok(LoginResponse::new(&user, token.as_str(), refresh_token.as_str()))
 }
