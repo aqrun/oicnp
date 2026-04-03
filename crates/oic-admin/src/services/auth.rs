@@ -72,31 +72,3 @@ pub async fn fetch_auth_info(
 		.context("auth info failed")?;
 	Ok(user_info)
 }
-
-pub async fn get_routes(
-    ctx: &WebAppContext,
-    bearer: &str,
-) -> Result<Value> {
-    let res = serde_json::json!([
-        {
-            "path": "/home",
-            "component": "/home/index.tsx",
-            "handle": {
-                "icon": "HomeOutlined",
-                "title": "common.menu.home",
-                "order": 1,
-            },
-        },
-        {
-            "path": "/about",
-            "component": "/about/index.tsx",
-            "handle": {
-                "icon": "CopyrightOutlined",
-                "title": "common.menu.about",
-                "order": 2,
-            },
-        },
-    ]);
-   
-    Ok(res)
-}

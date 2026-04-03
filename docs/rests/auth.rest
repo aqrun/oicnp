@@ -1,11 +1,31 @@
-GET http://localhost:5150/v1/info HTTP/1.1
+@base = http://192.168.1.241:5150
 
 ###
 
-POST http://192.168.1.241:5150/v1/auth/access-token HTTP/1.1
+GET {{base}}/v1/info HTTP/1.1
+
+###
+
+# @name accessToken
+# @prompt username 输入用户名
+# @prompt password 输入密码
+POST {{base}}/v1/auth/access-token HTTP/1.1
 content-type: application/json
 
 {
-    "username": "aqrun",
-    "password": "123456"
+    "username": "{{username}}",
+    "password": "{{password}}"
+}
+
+@token = {{accessToken.response.body.data.token}}
+
+### 
+
+# @name menuTree
+POST {{base}}/v1/menu/tree HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "vid": "backend"
 }

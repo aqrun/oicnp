@@ -2,6 +2,7 @@ use anyhow::Result;
 use oic_core::{
     models::{
         users::LoginParams,
+        menus::{MenuTreeItem, MenuReqParams},
     },
     services::auth::LoginResponse,
 };

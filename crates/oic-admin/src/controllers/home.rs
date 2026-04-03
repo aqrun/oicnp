@@ -17,7 +17,7 @@ use super::extrators::AuthToken;
 use crate::services::{
     fetch_auth_info,
     login as auth_login_service,
-    get_routes,
+    menu::get_routes,
 };
 use crate::{cached, WebAppContext, SESSION_ID};
 use oic_core::typings::JsonRes;

@@ -59,7 +59,7 @@ pub async fn call_api_with_bearer(
         .await?;
 
     let json_value: Value = response.json().await?;
-    tracing::info!("uri: {}, json_value: {:?}", url, json_value);
+    // tracing::info!("uri: {}, json_value: {:?}", url, json_value);
     Ok(json_value)
 }
 

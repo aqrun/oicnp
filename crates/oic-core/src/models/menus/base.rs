@@ -116,12 +116,13 @@ pub type DeleteMenuReqParams = MenuReqParams;
  * 树结构返回的菜单数据
  */
 #[derive(Clone, Debug, Deserialize, Serialize, Default)]
+#[serde(default)]
 pub struct MenuTreeItem {
     pub id: i64,
     /// 菜单组件需要的属性
     pub key: String,
     pub vid: String,
-    #[serde(rename(deserialize = "parentId"))]
+    #[serde(rename(deserialize = "parentId", serialize = "parentId"))]
     pub parent_id: i64,
     pub path: String,
     pub label: String,

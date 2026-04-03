@@ -11,3 +11,6 @@ export * from './tag/hooks';
 export * from './poetry/types';
 export * from './poetry/client';
 export * from './poetry/hooks';
+
+export * from './menu/types';
+export * from './permission/types';
