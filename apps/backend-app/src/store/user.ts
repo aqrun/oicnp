@@ -29,9 +29,9 @@ export const useUserStore = create<UserState & UserAction>()(
 		getUserInfo: async () => {
 			const response = await fetchUserInfo();
 			set({
-				...response.result,
+				...response.data,
 			});
-			return response.result;
+			return response.data;
 		},
 
 		reset: () => {

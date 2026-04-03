@@ -19,7 +19,7 @@ pub use crate::entities::prelude::{
 #[derive(Debug, Deserialize, Serialize, Clone, Validate, Default)]
 #[serde(default)]
 pub struct LoginParams {
-    #[validate(length(min = 1, message = "必须指定 email 或 password"))]
+    pub username: String,
     pub email: String,
     #[validate(length(min = 1, message = "必须指定 email 或 password"))]
     pub password: String,

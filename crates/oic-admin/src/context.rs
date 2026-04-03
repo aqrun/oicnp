@@ -12,7 +12,10 @@ use std::path::PathBuf;
 #[serde(default)]
 pub struct AdminConfig {
   pub port: u64,
+  /// 静态资源构建目录
   pub public_dir: String,
+  /// 公共 URI 白名单
+  pub public_uri: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]

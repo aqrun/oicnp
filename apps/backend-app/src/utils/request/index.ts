@@ -46,8 +46,7 @@ const defaultConfig: Options = {
 							goLogin();
 						}
 						return response;
-					}
-					else {
+					} else {
 						return handleErrorResponse(response);
 					}
 				}

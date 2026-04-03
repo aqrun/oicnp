@@ -33,3 +33,6 @@ site:
 
 admin:
   port: 9001
+  public_dir: ./apps/backend-app/build
+  public_uri:
+    - /auth/login

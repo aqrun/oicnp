@@ -56,9 +56,9 @@ export default function PieChart() {
 
 	useEffect(() => {
 		if (value) {
-			fetchPie({ by: value }).then(({ result }) => {
+			fetchPie({ by: value }).then(({ data }) => {
 				setData(
-					result.map((item) => {
+					data?.map((item) => {
 						const code = item.code as keyof typeof DATA_KEY;
 						return {
 							...item,

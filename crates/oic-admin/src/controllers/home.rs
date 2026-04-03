@@ -4,37 +4,45 @@ use axum::{
     routing::{get, post},
     extract::{State, Path},
     response::{IntoResponse, Redirect},
-    http::{HeaderMap, Method},
+    http::{HeaderMap, Method, Uri},
     Json,
+    debug_handler,
 };
 use axum_extra::extract::cookie::{Cookie, SameSite};
 use axum_extra::extract::CookieJar;
 use crate::views::{
     render_home_index,
 };
+use super::extrators::AuthToken;
 use crate::services::{
     fetch_auth_info,
     login as auth_login_service,
-    AuthInfoRequest,
-    AuthLoginRequest,
+    get_routes,
 };
 use crate::{cached, WebAppContext, SESSION_ID};
 use oic_core::typings::JsonRes;
+use oic_core::models::users::LoginParams;
 
 pub async fn home_index(
     State(ctx): State<WebAppContext>,
     cookies: CookieJar,
+    uri: Uri,
 ) -> impl IntoResponse {
-    let mut seccion_id = String::from("");
+    let uri_path = String::from(uri.path());
+    let is_public_uri = ctx.config.admin.public_uri.contains(&uri_path);
 
-    if let Some(cookie) = cookies.get(SESSION_ID) {
-        seccion_id = cookie.value().to_string();
+    if !is_public_uri {
+        let mut seccion_id = String::from("");
+
+        if let Some(cookie) = cookies.get(SESSION_ID) {
+            seccion_id = cookie.value().to_string();
+        }
+
+        if seccion_id.is_empty() {
+            return Redirect::temporary("/auth/login").into_response();
+        }
     }
-
-    if seccion_id.is_empty() {
-        return Redirect::temporary("/auth/login").into_response();
-    }
-
+    
     cached!(
         &ctx.cache,
         "admin:home:index",
@@ -47,9 +55,9 @@ pub async fn home_index(
 async fn auth_login(
     State(ctx): State<WebAppContext>,
     jar: CookieJar,
-    Json(payload): Json<AuthLoginRequest>,
+    Json(params): Json<LoginParams>,
 ) -> impl IntoResponse {
-    match auth_login_service(&ctx, payload).await {
+    match auth_login_service(&ctx, params).await {
         Ok(outcome) => {
             let cookie = Cookie::build((SESSION_ID, outcome.session_id))
                 .path("/")
@@ -57,23 +65,13 @@ async fn auth_login(
                 .same_site(SameSite::Lax)
                 .build();
             let jar = jar.add(cookie);
-            (jar, Json(outcome.upstream_json)).into_response()
+            let body = JsonRes::ok("Login Success");
+            (jar, body).into_response()
         }
         Err(e) => {
             let msg = e.to_string();
             JsonRes::<String>::code("400", msg.as_str()).into_response()
         }
-    }
-}
-
-fn bearer_token(headers: &HeaderMap) -> Option<String> {
-    let v = headers.get(axum::http::header::AUTHORIZATION)?.to_str().ok()?;
-    let rest = v.strip_prefix("Bearer ").or_else(|| v.strip_prefix("bearer "))?;
-    let t = rest.trim();
-    if t.is_empty() {
-        None
-    } else {
-        Some(t.to_string())
     }
 }
 
@@ -88,27 +86,32 @@ async fn auth_logout(jar: CookieJar) -> impl IntoResponse {
     (jar, JsonRes::ok(String::from("Admin Api success"))).into_response()
 }
 
+///
+/// 获取当前登陆用户信息（`SESSIONID` → Redis `admin:session:{id}` → Bearer）。
 async fn auth_user_info(
     State(ctx): State<WebAppContext>,
-    headers: HeaderMap,
-    body: Bytes,
+    auth: AuthToken,
 ) -> impl IntoResponse {
-    let Some(bearer) = bearer_token(&headers) else {
+    if auth.token.is_empty() {
         return JsonRes::<String>::code("401", "Unauthorized").into_response();
-    };
+    }
 
-    let req: AuthInfoRequest = if body.is_empty() {
-        AuthInfoRequest::default()
-    } else {
-        match serde_json::from_slice(&body) {
-            Ok(r) => r,
-            Err(_) => return JsonRes::<String>::code("400", "Invalid JSON body").into_response(),
-        }
-    };
-
-    match fetch_auth_info(&ctx, &bearer, &req).await {
+    match fetch_auth_info(&ctx, &auth.token).await {
         Ok(json) => Json(json).into_response(),
         Err(e) => JsonRes::<String>::code("400", e.to_string().as_str()).into_response(),
+    }
+}
+
+async fn get_async_routes(
+    State(ctx): State<WebAppContext>,
+    auth: AuthToken,
+) -> impl IntoResponse {
+    if auth.token.is_empty() {
+        return JsonRes::<String>::code("401", "Unauthorized").into_response();
+    }
+    match get_routes(&ctx, &auth.token).await {
+        Ok(json) => JsonRes::ok(json).into_response(),
+        Err(_) => JsonRes::<String>::code("400", "Get routes failed").into_response(),
     }
 }
 
@@ -119,25 +122,20 @@ async fn auth_user_info(
 /// 请求的 header 添加 Authorization: Bearer <token>
 /// 返回的response可以不用解析直接输出就行
 /// 
+#[debug_handler]
 async fn api(
     State(ctx): State<WebAppContext>,
     Path(uri): Path<String>,
-    cookies: CookieJar,
+    auth: AuthToken,
     method: Method,
     headers: HeaderMap,
     body: Bytes,
 ) -> impl IntoResponse {
-    let session_id = match cookies.get(SESSION_ID) {
-        Some(c) => c.value().to_string(),
-        None => return JsonRes::<String>::code("401", "Unauthorized").into_response(),
-    };
+    let token = auth.token;
 
-    let session_key = format!("session-{}", session_id);
-    let token = match ctx.cache.get(&session_key).await {
-        Ok(Some(t)) => t,
-        Ok(None) => return JsonRes::<String>::code("401", "Unauthorized").into_response(),
-        Err(_) => return JsonRes::<String>::code("500", "Internal server error").into_response(),
-    };
+    if token.is_empty() {
+        return JsonRes::<String>::code("401", "Unauthorized").into_response();
+    }
 
     let upstream = format!("{}/api/{}", ctx.config.api_url.trim_end_matches('/'), uri);
     let client = reqwest::Client::new();
@@ -162,10 +160,10 @@ async fn api(
 
 pub fn home_routes() -> Router<WebAppContext> {
     Router::new()
-        //  "/" 与所有路由冲突
         .route("/", get(home_index))
         .route("/api/auth/login", post(auth_login))
         .route("/api/auth/logout", post(auth_logout))
-        .route("/api/auth/user_info", post(auth_user_info))
+        .route("/api/auth/user-info", get(auth_user_info).post(auth_user_info))
+        .route("/api/get-async-routes", get(get_async_routes))
         .route("/api/{*uri}", get(api).post(api))
 }

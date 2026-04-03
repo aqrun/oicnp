@@ -59,20 +59,7 @@ pub async fn call_api_with_bearer(
         .await?;
 
     let json_value: Value = response.json().await?;
-
-    let code = json_value
-        .get("code")
-        .and_then(|v| v.as_str())
-        .unwrap_or("400");
-
-    if code != "200" {
-        let message = json_value
-            .get("message")
-            .and_then(|v| v.as_str())
-            .unwrap_or("API error");
-        return Err(anyhow::anyhow!("API error [{}]: {}", code, message));
-    }
-
+    tracing::info!("uri: {}, json_value: {:?}", url, json_value);
     Ok(json_value)
 }
 
@@ -132,26 +119,13 @@ where
 }
 
 /// 从 JSON Value 解析单个对象的 JsonRes 不带 wrap_key 的
-pub fn parse_response<T>(json_value: Value) -> Result<JsonRes<T>>
+pub fn parse_response<T>(json_value: Value) -> Result<T>
 where
     T: for<'de> Deserialize<'de> + Send + Sync + 'static,
 {
-    let data_value = json_value
-        .get("data")
-        .cloned()
-        .ok_or_else(|| anyhow::anyhow!("Missing 'data' field"))?;
-
-    let data: T = serde_json::from_value(data_value)
+    let data: T = serde_json::from_value(json_value)
         .map_err(|e| anyhow::anyhow!("Invalid data field: {}", e))?;
 
-    Ok(JsonRes {
-        wrap_key: None,
-        code: Some("200".to_string()),
-        message: json_value
-            .get("message")
-            .and_then(|v| v.as_str())
-            .map(|s| s.to_string()),
-        data: JsonResPayload::Data(data),
-    })
+    Ok(data)
 }
 

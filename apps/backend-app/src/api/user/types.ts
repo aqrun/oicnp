@@ -6,7 +6,8 @@ export interface AuthType {
 }
 
 export interface LoginInfo {
-	username: string
+  email?: string;
+	username?: string
 	password: string
 }
 

@@ -11,7 +11,6 @@ use oic_core::{
     utils::get_api_prefix,
     services::cache::OicCache,
     middleware::{JWTWithUser, ClientInfo},
-    auth::UserClaims,
     constants::{LOGIN_EXPIRE_TIME, LOGIN_REMEMBER_EXPIRE_TIME},
 };
 use oic_core::services::{
@@ -255,10 +254,23 @@ async fn access_token(
 
 #[debug_handler]
 async fn auth_info(
+    State(ctx): State<AppContext>,
     auth: JWTWithUser<UserModel>,
-    State(_ctx): State<AppContext>,
 ) -> JsonRes<LoginResponse> {
-    let res = LoginResponse::new(&auth.user, "", "");
+    let cache = match ctx.shared_store.get::<Arc<OicCache>>() {
+        Some(cache) => cache,
+        None => {
+            return JsonRes::err(String::from("Cache not found"));
+        },
+    };
+   
+    let res = match services::auth::auth_info(&ctx.db, cache, &auth.user).await {
+        Ok(res) => res,
+        Err(err) => {
+            return JsonRes::err(err.to_string());
+        },
+    };
+
     JsonRes::ok(res)
 }
 

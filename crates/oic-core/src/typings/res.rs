@@ -454,6 +454,13 @@ where
     }
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct JsonDataRes<T> {
+    pub code: Option<String>,
+    pub message: Option<String>,
+    pub data: Option<T>,
+}
+
 #[cfg(test)]
 mod test {
     use super::*;

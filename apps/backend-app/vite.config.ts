@@ -133,7 +133,7 @@ export default defineConfig({
 		license: true,
     manifest: true,
 		outDir: "build",
-		sourcemap: false,
+		sourcemap: true,
 		rollupOptions: {
 			output: {
 				manualChunks: {

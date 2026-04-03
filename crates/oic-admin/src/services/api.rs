@@ -5,7 +5,7 @@ use oic_core::{
     },
     services::auth::LoginResponse,
 };
-use oic_core::typings::JsonRes;
+use oic_core::typings::JsonDataRes;
 use super::{call_api_with_bearer, parse_response};
 use crate::WebAppContext;
 
@@ -13,8 +13,8 @@ use crate::WebAppContext;
 pub async fn describe_user_info(
     ctx: &WebAppContext,
     bearer: &str,
-) -> Result<JsonRes<LoginResponse>> {
-    let url = format!("{}/v1/user/info", ctx.config.api_url);
+) -> Result<JsonDataRes<LoginResponse>> {
+    let url = format!("{}/v1/auth/info", ctx.config.api_url);
     let json_value = call_api_with_bearer(&url, bearer, &LoginParams::default()).await?;
     parse_response(json_value)
 }
@@ -25,7 +25,7 @@ pub async fn describe_user_info(
 pub async fn describe_auth_login(
     ctx: &WebAppContext,
     params: LoginParams,
-) -> Result<JsonRes<LoginResponse>> {
+) -> Result<JsonDataRes<LoginResponse>> {
     let url = format!("{}/v1/auth/access-token", ctx.config.api_url);
     let json_value = call_api_with_bearer(&url, "", &params).await?;
     parse_response(json_value)

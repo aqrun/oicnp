@@ -24,6 +24,7 @@ const FORM_INITIAL_VALUES: LoginInfo = {
 
 export function PasswordLogin() {
 	const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
 	const [passwordLoginForm] = Form.useForm();
 	const { t } = useTranslation();
 	const [messageLoadingApi, contextLoadingHolder] = message.useMessage();
@@ -34,18 +35,24 @@ export function PasswordLogin() {
 
 	const handleFinish = async (values: LoginInfo) => {
 		setLoading(true);
+    setErr(null);
 		messageLoadingApi?.loading(t("authority.loginInProgress"), 0);
 
-		login(values).then(() => {
+		login(values).then((res) => {
 			messageLoadingApi?.destroy();
-			window.$message?.success(t("authority.loginSuccess"));
-			const redirect = searchParams.get("redirect");
-			if (redirect) {
-				navigate(`/${redirect.slice(1)}`);
-			}
-			else {
-				navigate(import.meta.env.VITE_BASE_HOME_PATH);
-			}
+
+      if (res?.code === '200') {
+        window.$message?.success(t("authority.loginSuccess"));
+        const redirect = searchParams.get("redirect");
+        
+        if (redirect) {
+        	navigate(`/${redirect.slice(1)}`);
+        } else {
+        	navigate('/');
+        }
+      } else {
+        setErr(res?.message || '用户名或密码错误');
+      }
 		}).finally(() => {
 			messageLoadingApi?.destroy();
 			// Prevent multiple requests from being made by clicking the login button
@@ -69,7 +76,7 @@ export function PasswordLogin() {
 					{t("authority.loginDescription")}
 				</p>
 			</Space>
-
+      {err && <div className="text-red-500 mb-2">{err}</div>}
 			<Form
 				name="passwordLoginForm"
 				form={passwordLoginForm}

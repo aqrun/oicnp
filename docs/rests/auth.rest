@@ -1,0 +1,11 @@
+GET http://localhost:5150/v1/info HTTP/1.1
+
+###
+
+POST http://192.168.1.241:5150/v1/auth/access-token HTTP/1.1
+content-type: application/json
+
+{
+    "username": "aqrun",
+    "password": "123456"
+}

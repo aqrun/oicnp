@@ -1,58 +1,20 @@
 //! 认证相关：转发上游 `/api/auth/login`，并在 Redis 写入 `session-{id}` → Bearer token。
 
 use anyhow::{Context, Result};
-use serde::{Deserialize, Serialize};
+use oic_core::models::users::LoginParams;
+use oic_core::typings::JsonDataRes;
+use oic_core::services::auth::LoginResponse;
 use serde_json::Value;
 use oic_core::uuid;
-
-use crate::services::{call_api, call_api_with_bearer};
+use crate::services::{describe_auth_login, describe_user_info};
 use crate::WebAppContext;
 
-/// 与 `bak/backend` DescribeLoginRequestParams 对齐；同时兼容前端仅传 `username` + `password`。
-#[derive(Debug, Deserialize, Serialize)]
-pub struct AuthLoginRequest {
-	#[serde(default)]
-	pub username: Option<String>,
-	#[serde(default)]
-	pub email: Option<String>,
-	pub password: String,
-	#[serde(default)]
-	pub remember: bool,
-	#[serde(default)]
-	pub captcha_id: Option<String>,
-	#[serde(default)]
-	pub captcha: Option<String>,
-}
-
-/// 发往上游的请求体（camelCase 与 TS 侧一致）。
-#[derive(Serialize)]
-struct AuthLoginUpstreamBody {
-	email: String,
-	password: String,
-	remember: bool,
-	#[serde(skip_serializing_if = "Option::is_none", rename = "captchaId")]
-	captcha_id: Option<String>,
-	#[serde(skip_serializing_if = "Option::is_none")]
-	captcha: Option<String>,
-}
-
 /// 登录成功：用于写 Cookie 与返回上游 JSON。
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct AuthLoginOutcome {
 	/// 写入 `SESSIONID` Cookie 的值；Redis 键为 `session-{session_id}`。
 	pub session_id: String,
 	pub ttl_secs: u64,
-	pub upstream_json: Value,
-}
-
-fn resolve_email(req: &AuthLoginRequest) -> Result<String> {
-	let email = req
-		.email
-		.clone()
-		.or_else(|| req.username.clone())
-		.map(|s| s.trim().to_string())
-		.filter(|s| !s.is_empty());
-	email.ok_or_else(|| anyhow::anyhow!("email or username is required"))
 }
 
 fn login_ttl_secs(remember: bool) -> u64 {
@@ -65,32 +27,26 @@ fn login_ttl_secs(remember: bool) -> u64 {
 }
 
 /// 调用上游 `POST {api_url}/api/auth/login`，成功后写入 Redis，并返回完整上游 JSON（供 BFF 原样返回给前端）。
-pub async fn login(ctx: &WebAppContext, req: AuthLoginRequest) -> Result<AuthLoginOutcome> {
-	let email = resolve_email(&req)?;
-	let body = AuthLoginUpstreamBody {
-		email,
-		password: req.password,
-		remember: req.remember,
-		captcha_id: req.captcha_id.clone(),
-		captcha: req.captcha.clone(),
-	};
+pub async fn login(
+    ctx: &WebAppContext,
+    params: LoginParams,
+) -> Result<AuthLoginOutcome> {
+    let remember = params.remember;
+	let auth_res = describe_auth_login(ctx, params).await?;
 
-	let url = format!(
-		"{}/api/auth/login",
-		ctx.config.api_url.trim_end_matches('/')
-	);
+    if auth_res.data.is_none() {
+        let mut msg = String::from("auth login failed");
 
-	let json_value = call_api::<AuthLoginUpstreamBody>(&url, &body)
-		.await
-		.with_context(|| format!("auth login failed: {url}"))?;
+        if let Some(message) = auth_res.message {
+            msg = message;
+        }
 
-	let token = json_value
-		.pointer("/data/token")
-		.and_then(|v| v.as_str())
-		.map(String::from)
-		.context("upstream login response missing data.token")?;
+        return Err(anyhow::anyhow!(msg));
+    }
+    let res_data = auth_res.data.unwrap();
+    let token = res_data.token;
 
-	let ttl_secs = login_ttl_secs(req.remember);
+	let ttl_secs = login_ttl_secs(remember);
     let session_id = uuid!();
 	let session_key = format!("admin:session:{}", session_id.as_str());
 
@@ -101,30 +57,46 @@ pub async fn login(ctx: &WebAppContext, req: AuthLoginRequest) -> Result<AuthLog
 		.context("failed to store session in cache")?;
 
 	Ok(AuthLoginOutcome {
-		session_id,
-		ttl_secs,
-		upstream_json: json_value,
-	})
-}
-
-/// 与 `bak/backend` DescribeAuthInfoRequestParams 对齐（可为 `{}`）。
-#[derive(Debug, Default, Deserialize, Serialize)]
-pub struct AuthInfoRequest {
-	#[serde(default, skip_serializing_if = "Option::is_none", rename = "_name")]
-	pub name: Option<String>,
+        session_id,
+        ttl_secs,
+    })
 }
 
 /// 调用上游 `POST {api_url}/api/auth/info`，使用 Bearer，不访问本地 cache。
 pub async fn fetch_auth_info(
 	ctx: &WebAppContext,
 	bearer: &str,
-	req: &AuthInfoRequest,
-) -> Result<Value> {
-	let url = format!(
-		"{}/api/auth/info",
-		ctx.config.api_url.trim_end_matches('/')
-	);
-	call_api_with_bearer(&url, bearer, req)
+) -> Result<JsonDataRes<LoginResponse>> {
+	let user_info = describe_user_info(ctx, bearer)
 		.await
-		.with_context(|| format!("auth info failed: {url}"))
+		.context("auth info failed")?;
+	Ok(user_info)
+}
+
+pub async fn get_routes(
+    ctx: &WebAppContext,
+    bearer: &str,
+) -> Result<Value> {
+    let res = serde_json::json!([
+        {
+            "path": "/home",
+            "component": "/home/index.tsx",
+            "handle": {
+                "icon": "HomeOutlined",
+                "title": "common.menu.home",
+                "order": 1,
+            },
+        },
+        {
+            "path": "/about",
+            "component": "/about/index.tsx",
+            "handle": {
+                "icon": "CopyrightOutlined",
+                "title": "common.menu.about",
+                "order": 2,
+            },
+        },
+    ]);
+   
+    Ok(res)
 }

@@ -20,13 +20,11 @@ export async function handleErrorResponse(response: Response) {
 			// 如果解析后的数据中包含 errorMsg 或 message 属性，则显示错误信息
 			// 否则显示响应的状态文本作为错误信息
 			message.error(json.errorMsg || json.message || response.statusText);
-		}
-		else {
+		} else {
 			// 如果解析后的数据不是对象类型，则直接显示响应的状态文本作为错误信息
 			message.error(response.statusText);
 		}
-	}
-	catch (e) {
+	} catch (e) {
 		// 如果解析 JSON 格式出错，则打印错误信息到控制台
 		console.error("Error parsing JSON:", e);
 

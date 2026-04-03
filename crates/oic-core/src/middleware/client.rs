@@ -3,7 +3,7 @@ use std::borrow::Cow;
 
 use axum::{
     extract::{FromRef, FromRequestParts},
-    http::{request::Parts, HeaderMap},
+    http::{request::Parts, HeaderMap, HeaderValue},
 };
 use serde::{Deserialize, Serialize};
 
@@ -50,7 +50,8 @@ impl ClientInfo {
         };
         let user_agent_parser = settings.user_agent_parser.clone();
 
-        let user_agent = headers.get("user-agent").unwrap().to_str().unwrap();
+        let default_user_agent = HeaderValue::from_static("");
+        let user_agent = headers.get("user-agent").unwrap_or(&default_user_agent).to_str().unwrap_or_default();
         let ip = get_remote_ip(headers.clone());
         let ua = get_user_agent_info(user_agent, user_agent_parser.as_str());
         let net = match get_net_info(&ctx.db, ip.as_str()).await {

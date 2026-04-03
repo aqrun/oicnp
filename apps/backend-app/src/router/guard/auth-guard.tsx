@@ -77,7 +77,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
 			}
 
 			const results = await Promise.allSettled(promises);
-			const [userInfoResult, routeResult] = results;
+			const [userInfoResult, routeResult] = results;console.log('routeResult---', routeResult)
 			const routes = [];
 			const latestRoles = [];
 			/**
@@ -98,10 +98,10 @@ export function AuthGuard({ children }: AuthGuardProps) {
 			 * @zh 启用了后端路由且路由从单独接口中获取
 			 * @en If backend routing is enabled and the route is obtained from a separate interface
 			 */
-			if (enableBackendAccess && isSendRoutingRequest && routeResult.status === "fulfilled" && "result" in routeResult.value) {
-				routes.push(...await generateRoutesFromBackend(routeResult.value?.result ?? []));
+			if (enableBackendAccess && isSendRoutingRequest && routeResult.status === "fulfilled" && "data" in routeResult.value) {
+				routes.push(...await generateRoutesFromBackend(routeResult.value?.data ?? []));
 			}
-
+      console.log('routes---', routes)
 			/**
 			 * @zh 启用了前端路由
 			 * @en If frontend routing is enabled

@@ -34,7 +34,9 @@ pub struct ResetParams {
 }
 
 #[derive(Debug, Deserialize, Serialize, Default, Clone)]
+#[serde(default)]
 pub struct LoginResponse {
+    pub id: i64,
     pub token: String,
     pub refresh_token: String,
     pub uid: i64,
@@ -43,6 +45,12 @@ pub struct LoginResponse {
     pub email: String,
     pub is_verified: bool,
     pub remember: bool,
+    pub avatar: String,
+    #[serde(rename(deserialize = "phoneNumber", serialize = "phoneNumber"))]
+    pub phone_number: String,
+    pub description: String,
+    pub roles: Vec<String>,
+    // pub menus: Vec<AppRouteRecordRaw>,
 }
 
 impl LoginResponse {
@@ -57,6 +65,11 @@ impl LoginResponse {
             email: String::from(user.email.as_str()),
             is_verified: user.email_verified_at.is_some(),
             remember: false,
+            avatar: String::from(user.avatar.as_str()),
+            phone_number: String::from(user.phone.as_str()),
+            description: String::from(user.remark.as_str()),
+            roles: vec![],
+            id: user.uid,
         }
     }
 }
@@ -209,9 +222,28 @@ pub async fn access_token(
 ) -> Result<LoginResponse> {
     catch_err(params.validate())?;
 
-    let user = UserModel::find_by_email(db, params.email.as_str()).await?;
+    if params.email.is_empty() && params.username.is_empty() {
+        return Err(anyhow!("请确认邮箱或用户名"));
+    }
 
-    // let valid = user.verify_password(&params.password);
+    let user = if !params.email.is_empty() {
+        match UserModel::find_by_email(db, params.email.as_str()).await {
+            Ok(user) => user,
+            Err(err) => {
+                tracing::info!(message = err.to_string(), "user not found");
+                return Err(anyhow!("用户名或密码错误"));
+            }
+        }
+    } else {
+        match UserModel::find_by_username(db, params.username.as_str()).await {
+            Ok(user) => user,
+            Err(err) => {
+                tracing::info!(message = err.to_string(), "user not found");
+                return Err(anyhow!("用户名或密码错误"));
+            }
+        }
+    };
+
     let valid = match verify_password(
         params.password.as_str(), 
         user.password.as_str(),
@@ -287,4 +319,26 @@ pub async fn refresh_token(
         return Err(anyhow!("failed to insert refresh token into cache"));
     }
     Ok(LoginResponse::new(&user, token.as_str(), refresh_token.as_str()))
+}
+
+pub async fn auth_info(
+    db: &DatabaseConnection,
+    cache: Arc<OicCache>,
+    user: &UserModel,
+) -> Result<LoginResponse> {
+    let cache_key = format!("api:auth-info:{}", user.uid);
+    let res = match cache.get::<LoginResponse>(cache_key.as_str()).await {
+        Ok(res) => res,
+        Err(_) => None,
+    };
+
+    if res.is_some() {
+        return Ok(res.unwrap());
+    }
+
+    let mut res = LoginResponse::new(&user, "", "");
+    let user_roles = UserModel::get_roles_by_uid(db, user.uid).await?;
+    res.roles = user_roles.iter().map(|role| String::from(role.vid.as_str())).collect();
+    cache.insert_with_expiry(cache_key.as_str(), &res, Duration::from_secs(10 * 60)).await?;
+    Ok(res)
 }
