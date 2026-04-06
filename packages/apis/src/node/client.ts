@@ -1,6 +1,4 @@
-'use client';
-
-import { createService } from '@repo/services/request';
+import type { CreateService } from "@repo/services";
 import {
   DescribeNodeListRequestParams,
   DescribeNodeListResponseData,
@@ -18,44 +16,41 @@ import {
   DescribeNodeCategoriesResponseData,
   DescribeNodeBodyRequestParams,
   DescribeNodeBodyResponseData,
-} from './types';
+} from "./types";
 
-export const DescribeNodeList = createService<
-DescribeNodeListRequestParams,
-DescribeNodeListResponseData
->('/node/list', 'post', { ignoreError: true, });
-
-export const DescribeNodeDetail = createService<
-DescribeNodeDetailRequestParams,
-DescribeNodeDetailResponseData
->('/node/one', 'post', { ignoreError: true, });
-
-export const DescribeDeleteNode = createService<
-DescribeDeleteNodeRequestParams,
-DescribeDeleteNodeResponseData
->('/node/remove', 'post');
-
-export const DescribeCreateNode = createService<
-DescribeCreateNodeRequestParams,
-DescribeCreateNodeResponseData
->('/node/add', 'post');
-
-export const DescribeUpdateNode = createService<
-DescribeUpdateNodeRequestParams,
-DescribeUpdateNodeResponseData
->('/node/update', 'post');
-
-export const DescribeNodeTags = createService<
-DescribeNodeTagsRequestParams,
-DescribeNodeTagsResponseData
->('/node/tags', 'post');
-
-export const DescribeNodeCategories = createService<
-DescribeNodeCategoriesRequestParams,
-DescribeNodeCategoriesResponseData
->('/node/categories', 'post');
-
-export const DescribeNodeBody = createService<
-DescribeNodeBodyRequestParams,
-DescribeNodeBodyResponseData
->('/node/body', 'post');
+export function createNodeApis(createService: CreateService) {
+  return {
+    DescribeNodeList: createService<
+      DescribeNodeListRequestParams,
+      DescribeNodeListResponseData
+    >("node/list", "post", { ignoreError: true }),
+    DescribeNodeDetail: createService<
+      DescribeNodeDetailRequestParams,
+      DescribeNodeDetailResponseData
+    >("node/one", "post", { ignoreError: true }),
+    DescribeDeleteNode: createService<
+      DescribeDeleteNodeRequestParams,
+      DescribeDeleteNodeResponseData
+    >("node/remove", "post"),
+    DescribeCreateNode: createService<
+      DescribeCreateNodeRequestParams,
+      DescribeCreateNodeResponseData
+    >("node/add", "post"),
+    DescribeUpdateNode: createService<
+      DescribeUpdateNodeRequestParams,
+      DescribeUpdateNodeResponseData
+    >("node/update", "post"),
+    DescribeNodeTags: createService<
+      DescribeNodeTagsRequestParams,
+      DescribeNodeTagsResponseData
+    >("node/tags", "post"),
+    DescribeNodeCategories: createService<
+      DescribeNodeCategoriesRequestParams,
+      DescribeNodeCategoriesResponseData
+    >("node/categories", "post"),
+    DescribeNodeBody: createService<
+      DescribeNodeBodyRequestParams,
+      DescribeNodeBodyResponseData
+    >("node/body", "post"),
+  };
+}

@@ -6,28 +6,21 @@
     "build": "tsc"
   },
   "exports": {
-    "./client": {
-      "types": "./src/client.ts",
-      "default": "./src/client.ts"
-    },
-    "./server": {
-      "types": "./src/server.ts",
-      "default": "./src/server.ts"
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
     }
   },
   "devDependencies": {
-    "@types/react": "^18.3.1",
-    "@repo/services": "workspace:*",
     "@repo/config-typescript": "workspace:*",
+    "@repo/services": "workspace:*",
     "@types/node": "^20",
     "dayjs": "^1.11.13",
     "ahooks": "^3.1.1",
-    "react": "^18.3.1",
     "typescript": "latest"
   },
   "peerDependencies": {
     "dayjs": "^1.11.13",
-    "react": "^18.3.1",
     "ahooks": "^3.1.1"
   }
 }

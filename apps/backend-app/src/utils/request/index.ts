@@ -1,11 +1,10 @@
 import type { Options } from "ky";
-
+import { createRequest, createServiceFactory } from '@repo/services';
 import { loginPath } from "#src/router/extra-info";
 import { usePreferencesStore } from "#src/store/preferences";
-import ky from "ky";
 
 import { LANG_HEADER } from "./constants";
-import { handleErrorResponse } from "./error-response";
+import { handleErrorResponse, handleApiErrorResponse } from "./error-response";
 import { globalProgress } from "./global-progress";
 import { goLogin } from "./go-login";
 
@@ -38,6 +37,7 @@ const defaultConfig: Options = {
 				if (!ignoreLoading) {
 					globalProgress.done();
 				}
+
 				// request error
 				if (!response.ok) {
 					if (response.status === 401) {
@@ -53,8 +53,26 @@ const defaultConfig: Options = {
 				// request success
 				return response;
 			},
+      /*
+      async (request, options, response) => {
+        const res = await response.json<ApiResponse<any>>();
+        const code = res?.code ?? '200';
+
+        if (code === '401' || code === '400') {
+          goLogin();
+          return response;
+        } else if (code !== '200') {
+          handleApiErrorResponse(res);
+          return response;
+        }
+
+        return response;
+      }
+        */
 		],
 	},
 };
 
-export const request = ky.create(defaultConfig);
+export const request = createRequest(defaultConfig);
+
+export const createService = createServiceFactory(request);

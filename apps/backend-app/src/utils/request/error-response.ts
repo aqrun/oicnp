@@ -1,5 +1,5 @@
 import { isObject } from "#src/utils/is";
-import { message } from "#src/utils/static-antd";
+import { message, notification } from "#src/utils/static-antd";
 
 /**
  * 处理错误响应
@@ -34,4 +34,15 @@ export async function handleErrorResponse(response: Response) {
 
 	// 返回响应对象
 	return response;
+}
+
+export function handleApiErrorResponse(response: ApiResponse<any>) {
+  const code = response?.code ?? '200';
+
+  if (code !== '200') {
+    notification.error({
+      title: '系统异常',
+      description: response?.message ?? '系统异常',
+    });
+  }
 }

@@ -2,7 +2,7 @@ import {
   BaseFilterParams,
   BaseListResponseData,
   BaseResponse,
-} from '@repo/services/types';
+} from '@repo/services';
 
 export interface PermissionModel {
   permissionId?: number;
@@ -34,7 +34,7 @@ export interface PermissionTreeItem {
 export interface DescribePermissionDetailRequestParams extends PermissionModel {
   _name?: string;
 }
-export interface DescribePermissionDetailResponseData {
+export interface DescribePermissionDetailResponseData extends BaseResponse {
   permission: PermissionModel;
   _name?: string;
 }
@@ -47,7 +47,7 @@ export interface DescribePermissionTreeRequestParams extends BaseFilterParams {
   _name?: string;
 }
 
-export interface DescribePermissionTreeResponseData {
+export interface DescribePermissionTreeResponseData extends BaseResponse {
   permissions: Array<PermissionTreeItem>;
   _name?: string;
 }

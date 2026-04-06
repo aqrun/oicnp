@@ -1,0 +1,131 @@
+'use client';
+
+import type { ReactElement } from "react";
+
+import { Button, Form, Input, FormInstance, Checkbox, Select } from 'antd';
+import type { FormProps } from 'antd';
+import type { RoleModel, UserModel } from '@repo/apis';
+import { FieldType } from '../types';
+import { Container } from './index.styled';
+
+export interface DepartmentFormProps {
+  onFinish?: FormProps<FieldType>['onFinish'];
+  isEdit?: boolean;
+  user?: UserModel;
+  loading?: boolean;
+  showSubmit?: boolean;
+  form?: FormInstance<UserModel>;
+  disabled?: boolean;
+  roleList?: Array<RoleModel>;
+  roleIds?: Array<number>;
+}
+
+export default function DepartmentForm({
+  onFinish,
+  loading,
+  isEdit,
+  user,
+  showSubmit,
+  form,
+  disabled,
+  roleList,
+  roleIds,
+}: DepartmentFormProps): ReactElement {
+  const initialValues: FieldType = {
+    username: user?.username,
+    nickname: user?.nickname,
+    email: user?.email,
+    status: user?.status,
+    isAdmin: user?.isAdmin,
+    roleIds,
+  };
+
+  return (
+    <Container>
+      <Form
+        name="basic"
+        initialValues={initialValues}
+        onFinish={onFinish}
+        autoComplete="off"
+        layout="vertical"
+        form={form}
+        disabled={disabled}
+      >
+        <Form.Item<FieldType>
+          label="用户名"
+          name="username"
+          rules={[{ required: true, message: '请输入用户名！' }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item<FieldType>
+          label="昵称"
+          name="nickname"
+          rules={[{ required: true, message: '请输入用户名！' }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item<FieldType>
+          label="邮箱"
+          name="email"
+          rules={[{ required: true, message: '请输入邮箱！' }]}
+        >
+          <Input />
+        </Form.Item>
+        {!isEdit && (
+          <Form.Item<FieldType>
+            label="密码"
+            name="password"
+            rules={[{ required: true, message: '请输入密码' }]}
+          >
+            <Input.Password />
+          </Form.Item>
+        )}
+        <Form.Item<FieldType>
+          name="status"
+          valuePropName="checked"
+        >
+          <Checkbox>账号启用</Checkbox>
+        </Form.Item>
+        <Form.Item<FieldType>
+          name="isAdmin"
+          valuePropName="checked"
+        >
+          <Checkbox>超级管理员</Checkbox>
+        </Form.Item>
+        <Form.Item<FieldType>
+          name="roleIds"
+          label="角色"
+        >
+          <Select
+            mode="multiple"
+            allowClear
+          >
+            {roleList?.map((item) => {
+              return (
+                <Select.Option
+                  key={item.roleId}
+                  value={item.roleId}
+                >
+                  {item?.name}
+                </Select.Option>
+              );
+            })}
+          </Select>
+        </Form.Item>
+
+        {showSubmit && (
+          <Form.Item label={null}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+            >
+              {isEdit ? '更新' : '创建'}
+            </Button>
+          </Form.Item>
+        )}
+      </Form>
+    </Container>
+  );
+}

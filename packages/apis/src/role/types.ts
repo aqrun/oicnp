@@ -1,0 +1,66 @@
+import {
+  BaseFilterParams,
+  BaseListResponseData,
+  BaseResponse,
+} from '@repo/services';
+import {
+  PermissionModel,
+} from '../permission/types';
+
+export interface RoleModel {
+  roleId?: number;
+  vid?: string;
+  name?: string;
+  weight?: number;
+  scope?: string;
+  status?: string;
+  remark?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  permissionVids?: Array<string>;
+  permissionIds?: Array<string>;
+}
+
+export interface RoleFilters {
+  roleId?: number;
+  vid?: string;
+  name?: string;
+}
+
+export interface DescribeRoleDetailRequestParams extends RoleFilters {
+  _name?: string;
+}
+export interface DescribeRoleDetailResponseData extends BaseResponse {
+  role: RoleModel;
+  _name?: string;
+}
+
+export interface DescribeRoleListRequestParams extends BaseFilterParams {
+  _name?: string;
+}
+
+export interface DescribeRoleListResponseData extends BaseListResponseData {
+  roles: Array<RoleModel>;
+  _name?: string;
+}
+
+export interface DescribeCreateRoleRequestParams extends RoleModel {
+  _name?: string;
+}
+
+export interface DescribeCreateRoleResponseData extends BaseResponse {
+  _name?: string;
+}
+
+export type DescribeUpdateRoleRequestParams = DescribeCreateRoleRequestParams;
+export type DescribeUpdateRoleResponseData = DescribeCreateRoleResponseData;
+export type DescribeDeleteRoleRequestParams = DescribeCreateRoleRequestParams;
+export type DescribeDeleteRoleResponseData = DescribeCreateRoleResponseData;
+
+export interface DescribeRolePermissionsRequestParams {
+  roleId: number;
+}
+
+export interface DescribeRolePermissionsResponseData extends BaseResponse {
+  permissions: Array<PermissionModel>;
+}

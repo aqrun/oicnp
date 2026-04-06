@@ -47,8 +47,14 @@ export function PasswordLogin() {
         
         if (redirect) {
         	navigate(`/${redirect.slice(1)}`);
+          setTimeout(() => {
+            location.reload();
+          }, 300);
         } else {
         	navigate('/');
+          setTimeout(() => {
+            location.reload();
+          }, 300);
         }
       } else {
         setErr(res?.message || '用户名或密码错误');
@@ -81,7 +87,7 @@ export function PasswordLogin() {
 				name="passwordLoginForm"
 				form={passwordLoginForm}
 				layout="vertical"
-				initialValues={FORM_INITIAL_VALUES}
+				// initialValues={FORM_INITIAL_VALUES}
 				onFinish={handleFinish}
 			>
 				<Form.Item

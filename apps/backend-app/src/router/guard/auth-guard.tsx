@@ -77,14 +77,14 @@ export function AuthGuard({ children }: AuthGuardProps) {
 			}
 
 			const results = await Promise.allSettled(promises);
-			const [userInfoResult, routeResult] = results;console.log('routeResult---', routeResult)
+			const [userInfoResult, routeResult] = results;
 			const routes = [];
 			const latestRoles = [];
 			/**
 			 * @zh 从用户接口中获取角色信息
 			 * @en Fetch role information from the user interface
 			 */
-			if (userInfoResult.status === "fulfilled" && "roles" in userInfoResult.value) {
+			if (userInfoResult.status === "fulfilled" && userInfoResult?.value?.roles?.length) {
 				latestRoles.push(...userInfoResult.value?.roles ?? []);
 			}
 			/**
@@ -119,7 +119,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
 			 * @en Network request failed, redirect to 500 page
 			 */
 			if (hasError) {
-				const unAuthorized = results.some((result: any) => result.reason.response.status === 401);
+				const unAuthorized = results.some((result: any) => result.reason?.response?.status === 401);
 				if (unAuthorized) {
 					if (pathname !== loginPath) {
 						const redirectPath = pathname.length > 1 ? `${loginPath}?redirect=${pathname}${search}` : loginPath;

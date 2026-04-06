@@ -2,7 +2,7 @@ import {
   BaseFilterParams,
   BaseListResponseData,
   BaseResponse,
-} from '@repo/services/types';
+} from '@repo/services';
 import { TagModel } from '../tag/types';
 import { CategoryModel } from '../category/types';
 import { Dayjs } from 'dayjs';
@@ -97,13 +97,13 @@ export type DescribeDeleteNodeRequestParams = DescribeCreateNodeRequestParams;
 export type DescribeDeleteNodeResponseData = DescribeCreateNodeResponseData;
 export type DescribeNodeTagsRequestParams = NodeFilters;
 
-export interface DescribeNodeTagsResponseData {
+export interface DescribeNodeTagsResponseData extends BaseResponse {
   tags: Array<TagModel>;
 }
 
 export type DescribeNodeCategoriesRequestParams = NodeFilters;
 
-export interface DescribeNodeCategoriesResponseData {
+export interface DescribeNodeCategoriesResponseData extends BaseResponse {
   categories: Array<CategoryModel>;
 }
 
@@ -119,6 +119,6 @@ export interface NodeBody {
     bodyFormat: string;
 }
 
-export interface DescribeNodeBodyResponseData {
+export interface DescribeNodeBodyResponseData extends BaseResponse {
   body: NodeBody;
 }

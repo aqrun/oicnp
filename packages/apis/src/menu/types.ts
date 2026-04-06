@@ -2,7 +2,7 @@ import {
   BaseResponse,
   BaseFilterParams,
   BaseListResponseData,
-} from '@repo/services/types';
+} from '@repo/services';
 import {
   PermissionModel,
 } from '../permission/types';
@@ -36,7 +36,7 @@ export interface MenuModel {
 export interface DescribeMenuDetailRequestParams extends Partial<MenuModel> {
   _name?: string;
 }
-export interface DescribeMenuDetailResponseData {
+export interface DescribeMenuDetailResponseData extends BaseResponse {
   menu: MenuModel;
   _name?: string;
 }
@@ -86,6 +86,6 @@ export interface DescribeMenuPermissionsRequestParams {
   id: number;
 }
 
-export interface DescribeMenuPermissionsResponseData {
+export interface DescribeMenuPermissionsResponseData extends BaseResponse {
   permissions: Array<PermissionModel>;
 }

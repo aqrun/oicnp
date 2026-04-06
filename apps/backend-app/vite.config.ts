@@ -136,10 +136,16 @@ export default defineConfig({
 		sourcemap: true,
 		rollupOptions: {
 			output: {
-				manualChunks: {
-					react: ["react", "react-dom", "react-router"],
-					antd: ["antd", "@ant-design/icons"],
-					faker: ["@faker-js/faker"],
+				/** Vite 8 / Rolldown 仅支持函数形式的 manualChunks */
+				manualChunks(id) {
+					if (!id.includes("node_modules"))
+						return;
+					if (/node_modules[/\\](react|react-dom|react-router)([/\\]|$)/.test(id))
+						return "react";
+					if (/node_modules[/\\]antd[/\\]/.test(id) || /node_modules[/\\]@ant-design[/\\]icons[/\\]/.test(id))
+						return "antd";
+					if (/node_modules[/\\]@faker-js[/\\]faker[/\\]/.test(id))
+						return "faker";
 				},
 			},
 		},

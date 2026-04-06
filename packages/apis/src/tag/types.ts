@@ -2,7 +2,7 @@ import {
   BaseFilterParams,
   BaseListResponseData,
   BaseResponse,
-} from '@repo/services/types';
+} from '@repo/services';
 
 export interface TagModel {
   tagId?: number;
@@ -23,7 +23,7 @@ export interface TagFilters {
 export interface DescribeTagDetailRequestParams extends TagFilters {
   _name?: string;
 }
-export interface DescribeTagDetailResponseData {
+export interface DescribeTagDetailResponseData extends BaseResponse {
   tag: TagModel;
   _name?: string;
 }

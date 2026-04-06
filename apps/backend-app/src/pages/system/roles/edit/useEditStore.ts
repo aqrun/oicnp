@@ -1,0 +1,35 @@
+'use client';
+
+import { create } from 'zustand';
+import type { BaseState } from '#src/store/types';
+import type { RoleModel, PermissionModel } from '@repo/apis';
+
+export interface BaseEditState {
+  visible?: boolean;
+  /**
+   * 内容类型
+   */
+  contentType?: string;
+  roleId: number;
+  role: RoleModel | undefined;
+  rolePermissions: Array<PermissionModel>;
+};
+
+export type EditState = BaseEditState & BaseState<BaseEditState>;
+
+/**
+ *  创建数据
+ */
+export const useEditStore = create<EditState>()((set) => ({
+  visible: false,
+  roleId: 0,
+  role: undefined,
+  contentType: '',
+  rolePermissions: [],
+  setState: (payload) => set((state) => {
+    return {
+      ...state,
+      ...(payload || {}),
+    };
+  }),
+}));

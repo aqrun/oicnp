@@ -13,7 +13,7 @@ interface ApiResponse<T> {
  * 数组形式的接口返回数据格式
  * list: 接口返回数据
  */
-interface ApiListResponse<T> extends ApiResponse<T> {
+interface ApiListResponse<T> extends Omit<ApiResponse<T>, 'data'> {
 	data: {
 		list: T[]
 		total: number

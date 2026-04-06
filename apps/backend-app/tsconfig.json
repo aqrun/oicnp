@@ -13,7 +13,8 @@
 		"types": [
 			"vitest/globals",
 			"@testing-library/jest-dom",
-			"unplugin-icons/types/react"
+			"unplugin-icons/types/react",
+      "react"
 		],
 		"allowJs": true,
 		"strict": true,
@@ -31,5 +32,8 @@
 		"tests",
 		"vite.config.ts",
 		"commitlint.config.ts"
+	],
+	"exclude": [
+		"src/pages/system-bak"
 	]
 }

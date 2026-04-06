@@ -4,7 +4,7 @@ use axum::{
     routing::{get, post},
     extract::{State, Path},
     response::{IntoResponse, Redirect},
-    http::{HeaderMap, Method, Uri},
+    http::{HeaderMap, Method, Uri, StatusCode},
     Json,
     debug_handler,
 };
@@ -93,12 +93,12 @@ async fn auth_user_info(
     auth: AuthToken,
 ) -> impl IntoResponse {
     if auth.token.is_empty() {
-        return JsonRes::<String>::code("401", "Unauthorized").into_response();
+        return (StatusCode::UNAUTHORIZED, "Unauthorized").into_response();
     }
 
     match fetch_auth_info(&ctx, &auth.token).await {
         Ok(json) => Json(json).into_response(),
-        Err(e) => JsonRes::<String>::code("400", e.to_string().as_str()).into_response(),
+        Err(_e) => return (StatusCode::UNAUTHORIZED, "Unauthorized").into_response(),
     }
 }
 
@@ -107,11 +107,11 @@ async fn get_async_routes(
     auth: AuthToken,
 ) -> impl IntoResponse {
     if auth.token.is_empty() {
-        return JsonRes::<String>::code("401", "Unauthorized").into_response();
+        return (StatusCode::UNAUTHORIZED, "Unauthorized").into_response();
     }
     match get_routes(&ctx, &auth.token).await {
         Ok(json) => JsonRes::ok(json).into_response(),
-        Err(_) => JsonRes::<String>::code("400", "Get routes failed").into_response(),
+        Err(_) => return (StatusCode::UNAUTHORIZED, "Unauthorized").into_response(),
     }
 }
 
@@ -134,10 +134,10 @@ async fn api(
     let token = auth.token;
 
     if token.is_empty() {
-        return JsonRes::<String>::code("401", "Unauthorized").into_response();
+        return (StatusCode::UNAUTHORIZED, "Unauthorized").into_response();
     }
 
-    let upstream = format!("{}/api/{}", ctx.config.api_url.trim_end_matches('/'), uri);
+    let upstream = format!("{}/v1/{}", ctx.config.api_url.trim_end_matches('/'), uri);
     let client = reqwest::Client::new();
     let mut req = client.request(method, &upstream).body(body);
     req = req.header("Authorization", format!("Bearer {}", token));
@@ -149,7 +149,7 @@ async fn api(
 
     let resp = match req.send().await {
         Ok(r) => r,
-        Err(_) => return JsonRes::<String>::code("502", "Upstream error").into_response(),
+        Err(_) => return (StatusCode::UNAUTHORIZED, "Unauthorized").into_response(),
     };
 
     let status = resp.status();

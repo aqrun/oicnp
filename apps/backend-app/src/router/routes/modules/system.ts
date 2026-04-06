@@ -4,10 +4,10 @@ import { system } from "#src/router/extra-info";
 
 import { lazy } from "react";
 
-const User = lazy(() => import("#src/pages/system/user"));
-const Dept = lazy(() => import("#src/pages/system/dept"));
-const Role = lazy(() => import("#src/pages/system/role"));
-const Menu = lazy(() => import("#src/pages/system/menu"));
+const User = lazy(() => import("#src/pages/system/users"));
+const Dept = lazy(() => import("#src/pages/system/departments"));
+const Role = lazy(() => import("#src/pages/system/roles"));
+const Menu = lazy(() => import("#src/pages/system/menus"));
 
 const routes: AppRouteRecordRaw[] = [
 	{

@@ -2,7 +2,7 @@ import {
   BaseFilterParams,
   BaseListResponseData,
   BaseResponse,
-} from '@repo/services/types';
+} from '@repo/services';
 
 export interface CategoryModel {
   catId?: number;
@@ -29,7 +29,7 @@ export interface CategoryFilters {
 export interface DescribeCategoryDetailRequestParams extends CategoryFilters {
   _name?: string;
 }
-export interface DescribeCategoryDetailResponseData {
+export interface DescribeCategoryDetailResponseData extends BaseResponse {
   category: CategoryModel;
   _name?: string;
 }

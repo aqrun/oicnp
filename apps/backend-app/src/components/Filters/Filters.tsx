@@ -1,0 +1,91 @@
+'use client';
+
+import type { ReactElement } from "react";
+
+import { useState } from 'react';
+import { CLASS_PREFIX } from '#src/constants';
+import cls from 'clsx';
+import { CreateButton } from './CreateButton';
+import { RefreshButton } from './RefreshButton';
+import { ExpandButton } from './ExpandButton';
+import { SearchBox } from './SearchBox';
+import { FilterValues } from '#src/types';
+import {
+  FilterContext,
+  FilterScopeState,
+  useFilterState,
+} from './context';
+import {
+  FiltersProps,
+} from './types';
+import { Container } from './index.styled';
+import { useMemoizedFn } from 'ahooks';
+
+/**
+ * 筛选组件
+ */
+export function FiltersWidget(): ReactElement {
+  const {
+    createLabel,
+    onSearch,
+    onCreate,
+    onRefresh,
+    onExpand,
+  } = useFilterState();
+
+  return (
+    <Container>
+      <div className={cls(`${CLASS_PREFIX}-filter-left`)}>
+        {Boolean(onCreate) && (
+          <CreateButton
+            label={createLabel}
+            onCreate={onCreate}
+          />
+        )}
+        {Boolean(onExpand) && (
+          <ExpandButton
+            onExpand={onExpand}
+          />
+        )}
+        {Boolean(onSearch) && (
+          <SearchBox />
+        )}
+      </div>
+      <div className={cls(`${CLASS_PREFIX}-filter-right`)}>
+        {Boolean(onRefresh) && (
+          <RefreshButton
+            onRefresh={onRefresh}
+          />
+        )}
+      </div>
+    </Container>
+  );
+}
+
+export function Filters(props: FiltersProps) {
+  const [values, setValues] = useState<FilterValues>({});
+
+  const updateValues = useMemoizedFn((payload: FilterValues = {}) => {
+    const newState: FilterValues = {
+      ...values,
+      ...payload,
+    };
+    setValues(newState);
+    return newState;
+  });
+  
+  // context 数据
+  const scopeData: FilterScopeState = {
+    ...(props || {}),
+    values,
+    setValues: updateValues,
+  };
+
+  return (
+    <FilterContext.Provider
+      value={scopeData}
+    >
+      <FiltersWidget />
+    </FilterContext.Provider>
+  );
+}

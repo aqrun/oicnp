@@ -138,20 +138,20 @@ pub async fn get_routes(
             },
             children: None,
         },
-        MenuRouteItem {
-            path: "/about".to_string(),
-            component: "/about/index.tsx".to_string(),
-            handle: RouteHandle {
-                icon: "CopyrightOutlined".to_string(),
-                title: "common.menu.about".to_string(),
-                order: 2,
-                roles: Vec::new(),
-                permissions: Vec::new(),
-            },
-            children: None,
-        },
     ];
 
     res.extend(parse_menu_to_routes(routes));
+    res.push(MenuRouteItem {
+        path: "/about".to_string(),
+        component: "/about/index.tsx".to_string(),
+        handle: RouteHandle {
+            icon: "CopyrightOutlined".to_string(),
+            title: "common.menu.about".to_string(),
+            order: 2,
+            roles: Vec::new(),
+            permissions: Vec::new(),
+        },
+        children: None,
+    });
     Ok(res)
 }

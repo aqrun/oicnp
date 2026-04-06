@@ -4,6 +4,22 @@ import type { ThemeType } from "#src/store";
 import type { GlobalToken } from "antd";
 
 declare global {
+	/** 与 `types/index.d.ts` 一致，保证全局可识别 */
+	interface ApiResponse<T> {
+		code: string
+		data: T
+		message: string
+		success: boolean
+	}
+
+	interface ApiListResponse<T> extends Omit<ApiResponse<T>, "data"> {
+		data: {
+			list: T[]
+			total: number
+			current: number
+		}
+	}
+
 	const __APP_INFO__: {
 		pkg: {
 			name: string

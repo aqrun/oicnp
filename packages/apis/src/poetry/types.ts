@@ -2,7 +2,7 @@ import {
   BaseFilterParams,
   BaseListResponseData,
   BaseResponse,
-} from '@repo/services/types';
+} from '@repo/services';
 
 export interface BasePoetryModel {
   id?: number;

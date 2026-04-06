@@ -6,29 +6,9 @@
     "build": "tsc"
   },
   "exports": {
-    "./consts": {
-      "types": "./src/consts.ts",
-      "default": "./src/consts.ts"
-    },
-    "./request": {
-      "types": "./src/request.ts",
-      "default": "./src/request.ts"
-    },
-    "./action_request": {
-      "types": "./src/action_request.ts",
-      "default": "./src/action_request.ts"
-    },
-    "./types": {
-      "types": "./src/types.ts",
-      "default": "./src/types.ts"
-    },
-    "./useFetchStore": {
-      "types": "./src/useFetchStore.ts",
-      "default": "./src/useFetchStore.ts"
-    },
-    "./url": {
-      "types": "./src/url.ts",
-      "default": "./src/url.ts"
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
     }
   },
   "devDependencies": {
@@ -39,5 +19,8 @@
     "js-cookie": "^3.0.5",
     "typescript": "latest",
     "zustand": "^5.0.2"
+  },
+  "dependencies": {
+    "ky": "^1.14"
   }
 }
