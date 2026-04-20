@@ -126,6 +126,7 @@ pub async fn get_routes(
     let routes = describe_menu_tree(ctx, bearer).await?;
     // 这里保留一部分内置路由，便于你在菜单为空/未配置时仍能访问主页。
     let mut res = vec![
+        /*
         MenuRouteItem {
             path: "/home".to_string(),
             component: "/home/index.tsx".to_string(),
@@ -138,20 +139,21 @@ pub async fn get_routes(
             },
             children: None,
         },
+        */
     ];
 
     res.extend(parse_menu_to_routes(routes));
-    res.push(MenuRouteItem {
-        path: "/about".to_string(),
-        component: "/about/index.tsx".to_string(),
-        handle: RouteHandle {
-            icon: "CopyrightOutlined".to_string(),
-            title: "common.menu.about".to_string(),
-            order: 2,
-            roles: Vec::new(),
-            permissions: Vec::new(),
-        },
-        children: None,
-    });
+    // res.push(MenuRouteItem {
+    //     path: "/about".to_string(),
+    //     component: "/about/index.tsx".to_string(),
+    //     handle: RouteHandle {
+    //         icon: "CopyrightOutlined".to_string(),
+    //         title: "common.menu.about".to_string(),
+    //         order: 0,
+    //         roles: Vec::new(),
+    //         permissions: Vec::new(),
+    //     },
+    //     children: None,
+    // });
     Ok(res)
 }

@@ -70,5 +70,6 @@ pub async fn fetch_auth_info(
 	let user_info = describe_user_info(ctx, bearer)
 		.await
 		.context("auth info failed")?;
+
 	Ok(user_info)
 }

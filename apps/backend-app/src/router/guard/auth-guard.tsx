@@ -84,8 +84,8 @@ export function AuthGuard({ children }: AuthGuardProps) {
 			 * @zh 从用户接口中获取角色信息
 			 * @en Fetch role information from the user interface
 			 */
-			if (userInfoResult.status === "fulfilled" && userInfoResult?.value?.roles?.length) {
-				latestRoles.push(...userInfoResult.value?.roles ?? []);
+			if (userInfoResult.status === "fulfilled" && (userInfoResult as any)?.value?.roles?.length) {
+				latestRoles.push(...(userInfoResult as any)?.value?.roles ?? []);
 			}
 			/**
 			 * @zh 启用了后端路由且路由从用户接口中获取
@@ -101,7 +101,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
 			if (enableBackendAccess && isSendRoutingRequest && routeResult.status === "fulfilled" && "data" in routeResult.value) {
 				routes.push(...await generateRoutesFromBackend(routeResult.value?.data ?? []));
 			}
-      console.log('routes---', routes)
+
 			/**
 			 * @zh 启用了前端路由
 			 * @en If frontend routing is enabled
@@ -123,7 +123,9 @@ export function AuthGuard({ children }: AuthGuardProps) {
 				if (unAuthorized) {
 					if (pathname !== loginPath) {
 						const redirectPath = pathname.length > 1 ? `${loginPath}?redirect=${pathname}${search}` : loginPath;
-						return navigate(redirectPath, { replace: true });
+						//return navigate(redirectPath, { replace: true });
+            window.location.href = redirectPath;
+            return;
 					}
 					return;
 				}

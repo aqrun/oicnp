@@ -5,11 +5,11 @@
   name: Backend
   icon: ''
   permissionVids: []
-- vid: dashboard
+- vid: home
   parentVid: backend
-  path: '/dashboard'
-  name: 仪表盘
-  icon: 'DashboardOutlined'
+  path: '/home'
+  name: 首页
+  icon: 'HomeOutlined'
   permissionVids: []
 - vid: system
   parentVid: backend
@@ -151,3 +151,9 @@
   icon: 'AuditOutlined'
   permissionVids:
     - monitor:loginLog
+- vid: about
+  parentVid: backend
+  path: '/about'
+  name: 关于
+  icon: 'CopyrightOutlined'
+  permissionVids: []
