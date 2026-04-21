@@ -31,7 +31,7 @@ pub async fn home_index(
     let uri_path = String::from(uri.path());
     let is_public_uri = ctx.config.admin.public_uri.contains(&uri_path);
 
-    if !is_public_uri {
+    if false &&!is_public_uri {
         let mut seccion_id = String::from("");
 
         if let Some(cookie) = cookies.get(SESSION_ID) {

@@ -12,5 +12,5 @@ export function goLogin() {
 	useAuthStore.getState().reset();
 	// 跳转到登录页面，并带上需要记住的路由信息
 	// window.location.href = `${import.meta.env.BASE_URL.slice(0, -1)}${loginPath}${rememberRoute()}`;
-	window.location.href = `${import.meta.env.BASE_URL.slice(0, -1)}${loginPath}${rememberRoute()}`;
+	window.location.href = `${loginPath}${rememberRoute()}`;
 }
