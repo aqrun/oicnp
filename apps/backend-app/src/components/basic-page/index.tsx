@@ -19,7 +19,7 @@ export function BasicPage(props: Props) {
 			 * 2. 如果需要 children 的高度小于等于 basic-content 请使用 h-full
 			 * 请参考 src/pages/system/role/index.tsx
 			 */
-			className={clsx("h-full m-4 p-4 box-border rounded-sm bg-white", className)}
+			className={clsx("h-fit m-4 p-4 box-border rounded-sm bg-white", className)}
 			style={{ ...style }}
 		>
 			{

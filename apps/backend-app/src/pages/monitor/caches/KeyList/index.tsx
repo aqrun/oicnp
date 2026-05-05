@@ -70,6 +70,7 @@ export default function KeyList(): ReactElement {
           rowKey="id"
           size="small"
           pagination={false}
+          tableLayout="auto"
         />
       </Card>
     </Container>

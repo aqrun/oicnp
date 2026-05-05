@@ -1,9 +1,18 @@
+use std::time::Duration;
 use anyhow::Result;
 use async_trait::async_trait;
 use bb8::Pool;
 use bb8_redis::redis::AsyncCommands;
 use bb8_redis::RedisConnectionManager;
 use bytes::Bytes;
+use loco_rs::{
+    prelude::*,
+};
+use crate::entities::prelude::*;
+use crate::prelude::ModelCrudHandler;
+use crate::models::caches::{CreateCacheReqParams};
+use crate::{utils::{utc_now, parse_cache_scope_by_key}, constants::DATE_TIME_FORMAT};
+use anyhow::anyhow;
 
 /// Bytes 版缓存抽象：以二进制读写，便于零拷贝（如 HTML 片段）。
 #[async_trait]
@@ -21,12 +30,13 @@ pub trait CacheDriver: Send + Sync {
 /// 基于 bb8 + bb8-redis 的 Redis 缓存实现，使用 oic-cache 的 Redis 协议服务作为后端。
 #[derive(Clone)]
 pub struct RedisCache {
+    pub db: DatabaseConnection,
     pool: Pool<RedisConnectionManager>,
 }
 
 impl RedisCache {
-    pub fn new(pool: Pool<RedisConnectionManager>) -> Self {
-        Self { pool }
+    pub fn new(pool: Pool<RedisConnectionManager>, db: DatabaseConnection) -> Self {
+        Self { pool, db }
     }
 }
 
@@ -51,6 +61,28 @@ impl CacheDriver for RedisCache {
         conn.set_ex::<_, _, ()>(key, value, ttl_secs)
             .await
             .map_err(|e| anyhow::anyhow!("redis set_ex: {}", e))?;
+
+        let db = self.db.clone();
+        let key = String::from(key);
+        let serialized = serde_json::to_string(value)
+            .map_err(|e| {
+                anyhow!("缓存数据序列化失败: {}", e)
+            })?;
+        let expired_at = utc_now() + Duration::from_secs(ttl_secs);
+        let scope = parse_cache_scope_by_key(key.as_str());
+        
+        tokio::spawn(async move {
+            let create_model = CreateCacheReqParams {
+                cache_key: Some(key.to_string()),
+                cache_value: Some(serialized),
+                scope: Some(scope.to_string()),
+                created_at: Some(utc_now().format(DATE_TIME_FORMAT).to_string()),
+                expired_at: Some(expired_at.format(DATE_TIME_FORMAT).to_string()),
+                ..Default::default()
+            };
+            let _ = CacheModel::create(&db, &create_model).await;
+        });
+
         Ok(())
     }
 
@@ -73,6 +105,27 @@ impl CacheDriver for RedisCache {
         conn.set_ex::<_, _, ()>(key, value, ttl_secs)
             .await
             .map_err(|e| anyhow::anyhow!("redis set_ex: {}", e))?;
+
+        let db = self.db.clone();
+        let key = String::from(key);
+        let serialized = serde_json::to_string(value)
+            .map_err(|e| {
+                anyhow!("缓存数据序列化失败: {}", e)
+            })?;
+
+        let scope = parse_cache_scope_by_key(key.as_str());
+        
+        tokio::spawn(async move {
+            let create_model = CreateCacheReqParams {
+                cache_key: Some(key.to_string()),
+                cache_value: Some(serialized),
+                scope: Some(scope.to_string()),
+                created_at: Some(utc_now().format(DATE_TIME_FORMAT).to_string()),
+                ..Default::default()
+            };
+            let _ = CacheModel::create(&db, &create_model).await;
+        });
+
         Ok(())
     }
 }

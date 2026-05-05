@@ -9,6 +9,7 @@ mod route;
 mod err;
 mod time;
 mod captcha;
+mod cache;
 pub mod logger;
 
 pub use app_config::*;
@@ -22,3 +23,4 @@ pub use route::*;
 pub use err::*;
 pub use time::*;
 pub use captcha::*;
+pub use cache::*;

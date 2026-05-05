@@ -106,11 +106,12 @@ export default function LayoutContent() {
 			<Scrollbar>
 				<GlobalSpin>
 					<div
-						className="flex flex-col h-full"
+						className="flex flex-col h-full min-h-fit"
 					>
 						<div
 							style={{
 								height: `var(${CSS_VARIABLE_LAYOUT_CONTENT_HEIGHT})`,
+								minHeight: 'fit-content',
 							}}
 						>
 							<KeepAlive

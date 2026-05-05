@@ -16,7 +16,7 @@ export default function CachesPage(): ReactElement {
       <Container>
         <PageTitle title="缓存列表" />
 
-        <div className="flex gap-4 h-full">
+        <div className="flex gap-4 h-fit">
           <CacheList />
           <KeyList />
           <CacheContent />

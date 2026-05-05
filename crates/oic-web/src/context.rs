@@ -6,6 +6,7 @@ use oic_core::prelude::cache_client::{CacheDriver, RedisCache};
 use std::path::PathBuf;
 use bb8::Pool;
 use bb8_redis::RedisConnectionManager;
+use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(default)]
@@ -23,6 +24,7 @@ pub struct WebConfig {
     pub handler_cache_time: i64,
     /// oic-cache Redis 地址，如 redis://127.0.0.1:6381
     pub redis_uri: String,
+    pub db_uri: String,
 }
 
 /// Web 应用的上下文
@@ -58,7 +60,8 @@ pub async fn load_config() -> Result<WebConfig> {
 
 pub async fn init_context() -> Result<WebAppContext> {
   let config = load_config().await?;
-  let cache = init_cache(config.redis_uri.as_str()).await?;
+  let db = init_db(config.db_uri.as_str()).await?;
+  let cache = init_cache(db, config.redis_uri.as_str()).await?;
 
   Ok(WebAppContext {
     config,
@@ -66,7 +69,7 @@ pub async fn init_context() -> Result<WebAppContext> {
   })
 }
 
-async fn init_cache(redis_uri: &str) -> Result<RedisCache> {
+async fn init_cache(db: DatabaseConnection, redis_uri: &str) -> Result<RedisCache> {
   tracing::info!("redis cache uri: {}", redis_uri);
 
   let manager = RedisConnectionManager::new(redis_uri)?;
@@ -76,5 +79,24 @@ async fn init_cache(redis_uri: &str) -> Result<RedisCache> {
     .await
     .map_err(|e| anyhow::anyhow!("redis pool: {}", e))?;
 
-  Ok(RedisCache::new(pool))
+  Ok(RedisCache::new(pool, db))
+}
+
+async fn init_db(db_uri: &str) -> Result<DatabaseConnection> {
+  if db_uri.is_empty() {
+      anyhow::bail!("db_uri is empty; set config/web.yaml db_uri");
+  }
+  tracing::info!("connecting database (admin)");
+
+  let mut opt = ConnectOptions::new(db_uri.to_owned());
+  opt.max_connections(10)
+      .min_connections(1)
+      .connect_timeout(std::time::Duration::from_secs(8))
+      .sqlx_logging(true);
+
+  let db = Database::connect(opt)
+      .await
+      .map_err(|e| anyhow::anyhow!("database connect: {}", e))?;
+
+  Ok(db)
 }

@@ -16,6 +16,9 @@ use strum::EnumString;
 pub enum CacheScope {
     Captcha,
     Session,
+    Api,
+    Web,
+    Admin,
     Other,
 }
 

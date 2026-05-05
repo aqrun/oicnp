@@ -118,6 +118,7 @@ settings:
     - /v1/auth/login
     - /v1/auth/register
     - /v1/auth/info
+    - /v1/auth/access-token
     - /v1/user/one
     - /v1/menu/tree
     - /v1/node/list

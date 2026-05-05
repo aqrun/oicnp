@@ -45,6 +45,7 @@ export function GlobalSpin({ children, className }: GlobalSpinProps) {
 			delay={300}
 			spinning={loading}
 			wrapperClassName={cn(classes.rootSpin, className)}
+			className="oic-spin-w"
 		>
 			{children}
 		</Spin>

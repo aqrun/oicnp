@@ -44,7 +44,7 @@ export default function CacheList(): ReactElement {
 
   return (
     <Container
-      className="oic-card-w flex-1"
+      className="oic-card-w flex-1 oic-card-cache-list-w"
     >
       <Card
         title="缓存列表"

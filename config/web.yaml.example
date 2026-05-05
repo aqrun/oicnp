@@ -7,6 +7,7 @@ api_url: http://localhost:5150
 handler_cache_time: 1 # 60 * 60 * 2;
 # oic-cache Redis 协议地址（与 gRPC 二选一）
 redis_uri: redis://127.0.0.1:6381
+db_uri: postgres://aqrun:123456@localhost:5432/oicnp
 
 site:
   title: "灵犀纪"

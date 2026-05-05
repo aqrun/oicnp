@@ -45,7 +45,7 @@ export default function CacheContent(): ReactElement {
 
   return (
     <Container
-      className="oic-card-w flex-1"
+      className="oic-card-w flex-1 oic-card-cache-content-w"
     >
       <Card
         title="缓存内容"

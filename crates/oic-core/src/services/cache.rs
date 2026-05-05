@@ -7,8 +7,8 @@ use loco_rs::{
 };
 use crate::entities::prelude::*;
 use crate::prelude::ModelCrudHandler;
-use crate::models::caches::{CreateCacheReqParams, CacheScope};
-use crate::{utils::utc_now, constants::DATE_TIME_FORMAT};
+use crate::models::caches::{CreateCacheReqParams};
+use crate::{utils::{utc_now, parse_cache_scope_by_key}, constants::DATE_TIME_FORMAT};
 use serde::{de::DeserializeOwned, Serialize};
 use anyhow::anyhow;
 
@@ -71,7 +71,7 @@ impl OicCache {
                 anyhow!("缓存数据序列化失败: {}", e)
             })?;
 
-        let scope = Self::parse_scope_by_key(key);
+        let scope = parse_cache_scope_by_key(key);
         
         let create_model = CreateCacheReqParams {
             cache_key: Some(key.to_string()),
@@ -116,13 +116,7 @@ impl OicCache {
         })?;
 
         let expired_at = utc_now() + duration;
-        let mut scope = CacheScope::Other;
-        
-        if key.starts_with("session-") {
-            scope = CacheScope::Session;
-        } else if key.starts_with("captcha-") {
-            scope = CacheScope::Captcha;
-        }
+        let scope = parse_cache_scope_by_key(key);
         
         let create_model = CreateCacheReqParams {
             cache_key: Some(key.to_string()),
@@ -145,20 +139,5 @@ impl OicCache {
         CacheModel::refresh(&self.db).await?;
 
         Ok(())
-    }
-
-    ///
-    /// 根据 key 解析缓存作用域
-    /// 
-    pub fn parse_scope_by_key(key: &str) -> CacheScope {
-        if key.is_empty() {
-            return CacheScope::Other;
-        }
-
-        if key.starts_with("captcha-") {
-            return CacheScope::Captcha;
-        }
-
-        CacheScope::Other
     }
 }
