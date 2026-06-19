@@ -21,4 +21,14 @@ pub struct StorageSettings {
     /// 本地为磁盘存储位置
     /// oss 为 bucket 名称
     pub path: String,
+    /// OSS endpoint，如 https://oss-cn-hangzhou.aliyuncs.com
+    pub endpoint: String,
+    /// OSS AccessKey ID，建议通过环境变量注入
+    pub access_key_id: String,
+    /// OSS AccessKey Secret，建议通过环境变量注入
+    pub access_key_secret: String,
+    /// OSS region，如 cn-hangzhou
+    pub region: String,
+    /// OSS 对象前缀，如 uploads
+    pub prefix: String,
 }

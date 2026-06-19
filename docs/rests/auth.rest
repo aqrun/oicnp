@@ -1,4 +1,4 @@
-@base = http://192.168.1.241:5150
+@base = http://localhost:5150
 
 ###
 
@@ -29,3 +29,40 @@ Authorization: Bearer {{token}}
 {
     "vid": "backend"
 }
+
+### 
+
+# @name authInfo
+POST {{base}}/v1/auth/info HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{token}}
+
+### 
+
+# @name fileUpload
+POST {{base}}/v1/file/upload HTTP/1.1
+Authorization: Bearer {{token}}
+content-type: multipart/form-data; boundary=----RestClientFormBoundary
+
+------RestClientFormBoundary
+Content-Disposition: form-data; name="storage"
+
+oss
+------RestClientFormBoundary
+Content-Disposition: form-data; name="type"
+
+image/png
+------RestClientFormBoundary
+Content-Disposition: form-data; name="size"
+
+64056
+------RestClientFormBoundary
+Content-Disposition: form-data; name="name"
+
+triger.jpg
+------RestClientFormBoundary
+Content-Disposition: form-data; name="file"; filename="triger.jpg"
+Content-Type: image/jpeg
+
+< /Users/aqrun/Downloads/triger.jpg
+------RestClientFormBoundary--

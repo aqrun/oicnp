@@ -7,26 +7,37 @@ use oic_core::{
         CreateFileReqParams, DeleteFileReqParams, FileFilters, UpdateFileReqParams, UploadFileRes,
     },
     prelude::Settings,
-    services::file::{store_file_local, store_file_oss},
+    services::storage::{StorageProvider, StorageProviderFactory},
     typings::{JsonRes, Pagination},
     utils::get_api_prefix,
     ModelCrudHandler,
 };
 use std::io;
 use std::sync::Arc;
+use tokio::io::AsyncReadExt;
 use tokio_util::io::StreamReader;
+
+fn get_settings(ctx: &AppContext) -> Arc<Settings> {
+    ctx.shared_store
+        .get::<Arc<Settings>>()
+        .unwrap_or_else(|| Arc::new(Settings::default()))
+}
+
+fn get_provider(ctx: &AppContext) -> Result<Arc<dyn StorageProvider>, String> {
+    ctx.shared_store
+        .get::<Arc<dyn StorageProvider>>()
+        .ok_or_else(|| String::from("Storage Provider 未初始化"))
+}
 
 #[debug_handler]
 pub async fn get_one(
     State(ctx): State<AppContext>,
     Json(params): Json<FileFilters>,
 ) -> JsonRes<UploadFileRes> {
-    let default_settings = std::sync::Arc::new(Settings::default());
-    let settings = match ctx.shared_store.get::<Arc<Settings>>() {
-        Some(s) => s,
-        None => default_settings,
+    let provider = match get_provider(&ctx) {
+        Ok(p) => p,
+        Err(err) => return JsonRes::err(err),
     };
-    let storage_cfg = settings.storage.clone();
 
     let id = params.file_id.unwrap_or(0);
     let res = FileModel::find_by_id(&ctx.db, id).await;
@@ -34,8 +45,7 @@ pub async fn get_one(
     match res {
         Ok(data) => {
             let mut file = UploadFileRes::from(data);
-            file.url = format!("{}/{}", storage_cfg.uri, file.uri);
-            // 使用两个数据的元组指定最终 JSON 数据 key
+            file.url = provider.public_url(&file.uri);
             JsonRes::from((file, "file"))
         }
         Err(err) => JsonRes::err(err),
@@ -47,18 +57,15 @@ pub async fn list(
     State(ctx): State<AppContext>,
     Json(params): Json<FileFilters>,
 ) -> JsonRes<Vec<UploadFileRes>> {
-    let default_settings = std::sync::Arc::new(Settings::default());
-    let settings = match ctx.shared_store.get::<Arc<Settings>>() {
-        Some(s) => s,
-        None => default_settings,
+    let provider = match get_provider(&ctx) {
+        Ok(p) => p,
+        Err(err) => return JsonRes::err(err),
     };
-    let storage_cfg = settings.storage.clone();
 
     let (files, total) = match FileModel::find_list(&ctx.db, &params).await {
         Ok(res) => res,
         Err(err) => return JsonRes::err(err),
     };
-    // 分页数据
     let pager = Pagination {
         total,
         page: params.page.unwrap_or(1),
@@ -69,12 +76,11 @@ pub async fn list(
         .iter()
         .map(|file| {
             let mut file = UploadFileRes::from(file.clone());
-            file.url = format!("{}/{}", storage_cfg.uri, file.uri);
+            file.url = provider.public_url(&file.uri);
             file
         })
         .collect::<Vec<UploadFileRes>>();
 
-    // 使用传递三个数据的元组指定最终 JSON 数据 key
     JsonRes::from((files, pager, "files"))
 }
 
@@ -114,6 +120,27 @@ pub async fn remove(
     State(ctx): State<AppContext>,
     Json(params): Json<DeleteFileReqParams>,
 ) -> JsonRes<i64> {
+    let settings = get_settings(&ctx);
+    let id = params.file_id.unwrap_or(0);
+
+    if id <= 0 {
+        return JsonRes::err(format!("数据不存在,id: {id}"));
+    }
+
+    let file = match FileModel::find_by_id(&ctx.db, id).await {
+        Ok(file) => file,
+        Err(err) => return JsonRes::err(err),
+    };
+
+    let provider = match StorageProviderFactory::for_driver(&settings.storage, &file.storage) {
+        Ok(p) => p,
+        Err(err) => return JsonRes::err(err.to_string()),
+    };
+
+    if let Err(err) = provider.delete(&file.uri).await {
+        return JsonRes::err(format!("删除存储文件失败: {err}"));
+    }
+
     let res = FileModel::delete_one(&ctx.db, &params).await;
 
     JsonRes::from(res)
@@ -130,14 +157,16 @@ pub async fn upload(
             return JsonRes::err(String::from("Storage 配置参数不存在"));
         }
     };
-    let storage_cfg = settings.storage.clone();
+    let provider = match get_provider(&ctx) {
+        Ok(p) => p,
+        Err(err) => return JsonRes::err(err),
+    };
 
     let mut _file_name = String::from("");
     let mut file_size = 0;
     let mut file_type = String::from("");
     let mut storage = String::from("local");
     let mut uri = String::from("");
-    // 图床地址
     let mut link = String::from("");
     let mut file_req_params = CreateFileReqParams::default();
 
@@ -154,8 +183,8 @@ pub async fn upload(
         } else if name.as_str().eq("storage") {
             storage = field.text().await.unwrap_or("local".to_string());
 
-            if !storage_cfg.driver.as_str().eq(storage.as_str()) {
-                return JsonRes::err(format!("指定 Storage 配置参数不匹配： {}", storage));
+            if !settings.storage.driver.as_str().eq(storage.as_str()) {
+                return JsonRes::err(format!("指定 Storage 配置参数不匹配： {storage}"));
             }
         } else if name.as_str().eq("link") {
             link = field.text().await.unwrap_or("".to_string());
@@ -167,9 +196,12 @@ pub async fn upload(
             };
 
             let body_with_io_error = field.map_err(|err| io::Error::new(io::ErrorKind::Other, err));
-            let body_reader = StreamReader::new(body_with_io_error);
+            let mut body_reader = StreamReader::new(body_with_io_error);
+            let mut data = Vec::new();
 
-            futures::pin_mut!(body_reader);
+            if let Err(err) = body_reader.read_to_end(&mut data).await {
+                return JsonRes::err(err.to_string());
+            }
 
             file_req_params.filename = Some(String::from(_file_name.as_str()));
             file_req_params.storage = Some(String::from(storage.as_str()));
@@ -177,29 +209,26 @@ pub async fn upload(
             file_req_params.link = Some(String::from(link.as_str()));
             file_req_params.size = Some(file_size);
 
-            // 本地存储
-            if storage.as_str().eq("local") {
-                uri = match store_file_local(body_reader, &storage_cfg, &file_req_params).await {
-                    Ok(res) => res,
-                    Err(err) => {
-                        return JsonRes::err(err.to_string());
-                    }
-                };
-            } else if storage_cfg.driver.as_str().eq("oss") {
-                uri = match store_file_oss(body_reader, &storage_cfg, &file_req_params).await {
-                    Ok(res) => res,
-                    Err(err) => {
-                        return JsonRes::err(err.to_string());
-                    }
-                };
-            }
+            uri = match provider.store(data.into(), &file_req_params).await {
+                Ok(res) => res,
+                Err(err) => {
+                    return JsonRes::err(err.to_string());
+                }
+            };
         }
+    }
+
+    if uri.is_empty() {
+        return JsonRes::err(String::from("未上传文件"));
     }
 
     file_req_params.uri = Some(String::from(uri.as_str()));
     let res = match FileModel::create(&ctx.db, &file_req_params).await {
         Ok(res) => res,
         Err(err) => {
+            if let Err(delete_err) = provider.delete(&uri).await {
+                tracing::warn!("回滚删除存储文件失败: {delete_err}");
+            }
             return JsonRes::err(err.to_string());
         }
     };
@@ -210,9 +239,8 @@ pub async fn upload(
         }
     };
 
-    // 转换为接口返回数据
     let mut res = UploadFileRes::from(res_file);
-    res.url = format!("{}/{}", storage_cfg.uri, uri.as_str());
+    res.url = provider.public_url(&uri);
 
     JsonRes::from((res, "file"))
 }

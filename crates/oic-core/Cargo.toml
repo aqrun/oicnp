@@ -60,3 +60,4 @@ http-body-util = { workspace = true }
 bb8 = { workspace = true }
 bb8-redis = { workspace = true }
 bytes = { workspace = true }
+opendal = { version = "0.47", features = ["services-oss", "services-fs"] }

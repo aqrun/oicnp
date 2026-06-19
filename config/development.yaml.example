@@ -106,10 +106,19 @@ auth:
 
 # 自定义附加配置参数
 settings:
+  # storage:
+  #   driver: local
+  #   uri: http://localhost/uploads
+  #   path: /Users/aqrun/workspace/www/uploads
   storage:
-    driver: local
-    uri: http://localhost/uploads
-    path: /Users/aqrun/workspace/www/uploads
+    driver: oss
+    uri: {{ get_env(name="STATIC_BASE_URL", default="") }}
+    path: oicnp
+    endpoint: https://oss-cn-shanghai.aliyuncs.com
+    access_key_id: {{ get_env(name="OSS_ACCESS_KEY_ID", default="") }}
+    access_key_secret: {{ get_env(name="OSS_ACCESS_KEY_SECRET", default="") }}
+    region: cn-shanghai
+    prefix: uploads
   user_agent_parser: config/regexes.yaml
   public_apis:
     - /v1/info

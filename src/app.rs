@@ -17,6 +17,7 @@ use migration::Migrator;
 use oic_core::{
     entities::prelude::*,
     services::cache::OicCache,
+    services::storage::{StorageProvider, StorageProviderFactory},
     prelude::{
         Settings,
         get_poetry_db,
@@ -89,8 +90,12 @@ impl Hooks for App {
             };
         }
 
+        let provider = StorageProviderFactory::from_settings(&settings.storage)
+            .map_err(|err| loco_rs::Error::string(&err.to_string()))?;
+
         ctx.shared_store.insert::<Arc<OicCache>>(Arc::new(cache));
         ctx.shared_store.insert::<Arc<Settings>>(Arc::new(settings));
+        ctx.shared_store.insert::<Arc<dyn StorageProvider>>(provider);
         Ok(ctx)
     }
 
